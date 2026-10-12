@@ -1,8 +1,9 @@
 # API contracts
 
 - `identity.openapi.json`: registration, login, current account and ADMIN role management.
-- `event-catalog.openapi.json`: organizer draft list/create/read/update with owner isolation and optimistic versions.
+- `event-catalog.openapi.json`: owned drafts, durable publication, public search/detail and internal event snapshots.
+- `admission.openapi.json`: free ticket configuration, availability and internal retry-safe sales activation.
 
-Both are OpenAPI 3.0.3 contracts for the current release. The gateway routes `/api/v1/auth/*` and `/api/v1/admin/*` to Identity, and draft event operations to Catalog. Future ticket types/check-ins under an event path must be routed to Admission rather than matching all event paths indiscriminately.
+OpenAPI 3.0.3. `/api/v1/events/{id}/ticket-types` and the organizer equivalent route to Admission, while event metadata routes to Catalog. `/internal` is blocked by the gateway; service-only paths use their own network addresses and `X-Service-Token`. The two call directions have separate credentials.
 
-Admission has no public business API in this release; its contract will be added with ticketing. `/internal` is not exposed by the gateway. Never accept owner IDs from clients as authorization evidence.
+Starting ticket setup fixes event capacity and time. Other draft details can still be edited. Publication freezes ticket configuration. Bookings, cancellation and check-in arrive in a subsequent increment.

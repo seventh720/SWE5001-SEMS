@@ -231,3 +231,13 @@ textarea {
     padding: 16px 24px;
   }
 }
+
+.ticket-fields {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.ticket-row {
+  border-bottom: 1px solid #e0e4ee;
+  padding: 16px 0;
+}

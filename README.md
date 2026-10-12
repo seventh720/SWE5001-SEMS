@@ -4,7 +4,7 @@
 
 SEMS is a shared event and ticketing platform for independent organizers and attendees, using React + TypeScript, three independent Spring Boot services and PostgreSQL.
 
-Implemented: registration/login, RSA JWT, administrator role assignment, organizer draft creation/list/detail/edit, owner isolation and optimistic version conflicts. Publication, public discovery, booking, ticket issuance and check-in are pending.
+Implemented: registration/login, RSA JWT, administrator role assignment, organizer draft creation/list/detail/edit, owner isolation and optimistic version conflicts. Free ticket configuration, quota/sales-window validation, retry-safe publication and public event browsing are also implemented. Booking, cancellation, ticket issuance and check-in remain pending.
 
 ## 1. Architecture and roles
 
@@ -12,7 +12,7 @@ Implemented: registration/login, RSA JWT, administrator role assignment, organiz
 |---|---|---|
 | Identity | Accounts, passwords, roles | Implemented |
 | Event Catalog | Organizer-owned event drafts | Implemented |
-| Admission | Inventory, bookings, tickets, check-in | Database and authentication foundation only |
+| Admission | Inventory, bookings, tickets, check-in | Free ticket inventory and sales activation |
 
 Each service owns a schema, database account and Flyway migrations, with no cross-service foreign keys or queries. Only Identity holds the RSA private key; the other services validate signatures, issuer, audience and token lifetime using the public key.
 
@@ -34,7 +34,7 @@ docker compose --env-file .env -f deployment/compose.yaml up --build -d
 bash scripts/smoke.sh
 ```
 
-Open [the local platform](http://localhost:8080). Setup generates `.env` and `.secrets/` without overwriting existing configuration. The initial admin email is `admin@example.com`; read its random `SEMS_BOOTSTRAP_ADMIN_PASSWORD` from your local `.env`. Do not commit or share that file. Clear bootstrap settings after initialization; the persisted admin can still log in.
+Open [the local platform](http://localhost:8080). Setup generates `.env` and `.secrets/` without overwriting existing credentials. Re-running it on an existing setup appends missing internal service tokens; it does not rotate database passwords or RSA keys. The initial admin email is `admin@example.com`; read its random `SEMS_BOOTSTRAP_ADMIN_PASSWORD` from your local `.env`. Do not commit or share that file. Clear bootstrap settings after initialization; the persisted admin can still log in.
 
 Database credentials are applied only when a new volume is initialized. Editing `.env` does not rotate existing database passwords. Stop while preserving data:
 
@@ -54,7 +54,8 @@ This is local HTTP configuration. Cloud HTTPS, secret management and deployment 
 4. Create a draft, refresh and edit it. The second organizer must not see the first organizer’s draft.
 5. Edit one draft in two windows: a stale submission returns a conflict and can reload the latest version.
 
-Publication is unavailable until Admission sales coordination is implemented.
+6. Open “Ticket setup & publication”, configure free ticket types within event capacity and save. Starting setup fixes the event time and capacity.
+7. Confirm publication and open the public event page. A dependency outage leaves the event pending/private until automatic recovery completes.
 
 ## 4. Tests and CI
 
@@ -67,10 +68,10 @@ bash scripts/check-db-isolation.sh
 set -a
 source .env
 set +a
-python3 scripts/acceptance.py
+python3 scripts/publication-acceptance.py
 ```
 
-The last two checks need a running Compose stack. Acceptance creates uniquely named test accounts and drafts; use an isolated test volume. CI runs these checks in an ephemeral environment, covering authentication, authorization, schema isolation, validation, persistence and concurrent version conflicts. Telegram reports results; logs/JARs are retained for seven days. See [CI operations](docs/ci.md).
+The last two checks need a running Compose stack. Publication acceptance intentionally stops/restarts test containers; use a disposable environment. Acceptance creates uniquely named test accounts and drafts; use an isolated test volume. CI exposes separate backend, frontend and integration jobs, reports JaCoCo/Vitest line and branch coverage, and runs these checks in an ephemeral environment, covering authentication, authorization, schema isolation, validation, persistence and concurrent version conflicts. Telegram reports results; logs/JARs are retained for seven days. See [CI operations](docs/ci.md).
 
 ## 5. Layout and documentation
 

@@ -1,21 +1,19 @@
 # CI operations
 
-## Included
+Three independently visible checks run on main pushes and PRs targeting main:
 
-`Platform CI` builds the three services with Java 21, runs Maven verification, validates Compose, builds and starts containers, then checks all three readiness endpoints through Nginx. `scripts/smoke.sh` also runs locally and accepts `SEMS_BASE_URL` when the gateway uses another address. Maven runs draft service unit tests. CI also runs frontend tests/typechecking, generates ephemeral RSA keys and database passwords, and verifies the real HTTP workflow and PostgreSQL schema isolation with `scripts/acceptance.py` and `scripts/check-db-isolation.sh`.
+| Check | Work and evidence |
+|---|---|
+| Backend tests and build | Java 21, Maven clean verify, all service unit tests, JaCoCo line/branch reports, JAR artifacts |
+| Frontend tests and build | Node 22, npm ci, Vitest V8 coverage, TypeScript and Vite build, web-dist artifact |
+| PostgreSQL and API acceptance | Downloads the tested JARs/web bundle, builds Compose images, runs readiness, schema isolation, authentication, draft, ticket/publication and restart recovery checks |
 
-Container logs and test reports are retained for seven days, including failed runs. JARs are uploaded only after successful smoke checks. Containers are cleaned up after each job. CI does not deploy to a cloud environment or publish container images yet.
+Backend and frontend run concurrently. Integration runs only after both succeed. Use all three named checks when configuring branch protection; this change does not modify repository protection settings.
 
-## Telegram
+Reports and diagnostics are retained for seven days, including failed runs. Missing coverage is shown as N/A, never 100%. Backend coverage is unit-test coverage, reported per service and as a weighted total only when all reports exist. The real HTTP/database tests run separately and are **not included** in these percentages. No percentage threshold is imposed yet; failed tests/typechecking/builds do block their jobs. This establishes an honest baseline for later improvements.
 
-Configure repository Actions secrets `TELEGRAM_TOKEN` (bot token) and `TELEGRAM_TO` (destination chat ID). The acceptance script creates unique test accounts and drafts; CI uses a fresh database volume.
+Telegram uses repository Actions secrets `TELEGRAM_TOKEN` and `TELEGRAM_TO`. Messages list backend, frontend and integration status plus available line/branch coverage and a run link. Fork/Dependabot PRs and cancelled runs do not notify. Notification failure does not override build status. [GitHub secret behavior](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets) and [Telegram API](https://core.telegram.org/bots/api#sendmessage).
 
-The notification contains repository, ref, commit, build result and run URL. It runs after successful or failed verification; cancelled runs, fork PRs and Dependabot PRs do not notify. Missing secrets skip sending, and delivery errors do not mask the build result. Do not place either secret value in source files.
+Local commands: `mvn verify`, `npm --prefix apps/web run test:coverage`, `npm --prefix apps/web run build`, then run Compose and `bash scripts/check-db-isolation.sh`. Load `.env` into the shell before `python3 scripts/publication-acceptance.py`. The latter creates unique test data and intentionally stops Admission and restarts Catalog/gateway; run it only against a disposable local/CI Compose environment. Use `COMPOSE_PROJECT_NAME` to select a dedicated test project.
 
-GitHub does not provide ordinary repository secrets to fork PR workflows: [GitHub secrets documentation](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets). Messages use the [Telegram sendMessage API](https://core.telegram.org/bots/api#sendmessage).
-
-## Reviewing and troubleshooting
-
-Use the `Build and smoke test` job as the required check when branch protection is configured. Branch protection is not changed by this commit. A failed readiness check should be diagnosed using the diagnostics artifact, starting with container status and startup logs. Re-run after addressing the cause.
-
-Next delivery work: choose a cloud environment and registry, configure deployment credentials, publish versioned images, and implement deployment/rollback smoke checks. Add service contract/database tests and security gates alongside the relevant implementation. Do not describe the current workflow as completed production CD.
+Cloud deployment, image registry publication, security scan gates, booking consistency and check-in remain pending. Container restart recovery here is publication recovery, not evidence that the final cloud recovery/scaling targets have been achieved.

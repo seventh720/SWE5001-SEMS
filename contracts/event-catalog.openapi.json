@@ -3,7 +3,7 @@
   "info": {
     "title": "SEMS Event Catalog API",
     "version": "0.1.0",
-    "description": "All operations require ORGANIZER or ADMIN. ADMIN does not bypass owner checks. Publication is unavailable in this release."
+    "description": "Draft management and durable publication. ORGANIZER/ADMIN cannot bypass ownership. Starting ticket setup fixes time and capacity; other draft details remain editable until publication. All published configuration is immutable in this release."
   },
   "servers": [
     {
@@ -21,6 +21,11 @@
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
+      },
+      "serviceToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Service-Token"
       }
     },
     "schemas": {
@@ -186,7 +191,9 @@
           "status": {
             "type": "string",
             "enum": [
-              "DRAFT"
+              "DRAFT",
+              "PUBLISHING",
+              "PUBLISHED"
             ]
           },
           "createdAt": {
@@ -196,6 +203,13 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "salesConfigured": {
+            "type": "boolean"
+          },
+          "publicationError": {
+            "type": "string",
+            "nullable": true
           }
         },
         "required": [
@@ -210,6 +224,88 @@
           "status",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "Offering": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "location": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Must be after startsAt."
+          },
+          "capacity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2147483647
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "location",
+          "startsAt",
+          "endsAt",
+          "capacity"
+        ]
+      },
+      "SalesSnapshot": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "organizerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "capacity": {
+            "type": "integer"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "organizerId",
+          "capacity",
+          "startsAt",
+          "endsAt",
+          "status"
         ]
       }
     }
@@ -498,6 +594,393 @@
                 "$ref": "#/components/schemas/DraftUpdate"
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/organizer/events/{id}/publish": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "summary": "ORGANIZER/ADMIN: publish own event; exact request replay is idempotent",
+        "description": "Admission activation must succeed before public visibility. 202 is a durable pending operation reconciled automatically. A stale ticket version returns the event to DRAFT with publicationError.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "format": "int64"
+                  },
+                  "ticketVersion": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "format": "int64"
+                  }
+                },
+                "required": [
+                  "version",
+                  "ticketVersion"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient role"
+          },
+          "404": {
+            "description": "Missing or not owned"
+          },
+          "409": {
+            "description": "State/version/quota conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/events": {
+      "get": {
+        "summary": "Browse upcoming published offerings; title search and pagination",
+        "security": [],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          },
+          {
+            "in": "query",
+            "name": "keyword",
+            "schema": {
+              "type": "string",
+              "maxLength": 200,
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Offering"
+                      }
+                    },
+                    "page": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "format": "int64"
+                    },
+                    "size": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "format": "int64"
+                    },
+                    "totalElements": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "format": "int64"
+                    },
+                    "totalPages": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "format": "int64"
+                    }
+                  },
+                  "required": [
+                    "items",
+                    "page",
+                    "size",
+                    "totalElements",
+                    "totalPages"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/api/v1/events/{id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Read a future published offering; drafts and pending events return 404",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Offering"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Missing or not owned"
+          }
+        }
+      }
+    },
+    "/internal/v1/events/{id}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "servers": [
+        {
+          "url": "http://event-catalog:8082"
+        }
+      ],
+      "get": {
+        "summary": "Internal service-only event snapshot",
+        "security": [
+          {
+            "serviceToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesSnapshot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Missing or not owned"
+          },
+          "409": {
+            "description": "State/version/quota conflict"
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "owner",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/internal/v1/events/{id}/prepare-sales": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "servers": [
+        {
+          "url": "http://event-catalog:8082"
+        }
+      ],
+      "post": {
+        "summary": "Internal service-only event snapshot/prepare-sales",
+        "security": [
+          {
+            "serviceToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesSnapshot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Missing or not owned"
+          },
+          "409": {
+            "description": "State/version/quota conflict"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "owner": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "version": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "format": "int64"
+                  }
+                },
+                "required": [
+                  "owner",
+                  "version"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/v1/events/{id}/published": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "servers": [
+        {
+          "url": "http://event-catalog:8082"
+        }
+      ],
+      "get": {
+        "summary": "Internal service-only event snapshot/published",
+        "security": [
+          {
+            "serviceToken": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesSnapshot"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Missing or not owned"
+          },
+          "409": {
+            "description": "State/version/quota conflict"
           }
         }
       }

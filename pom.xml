@@ -5,4 +5,9 @@
   <name>Smart Event Management and Ticketing Platform</name>
   <properties><java.version>21</java.version></properties>
   <modules><module>services/identity</module><module>services/event-catalog</module><module>services/admission</module></modules>
+  <build><plugins><plugin>
+    <groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>0.8.13</version>
+    <executions><execution><goals><goal>prepare-agent</goal></goals></execution>
+      <execution><id>report</id><phase>verify</phase><goals><goal>report</goal></goals></execution></executions>
+  </plugin></plugins></build>
 </project>

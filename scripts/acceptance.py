@@ -10,7 +10,11 @@ def call(method,path,body=None,token=None,expected=200):
         with urllib.request.urlopen(req,timeout=15) as response: status=response.status; raw=response.read()
     except urllib.error.HTTPError as error: status=error.code; raw=error.read()
     assert status==expected, f'{method} {path}: expected {expected}, got {status}'
-    return json.loads(raw) if raw else None
+    if not raw: return None
+    try: return json.loads(raw)
+    except json.JSONDecodeError:
+        if status < 400: raise
+        return None
 suffix=uuid.uuid4().hex[:10]
 password='Test-'+uuid.uuid4().hex
 users=[]
@@ -60,5 +64,5 @@ def competing(n):
     except urllib.error.HTTPError as error:return error.code
 with concurrent.futures.ThreadPoolExecutor(2) as pool: assert sorted(pool.map(competing,[1,2]))==[200,409]
 assert call('GET',path,token=a)['version']>updated['version']
-call('POST',path+'/publish',{},a,404)
+call('POST',path+'/publish',{},a,400)
 print('PASS: registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits')

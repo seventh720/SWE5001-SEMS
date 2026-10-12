@@ -3,6 +3,11 @@ import { useAuth } from "../features/auth/AuthContext";
 import { AuthPage } from "../features/auth/AuthPage";
 import { AdminUsersPage } from "../features/admin/AdminUsersPage";
 import { DraftsPage } from "../features/events/DraftsPage";
+import { EventSetupPage } from "../features/events/EventSetupPage";
+import {
+  PublicEventsPage,
+  PublicEventDetail,
+} from "../features/events/PublicEventsPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 function Home() {
   const { user } = useAuth();
@@ -39,10 +44,11 @@ function Home() {
         )}
       </section>
       <section className="card">
-        <h2>Start with an event draft</h2>
+        <Link to="/events">Browse events →</Link>
+        <h2>Discover events from your community</h2>
         <p>
-          Organizers can prepare event details and keep their work saved. Event
-          publication and ticket booking will open in a later release.
+          Browse upcoming events and free admission options from independent
+          organizers.
         </p>
       </section>
     </main>
@@ -67,8 +73,14 @@ export function App() {
       </nav>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/events" element={<PublicEventsPage />} />
+        <Route path="/events/:id" element={<PublicEventDetail />} />
         <Route path="/login" element={<AuthPage />} />
         <Route element={<ProtectedRoute />}>
+          <Route
+            path="/organizer/events/:id/setup"
+            element={<EventSetupPage />}
+          />
           <Route path="/admin/users" element={<AdminUsersPage />} />
           <Route path="/organizer/events" element={<DraftsPage />} />
         </Route>
