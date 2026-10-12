@@ -1,5 +1,5 @@
 import { type FormEvent, useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { apiRequest, ApiError } from "../../shared/api/client";
 interface Draft {
@@ -12,6 +12,7 @@ interface Draft {
   capacity: number;
   version: number;
   status: string;
+  salesConfigured?: boolean;
 }
 interface Page {
   items: Draft[];
@@ -182,6 +183,9 @@ export function DraftsPage() {
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
               />
             </label>
+            {editing?.salesConfigured && (
+              <p>Event time and capacity are fixed after ticket setup.</p>
+            )}
             <p className="muted">
               Times use your browser timezone:{" "}
               {Intl.DateTimeFormat().resolvedOptions().timeZone}.
@@ -210,6 +214,7 @@ export function DraftsPage() {
               <label>
                 Capacity
                 <input
+                  disabled={editing?.salesConfigured}
                   type="number"
                   min={1}
                   max={2147483647}
@@ -253,7 +258,14 @@ export function DraftsPage() {
                   </p>
                   <p className="muted">Capacity {d.capacity}</p>
                 </div>
-                <button onClick={() => edit(d.id)}>Edit draft</button>
+                <div className="actions">
+                  {d.status === "DRAFT" && (
+                    <button onClick={() => edit(d.id)}>Edit draft</button>
+                  )}
+                  <Link to={`/organizer/events/${d.id}/setup`}>
+                    Ticket setup & publication →
+                  </Link>
+                </div>
               </article>
             ))
           )}

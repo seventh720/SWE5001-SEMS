@@ -41,6 +41,8 @@ services:
       dockerfile: services/event-catalog/Dockerfile
     environment:
       DB_URL: jdbc:postgresql://postgres:5432/sems?currentSchema=catalog
+      CATALOG_TO_ADMISSION_TOKEN: ${CATALOG_TO_ADMISSION_TOKEN:?Required}
+      ADMISSION_TO_CATALOG_TOKEN: ${ADMISSION_TO_CATALOG_TOKEN:?Required}
       DB_USERNAME: catalog_app
       DB_PASSWORD: ${CATALOG_DB_PASSWORD:?Required}
       JWT_PUBLIC_KEY: /run/keys/jwt-public.pem
@@ -55,6 +57,8 @@ services:
       dockerfile: services/admission/Dockerfile
     environment:
       DB_URL: jdbc:postgresql://postgres:5432/sems?currentSchema=admission
+      CATALOG_TO_ADMISSION_TOKEN: ${CATALOG_TO_ADMISSION_TOKEN:?Required}
+      ADMISSION_TO_CATALOG_TOKEN: ${ADMISSION_TO_CATALOG_TOKEN:?Required}
       DB_USERNAME: admission_app
       DB_PASSWORD: ${ADMISSION_DB_PASSWORD:?Required}
       JWT_PUBLIC_KEY: /run/keys/jwt-public.pem

@@ -1,0 +1,382 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "SEMS Admission API",
+    "version": "0.2.0",
+    "description": "Free ticket configuration, inventory and internal idempotent sales activation. Bookings and ticket issuance are not yet implemented."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "serviceToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Service-Token"
+      }
+    },
+    "schemas": {
+      "TicketInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "quota": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "opensAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "closesAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "After opening, no later than the event start."
+          }
+        },
+        "required": [
+          "name",
+          "quota",
+          "opensAt",
+          "closesAt"
+        ]
+      },
+      "Ticket": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "quota": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "opensAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "closesAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "After opening, no later than the event start."
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "available": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "amount": {
+            "type": "integer",
+            "enum": [
+              0
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "quota",
+          "opensAt",
+          "closesAt",
+          "id",
+          "available",
+          "amount"
+        ]
+      },
+      "Inventory": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int64"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ACTIVE"
+            ]
+          },
+          "ticketTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ticket"
+            }
+          }
+        },
+        "required": [
+          "eventId",
+          "version",
+          "state",
+          "ticketTypes"
+        ]
+      },
+      "Configuration": {
+        "type": "object",
+        "properties": {
+          "eventVersion": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int64"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0,
+            "format": "int64"
+          },
+          "ticketTypes": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "$ref": "#/components/schemas/TicketInput"
+            }
+          }
+        },
+        "required": [
+          "eventVersion",
+          "version",
+          "ticketTypes"
+        ]
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/organizer/events/{id}/ticket-types": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "summary": "ORGANIZER/ADMIN: read only own inventory configuration",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient role"
+          },
+          "404": {
+            "description": "Missing or not owned"
+          },
+          "503": {
+            "description": "Dependency unavailable"
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace draft ticket types using event and inventory versions",
+        "description": "First setup fixes event time and capacity in Catalog. Total quotas cannot exceed capacity. Duplicate names and invalid windows are rejected. Ticket IDs can change on replacement; editing after activation is rejected.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Configuration"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient role"
+          },
+          "404": {
+            "description": "Missing or not owned"
+          },
+          "409": {
+            "description": "State/version/quota conflict"
+          },
+          "503": {
+            "description": "Dependency unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/events/{id}/ticket-types": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Anonymous inventory for a future published event",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Missing or not owned"
+          },
+          "503": {
+            "description": "Dependency unavailable"
+          }
+        }
+      }
+    },
+    "/internal/v1/events/{id}/activate-sales": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "servers": [
+        {
+          "url": "http://admission:8083"
+        }
+      ],
+      "post": {
+        "summary": "Catalog-only activation; same operation and snapshot can be retried",
+        "security": [
+          {
+            "serviceToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "operationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "organizerId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "capacity": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "startsAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "endsAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "ticketVersion": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "format": "int64"
+                  }
+                },
+                "required": [
+                  "operationId",
+                  "organizerId",
+                  "capacity",
+                  "startsAt",
+                  "endsAt",
+                  "ticketVersion"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Activated or identical operation already applied"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "409": {
+            "description": "State/version/quota conflict"
+          }
+        }
+      }
+    }
+  }
+}

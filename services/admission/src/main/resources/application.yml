@@ -32,3 +32,7 @@ sems:
   jwt:
     public-key: ${JWT_PUBLIC_KEY}
     issuer: sems-identity
+  internal:
+    inbound-token: ${CATALOG_TO_ADMISSION_TOKEN}
+    outbound-token: ${ADMISSION_TO_CATALOG_TOKEN}
+    remote-url: http://event-catalog:8082

@@ -15,6 +15,8 @@ public class DraftService {
   if(input.version()==null)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"version is required when updating");
   if(event.version!=input.version())throw new ResponseStatusException(HttpStatus.CONFLICT,"Event changed; reload before editing");
   if(!event.status.equals("DRAFT"))throw new ResponseStatusException(HttpStatus.CONFLICT,"Only drafts can be edited");
+  if(event.salesConfigured && (event.capacity!=input.capacity() || !event.startsAt.equals(input.startsAt()) || !event.endsAt.equals(input.endsAt())))
+   throw new ResponseStatusException(HttpStatus.CONFLICT,"Time and capacity are fixed after ticket setup begins");
   validate(input);event.apply(input);events.flush();return event.view();
  }
  @Transactional(readOnly=true) public Event.View detail(UUID owner,UUID id){return owned(owner,id).view();}

@@ -29,11 +29,11 @@ public class SecurityConfiguration {
   };
   decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(JwtValidators.createDefaultWithIssuer(issuer),required));return decoder;
  }
- @Bean SecurityFilterChain security(HttpSecurity http) throws Exception {
+ @Bean @org.springframework.core.annotation.Order(2) SecurityFilterChain security(HttpSecurity http) throws Exception {
   var roles=new JwtGrantedAuthoritiesConverter();roles.setAuthoritiesClaimName("roles");roles.setAuthorityPrefix("ROLE_");
   var converter=new JwtAuthenticationConverter();converter.setJwtGrantedAuthoritiesConverter(roles);
   return http.csrf(c->c.disable()).sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-   .authorizeHttpRequests(a->a.requestMatchers("/actuator/health", "/actuator/health/**").permitAll().anyRequest().authenticated())
+   .authorizeHttpRequests(a->a.requestMatchers("/actuator/health", "/actuator/health/**").permitAll().requestMatchers(org.springframework.http.HttpMethod.GET,"/api/v1/events","/api/v1/events/*").permitAll().anyRequest().authenticated())
    .oauth2ResourceServer(o->o.jwt(j->j.jwtAuthenticationConverter(converter))).build();
  }
 

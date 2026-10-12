@@ -10,3 +10,6 @@
 .secrets/
 **/coverage/
 ci-logs/
+
+__pycache__/
+*.pyc
