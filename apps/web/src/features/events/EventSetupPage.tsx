@@ -119,7 +119,7 @@ export function EventSetupPage() {
     }
   }
   async function publish() {
-    if (!event || !inventory) return;
+    if (!event || !inventory || dirty) return;
     setBusy(true);
     setError("");
     setMessage("");
@@ -252,6 +252,7 @@ export function EventSetupPage() {
                         onClick={() => {
                           setTickets((rows) => rows.filter((_, i) => i !== n));
                           setDirty(true);
+                          setConfirm(false);
                         }}
                       >
                         Remove ticket type {n + 1}
@@ -282,6 +283,7 @@ export function EventSetupPage() {
                         },
                       ]);
                       setDirty(true);
+                      setConfirm(false);
                     }}
                   >
                     Add ticket type
@@ -315,7 +317,7 @@ export function EventSetupPage() {
               {confirm && (
                 <div role="group" aria-label="Confirm publication">
                   <p>Publish this event with the saved ticket types?</p>
-                  <button onClick={publish} disabled={busy}>
+                  <button onClick={publish} disabled={busy || dirty}>
                     Confirm publication
                   </button>
                   <button onClick={() => setConfirm(false)} disabled={busy}>

@@ -105,3 +105,37 @@ it("shows a pending publication rather than claiming it succeeded", async () => 
   );
   expect(screen.queryByRole("link", { name: "View public event" })).toBeNull();
 });
+
+it.each(["Add ticket type", "Remove ticket type 1"])(
+  "invalidates publication confirmation after %s",
+  async (action) => {
+    fetchMock.mockResolvedValueOnce(response(event)).mockResolvedValueOnce(
+      response({
+        ...inventory,
+        ticketTypes: [
+          { ...inventory.ticketTypes[0], quota: 15 },
+          { ...inventory.ticketTypes[0], name: "Student", quota: 15 },
+        ],
+      }),
+    );
+    mount();
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Publish event" }),
+    );
+    expect(
+      screen.getByRole("button", { name: "Confirm publication" }),
+    ).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: action }));
+    expect(
+      screen.queryByRole("button", { name: "Confirm publication" }),
+    ).toBeNull();
+    expect(
+      (
+        screen.getByRole("button", {
+          name: "Publish event",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  },
+);
