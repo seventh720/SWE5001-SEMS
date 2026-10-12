@@ -1,6 +1,18 @@
 spring:
   application:
     name: identity-service
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    default-schema: identity
+    schemas: identity
+    create-schemas: false
 server:
   port: ${SERVER_PORT:8081}
 management:
@@ -12,4 +24,17 @@ management:
     health:
       probes:
         enabled: true
+      group:
+        readiness:
+          include: readinessState,db
       show-details: never
+sems:
+  jwt:
+    public-key: ${JWT_PUBLIC_KEY}
+    issuer: sems-identity
+    private-key: ${JWT_PRIVATE_KEY}
+  bootstrap:
+    admin:
+      username: ${SEMS_BOOTSTRAP_ADMIN_USERNAME:admin}
+      email: ${SEMS_BOOTSTRAP_ADMIN_EMAIL:}
+      password: ${SEMS_BOOTSTRAP_ADMIN_PASSWORD:}

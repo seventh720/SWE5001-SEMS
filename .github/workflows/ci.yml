@@ -26,20 +26,37 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Frontend tests and build
+        working-directory: apps/web
+        run: npm ci && npm test && npm run build
+      - name: Generate ephemeral local credentials
+        run: bash scripts/setup-local.sh
       - name: Build services
         run: mvn -B -ntp verify
       - name: Validate Compose
-        run: docker compose -f deployment/compose.yaml config --quiet
+        run: docker compose --env-file .env -f deployment/compose.yaml config --quiet
       - name: Build and start containers
-        run: docker compose -f deployment/compose.yaml up --build -d
+        run: docker compose --env-file .env -f deployment/compose.yaml up --build -d
       - name: Verify gateway and service readiness
         run: bash scripts/smoke.sh
+      - name: Database isolation and authenticated workflow
+        run: |
+          bash scripts/check-db-isolation.sh
+          set -a
+          source .env
+          set +a
+          python3 scripts/acceptance.py
       - name: Collect container logs
         if: always()
         run: |
           mkdir -p ci-logs
-          docker compose -f deployment/compose.yaml ps -a > ci-logs/containers.txt
-          docker compose -f deployment/compose.yaml logs --no-color > ci-logs/compose.log 2>&1
+          docker compose --env-file .env -f deployment/compose.yaml ps -a > ci-logs/containers.txt
+          docker compose --env-file .env -f deployment/compose.yaml logs --no-color > ci-logs/compose.log 2>&1
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
@@ -58,7 +75,7 @@ jobs:
           retention-days: 7
       - name: Stop containers
         if: always()
-        run: docker compose -f deployment/compose.yaml down
+        run: docker compose --env-file .env -f deployment/compose.yaml down
 
   notify:
     name: Telegram notification
