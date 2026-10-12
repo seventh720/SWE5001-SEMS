@@ -102,7 +102,11 @@ mvn verify
 docker compose -f deployment/compose.yaml config --quiet
 ```
 
-CI/CD 与 Telegram 通知将在下一阶段配置。本次初始化不包含 GitHub Actions 工作流。骨架构建通过不代表业务验收通过。
+Platform CI 在推送 `main`、向 `main` 提交 PR 或手动触发时运行。使用 Java 21 构建三服务、验证 Compose、构建并启动容器，经网关检查三服务就绪状态。日志和成功构建的 JAR 保留7天。本地启动 Compose 后可运行 `bash scripts/smoke.sh` 进行相同检查。
+
+Telegram 通过仓库 Actions Secrets `TELEGRAM_TOKEN` 和 `TELEGRAM_TO` 发送构建结果和运行链接。缺少配置时跳过，通知失败不影响构建结果；Fork 和 Dependabot PR 跳过通知。
+
+云部署、镜像发布、安全扫描与业务测试仍待接入；当前验证服务骨架，不代表业务验收。详见 [CI 运维说明](docs/ci.md)。
 
 ## 6. 开发路线
 

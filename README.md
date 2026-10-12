@@ -102,7 +102,11 @@ mvn verify
 docker compose -f deployment/compose.yaml config --quiet
 ```
 
-CI/CD and Telegram notifications are planned for the next development step. No GitHub Actions workflow is included in this initial version. A successful skeleton build does not demonstrate functional acceptance.
+Platform CI runs on pushes to `main`, pull requests targeting `main`, and manual dispatch. It builds the three services with Java 21, validates Compose, builds and starts containers, and checks service readiness through the gateway. Logs and successful JAR builds are retained for 7 days. Run the same smoke checks locally with `bash scripts/smoke.sh` after starting Compose.
+
+Telegram reports the build result and run link using repository Actions secrets `TELEGRAM_TOKEN` and `TELEGRAM_TO`. Missing secrets skip delivery; notification failures do not change the build result. Fork and Dependabot pull requests skip notifications.
+
+Cloud deployment, image publishing, security scanning and business tests remain pending. This workflow verifies the service skeleton, not business acceptance. See [CI operations](docs/ci.md).
 
 ## 6. Development roadmap
 

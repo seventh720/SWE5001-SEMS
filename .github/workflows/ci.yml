@@ -1,0 +1,104 @@
+name: Platform CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: platform-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Build and smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Build services
+        run: mvn -B -ntp verify
+      - name: Validate Compose
+        run: docker compose -f deployment/compose.yaml config --quiet
+      - name: Build and start containers
+        run: docker compose -f deployment/compose.yaml up --build -d
+      - name: Verify gateway and service readiness
+        run: bash scripts/smoke.sh
+      - name: Collect container logs
+        if: always()
+        run: |
+          mkdir -p ci-logs
+          docker compose -f deployment/compose.yaml ps -a > ci-logs/containers.txt
+          docker compose -f deployment/compose.yaml logs --no-color > ci-logs/compose.log 2>&1
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostics-${{ github.sha }}
+          path: |
+            ci-logs/
+            services/*/target/surefire-reports/
+          retention-days: 7
+      - name: Upload verified JARs
+        uses: actions/upload-artifact@v4
+        with:
+          name: service-jars-${{ github.sha }}
+          path: services/*/target/*-SNAPSHOT.jar
+          if-no-files-found: error
+          retention-days: 7
+      - name: Stop containers
+        if: always()
+        run: docker compose -f deployment/compose.yaml down
+
+  notify:
+    name: Telegram notification
+    needs: verify
+    if: always() && !cancelled() && github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Send build result
+        continue-on-error: true
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+          BUILD_RESULT: ${{ needs.verify.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: python
+        run: |
+          import json, os, urllib.request
+          token = os.environ.get('TELEGRAM_TOKEN')
+          chat = os.environ.get('TELEGRAM_TO')
+          if not token or not chat:
+              print('::notice::Telegram secrets are absent; notification skipped.')
+              raise SystemExit(0)
+          text = '\n'.join([
+              'SEMS Platform CI: ' + os.environ['BUILD_RESULT'],
+              os.environ['GITHUB_REPOSITORY'],
+              'Ref: ' + os.environ['GITHUB_REF_NAME'],
+              'Commit: ' + os.environ['GITHUB_SHA'][:12],
+              os.environ['RUN_URL'],
+          ])
+          request = urllib.request.Request(
+              'https://api.telegram.org/bot' + token + '/sendMessage',
+              data=json.dumps({'chat_id': chat, 'text': text}).encode(),
+              headers={'Content-Type': 'application/json'}, method='POST')
+          try:
+              with urllib.request.urlopen(request, timeout=20) as response:
+                  result = json.load(response)
+              if not result.get('ok'):
+                  raise RuntimeError('Rejected')
+          except Exception:
+              print('::warning::Telegram delivery failed; check bot access and repository secrets.')
+              raise SystemExit(1)
+          print('Telegram notification delivered.')
