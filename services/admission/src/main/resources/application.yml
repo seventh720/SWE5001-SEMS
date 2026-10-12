@@ -1,6 +1,18 @@
 spring:
   application:
     name: admission-service
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    default-schema: admission
+    schemas: admission
+    create-schemas: false
 server:
   port: ${SERVER_PORT:8083}
 management:
@@ -12,4 +24,11 @@ management:
     health:
       probes:
         enabled: true
+      group:
+        readiness:
+          include: readinessState,db
       show-details: never
+sems:
+  jwt:
+    public-key: ${JWT_PUBLIC_KEY}
+    issuer: sems-identity

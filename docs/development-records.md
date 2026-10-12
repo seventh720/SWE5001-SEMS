@@ -1,5 +1,5 @@
 # Development records
 
-当前仓库包含三服务启动与部署骨架，业务实现尚未完成。
+The current increment implements identity, role management, event drafts and a React client. Three services own separate PostgreSQL schemas and credentials. Admission business workflows are pending.
 
-后续变更记录关联提交、文件范围、设计理由、贡献者及验证结果。验收证据必须对应实际运行版本。引入第三方代码时保留适用许可声明与作者署名。
+Changes must record their associated commits, affected files, design rationale, contributors and validation results. Acceptance evidence must correspond to the tested version. Retain applicable attribution and license notices when incorporating third-party code.

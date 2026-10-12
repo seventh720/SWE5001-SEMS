@@ -2,126 +2,86 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-SEMS is a shared event and ticketing platform for independent organizers and attendees. It is designed around three independently deployable Spring Boot services and a React web application. Organizers manage their own offerings, while attendees discover events through a common catalog.
+SEMS is a shared event and ticketing platform for independent organizers and attendees, using React + TypeScript, three independent Spring Boot services and PostgreSQL.
 
-## 1. Project status
+Implemented: registration/login, RSA JWT, administrator role assignment, organizer draft creation/list/detail/edit, owner isolation and optimistic version conflicts. Publication, public discovery, booking, ticket issuance and check-in are pending.
 
-The repository currently contains three service entry points, health endpoints, Dockerfiles, a local gateway, Docker Compose configuration. Business APIs, authentication, persistence, the web application and cloud deployment are not implemented yet. There are no automated business tests at this stage.
+## 1. Architecture and roles
 
-The planned core workflow is event publication → free-ticket booking → individual ticket issuance → staff check-in → attendance summaries. Paid tickets, payment providers and external email/SMS delivery are outside the core scope.
+| Service | Data ownership | Status |
+|---|---|---|
+| Identity | Accounts, passwords, roles | Implemented |
+| Event Catalog | Organizer-owned event drafts | Implemented |
+| Admission | Inventory, bookings, tickets, check-in | Database and authentication foundation only |
 
-## 2. Architecture and repository layout
+Each service owns a schema, database account and Flyway migrations, with no cross-service foreign keys or queries. Only Identity holds the RSA private key; the other services validate signatures, issuer, audience and token lifetime using the public key.
 
-| Path | Responsibility |
-|---|---|
-| `services/identity/` | Accounts, authentication and roles |
-| `services/event-catalog/` | Event ownership, details, publication and discovery |
-| `services/admission/` | Ticket types, inventory, bookings, tickets, staff assignment and check-in |
-| `apps/web/` | Planned React and TypeScript application; currently documentation only |
-| `contracts/` | API contract planning; business OpenAPI specifications are pending |
-| `deployment/` | Local Compose configuration and Nginx gateway |
-| `docs/` | Implementation plan, architecture decisions and acceptance criteria |
+Roles are `ATTENDEE`, `ORGANIZER`, `STAFF` and `ADMIN`. Registration grants ATTENDEE; administrators assign roles. ADMIN does not bypass event ownership. Sign in again after role changes; existing tokens remain valid for up to 30 minutes. Immediate revocation is not implemented.
 
-Each service produces its own executable JAR and container image. The planned persistence model gives each service its own PostgreSQL schema, credentials and migrations. Services must not share JPA entities, repositories or cross-schema queries. Inventory, booking and ticket changes stay within Admission transactions.
+## 2. Local setup
 
-## 3. Development requirements
-
-| Tool | Version |
-|---|---|
-| Java | 21 |
-| Maven | 3.9+ |
-| Docker Engine or Docker Desktop | With Docker Compose v2 |
-| Spring Boot | 3.5.16, pinned in the root POM |
-
-Node.js and PostgreSQL are not needed to run the current service skeleton. Their setup will be documented when the web application and persistence are added.
-
-## 4. Getting started
-
-Clone the repository and enter its directory:
+Requires Java 21, Maven 3.9+, Node.js 22, npm, OpenSSL, Python 3 and Docker Compose v2.
 
 ```bash
 git clone git@github.com:seventh720/SWE5001-SMES.git
 cd SWE5001-SMES
+bash scripts/setup-local.sh
+mvn verify
+npm --prefix apps/web ci
+npm --prefix apps/web test
+npm --prefix apps/web run build
+docker compose --env-file .env -f deployment/compose.yaml up --build -d
+bash scripts/smoke.sh
 ```
 
-For an existing local checkout, run the commands below from its root.
+Open [the local platform](http://localhost:8080). Setup generates `.env` and `.secrets/` without overwriting existing configuration. The initial admin email is `admin@example.com`; read its random `SEMS_BOOTSTRAP_ADMIN_PASSWORD` from your local `.env`. Do not commit or share that file. Clear bootstrap settings after initialization; the persisted admin can still log in.
 
-### Option A: Run with Docker
+Database credentials are applied only when a new volume is initialized. Editing `.env` does not rotate existing database passwords. Stop while preserving data:
 
-Build the JARs before building the images:
+```bash
+docker compose --env-file .env -f deployment/compose.yaml down
+```
+
+For frontend development, run `npm --prefix apps/web run dev`; port 5173 proxies APIs to the gateway on 8080. The production frontend is served at the gateway root. Date inputs use the browser timezone and submit UTC timestamps. PostgreSQL is not exposed to the host.
+
+This is local HTTP configuration. Cloud HTTPS, secret management and deployment remain pending.
+
+## 3. Acceptance walkthrough
+
+1. Register two accounts.
+2. Sign in as admin, open “Manage users and roles”, grant ORGANIZER to both accounts and save.
+3. Sign in again as each organizer and open “My events”.
+4. Create a draft, refresh and edit it. The second organizer must not see the first organizer’s draft.
+5. Edit one draft in two windows: a stale submission returns a conflict and can reload the latest version.
+
+Publication is unavailable until Admission sales coordination is implemented.
+
+## 4. Tests and CI
+
 
 ```bash
 mvn verify
-docker compose -f deployment/compose.yaml up --build
+npm --prefix apps/web test
+npm --prefix apps/web run build
+bash scripts/check-db-isolation.sh
+set -a
+source .env
+set +a
+python3 scripts/acceptance.py
 ```
 
-The local gateway listens at `http://localhost:8080`. Verify the services:
+The last two checks need a running Compose stack. Acceptance creates uniquely named test accounts and drafts; use an isolated test volume. CI runs these checks in an ephemeral environment, covering authentication, authorization, schema isolation, validation, persistence and concurrent version conflicts. Telegram reports results; logs/JARs are retained for seven days. See [CI operations](docs/ci.md).
 
-```bash
-curl --fail http://localhost:8080/health/identity
-curl --fail http://localhost:8080/health/event-catalog
-curl --fail http://localhost:8080/health/admission
-```
+## 5. Layout and documentation
 
-Each readiness response should report `UP`. The root URL returns 404 because there is no web interface or business routing yet. Local Compose uses HTTP and is not a production deployment configuration.
+- `services/`: independent backend services and migrations.
+- `apps/web/`: React application and UI tests.
+- `contracts/`: current OpenAPI specifications.
+- `deployment/`: gateway, database initialization and Compose.
+- `scripts/`: local setup, readiness and acceptance checks.
+- [Implementation plan](docs/implementation-plan.zh-CN.md)
+- [API contracts](contracts/README.md)
+- [Architecture](docs/adr/0001-service-boundaries.md)
+- [Acceptance targets](docs/acceptance-matrix.md)
 
-Stop the containers:
-
-```bash
-docker compose -f deployment/compose.yaml down
-```
-
-### Option B: Run services locally
-
-Run each command in a separate terminal from the repository root:
-
-```bash
-mvn -pl services/identity spring-boot:run
-```
-
-```bash
-mvn -pl services/event-catalog spring-boot:run
-```
-
-```bash
-mvn -pl services/admission spring-boot:run
-```
-
-| Service | Default port | Readiness path |
-|---|---|---|
-| Identity | 8081 | `/actuator/health/readiness` |
-| Event Catalog | 8082 | `/actuator/health/readiness` |
-| Admission | 8083 | `/actuator/health/readiness` |
-
-`SERVER_PORT` overrides a service's port. This option runs the services directly without the gateway. Stop each process with Ctrl+C.
-
-## 5. Build and validation
-
-```bash
-mvn verify
-docker compose -f deployment/compose.yaml config --quiet
-```
-
-Platform CI runs on pushes to `main`, pull requests targeting `main`, and manual dispatch. It builds the three services with Java 21, validates Compose, builds and starts containers, and checks service readiness through the gateway. Logs and successful JAR builds are retained for 7 days. Run the same smoke checks locally with `bash scripts/smoke.sh` after starting Compose.
-
-Telegram reports the build result and run link using repository Actions secrets `TELEGRAM_TOKEN` and `TELEGRAM_TO`. Missing secrets skip delivery; notification failures do not change the build result. Fork and Dependabot pull requests skip notifications.
-
-Cloud deployment, image publishing, security scanning and business tests remain pending. This workflow verifies the service skeleton, not business acceptance. See [CI operations](docs/ci.md).
-
-## 6. Development roadmap
-
-1. Define versioned API contracts, service-owned persistence, authentication and gateway routing.
-2. Implement account onboarding, organizer ownership, event drafts and catalog discovery.
-3. Complete free booking, inventory protection, ticket issuance, cancellation and staff check-in.
-4. Integrate the web application and demonstrate two independent organizers using shared capabilities.
-5. Add cloud deployment, security checks, independent scaling, concurrency and recovery experiments.
-
-## 7. Collaboration and documentation
-
-Use short-lived branches and pull requests. Include relevant tests, API contracts and database migrations with business changes. Keep credentials and local environment files out of version control.
-
-- [Implementation plan (Chinese)](docs/implementation-plan.zh-CN.md)
-- [Service boundaries and consistency (Chinese)](docs/adr/0001-service-boundaries.md)
-- [Acceptance criteria (Chinese)](docs/acceptance-matrix.md)
-
-The proposal and its figures are maintained separately from this code repository.
+Use short-lived branches and pull requests with corresponding tests and contracts. The proposal and its figures are maintained separately.

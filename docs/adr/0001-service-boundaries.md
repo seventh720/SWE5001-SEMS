@@ -1,6 +1,6 @@
 # ADR 0001：服务边界与一致性
 
-状态：采用 proposal 边界，协议为待实现设计。当前骨架无业务实现。
+状态：采用 proposal 边界，协议为待实现设计。当前已实现 Identity、Catalog 草稿、三服务认证与独立 schema；发布/取消协议仍待实现。
 
 Identity 拥有用户和角色；Catalog 拥有活动、owner、发布状态；Admission 拥有销售状态、票种、库存、订单、票券、staff assignment、签到。共享物理 PostgreSQL 时仍隔离 schema/凭据，撤销公共建表权限，每服务独立迁移。跨服务仅存 ID/必要快照，禁止共享 JPA 或 repository。
 

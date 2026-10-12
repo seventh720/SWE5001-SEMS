@@ -2,126 +2,86 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-SEMS 是面向独立组织者与参与者的共享活动与票务平台，计划采用三个可独立部署的 Spring Boot 服务和一个 React Web 应用。组织者管理自己的活动，参与者通过统一目录发现活动。
+SEMS 是面向独立组织者与参与者的共享活动与票务平台。采用 React + TypeScript、三个独立 Spring Boot 服务和 PostgreSQL。
 
-## 1. 项目状态
+本轮已实现：注册登录、RSA JWT、管理员角色授权、组织者活动草稿创建/列表/详情/编辑、所有权隔离及乐观版本冲突。活动发布、公开目录、预订、出票和签到仍待实现。
 
-当前仓库包含三个服务启动入口、健康检查、Dockerfile、本地网关和 Docker Compose 配置。业务 API、认证、数据库、Web 应用与云部署尚未实现，当前没有自动化业务测试。
+## 1. 架构与角色
 
-核心流程为：发布活动 → 免费预订 → 签发个人票券 → 工作人员签到 → 出席统计。付费票、支付服务以及外部邮件和短信不在核心范围内。
+| Service | Data ownership | Status |
+|---|---|---|
+| Identity | Accounts, passwords, roles | Implemented |
+| Event Catalog | Organizer-owned event drafts | Implemented |
+| Admission | Inventory, bookings, tickets, check-in | Database and authentication foundation only |
 
-## 2. 架构与目录
+三服务分别拥有 schema、数据库账号和 Flyway 迁移，无跨服务外键或查询。Identity 持 RSA 私钥，另外两个服务只持公钥；令牌校验签名、issuer、audience 和有效期。
 
-| 路径 | 职责 |
-|---|---|
-| `services/identity/` | 账号、认证与角色 |
-| `services/event-catalog/` | 活动所有权、详情、发布与发现 |
-| `services/admission/` | 票种、库存、订单、票券、工作人员分配与签到 |
-| `apps/web/` | 计划中的 React + TypeScript 应用，目前只有说明文档 |
-| `contracts/` | API 契约规划，业务 OpenAPI 规范待编写 |
-| `deployment/` | 本地 Compose 配置和 Nginx 网关 |
-| `docs/` | 实施计划、架构决策与验收标准 |
+角色为 `ATTENDEE`、`ORGANIZER`、`STAFF`、`ADMIN`。注册默认 ATTENDEE；管理员可分配角色。ADMIN 不绕过活动所有权。角色变更后重新登录；已有令牌最多继续有效30分钟，本轮无即时撤销机制。
 
-每个服务生成独立的可执行 JAR 和容器镜像。数据库设计要求每个服务拥有独立的 PostgreSQL schema、凭据与迁移。服务之间不得共享 JPA 实体、Repository 或执行跨 schema 查询。库存、订单与票券变更在 Admission 本地事务内完成。
+## 2. 本地启动
 
-## 3. 开发环境
-
-| 工具 | 版本 |
-|---|---|
-| Java | 21 |
-| Maven | 3.9+ |
-| Docker Engine 或 Docker Desktop | 包含 Docker Compose v2 |
-| Spring Boot | 3.5.16，在根 POM 中固定 |
-
-运行当前骨架不需要 Node.js 或 PostgreSQL；Web 与持久化实现后再补充对应环境配置。
-
-## 4. 首次启动
-
-克隆仓库并进入目录：
+需要 Java 21、Maven 3.9+、Node.js 22、npm、OpenSSL、Python 3 和 Docker Compose v2。
 
 ```bash
 git clone git@github.com:seventh720/SWE5001-SMES.git
 cd SWE5001-SMES
+bash scripts/setup-local.sh
+mvn verify
+npm --prefix apps/web ci
+npm --prefix apps/web test
+npm --prefix apps/web run build
+docker compose --env-file .env -f deployment/compose.yaml up --build -d
+bash scripts/smoke.sh
 ```
 
-已有本地代码时，直接从代码仓库根目录执行后续命令。
+访问 [本地平台](http://localhost:8080)。首次配置脚本生成 `.env` 和 `.secrets/`，不会覆盖已有配置。管理员邮箱默认 `admin@example.com`，随机密码见本地 `.env` 的 `SEMS_BOOTSTRAP_ADMIN_PASSWORD`，不要提交或分享该文件。首次初始化后可清空 bootstrap 配置，已存管理员仍可登录。
 
-### 方式 A：Docker 运行
+数据库凭据仅在新数据卷首次初始化时应用；修改 `.env` 不会自动修改已有数据库密码。普通停机保留数据：
 
-先构建 JAR，再构建镜像：
+```bash
+docker compose --env-file .env -f deployment/compose.yaml down
+```
+
+开发前端可执行 `npm --prefix apps/web run dev`，访问5173端口，API代理到8080网关。生产构建的页面运行在网关根路径。日期输入使用浏览器时区，提交为UTC；数据库无需向主机暴露端口。
+
+这是本地HTTP配置，云端仍需HTTPS、密钥管理和部署配置。
+
+## 3. 验收流程
+
+1. 注册两个普通账号。
+2. 以管理员登录“Manage users and roles”，为两个账号勾选 ORGANIZER 并保存。
+3. 两个账号分别重新登录，进入“My events”。
+4. 创建草稿，刷新后编辑；第二个账号列表不显示第一个账号的草稿。
+5. 同一草稿在两个窗口编辑，后提交的旧版本返回冲突，可点击重新加载。
+
+本轮没有发布按钮；发布将在 Admission 销售状态接通后开放。
+
+## 4. 测试与 CI
+
 
 ```bash
 mvn verify
-docker compose -f deployment/compose.yaml up --build
+npm --prefix apps/web test
+npm --prefix apps/web run build
+bash scripts/check-db-isolation.sh
+set -a
+source .env
+set +a
+python3 scripts/acceptance.py
 ```
 
-本地网关地址为 `http://localhost:8080`。检查三个服务：
+最后两项需要运行中的 Compose 环境；验收脚本会创建带唯一后缀的测试账号与草稿，建议使用独立测试数据卷。CI 在临时环境运行同样检查，涵盖认证、权限、schema隔离、输入校验、持久化和并发版本冲突。构建结果经已有Telegram通知发送，日志/JAR保留7天。详见 [CI说明](docs/ci.md)。
 
-```bash
-curl --fail http://localhost:8080/health/identity
-curl --fail http://localhost:8080/health/event-catalog
-curl --fail http://localhost:8080/health/admission
-```
+## 5. 目录与文档
 
-就绪响应应显示 `UP`。根路径返回 404，因为目前没有 Web 界面与业务路由。本地 Compose 使用 HTTP，不是生产部署配置。
+- `services/`: independent backend services and migrations.
+- `apps/web/`: React application and UI tests.
+- `contracts/`: current OpenAPI specifications.
+- `deployment/`: gateway, database initialization and Compose.
+- `scripts/`: local setup, readiness and acceptance checks.
+- [Implementation plan](docs/implementation-plan.zh-CN.md)
+- [API contracts](contracts/README.md)
+- [Architecture](docs/adr/0001-service-boundaries.md)
+- [Acceptance targets](docs/acceptance-matrix.md)
 
-停止容器：
-
-```bash
-docker compose -f deployment/compose.yaml down
-```
-
-### 方式 B：本地运行服务
-
-在三个独立终端中，分别从仓库根目录执行：
-
-```bash
-mvn -pl services/identity spring-boot:run
-```
-
-```bash
-mvn -pl services/event-catalog spring-boot:run
-```
-
-```bash
-mvn -pl services/admission spring-boot:run
-```
-
-| 服务 | 默认端口 | 就绪检查路径 |
-|---|---|---|
-| Identity | 8081 | `/actuator/health/readiness` |
-| Event Catalog | 8082 | `/actuator/health/readiness` |
-| Admission | 8083 | `/actuator/health/readiness` |
-
-可使用 `SERVER_PORT` 覆盖服务端口。此方式直接运行服务，不启动网关。使用 Ctrl+C 停止对应进程。
-
-## 5. 构建与检查
-
-```bash
-mvn verify
-docker compose -f deployment/compose.yaml config --quiet
-```
-
-Platform CI 在推送 `main`、向 `main` 提交 PR 或手动触发时运行。使用 Java 21 构建三服务、验证 Compose、构建并启动容器，经网关检查三服务就绪状态。日志和成功构建的 JAR 保留7天。本地启动 Compose 后可运行 `bash scripts/smoke.sh` 进行相同检查。
-
-Telegram 通过仓库 Actions Secrets `TELEGRAM_TOKEN` 和 `TELEGRAM_TO` 发送构建结果和运行链接。缺少配置时跳过，通知失败不影响构建结果；Fork 和 Dependabot PR 跳过通知。
-
-云部署、镜像发布、安全扫描与业务测试仍待接入；当前验证服务骨架，不代表业务验收。详见 [CI 运维说明](docs/ci.md)。
-
-## 6. 开发路线
-
-1. 定义版本化 API、服务独立持久化、认证与网关路由。
-2. 实现账号入驻、组织者所有权、活动草稿和目录发现。
-3. 完成免费预订、库存保护、出票、取消和工作人员签到。
-4. 联调 Web 应用，演示两个独立组织者共享平台能力。
-5. 完成云部署、安全检查、独立扩容、并发与恢复实验。
-
-## 7. 协作与文档
-
-采用短期分支与 PR 集成。业务变更同时提交相关测试、API 契约和数据库迁移。密钥与本地环境配置不进入版本控制。
-
-- [实施计划](docs/implementation-plan.zh-CN.md)
-- [服务边界与一致性决策](docs/adr/0001-service-boundaries.md)
-- [验收标准](docs/acceptance-matrix.md)
-
-Proposal 与配图独立存放，不纳入代码仓库。
+通过短分支与PR集成，业务变更同时提交测试和契约。Proposal与配图独立存放，不纳入代码仓库。

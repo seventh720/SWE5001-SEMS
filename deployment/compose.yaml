@@ -1,17 +1,71 @@
 name: sems-platform
 services:
+  postgres:
+    build:
+      context: ./postgres
+    environment:
+      POSTGRES_DB: sems
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/setup-local.sh}
+      IDENTITY_DB_PASSWORD: ${IDENTITY_DB_PASSWORD:?Required}
+      CATALOG_DB_PASSWORD: ${CATALOG_DB_PASSWORD:?Required}
+      ADMISSION_DB_PASSWORD: ${ADMISSION_DB_PASSWORD:?Required}
+    volumes:
+      - platform-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sems"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
   identity:
     build:
       context: ..
       dockerfile: services/identity/Dockerfile
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/sems?currentSchema=identity
+      DB_USERNAME: identity_app
+      DB_PASSWORD: ${IDENTITY_DB_PASSWORD:?Required}
+      JWT_PUBLIC_KEY: /run/keys/jwt-public.pem
+      JWT_PRIVATE_KEY: /run/keys/jwt-private.pem
+      SEMS_BOOTSTRAP_ADMIN_EMAIL: ${SEMS_BOOTSTRAP_ADMIN_EMAIL:-}
+      SEMS_BOOTSTRAP_ADMIN_PASSWORD: ${SEMS_BOOTSTRAP_ADMIN_PASSWORD:-}
+    volumes:
+      - ../.secrets/jwt-public.pem:/run/keys/jwt-public.pem:ro
+      - ../.secrets/jwt-private.pem:/run/keys/jwt-private.pem:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
   event-catalog:
     build:
       context: ..
       dockerfile: services/event-catalog/Dockerfile
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/sems?currentSchema=catalog
+      DB_USERNAME: catalog_app
+      DB_PASSWORD: ${CATALOG_DB_PASSWORD:?Required}
+      JWT_PUBLIC_KEY: /run/keys/jwt-public.pem
+    volumes:
+      - ../.secrets/jwt-public.pem:/run/keys/jwt-public.pem:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
   admission:
     build:
       context: ..
       dockerfile: services/admission/Dockerfile
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/sems?currentSchema=admission
+      DB_USERNAME: admission_app
+      DB_PASSWORD: ${ADMISSION_DB_PASSWORD:?Required}
+      JWT_PUBLIC_KEY: /run/keys/jwt-public.pem
+    volumes:
+      - ../.secrets/jwt-public.pem:/run/keys/jwt-public.pem:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+  web:
+    build:
+      context: ../apps/web
   gateway:
     image: nginx:1.28-alpine
     ports:
@@ -22,3 +76,6 @@ services:
       - identity
       - event-catalog
       - admission
+      - web
+volumes:
+  platform-db:

@@ -1,5 +1,7 @@
-# SEMS Web Application（待实现）
+# SEMS Web Application
 
-使用 React 和 TypeScript 实现登录、活动浏览、组织者管理、订单和角色视图。API 统一通过网关访问，业务规则由服务端执行。
+React + TypeScript client for account registration, login, administrator role assignment and organizer draft management. Business permissions are enforced by the services.
 
-核心界面包括票券 QR/手动凭证、工作人员签到和组织者出席统计。支付、预约预填、头像不进入首轮核心范围。
+Run `npm ci`, `npm test`, and `npm run build`. Build output is required before the Compose web image is built. For development, `npm run dev` proxies `/api` to the gateway on port 8080.
+
+Role changes require a fresh login. Draft times use the browser timezone and are submitted as ISO 8601 UTC timestamps. Publication, ticketing and check-in are not yet exposed.
