@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SEMS Admission API",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "description": "Free inventory, retry-safe bookings, per-place ticket credentials and attendee cancellation. Staff check-in and event-wide cancellation are pending."
   },
   "servers": [
@@ -432,6 +432,100 @@
           "totalPages": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "PreRegistrationInput": {
+        "type": "object",
+        "required": [
+          "ticketTypeId",
+          "quantity"
+        ],
+        "properties": {
+          "ticketTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "attendeeInfo": {
+            "$ref": "#/components/schemas/AttendeeInfo"
+          }
+        }
+      },
+      "PreRegistration": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PreRegistrationInput"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "eventId": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "eventTitle": {
+                "type": "string"
+              },
+              "eventLocation": {
+                "type": "string"
+              },
+              "ticketName": {
+                "type": "string"
+              },
+              "opensAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "closesAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "startsAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "customFieldLabel": {
+                "type": "string",
+                "nullable": true
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "WAITING",
+                  "READY",
+                  "SOLD_OUT",
+                  "CLOSED"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "PreRegistrationPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PreRegistration"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
           }
         }
       }
@@ -899,6 +993,136 @@
           },
           "503": {
             "description": "Catalog unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/pre-registrations": {
+      "get": {
+        "summary": "Page through own pre-registrations; no tickets or inventory held",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreRegistrationPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination"
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      }
+    },
+    "/api/v1/pre-registrations/{eventId}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "eventId",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Read own pre-registration",
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreRegistration"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Not found for this user"
+          }
+        }
+      },
+      "put": {
+        "summary": "Create or replace one pre-registration per user/event before opening; validates requested information without reserving inventory",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreRegistrationInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreRegistration"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid information or quantity"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Event or ticket not found"
+          },
+          "409": {
+            "description": "Event not published or pre-registration window has ended"
+          },
+          "503": {
+            "description": "Catalog unavailable"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Idempotently remove own pre-registration",
+        "responses": {
+          "204": {
+            "description": "Removed; Cache-Control: no-store"
+          },
+          "401": {
+            "description": "Authentication required"
           }
         }
       }

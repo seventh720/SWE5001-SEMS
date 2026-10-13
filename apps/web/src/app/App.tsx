@@ -1,3 +1,5 @@
+import { ProfilePage } from "../features/profile/ProfilePage";
+import { PreRegistrationsPage } from "../features/bookings/PreRegistrationsPage";
 import { OrganizerBookingsPage } from "../features/bookings/OrganizerBookingsPage";
 import { useEffect, useRef, useState } from "react";
 import { Link, Route, Routes, useLocation } from "react-router-dom";
@@ -165,110 +167,54 @@ function Home() {
 }
 
 function ExploreMenu({ onClose }: { onClose: () => void }) {
-  const dialog = useRef<HTMLDialogElement>(null);
   const { user } = useAuth();
-  useEffect(() => {
-    const opener = document.activeElement as HTMLElement | null;
-    const element = dialog.current!;
-    element.showModal();
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      element.close();
-      document.body.style.overflow = overflow;
-      opener?.focus();
-    };
-  }, []);
   return (
-    <dialog
-      ref={dialog}
-      className="explore-dialog"
-      aria-labelledby="explore-title"
-      onCancel={(e) => {
-        e.preventDefault();
-        onClose();
-      }}
+    <nav
+      id="explore-navigation"
+      className="explore-expanded"
+      aria-label="Explore navigation"
     >
-      <div className="overlay-top">
-        <span className="brand">
-          SEMS <span>MAKE IT A MOMENT</span>
-        </span>
-        <button
-          onClick={onClose}
-          className="close-menu"
-          aria-label="Close navigation"
-        >
-          Close ×
-        </button>
-      </div>
-      <div className="overlay-content">
-        <p className="eyebrow">WHERE TO NEXT?</p>
-        <h2 id="explore-title">
-          A world of
-          <br />
-          <em>possibilities.</em>
-        </h2>
-        <nav aria-label="Explore navigation" className="overlay-links">
-          <Link to="/" onClick={onClose}>
-            <span className="overlay-index">01</span>
-            <span className="overlay-label">Home</span>
-            <span className="overlay-arrow" aria-hidden="true">
-              ↗
-            </span>
+      <Link to="/" onClick={onClose}>
+        Home <span>Start here</span>
+      </Link>
+      <Link to="/events" onClick={onClose}>
+        Discover events <span>Find your next experience</span>
+      </Link>
+      {user ? (
+        <>
+          <Link to="/bookings" onClick={onClose}>
+            My tickets <span>Confirmed bookings</span>
           </Link>
-          <Link to="/events" onClick={onClose}>
-            <span className="overlay-index">02</span>
-            <span className="overlay-label">Discover events</span>
-            <span className="overlay-arrow" aria-hidden="true">
-              ↗
-            </span>
+          <Link to="/pre-registrations" onClick={onClose}>
+            My pre-registrations <span>Get ready for opening</span>
           </Link>
-          {user && (
-            <Link to="/bookings" onClick={onClose}>
-              <span className="overlay-index">03</span>
-              <span className="overlay-label">My tickets</span>
-              <span className="overlay-arrow" aria-hidden="true">
-                ↗
-              </span>
-            </Link>
-          )}
-          {user?.roles.some((r) => r === "ORGANIZER" || r === "ADMIN") && (
+          <Link to="/profile" onClick={onClose}>
+            My profile <span>Saved registration details</span>
+          </Link>
+          {user.roles.some((r) => r === "ORGANIZER" || r === "ADMIN") && (
             <Link to="/organizer/events" onClick={onClose}>
-              <span className="overlay-index">04</span>
-              <span className="overlay-label">My events</span>
-              <span className="overlay-arrow" aria-hidden="true">
-                ↗
-              </span>
+              My events <span>Create and manage</span>
             </Link>
           )}
-          {user?.roles.includes("ADMIN") && (
+          {user.roles.includes("ADMIN") && (
             <Link to="/admin/users" onClick={onClose}>
-              <span className="overlay-index">05</span>
-              <span className="overlay-label">Manage users</span>
-              <span className="overlay-arrow" aria-hidden="true">
-                ↗
-              </span>
+              Manage users <span>Roles and access</span>
             </Link>
           )}
-          {!user && (
-            <Link to="/login" onClick={onClose}>
-              <span className="overlay-index">03</span>
-              <span className="overlay-label">Join the community</span>
-              <span className="overlay-arrow" aria-hidden="true">
-                ↗
-              </span>
-            </Link>
-          )}
-        </nav>
-      </div>
-      <p className="overlay-footer">Find something worth stepping out for.</p>
-    </dialog>
+        </>
+      ) : (
+        <Link to="/login" onClick={onClose}>
+          Join the community <span>Sign in or create an account</span>
+        </Link>
+      )}
+    </nav>
   );
 }
 
 export function App() {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const exploreTrigger = useRef<HTMLButtonElement>(null);
   const [menu, setMenu] = useState(false);
   const [paused, setPaused] = useState(
     () =>
@@ -278,7 +224,15 @@ export function App() {
     setMenu(false);
   }, [location.pathname]);
   return (
-    <div className={paused ? "platform motion-paused" : "platform"}>
+    <div
+      className={paused ? "platform motion-paused" : "platform"}
+      onKeyDown={(e) => {
+        if (e.key === "Escape" && menu) {
+          setMenu(false);
+          exploreTrigger.current?.focus();
+        }
+      }}
+    >
       <div className="ambient-background" aria-hidden="true">
         <div className="ambient-orb orb-lilac" />
         <div className="ambient-orb orb-peach" />
@@ -311,9 +265,10 @@ export function App() {
           )}
           <button
             className="menu-toggle"
-            aria-haspopup="dialog"
+            ref={exploreTrigger}
+            aria-controls="explore-navigation"
             aria-expanded={menu}
-            onClick={() => setMenu(true)}
+            onClick={() => setMenu(!menu)}
           >
             Explore <span aria-hidden="true">☰</span>
           </button>
@@ -332,6 +287,11 @@ export function App() {
           <Route path="/events/:id" element={<PublicEventDetail />} />
           <Route path="/login" element={<AuthPage />} />
           <Route element={<ProtectedRoute />}>
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route
+              path="/pre-registrations"
+              element={<PreRegistrationsPage />}
+            />
             <Route
               path="/organizer/events/:id/bookings"
               element={<OrganizerBookingsPage />}

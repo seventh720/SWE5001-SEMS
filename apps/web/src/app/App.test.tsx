@@ -13,18 +13,6 @@ import { App } from "./App";
 
 beforeEach(() => {
   sessionStorage.clear();
-  // jsdom has no top-layer dialog implementation; native focus trapping is browser-owned.
-  HTMLDialogElement.prototype.showModal = vi.fn(
-    function (this: HTMLDialogElement) {
-      this.setAttribute("open", "");
-      this.querySelector<HTMLButtonElement>("button")?.focus();
-    },
-  );
-  HTMLDialogElement.prototype.close = vi.fn(
-    function (this: HTMLDialogElement) {
-      this.removeAttribute("open");
-    },
-  );
 });
 afterEach(() => {
   cleanup();
@@ -41,30 +29,37 @@ function mount() {
   );
 }
 
-it("closes navigation on cancel and returns focus and scrolling to the page", () => {
+it("expands navigation in the page, toggles closed and supports Escape", () => {
   mount();
   const trigger = screen.getByRole("button", { name: /Explore/ });
-  trigger.focus();
   fireEvent.click(trigger);
-  const dialog = screen.getByRole("dialog");
-  expect(document.body.style.overflow).toBe("hidden");
-  expect(document.activeElement).toBe(
-    within(dialog).getByRole("button", { name: "Close navigation" }),
-  );
-  fireEvent(dialog, new Event("cancel", { cancelable: true }));
   expect(screen.queryByRole("dialog")).toBeNull();
   expect(document.body.style.overflow).toBe("");
+  expect(
+    screen.getByRole("navigation", { name: "Explore navigation" }),
+  ).toBeTruthy();
+  fireEvent.click(trigger);
+  expect(
+    screen.queryByRole("navigation", { name: "Explore navigation" }),
+  ).toBeNull();
+  fireEvent.click(trigger);
+  fireEvent.keyDown(trigger, { key: "Escape" });
+  expect(
+    screen.queryByRole("navigation", { name: "Explore navigation" }),
+  ).toBeNull();
   expect(document.activeElement).toBe(trigger);
 });
-it("navigates from the overlay and closes it", () => {
+it("closes expanded navigation after following a link", () => {
   mount();
   fireEvent.click(screen.getByRole("button", { name: /Explore/ }));
   fireEvent.click(
-    within(screen.getByRole("dialog")).getByRole("link", {
-      name: /Join the community/,
-    }),
+    within(
+      screen.getByRole("navigation", { name: "Explore navigation" }),
+    ).getByRole("link", { name: /Join the community/ }),
   );
-  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(
+    screen.queryByRole("navigation", { name: "Explore navigation" }),
+  ).toBeNull();
   expect(screen.getByRole("heading", { name: "Welcome back" })).toBeTruthy();
 });
 it("starts with motion paused when the system requests reduced motion", () => {

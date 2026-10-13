@@ -105,7 +105,7 @@ jobs:
           set -a
           source .env
           set +a
-          python3 scripts/registration-acceptance.py
+          python3 scripts/pre-registration-acceptance.py
       - name: Collect diagnostics
         if: always()
         run: |
