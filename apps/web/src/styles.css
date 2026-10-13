@@ -591,7 +591,7 @@ em {
 }
 .discovery-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
 .discovery-card {
@@ -614,9 +614,6 @@ em {
 }
 .discovery-lime {
   background: #edf1d8;
-}
-.discovery-peach {
-  background: #f7e7dc;
 }
 .discovery-symbol {
   display: block;
@@ -778,30 +775,41 @@ textarea {
   font-weight: 550;
   margin: 22px 0 35px;
 }
+/* Editorial labels echo the overlay heading; small indices stay secondary. */
 .overlay-links a {
-  display: flex;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 32px;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
   border-top: 1px solid #d4c7e2;
-  padding: 18px 0;
+  padding: 23px 0;
   color: var(--ink);
-  font-size: clamp(21px, 3vw, 35px);
-  letter-spacing: -0.8px;
-  transition:
-    padding 0.2s,
-    color 0.2s;
+  transition: color 0.2s;
+}
+.overlay-label {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  font-size: clamp(25px, 3vw, 38px);
+  line-height: 1.25;
+  letter-spacing: -0.6px;
+  transition: transform 0.2s;
 }
 .overlay-links a:hover {
   color: var(--violet);
-  padding-left: 12px;
 }
-.overlay-links a span:first-child {
-  font-size: 11px;
+.overlay-links a:hover .overlay-label {
+  transform: translateX(6px);
+}
+.overlay-index {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
   color: var(--muted);
-  letter-spacing: 0;
 }
-.overlay-links a span:last-child {
-  margin-left: auto;
+.overlay-arrow {
+  font-size: 24px;
+  font-weight: 400;
+  text-align: right;
 }
 .overlay-footer {
   font-size: 12px;

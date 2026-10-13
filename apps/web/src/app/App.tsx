@@ -149,17 +149,6 @@ function Home() {
               ↗
             </span>
           </Link>
-          <Link className="discovery-card discovery-peach" to="/events">
-            <span className="discovery-symbol" aria-hidden="true">
-              ◎
-            </span>
-            <span className="card-kicker">03 / CONNECT</span>
-            <h3>Find your next shared moment.</h3>
-            <p>Explore event details and free admission options.</p>
-            <span className="card-arrow" aria-hidden="true">
-              ↗
-            </span>
-          </Link>
         </div>
       </section>
       <footer className="home-footer">
@@ -216,25 +205,44 @@ function ExploreMenu({ onClose }: { onClose: () => void }) {
         </h2>
         <nav aria-label="Explore navigation" className="overlay-links">
           <Link to="/" onClick={onClose}>
-            <span>01</span> Home <span aria-hidden="true">↗</span>
+            <span className="overlay-index">01</span>
+            <span className="overlay-label">Home</span>
+            <span className="overlay-arrow" aria-hidden="true">
+              ↗
+            </span>
           </Link>
           <Link to="/events" onClick={onClose}>
-            <span>02</span> Discover events <span aria-hidden="true">↗</span>
+            <span className="overlay-index">02</span>
+            <span className="overlay-label">Discover events</span>
+            <span className="overlay-arrow" aria-hidden="true">
+              ↗
+            </span>
           </Link>
           {user?.roles.some((r) => r === "ORGANIZER" || r === "ADMIN") && (
             <Link to="/organizer/events" onClick={onClose}>
-              <span>03</span> My events <span aria-hidden="true">↗</span>
+              <span className="overlay-index">03</span>
+              <span className="overlay-label">My events</span>
+              <span className="overlay-arrow" aria-hidden="true">
+                ↗
+              </span>
             </Link>
           )}
           {user?.roles.includes("ADMIN") && (
             <Link to="/admin/users" onClick={onClose}>
-              <span>04</span> Manage users <span aria-hidden="true">↗</span>
+              <span className="overlay-index">04</span>
+              <span className="overlay-label">Manage users</span>
+              <span className="overlay-arrow" aria-hidden="true">
+                ↗
+              </span>
             </Link>
           )}
           {!user && (
             <Link to="/login" onClick={onClose}>
-              <span>03</span> Join the community{" "}
-              <span aria-hidden="true">↗</span>
+              <span className="overlay-index">03</span>
+              <span className="overlay-label">Join the community</span>
+              <span className="overlay-arrow" aria-hidden="true">
+                ↗
+              </span>
             </Link>
           )}
         </nav>
