@@ -218,57 +218,62 @@ export function BookingForm({
           onChange={(e) => setQuantity(Number(e.target.value))}
         />
       </label>
-      <fieldset
-        className="registration-settings"
-        disabled={busy || applying || loadingSaved || !!pending}
-      >
-        <legend>Registration contact</legend>
-        <p className="muted">
-          One contact for this booking. These details are shared with the event
-          organizer.
-        </p>
-        <div className="actions">
-          <button
-            type="button"
-            className="secondary-button"
-            onClick={applyProfile}
-          >
-            Apply saved details
-          </button>
-          <Link to="/profile">Manage saved details</Link>
-        </div>
-        {registrationFields
-          .filter((f) => requirements[f.rule])
-          .map((f) => (
-            <label key={f.key}>
-              {f.label}
-              <input
-                type={f.type}
+      {(registrationFields.some((f) => requirements[f.rule]) ||
+        requirements.customFieldLabel) && (
+        <fieldset
+          className="registration-settings"
+          disabled={busy || applying || loadingSaved || !!pending}
+        >
+          <legend>Registration contact</legend>
+          <p className="muted">
+            One contact for this booking. These details are shared with the
+            event organizer.
+          </p>
+          <div className="actions">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={applyProfile}
+            >
+              Apply saved details
+            </button>
+            <Link to="/profile">Manage saved details</Link>
+          </div>
+          {registrationFields
+            .filter((f) => requirements[f.rule])
+            .map((f) => (
+              <label key={f.key}>
+                {f.label}
+                <input
+                  type={f.type}
+                  required
+                  maxLength={f.max}
+                  value={info[f.key] ?? ""}
+                  onChange={(e) =>
+                    setInfo({ ...info, [f.key]: e.target.value })
+                  }
+                />
+              </label>
+            ))}
+          {requirements.customFieldLabel && (
+            <label>
+              {requirements.customFieldLabel}
+              <textarea
                 required
-                maxLength={f.max}
-                value={info[f.key] ?? ""}
-                onChange={(e) => setInfo({ ...info, [f.key]: e.target.value })}
+                maxLength={500}
+                value={info.customAnswer ?? ""}
+                onChange={(e) =>
+                  setInfo({ ...info, customAnswer: e.target.value })
+                }
               />
             </label>
-          ))}
-        {requirements.customFieldLabel && (
-          <label>
-            {requirements.customFieldLabel}
-            <textarea
-              required
-              maxLength={500}
-              value={info.customAnswer ?? ""}
-              onChange={(e) =>
-                setInfo({ ...info, customAnswer: e.target.value })
-              }
-            />
-          </label>
-        )}
-        {!registrationFields.some((f) => requirements[f.rule]) &&
-          !requirements.customFieldLabel && (
-            <p>No additional information required.</p>
           )}
-      </fieldset>
+          {!registrationFields.some((f) => requirements[f.rule]) &&
+            !requirements.customFieldLabel && (
+              <p>No additional information required.</p>
+            )}
+        </fieldset>
+      )}
       <p className="muted">Free admission · Up to 10 places per booking.</p>
       {beforeOpening ? (
         <>

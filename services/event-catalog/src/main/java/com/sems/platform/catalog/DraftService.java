@@ -19,6 +19,12 @@ public class DraftService {
    throw new ResponseStatusException(HttpStatus.CONFLICT,"Time and capacity are fixed after ticket setup begins");
   validate(input);event.apply(input);events.flush();return event.view();
  }
+ public Event.View presentation(UUID owner,UUID id,PresentationUpdate input){
+  Event event=owned(owner,id);
+  if(!event.status.equals("PUBLISHED"))throw new ResponseStatusException(HttpStatus.CONFLICT,"Only published events use presentation editing");
+  if(event.version!=input.version())throw new ResponseStatusException(HttpStatus.CONFLICT,"Event changed; reload before editing");
+  event.title=input.title().strip();event.description=input.description().strip();event.location=input.location().strip();event.category=input.category();event.cardTheme=input.cardTheme();event.updatedAt=java.time.Instant.now();events.flush();return event.view();
+ }
  @Transactional(readOnly=true) public Event.View detail(UUID owner,UUID id){return owned(owner,id).view();}
  @Transactional(readOnly=true) public EventPage list(UUID owner,int page,int size){
   if(page<0||size<1||size>50||(long)page*size>Integer.MAX_VALUE)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid pagination");

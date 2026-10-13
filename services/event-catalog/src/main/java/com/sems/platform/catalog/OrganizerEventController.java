@@ -17,5 +17,6 @@ public class OrganizerEventController {
  @PostMapping public ResponseEntity<Event.View> create(@AuthenticationPrincipal Jwt jwt,@Valid @RequestBody Draft body){
   var event=drafts.create(UUID.fromString(jwt.getSubject()),body);return ResponseEntity.created(URI.create("/api/v1/organizer/events/"+event.id())).body(event);
  }
+ @PatchMapping("/{id}/presentation") public Event.View presentation(@AuthenticationPrincipal Jwt jwt,@PathVariable UUID id,@Valid @RequestBody PresentationUpdate body){return drafts.presentation(UUID.fromString(jwt.getSubject()),id,body);}
  @PutMapping("/{id}") public Event.View update(@AuthenticationPrincipal Jwt jwt,@PathVariable UUID id,@Valid @RequestBody Draft body){return drafts.update(UUID.fromString(jwt.getSubject()),id,body);}
 }

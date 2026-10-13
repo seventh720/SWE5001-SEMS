@@ -265,3 +265,11 @@ Before a ticket's opening time, **Save pre-registration** saves one selection pe
 Event cards separate category, date, venue and description; details show event-start and registration opening/closing countdowns. All times remain Singapore time. Countdown updates are informational and do not override server-side time or capacity checks.
 
 Upgrade Identity V2 and Admission V5 using newly built service jars, then rebuild the Web dist before its Docker image and restart the gateway. Database port stays **15432**. Full regression: `python3 scripts/pre-registration-acceptance.py` against an isolated test stack. See [design and verification](docs/pre-registration-increment.md).
+
+## 11. Workspaces and offering reuse
+
+Signed-in Home is a role-aware Dashboard with upcoming confirmed bookings and saved pre-registrations. Organizer and administrator tools appear only for the corresponding roles; staff check-in remains pending. Explore is a compact right-anchored navigation panel.
+
+**My events → Edit event** updates published title, description, venue, category and artwork. Dates, capacity, registration requirements and ticket settings remain fixed. Existing tickets retain booking-time details; use the public event page for the latest venue. **Use as template** loads your own event into a new draft; enter new dates, review contact requirements, then configure ticket types and publish separately.
+
+[Platform positioning and organization onboarding](docs/platform-positioning.md) explains the shared platform, two organizer scenarios and the boundary between account ownership and enterprise tenancy. Full regression now runs `python3 scripts/workspace-acceptance.py` in an isolated test environment.

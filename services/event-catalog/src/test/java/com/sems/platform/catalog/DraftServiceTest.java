@@ -11,4 +11,9 @@ class DraftServiceTest {
  @Test void cannotReadAnotherOwnersEvent(){var owner=UUID.randomUUID();var id=UUID.randomUUID();when(repo.findByIdAndOrganizerId(id,owner)).thenReturn(Optional.empty());assertEquals(404,assertThrows(ResponseStatusException.class,()->service.detail(owner,id)).getStatusCode().value());}
  @Test void staleUpdateDoesNotMutateEvent(){var owner=UUID.randomUUID();var event=new Event(owner,input);event.version=2;when(repo.findByIdAndOrganizerId(event.id,owner)).thenReturn(Optional.of(event));assertEquals(409,assertThrows(ResponseStatusException.class,()->service.update(owner,event.id,input)).getStatusCode().value());verify(repo,never()).flush();}
  @Test void rejectsEndBeforeStart(){var invalid=new Draft("x","x","x",input.endsAt(),input.startsAt(),10,null);assertEquals(400,assertThrows(ResponseStatusException.class,()->service.create(UUID.randomUUID(),invalid)).getStatusCode().value());verifyNoInteractions(repo);}
+ @Test void publishedPresentationKeepsTicketContract(){var owner=UUID.randomUUID();var event=new Event(owner,input);event.status="PUBLISHED";event.salesConfigured=true;when(repo.findByIdAndOrganizerId(event.id,owner)).thenReturn(Optional.of(event));
+ var updated=service.presentation(owner,event.id,new PresentationUpdate("New title","New description","New venue",EventCategory.MUSIC,CardTheme.PEACH,0L));
+ assertEquals("New title",updated.title());assertEquals(input.startsAt(),updated.startsAt());assertEquals(input.capacity(),updated.capacity());assertEquals(RegistrationRequirements.none(),updated.registrationRequirements());assertEquals("PUBLISHED",updated.status());
+ assertEquals(409,assertThrows(ResponseStatusException.class,()->service.presentation(owner,event.id,new PresentationUpdate("X","X","X",EventCategory.ART,CardTheme.SKY,5L))).getStatusCode().value());
+ }
 }

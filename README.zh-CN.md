@@ -265,3 +265,11 @@ git push
 活动卡片分开显示分类、时间、地点和简介；详情展示活动开始、报名开放／截止倒计时，统一使用新加坡时间。倒计时用于提示，实际时间与名额由后端校验。
 
 升级需应用 Identity V2、Admission V5；使用新构建的 JAR，先构建前端 dist 再重建 Web 容器，最后重启网关。数据库端口保持 **15432**。完整回归命令：`python3 scripts/pre-registration-acceptance.py`，仅在独立测试环境执行。见[设计与验证说明](docs/pre-registration-increment.md)。
+
+## 11. 分角色工作台与活动复用
+
+登录后首页展示 Dashboard，包括近期已确认行程及已保存预约。组织者、管理员按角色看到对应管理入口；工作人员检票仍待实现。Explore 调整为右侧紧凑导航面板。
+
+**My events → Edit event** 可修改已发布活动的标题、简介、地点、分类及背景。时间、容量、报名字段和票务配置保持锁定。历史票据保留报名时的信息，最新地点以公开详情为准。**Use as template** 将自己的活动载入新草稿，需要重新填写日期、审核报名字段、配置票种并发布。
+
+[平台定位与组织者接入说明](docs/platform-positioning.md)明确了共享平台、两个组织者场景，以及账号所有权隔离与企业租户的区别。完整验收入口为 `python3 scripts/workspace-acceptance.py`，仅在独立测试环境运行。

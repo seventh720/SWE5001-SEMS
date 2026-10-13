@@ -15,3 +15,7 @@ Victor branch, Codex-assisted implementation: configurable booking contact field
 ### 2026-10-13 — Profiles and pre-registration
 
 Added in-flow Explore navigation, readable event facts, manual profile application, persisted pre-registration and live opening/closing countdowns. Identity V2 and Admission V5 preserve service-owned schemas. 34 frontend tests, 16 backend tests, production builds and full two-replica PostgreSQL/API acceptance passed. Headless Chrome verified desktop/mobile layout without horizontal overflow and profile save/reload, pre-registration save/list/load. CI now includes the complete pre-registration lifecycle.
+
+### 2026-10-14 — Role workspaces and offering reuse
+
+Replaced signed-in marketing with Dashboard plans/pre-registrations and role-specific management; added community upcoming events, right-anchored navigation, category artwork and a ticket favicon. Published presentation edits preserve time/capacity/registration requirements and historical order snapshots. Own-event templates reset dates and require fresh sales configuration. 39 frontend tests and 17 backend tests passed with the full PostgreSQL/API regression. Headless Chrome verified organizer Dashboard, published edit, template date reset, setup spacing and mobile overflow. Platform positioning is documented against revised proposal sections 3 and 5.

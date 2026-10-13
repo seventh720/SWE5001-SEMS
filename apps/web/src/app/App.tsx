@@ -1,3 +1,4 @@
+import { DashboardPage } from "../features/dashboard/DashboardPage";
 import { ProfilePage } from "../features/profile/ProfilePage";
 import { PreRegistrationsPage } from "../features/bookings/PreRegistrationsPage";
 import { OrganizerBookingsPage } from "../features/bookings/OrganizerBookingsPage";
@@ -16,6 +17,10 @@ import { ProtectedRoute } from "./ProtectedRoute";
 
 import { BookingDetail, BookingsPage } from "../features/bookings/BookingsPage";
 function Home() {
+  const { user } = useAuth();
+  return user ? <DashboardPage /> : <Landing />;
+}
+function Landing() {
   const { user } = useAuth();
   const organizer = user?.roles.some((r) => r === "ORGANIZER" || r === "ADMIN");
   return (
@@ -216,6 +221,15 @@ export function App() {
   const location = useLocation();
   const exploreTrigger = useRef<HTMLButtonElement>(null);
   const [menu, setMenu] = useState(false);
+  useEffect(() => {
+    if (!menu) return;
+    const dismiss = (e: PointerEvent) => {
+      if (e.target instanceof Element && !e.target.closest(".site-header"))
+        setMenu(false);
+    };
+    document.addEventListener("pointerdown", dismiss);
+    return () => document.removeEventListener("pointerdown", dismiss);
+  }, [menu]);
   const [paused, setPaused] = useState(
     () =>
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false,
@@ -241,40 +255,43 @@ export function App() {
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
-      <nav className="topbar" aria-label="Main navigation">
-        <Link to="/" className="brand">
-          SEMS<span>GET TOGETHER</span>
-        </Link>
-        <div className="nav-actions">
-          <button
-            className="motion-toggle"
-            aria-pressed={paused}
-            onClick={() => setPaused(!paused)}
-          >
-            {paused ? "Enable motion" : "Pause motion"}
-          </button>
-          {user ? (
-            <>
-              <span className="nav-username">{user.username}</span>
-              <button onClick={logout}>Sign out</button>
-            </>
-          ) : (
-            <Link className="nav-signin" to="/login">
-              Sign in ↗
-            </Link>
-          )}
-          <button
-            className="menu-toggle"
-            ref={exploreTrigger}
-            aria-controls="explore-navigation"
-            aria-expanded={menu}
-            onClick={() => setMenu(!menu)}
-          >
-            Explore <span aria-hidden="true">☰</span>
-          </button>
-        </div>
-      </nav>
-      {menu && <ExploreMenu onClose={() => setMenu(false)} />}
+      <header className="site-header">
+        <nav className="topbar" aria-label="Main navigation">
+          <Link to="/" className="brand">
+            <img className="brand-icon" src="/favicon.svg" alt="" />
+            SEMS<span>GET TOGETHER</span>
+          </Link>
+          <div className="nav-actions">
+            <button
+              className="motion-toggle"
+              aria-pressed={paused}
+              onClick={() => setPaused(!paused)}
+            >
+              {paused ? "Enable motion" : "Pause motion"}
+            </button>
+            {user ? (
+              <>
+                <span className="nav-username">{user.username}</span>
+                <button onClick={logout}>Sign out</button>
+              </>
+            ) : (
+              <Link className="nav-signin" to="/login">
+                Sign in ↗
+              </Link>
+            )}
+            <button
+              className="menu-toggle"
+              ref={exploreTrigger}
+              aria-controls="explore-navigation"
+              aria-expanded={menu}
+              onClick={() => setMenu(!menu)}
+            >
+              Explore <span aria-hidden="true">☰</span>
+            </button>
+          </div>
+        </nav>
+        {menu && <ExploreMenu onClose={() => setMenu(false)} />}
+      </header>
       <div
         className="route-surface"
         key={location.pathname}

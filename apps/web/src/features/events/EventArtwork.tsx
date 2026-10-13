@@ -28,13 +28,28 @@ export function EventArtwork({
     ? theme.toLowerCase()
     : "lilac";
   return (
-    <div className={`event-artwork theme-${selected}`}>
+    <div
+      className={`event-artwork theme-${selected} category-${category.toLowerCase()}`}
+    >
       <div className="artwork-shapes" aria-hidden="true">
         <span className="artwork-ring" />
         <span className="artwork-glyph">
           {["✳", "⌘", "◈", "♫", "↗", "✺", "◎"][index]}
         </span>
         <span className="artwork-disc" />
+        <span className="artwork-word">
+          {
+            [
+              "GET TOGETHER",
+              "BUILD & INNOVATE",
+              "LEARN SOMETHING",
+              "FEEL THE MUSIC",
+              "GET MOVING",
+              "CREATE & INSPIRE",
+              "FIND YOUR PEOPLE",
+            ][index]
+          }
+        </span>
       </div>
       <span className="artwork-category">{categories[index][1]}</span>
     </div>

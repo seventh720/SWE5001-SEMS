@@ -57,32 +57,37 @@ export function PublicEventsPage() {
     setKeyword(search);
   }
   return (
-    <main className="app-shell">
+    <main className="app-shell discovery-workspace">
+      <Link className="back-link" to="/">
+        ← Home / Dashboard
+      </Link>
       <p className="eyebrow">DISCOVER YOUR COMMUNITY</p>
       <h1>Upcoming events</h1>
-      <form className="actions" onSubmit={submit}>
-        <label>
-          Search events
-          <input
-            value={search}
-            maxLength={200}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </label>
-        <button type="submit">Search</button>
-      </form>
-      <Select
-        label="Filter by category"
-        value={category}
-        options={[
-          { value: "", label: "All categories" },
-          ...categories.map(([value, label]) => ({ value, label })),
-        ]}
-        onChange={(value) => {
-          setCategory(value);
-          setPage(0);
-        }}
-      />
+      <div className="discovery-filters">
+        <form className="actions" onSubmit={submit}>
+          <label>
+            Search events
+            <input
+              value={search}
+              maxLength={200}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </label>
+          <button type="submit">Search</button>
+        </form>
+        <Select
+          label="Filter by category"
+          value={category}
+          options={[
+            { value: "", label: "All categories" },
+            ...categories.map(([value, label]) => ({ value, label })),
+          ]}
+          onChange={(value) => {
+            setCategory(value);
+            setPage(0);
+          }}
+        />
+      </div>
       {error && (
         <p role="alert" className="error-message">
           {error}
@@ -163,7 +168,10 @@ export function PublicEventDetail() {
   }, [id]);
   return (
     <main className="app-shell">
-      <Link to="/events">← All events</Link>
+      <div className="page-breadcrumbs">
+        <Link to="/">← Home / Dashboard</Link>
+        <Link to="/events">All events →</Link>
+      </div>
       {error && <p role="alert">{error}</p>}
       {event && (
         <>

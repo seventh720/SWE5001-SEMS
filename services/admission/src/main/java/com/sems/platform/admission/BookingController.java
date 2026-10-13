@@ -22,6 +22,7 @@ public class BookingController {
         return privateResponse(bookings.create(user,input,catalog.published(input.eventId())));
     }
     @GetMapping public ResponseEntity<Page> list(@AuthenticationPrincipal Jwt jwt,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="10") int size) {return privateResponse(bookings.list(UUID.fromString(jwt.getSubject()),page,size));}
+    @GetMapping("/upcoming") public ResponseEntity<Page> upcoming(@AuthenticationPrincipal Jwt jwt){return privateResponse(bookings.upcoming(UUID.fromString(jwt.getSubject())));}
     @GetMapping("/{id}") public ResponseEntity<Booking> detail(@AuthenticationPrincipal Jwt jwt,@PathVariable UUID id) {return privateResponse(bookings.owned(UUID.fromString(jwt.getSubject()),id));}
     @PostMapping("/{id}/cancel") public ResponseEntity<Booking> cancel(@AuthenticationPrincipal Jwt jwt,@PathVariable UUID id) {return privateResponse(bookings.cancel(UUID.fromString(jwt.getSubject()),id));}
 }
