@@ -1126,6 +1126,26 @@
           }
         }
       }
+    },
+    "/api/v1/bookings/upcoming": {
+      "get": {
+        "summary": "Own confirmed bookings whose end time is in the future, ordered by start time; up to five for Dashboard",
+        "responses": {
+          "200": {
+            "description": "Private paginated shape, size five, Cache-Control no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      }
     }
   }
 }

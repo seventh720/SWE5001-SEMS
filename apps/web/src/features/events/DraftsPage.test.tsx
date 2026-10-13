@@ -35,6 +35,7 @@ function mount(roles = ["ORGANIZER"]) {
   );
 }
 beforeEach(() => {
+  vi.stubGlobal("scrollTo", vi.fn());
   fetchMock.mockReset();
   vi.stubGlobal("fetch", fetchMock);
   sessionStorage.clear();
@@ -94,4 +95,52 @@ it("keeps edits visible and offers reload after a version conflict", async () =>
   expect(
     screen.getByRole("button", { name: "Reload latest draft" }),
   ).toBeTruthy();
+});
+
+it("reuses a published event as a new draft with empty dates", async () => {
+  const published = { ...draft, status: "PUBLISHED", salesConfigured: true };
+  fetchMock
+    .mockResolvedValueOnce(
+      response({ items: [published], totalPages: 1, totalElements: 1 }),
+    )
+    .mockResolvedValueOnce(response(published));
+  mount();
+  fireEvent.click(
+    await screen.findByRole("button", { name: "Use as template" }),
+  );
+  await screen.findByDisplayValue("Seminar (copy)");
+  expect((screen.getByLabelText("Starts at") as HTMLInputElement).value).toBe(
+    "",
+  );
+  expect(
+    (screen.getByLabelText("Starts at") as HTMLInputElement).disabled,
+  ).toBe(false);
+  expect(screen.getByRole("button", { name: "Save draft" })).toBeTruthy();
+});
+it("updates published presentation without submitting ticket settings", async () => {
+  const published = { ...draft, status: "PUBLISHED", salesConfigured: true };
+  fetchMock
+    .mockResolvedValueOnce(
+      response({ items: [published], totalPages: 1, totalElements: 1 }),
+    )
+    .mockResolvedValueOnce(response(published))
+    .mockResolvedValueOnce(response(published))
+    .mockResolvedValueOnce(
+      response({ items: [published], totalPages: 1, totalElements: 1 }),
+    );
+  mount();
+  fireEvent.click(await screen.findByRole("button", { name: "Edit event" }));
+  await screen.findByDisplayValue("Seminar");
+  fireEvent.change(screen.getByLabelText("Title"), {
+    target: { value: "Updated" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Save event changes" }));
+  await screen.findByText(/Published event updated/);
+  expect(fetchMock.mock.calls[2][0]).toBe(
+    "/api/v1/organizer/events/e1/presentation",
+  );
+  expect(fetchMock.mock.calls[2][1]?.method).toBe("PATCH");
+  expect(
+    JSON.parse(fetchMock.mock.calls[2][1]!.body as string).startsAt,
+  ).toBeUndefined();
 });

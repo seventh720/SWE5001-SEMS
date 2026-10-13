@@ -86,6 +86,13 @@ public class BookingService {
         var items=jdbc.query("SELECT * FROM bookings WHERE user_id=? ORDER BY created_at DESC,id DESC LIMIT ? OFFSET ?",this::map,user,size,(long)page*size);
         return new Page(items,page,size,total,(total+size-1)/size);
     }
+    @Transactional(readOnly=true,isolation=org.springframework.transaction.annotation.Isolation.REPEATABLE_READ)
+    public Page upcoming(UUID user){
+        var now=Timestamp.from(Instant.now());
+        long total=jdbc.queryForObject("SELECT count(*) FROM bookings WHERE user_id=? AND status='CONFIRMED' AND ends_at>?",Long.class,user,now);
+        var items=jdbc.query("SELECT * FROM bookings WHERE user_id=? AND status='CONFIRMED' AND ends_at>? ORDER BY starts_at,id LIMIT 5",this::map,user,now);
+        return new Page(items,0,5,total,(total+4)/5);
+    }
     @Transactional
     public Booking cancel(UUID user,UUID id) {
         // All booking writers acquire the sales row before changing tickets or inventory.

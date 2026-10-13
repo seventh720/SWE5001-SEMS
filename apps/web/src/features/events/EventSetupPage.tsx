@@ -150,7 +150,10 @@ export function EventSetupPage() {
   const editable = event?.status === "DRAFT";
   const total = tickets.reduce((n, t) => n + t.quota, 0);
   return (
-    <main className="app-shell">
+    <main className="app-shell event-setup-workspace">
+      <Link className="back-link" to="/">
+        ← Dashboard
+      </Link>
       <Link to="/organizer/events">← My events</Link>
       <h1>{event?.title ?? "Event setup"}</h1>
       {error && (
@@ -183,9 +186,14 @@ export function EventSetupPage() {
             </p>
           )}
           {event.status === "PUBLISHED" && (
-            <Link className="primary-button" to={`/events/${id}`}>
-              View public event
-            </Link>
+            <div className="published-actions">
+              <Link className="primary-button" to={`/events/${id}`}>
+                View public event
+              </Link>
+              <Link className="secondary-button" to="/organizer/events">
+                Edit details or reuse template
+              </Link>
+            </div>
           )}
           <section className="card">
             <h2>Free ticket types</h2>
@@ -194,8 +202,8 @@ export function EventSetupPage() {
               types remain editable until publication.
             </p>
             <p className="muted">
-              Times use {Intl.DateTimeFormat().resolvedOptions().timeZone}.
-              Sales must close by the event start.
+              Times use Singapore time (UTC+08:00). Sales must close by the
+              event start.
             </p>
             <form onSubmit={save}>
               <fieldset disabled={!editable || busy} className="ticket-fields">

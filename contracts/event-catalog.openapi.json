@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SEMS Event Catalog API",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "description": "Draft management and durable publication. ORGANIZER/ADMIN cannot bypass ownership. Starting ticket setup fixes time and capacity; other draft details remain editable until publication. All published configuration is immutable in this release."
   },
   "servers": [
@@ -452,6 +452,59 @@
             "nullable": true,
             "maxLength": 100,
             "description": "A nonblank label makes customAnswer required."
+          }
+        }
+      },
+      "PresentationUpdate": {
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "location",
+          "category",
+          "cardTheme",
+          "version"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "location": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "GENERAL",
+              "TECH",
+              "EDUCATION",
+              "MUSIC",
+              "SPORT",
+              "ART",
+              "COMMUNITY"
+            ]
+          },
+          "cardTheme": {
+            "type": "string",
+            "enum": [
+              "LILAC",
+              "LIME",
+              "PEACH",
+              "SKY"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
           }
         }
       }
@@ -1152,6 +1205,59 @@
           }
         },
         "description": " Internal event snapshots also include title and location for historical booking records; Admission stores these without cross-schema joins."
+      }
+    },
+    "/api/v1/organizer/events/{id}/presentation": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "patch": {
+        "summary": "Update presentation of an owned published event; time, capacity, requirements and historical booking snapshots remain unchanged",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PresentationUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated presentation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid data"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Organizer role required"
+          },
+          "404": {
+            "description": "Not owned"
+          },
+          "409": {
+            "description": "Version conflict or event not published"
+          }
+        }
       }
     }
   }

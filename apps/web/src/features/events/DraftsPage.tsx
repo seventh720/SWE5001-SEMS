@@ -82,7 +82,7 @@ export function DraftsPage() {
     };
   }, [token, allowed, page, refresh]);
   if (!allowed) return <Navigate to="/" replace />;
-  async function edit(id: string) {
+  async function edit(id: string, template = false) {
     setError("");
     try {
       const d = await apiRequest<Draft>(
@@ -90,17 +90,23 @@ export function DraftsPage() {
         {},
         token!,
       );
-      setEditing(d);
+      setEditing(template ? null : d);
       setForm({
         ...d,
         category: d.category ?? "GENERAL",
         cardTheme: d.cardTheme ?? "LILAC",
         registrationRequirements: d.registrationRequirements ?? noRequirements,
-        startsAt: singaporeInput(d.startsAt),
-        endsAt: singaporeInput(d.endsAt),
+        title: template ? `${d.title.slice(0, 190)} (copy)` : d.title,
+        startsAt: template ? "" : singaporeInput(d.startsAt),
+        endsAt: template ? "" : singaporeInput(d.endsAt),
       });
       setShow(true);
-      setMessage("");
+      setMessage(
+        template
+          ? "Template loaded. Choose new dates, save the draft, then configure its ticket types."
+          : "",
+      );
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to load draft");
     }
@@ -112,21 +118,40 @@ export function DraftsPage() {
     setMessage("");
     try {
       await apiRequest<Draft>(
-        `/api/v1/organizer/events${editing ? `/${editing.id}` : ""}`,
+        `/api/v1/organizer/events${editing ? `/${editing.id}${editing.status === "PUBLISHED" ? "/presentation" : ""}` : ""}`,
         {
-          method: editing ? "PUT" : "POST",
-          body: JSON.stringify({
-            ...form,
-            startsAt: toInstant(form.startsAt),
-            endsAt: toInstant(form.endsAt),
-            ...(editing ? { version: editing.version } : {}),
-          }),
+          method: editing
+            ? editing.status === "PUBLISHED"
+              ? "PATCH"
+              : "PUT"
+            : "POST",
+          body: JSON.stringify(
+            editing?.status === "PUBLISHED"
+              ? {
+                  title: form.title,
+                  description: form.description,
+                  location: form.location,
+                  category: form.category,
+                  cardTheme: form.cardTheme,
+                  version: editing.version,
+                }
+              : {
+                  ...form,
+                  startsAt: toInstant(form.startsAt),
+                  endsAt: toInstant(form.endsAt),
+                  ...(editing ? { version: editing.version } : {}),
+                },
+          ),
         },
         token!,
       );
       setShow(false);
       setEditing(null);
-      setMessage("Draft saved.");
+      setMessage(
+        editing?.status === "PUBLISHED"
+          ? "Published event updated. Existing tickets retain their booking-time details."
+          : "Draft saved.",
+      );
       setRefresh((v) => v + 1);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Unable to save draft");
@@ -135,7 +160,10 @@ export function DraftsPage() {
     }
   }
   return (
-    <main className="app-shell">
+    <main className="app-shell organizer-workspace">
+      <Link className="back-link" to="/">
+        ← Dashboard
+      </Link>
       <header className="app-header">
         <div>
           <p className="eyebrow">ORGANIZER WORKSPACE</p>
@@ -167,8 +195,22 @@ export function DraftsPage() {
       )}
       {message && <p role="status">{message}</p>}
       {show && (
-        <section className="card">
-          <h2>{editing ? "Edit draft" : "New event draft"}</h2>
+        <section className="card event-editor">
+          <h2>
+            {editing
+              ? editing.status === "PUBLISHED"
+                ? "Edit published event"
+                : "Edit draft"
+              : "New event draft"}
+          </h2>
+          {editing?.status === "PUBLISHED" && (
+            <p className="editor-notice">
+              You can update public details and artwork. Existing tickets keep
+              their booking-time details; attendees can check the public event
+              for the latest venue. Schedule, capacity and registration
+              requirements stay fixed.
+            </p>
+          )}
           <form onSubmit={save}>
             <label>
               Title
@@ -256,7 +298,10 @@ export function DraftsPage() {
               </div>
               <EventArtwork category={form.category} theme={form.cardTheme} />
             </div>
-            <fieldset className="registration-settings" disabled={busy}>
+            <fieldset
+              className="registration-settings"
+              disabled={busy || editing?.status === "PUBLISHED"}
+            >
               <legend>Registration information</legend>
               <p>
                 Choose what the booking contact must provide. One contact covers
@@ -306,7 +351,11 @@ export function DraftsPage() {
             </fieldset>
             <div className="actions">
               <button type="submit" className="primary-button" disabled={busy}>
-                {busy ? "Saving…" : "Save draft"}
+                {busy
+                  ? "Saving…"
+                  : editing?.status === "PUBLISHED"
+                    ? "Save event changes"
+                    : "Save draft"}
               </button>
               <button
                 type="button"
@@ -338,9 +387,17 @@ export function DraftsPage() {
                   <p className="muted">Capacity {d.capacity}</p>
                 </div>
                 <div className="actions">
-                  {d.status === "DRAFT" && (
-                    <button onClick={() => edit(d.id)}>Edit draft</button>
+                  {(d.status === "DRAFT" || d.status === "PUBLISHED") && (
+                    <button onClick={() => edit(d.id)}>
+                      {d.status === "PUBLISHED" ? "Edit event" : "Edit draft"}
+                    </button>
                   )}
+                  <button
+                    className="secondary-button"
+                    onClick={() => edit(d.id, true)}
+                  >
+                    Use as template
+                  </button>
                   <Link to={`/organizer/events/${d.id}/bookings`}>
                     Registration list →
                   </Link>

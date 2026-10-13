@@ -205,6 +205,9 @@ export function BookingDetail() {
         <>
           <p className="eyebrow">BOOKING / {booking.status}</p>
           <h1>{booking.eventTitle}</h1>
+          <Link to={`/events/${booking.eventId}`}>
+            View current event details →
+          </Link>
           <p>
             {booking.eventLocation} · {formatDateTime(booking.startsAt)}
           </p>
