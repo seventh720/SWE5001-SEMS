@@ -98,15 +98,13 @@ it("allows changing quantity after a definitive capacity rejection", async () =>
   );
 });
 it("requires cancellation confirmation and removes QR/manual codes afterwards", async () => {
-  fetchMock
-    .mockResolvedValueOnce(response(booking))
-    .mockResolvedValueOnce(
-      response({
-        ...booking,
-        status: "CANCELLED",
-        tickets: [{ ...ticket, state: "CANCELLED" }],
-      }),
-    );
+  fetchMock.mockResolvedValueOnce(response(booking)).mockResolvedValueOnce(
+    response({
+      ...booking,
+      status: "CANCELLED",
+      tickets: [{ ...ticket, state: "CANCELLED" }],
+    }),
+  );
   render(
     <AuthProvider>
       <MemoryRouter initialEntries={["/bookings/b1"]}>
@@ -124,4 +122,51 @@ it("requires cancellation confirmation and removes QR/manual codes afterwards", 
   await screen.findByText(/Booking cancelled/);
   expect(screen.queryByAltText("Admission ticket QR code")).toBeNull();
   expect(screen.queryByText("unique-code")).toBeNull();
+});
+it("submits requested contact fields and preserves them for retry", async () => {
+  fetchMock.mockRejectedValueOnce(new TypeError("Connection lost"));
+  render(
+    <AuthProvider>
+      <MemoryRouter>
+        <BookingForm
+          eventId="e1"
+          ticketTypeId="t1"
+          available={10}
+          opensAt="2020-01-01T00:00:00Z"
+          closesAt="2099-01-01T00:00:00Z"
+          requirements={{
+            realName: true,
+            email: true,
+            phone: false,
+            studentId: false,
+            passport: false,
+            customFieldLabel: "Dietary needs",
+          }}
+        />
+      </MemoryRouter>
+    </AuthProvider>,
+  );
+  expect(screen.queryByLabelText("Passport number")).toBeNull();
+  fireEvent.change(screen.getByLabelText("Full name"), {
+    target: { value: " Alice Tan " },
+  });
+  fireEvent.change(screen.getByLabelText("Contact email"), {
+    target: { value: "alice@example.com" },
+  });
+  fireEvent.change(screen.getByLabelText("Dietary needs"), {
+    target: { value: "None" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Confirm free booking" }));
+  await screen.findByText("Connection lost");
+  expect(
+    JSON.parse(fetchMock.mock.calls[0][1]!.body as string).attendeeInfo,
+  ).toEqual({
+    realName: "Alice Tan",
+    email: "alice@example.com",
+    customAnswer: "None",
+  });
+  expect(
+    (screen.getByLabelText("Full name") as HTMLInputElement).closest("fieldset")
+      ?.disabled,
+  ).toBe(true);
 });

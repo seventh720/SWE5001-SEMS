@@ -1,3 +1,4 @@
+import { OrganizerBookingsPage } from "../features/bookings/OrganizerBookingsPage";
 import { useEffect, useRef, useState } from "react";
 import { Link, Route, Routes, useLocation } from "react-router-dom";
 import { useAuth } from "../features/auth/AuthContext";
@@ -331,6 +332,10 @@ export function App() {
           <Route path="/events/:id" element={<PublicEventDetail />} />
           <Route path="/login" element={<AuthPage />} />
           <Route element={<ProtectedRoute />}>
+            <Route
+              path="/organizer/events/:id/bookings"
+              element={<OrganizerBookingsPage />}
+            />
             <Route path="/bookings" element={<BookingsPage />} />
             <Route path="/bookings/:id" element={<BookingDetail />} />
             <Route

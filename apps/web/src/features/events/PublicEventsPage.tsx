@@ -1,3 +1,7 @@
+import { Select } from "../../shared/components/Select";
+import { formatDateTime } from "../../shared/components/dateTime";
+import { categories, EventArtwork } from "./EventArtwork";
+import type { Requirements } from "../bookings/registration";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { apiRequest } from "../../shared/api/client";
@@ -10,6 +14,9 @@ interface Event {
   startsAt: string;
   endsAt: string;
   capacity: number;
+  category?: string;
+  cardTheme?: string;
+  registrationRequirements?: Requirements;
 }
 interface Page {
   items: Event[];
@@ -20,6 +27,7 @@ export function PublicEventsPage() {
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState("");
   const [keyword, setKeyword] = useState("");
+  const [category, setCategory] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -27,7 +35,7 @@ export function PublicEventsPage() {
     setLoading(true);
     setError("");
     apiRequest<Page>(
-      `/api/v1/events?page=${page}&size=10&keyword=${encodeURIComponent(keyword)}`,
+      `/api/v1/events?page=${page}&size=10&keyword=${encodeURIComponent(keyword)}${category ? `&category=${category}` : ""}`,
     )
       .then((d) => {
         if (active) setData(d);
@@ -41,7 +49,7 @@ export function PublicEventsPage() {
     return () => {
       active = false;
     };
-  }, [page, keyword]);
+  }, [page, keyword, category]);
   function submit(e: FormEvent) {
     e.preventDefault();
     setPage(0);
@@ -62,6 +70,18 @@ export function PublicEventsPage() {
         </label>
         <button type="submit">Search</button>
       </form>
+      <Select
+        label="Filter by category"
+        value={category}
+        options={[
+          { value: "", label: "All categories" },
+          ...categories.map(([value, label]) => ({ value, label })),
+        ]}
+        onChange={(value) => {
+          setCategory(value);
+          setPage(0);
+        }}
+      />
       {error && (
         <p role="alert" className="error-message">
           {error}
@@ -72,18 +92,21 @@ export function PublicEventsPage() {
       ) : data.items.length === 0 ? (
         <p>No upcoming events found.</p>
       ) : (
-        data.items.map((e) => (
-          <article key={e.id} className="card">
-            <h2>
-              <Link to={`/events/${e.id}`}>{e.title}</Link>
-            </h2>
-            <p>
-              {e.location} · {new Date(e.startsAt).toLocaleString()}
-            </p>
-            <p>{e.description}</p>
-            <Link to={`/events/${e.id}`}>View event →</Link>
-          </article>
-        ))
+        <section className="offering-grid">
+          {data.items.map((e) => (
+            <article key={e.id} className="card offering-card">
+              <EventArtwork category={e.category} theme={e.cardTheme} />
+              <h2>
+                <Link to={`/events/${e.id}`}>{e.title}</Link>
+              </h2>
+              <p>
+                {e.location} · {formatDateTime(e.startsAt)}
+              </p>
+              <p>{e.description}</p>
+              <Link to={`/events/${e.id}`}>View event →</Link>
+            </article>
+          ))}
+        </section>
       )}
       <div className="actions">
         <button disabled={page === 0} onClick={() => setPage((n) => n - 1)}>
@@ -132,11 +155,11 @@ export function PublicEventDetail() {
       {error && <p role="alert">{error}</p>}
       {event && (
         <>
+          <EventArtwork category={event.category} theme={event.cardTheme} />
           <h1>{event.title}</h1>
           <p>{event.location}</p>
           <p>
-            {new Date(event.startsAt).toLocaleString()} –{" "}
-            {new Date(event.endsAt).toLocaleString()}
+            {formatDateTime(event.startsAt)} – {formatDateTime(event.endsAt)}
           </p>
           <section className="card">
             <p>{event.description}</p>
@@ -147,10 +170,11 @@ export function PublicEventDetail() {
               <h3>{t.name} · Free</h3>
               <p>{t.available} places available</p>
               <p>
-                Sales: {new Date(t.opensAt).toLocaleString()} –{" "}
-                {new Date(t.closesAt).toLocaleString()}
+                Sales: {formatDateTime(t.opensAt)} –{" "}
+                {formatDateTime(t.closesAt)}
               </p>
               <BookingForm
+                requirements={event.registrationRequirements}
                 eventId={event.id}
                 ticketTypeId={t.id}
                 available={t.available}

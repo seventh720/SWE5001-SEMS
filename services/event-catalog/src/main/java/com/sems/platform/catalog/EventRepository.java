@@ -10,4 +10,5 @@ public interface EventRepository extends JpaRepository<Event,UUID>{
  Optional<Event> lockById(@org.springframework.data.repository.query.Param("id") UUID id);
  List<Event> findTop20ByStatusOrderByUpdatedAtAsc(String status);
  Page<Event> findByStatusAndStartsAtAfterAndTitleContainingIgnoreCase(String status,java.time.Instant now,String keyword,Pageable page);
+ Page<Event> findByStatusAndCategoryAndStartsAtAfterAndTitleContainingIgnoreCase(String status,EventCategory category,java.time.Instant now,String keyword,Pageable page);
 }

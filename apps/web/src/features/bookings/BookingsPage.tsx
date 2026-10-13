@@ -1,3 +1,5 @@
+import { RegistrationSummary, type AttendeeInfo } from "./registration";
+import { formatDateTime } from "../../shared/components/dateTime";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import QRCode from "qrcode";
@@ -14,6 +16,8 @@ export interface Booking {
   ticketName: string;
   quantity: number;
   amount: number;
+  attendeeInfo?: AttendeeInfo;
+  customFieldLabel?: string | null;
   tickets: { id: string; credential: string; state: string }[];
 }
 function TicketCode({ credential }: { credential: string }) {
@@ -111,7 +115,7 @@ export function BookingsPage() {
                   {b.quantity === 1 ? "ticket" : "tickets"} · Free
                 </p>
                 <p className="muted">
-                  {new Date(b.startsAt).toLocaleString()} · {b.eventLocation}
+                  {formatDateTime(b.startsAt)} · {b.eventLocation}
                 </p>
               </div>
               <Link className="secondary-button" to={`/bookings/${b.id}`}>
@@ -202,8 +206,7 @@ export function BookingDetail() {
           <p className="eyebrow">BOOKING / {booking.status}</p>
           <h1>{booking.eventTitle}</h1>
           <p>
-            {booking.eventLocation} ·{" "}
-            {new Date(booking.startsAt).toLocaleString()}
+            {booking.eventLocation} · {formatDateTime(booking.startsAt)}
           </p>
           <p>
             {booking.ticketName} · {booking.quantity} tickets · Total: Free
@@ -220,6 +223,13 @@ export function BookingDetail() {
               private. Staff check-in is being added in the next increment.
             </p>
           )}
+          <section className="card">
+            <h2>Registration information</h2>
+            <RegistrationSummary
+              info={booking.attendeeInfo}
+              customFieldLabel={booking.customFieldLabel}
+            />
+          </section>
           <div className="issued-ticket-grid">
             {booking.tickets.map((ticket, n) => (
               <article className="card issued-ticket" key={ticket.id}>

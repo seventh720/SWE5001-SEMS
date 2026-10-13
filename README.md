@@ -42,7 +42,7 @@ Database credentials are applied only when a new volume is initialized. Editing 
 docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.dev.yaml down
 ```
 
-For frontend development, run `npm --prefix apps/web run dev`; port 15173 proxies APIs to the gateway on 18080. The production frontend is served at the gateway root. Date inputs use the browser timezone and submit UTC timestamps. The local development override exposes PostgreSQL only at `127.0.0.1:15432`; the base Compose file used by CI does not publish a database port.
+For frontend development, run `npm --prefix apps/web run dev`; port 15173 proxies APIs to the gateway on 18080. The production frontend is served at the gateway root. Date inputs use the application’s English calendar/time controls in Singapore time (UTC+08:00) and submit UTC timestamps. The local development override exposes PostgreSQL only at `127.0.0.1:15432`; the base Compose file used by CI does not publish a database port.
 
 This is local HTTP configuration. Cloud HTTPS, secret management and deployment remain pending.
 
@@ -70,7 +70,7 @@ bash scripts/check-db-isolation.sh
 set -a
 source .env
 set +a
-python3 scripts/booking-acceptance.py
+python3 scripts/registration-acceptance.py
 ```
 
 The last two checks need a running Compose stack. Publication acceptance intentionally stops/restarts test containers; use a disposable environment. Acceptance creates uniquely named test accounts and drafts; use an isolated test volume. CI exposes separate backend, frontend and integration jobs, reports JaCoCo/Vitest line and branch coverage, and runs these checks in an ephemeral environment, covering authentication, authorization, schema isolation, validation, persistence and concurrent version conflicts. Telegram reports results; logs/JARs are retained for seven days. See [CI operations](docs/ci.md).
@@ -243,3 +243,15 @@ Start the next task only after the previous PR is merged, so unrelated changes d
 These are team conventions; README changes do not enable GitHub protection. The repository administrator should configure `main` protection/rulesets to require PRs, one approval from another teammate, renewed approval after updates, resolved discussions and the three checks above, and prohibit force pushes/deletion. If automatic branch deletion is enabled, disable it or preserve/restore persistent personal branches such as `victor`.
 
 Booking design, API rules, migration notes and verification: [Booking increment](docs/booking-increment.md).
+
+## 9. Event presentation and registration details
+
+While editing a draft, choose an **Event category** and an independent **Card background** (Lilac, Lime, Peach or Sky). The public catalog filters categories together with title search. Background artwork is generated locally and supports the existing motion toggle/reduced-motion setting.
+
+Under **Registration information**, select only the contact fields the event requires: full name, contact email, phone, student ID, passport number, and/or one custom question. One contact covers all places in a booking. These settings can change in drafts and become fixed on publication. Attendees submit the requested fields when booking; **My tickets** shows the historical information. Organizers open **Registration list** from their event card; other organizers cannot access it, and ticket credentials are excluded.
+
+Use the English calendar, hour/minute controls or type `YYYY-MM-DD HH:mm`. All event and sales times are explicitly Singapore time; existing UTC instants are unchanged. The components reject impossible dates and invalid time ranges.
+
+Deploy Catalog (V3 migration), then Admission (V4), then gateway/Web; do not serve registration-required events through older Admission writers. Existing rows default to General/Lilac with no requested registration fields; old orders retain empty information. No existing migration is edited.
+
+[Implementation and language/theme effort assessment](docs/registration-and-display.md). Language/theme switching is assessed, not implemented.
