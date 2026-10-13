@@ -255,3 +255,13 @@ Use the English calendar, hour/minute controls or type `YYYY-MM-DD HH:mm`. All e
 Deploy Catalog (V3 migration), then Admission (V4), then gateway/Web; do not serve registration-required events through older Admission writers. Existing rows default to General/Lilac with no requested registration fields; old orders retain empty information. No existing migration is edited.
 
 [Implementation and language/theme effort assessment](docs/registration-and-display.md). Language/theme switching is assessed, not implemented.
+
+## 10. Profile, pre-registration and countdowns
+
+Explore expands navigation inside the page. Open **My profile** to save optional registration details; **Apply saved details** copies only fields requested by an event and leaves them editable. Custom answers are event-specific and are not stored in the reusable profile. Clearing a profile does not modify existing bookings or pre-registrations.
+
+Before a ticket's opening time, **Save pre-registration** saves one selection per user/event without holding inventory. **My pre-registrations** shows an opening countdown and a review link. At opening, the form switches to **Confirm free booking**; confirmation is always manual and availability is checked again by Admission. Successful booking removes the matching pre-registration in the same transaction. Removing a pre-registration does not cancel a booking.
+
+Event cards separate category, date, venue and description; details show event-start and registration opening/closing countdowns. All times remain Singapore time. Countdown updates are informational and do not override server-side time or capacity checks.
+
+Upgrade Identity V2 and Admission V5 using newly built service jars, then rebuild the Web dist before its Docker image and restart the gateway. Database port stays **15432**. Full regression: `python3 scripts/pre-registration-acceptance.py` against an isolated test stack. See [design and verification](docs/pre-registration-increment.md).

@@ -1,0 +1,13 @@
+# Profile and pre-registration increment
+
+Identity owns optional reusable contact details (V2 booking_profiles); authenticated users can GET/PUT/DELETE /api/v1/profile. JWT subject determines ownership. Profile email is independent of login email. Blank fields normalize to null. Private responses use no-store. The UI explicitly applies only event-requested fields; custom answers and historical bookings are never overwritten by profile updates.
+
+Admission owns pre-registrations (V5) with one row per user/event. PUT before opening validates the published Catalog snapshot, ticket ownership, quantity and required information. Upserts are serialized by the event sales lock and hold no inventory. GET computes WAITING/READY/SOLD_OUT/CLOSED from server time and current inventory; DELETE is scoped to the JWT subject. Profiles are not queried across schemas. Organizers cannot browse pre-registration contacts through the confirmed registration list.
+
+A pre-registration is not a ticket, queue position, notification subscription or automatic booking. At opening the attendee reviews the saved selection and submits the existing idempotent booking endpoint. That transaction creates credentials, reserves places and removes the matching pre-registration. A failed booking retains the pre-registration. Replays retrieve the existing booking without another deduction. Profile deletion leaves these independent snapshots intact.
+
+Explore is an in-flow disclosure with aria-expanded/controls, toggle, Escape focus return and link-close behavior. No dialog, page scrim or scroll lock remains. Activity detail now groups event facts and registration facts into separate columns on desktop and one column on mobile. Countdown values refresh once per second without live-region announcements every second; opening enables manual confirmation without auto-submission. Client time is advisory and server checks remain authoritative. Existing motion controls apply to the navigation and artwork.
+
+Validation includes UI tests for in-flow navigation, requested-only prefill, editable copied values, pre-registration saving/loading and opening transitions; real PostgreSQL acceptance covers private profile persistence, invalid data, reservation ownership, repeat upsert, no inventory deduction, manual conversion and atomic cleanup. Existing publication recovery, duplicate booking and 100-request/10-place regression runs are included. CI runs two Admission replicas.
+
+Build Web before creating its Docker image: the Dockerfile copies apps/web/dist and does not run Vite itself. The same applies to backend target jars. New source alone is not sufficient to update the localhost:18080 container UI.

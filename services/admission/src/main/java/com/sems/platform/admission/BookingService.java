@@ -65,6 +65,7 @@ public class BookingService {
             String code=HexFormat.of().formatHex(bytes);
             jdbc.update("INSERT INTO tickets(id,booking_id,credential,state) VALUES (?,?,?,'VALID')",UUID.randomUUID(),id,code);
         }
+        jdbc.update("DELETE FROM pre_registrations WHERE user_id=? AND event_id=? AND ticket_type_id=?",user,input.eventId(),input.ticketTypeId());
         return owned(user,id);
     }
     @Transactional(readOnly=true, isolation=org.springframework.transaction.annotation.Isolation.REPEATABLE_READ)

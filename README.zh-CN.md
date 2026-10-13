@@ -255,3 +255,13 @@ git push
 升级顺序为 Catalog（V3 迁移）、Admission（V4），再更新网关与前端；启用报名字段后不能混用旧 Admission 写入版本。已有活动默认 General/Lilac 且无必填资料；已有订单报名资料为空，不修改历史迁移。
 
 [实现说明与语言／主题工作量评估](docs/registration-and-display.md)。本轮仅评估切换功能，未启用中英文或深浅色切换。
+
+## 10. 个人资料、预约报名与倒计时
+
+**Explore** 在页面内展开导航。在 **My profile** 保存可选个人资料，报名时点击 **Apply saved details**，只带入活动要求的字段，仍可修改。自定义问题按活动填写，不保存到通用个人资料；清除个人资料不修改已有订单或预约。
+
+开售前点击 **Save pre-registration**，每个用户对每场活动保存一份预约，不占名额。**My pre-registrations** 展示开售倒计时和修改入口。开售后表单切换为 **Confirm free booking**，必须手动确认，后端重新检查名额。报名成功时同一事务移除对应预约。删除预约不等于取消订单。
+
+活动卡片分开显示分类、时间、地点和简介；详情展示活动开始、报名开放／截止倒计时，统一使用新加坡时间。倒计时用于提示，实际时间与名额由后端校验。
+
+升级需应用 Identity V2、Admission V5；使用新构建的 JAR，先构建前端 dist 再重建 Web 容器，最后重启网关。数据库端口保持 **15432**。完整回归命令：`python3 scripts/pre-registration-acceptance.py`，仅在独立测试环境执行。见[设计与验证说明](docs/pre-registration-increment.md)。

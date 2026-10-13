@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SEMS Identity API",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "servers": [
     {
@@ -93,6 +93,37 @@
           "roles",
           "createdAt"
         ]
+      },
+      "BookingProfile": {
+        "type": "object",
+        "properties": {
+          "realName": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 254,
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 40
+          },
+          "studentId": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          },
+          "passportNumber": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          }
+        }
       }
     }
   },
@@ -484,6 +515,68 @@
                 ]
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/profile": {
+      "get": {
+        "summary": "Read own reusable booking profile; empty when not saved",
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      },
+      "put": {
+        "summary": "Replace own saved optional contact fields; does not change account email or existing bookings",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingProfile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingProfile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields"
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Clear own saved profile; order and pre-registration snapshots remain",
+        "responses": {
+          "204": {
+            "description": "Cleared; Cache-Control: no-store"
+          },
+          "401": {
+            "description": "Authentication required"
           }
         }
       }

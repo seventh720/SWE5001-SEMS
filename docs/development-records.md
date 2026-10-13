@@ -11,3 +11,7 @@ Implemented on Victor’s branch with Codex assistance, following revised propos
 ## Registration and presentation increment
 
 Victor branch, Codex-assisted implementation: configurable booking contact fields, private organizer registrations, category filtering, independent card themes and custom English date/time/select controls. New migrations are Catalog V3 and Admission V4; old event/order rows receive backward-compatible defaults. UI time entry/display is now explicitly Singapore time. Language and theme switching remain an effort assessment. Validation includes 31 frontend tests, 15 backend tests and the full two-Admission PostgreSQL acceptance suite.
+
+### 2026-10-13 — Profiles and pre-registration
+
+Added in-flow Explore navigation, readable event facts, manual profile application, persisted pre-registration and live opening/closing countdowns. Identity V2 and Admission V5 preserve service-owned schemas. 34 frontend tests, 16 backend tests, production builds and full two-replica PostgreSQL/API acceptance passed. Headless Chrome verified desktop/mobile layout without horizontal overflow and profile save/reload, pre-registration save/list/load. CI now includes the complete pre-registration lifecycle.

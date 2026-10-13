@@ -170,3 +170,104 @@ it("submits requested contact fields and preserves them for retry", async () => 
       ?.disabled,
   ).toBe(true);
 });
+
+it("applies only requested profile fields and allows editing them", async () => {
+  fetchMock.mockResolvedValueOnce(
+    response({
+      realName: "Saved Person",
+      email: "private@example.com",
+      passportNumber: "private",
+    }),
+  );
+  render(
+    <AuthProvider>
+      <MemoryRouter>
+        <BookingForm
+          eventId="e1"
+          ticketTypeId="t1"
+          available={10}
+          opensAt="2020-01-01T00:00:00Z"
+          closesAt="2099-01-01T00:00:00Z"
+          requirements={{
+            customFieldLabel: null,
+            realName: true,
+            email: false,
+            phone: false,
+            studentId: false,
+            passport: false,
+          }}
+        />
+      </MemoryRouter>
+    </AuthProvider>,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Apply saved details" }));
+  await screen.findByDisplayValue("Saved Person");
+  expect(screen.queryByDisplayValue("private@example.com")).toBeNull();
+  fireEvent.change(screen.getByLabelText("Full name"), {
+    target: { value: "Edited Person" },
+  });
+  expect(screen.getByDisplayValue("Edited Person")).toBeTruthy();
+});
+it("saves a pre-registration without creating a booking or pending request", async () => {
+  fetchMock.mockResolvedValueOnce(response({}));
+  render(
+    <AuthProvider>
+      <MemoryRouter>
+        <BookingForm
+          eventId="e1"
+          ticketTypeId="t1"
+          available={10}
+          opensAt="2098-01-01T00:00:00Z"
+          closesAt="2099-01-01T00:00:00Z"
+        />
+      </MemoryRouter>
+    </AuthProvider>,
+  );
+  fireEvent.click(
+    screen.getByRole("button", { name: "Save pre-registration" }),
+  );
+  await screen.findByText(/Pre-registration saved. No places/);
+  expect(fetchMock.mock.calls[0][0]).toBe("/api/v1/pre-registrations/e1");
+  expect(fetchMock.mock.calls[0][1]?.method).toBe("PUT");
+  expect(sessionStorage.getItem("sems-booking:u1:e1:t1")).toBeNull();
+});
+it("loads pre-registration for review and changes to booking at opening", async () => {
+  vi.useFakeTimers({ toFake: ["Date", "setInterval", "clearInterval"] });
+  vi.setSystemTime(new Date("2030-01-01T00:00:00Z"));
+  try {
+    fetchMock.mockResolvedValueOnce(
+      response({ ticketTypeId: "t1", quantity: 2, attendeeInfo: {} }),
+    );
+    render(
+      <AuthProvider>
+        <MemoryRouter initialEntries={["/?preRegistration=t1"]}>
+          <BookingForm
+            eventId="e1"
+            ticketTypeId="t1"
+            available={10}
+            opensAt="2030-01-01T00:00:02Z"
+            closesAt="2030-01-02T00:00:00Z"
+          />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+    await screen.findByText(/Saved pre-registration loaded/);
+    expect((screen.getByRole("spinbutton") as HTMLInputElement).value).toBe(
+      "2",
+    );
+    expect(
+      screen.getByRole("button", { name: "Save pre-registration" }),
+    ).toBeTruthy();
+    await import("@testing-library/react").then(({ act }) =>
+      act(async () => {
+        vi.advanceTimersByTime(3000);
+      }),
+    );
+    expect(
+      screen.getByRole("button", { name: "Confirm free booking" }),
+    ).toBeTruthy();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  } finally {
+    vi.useRealTimers();
+  }
+});

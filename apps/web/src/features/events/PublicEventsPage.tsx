@@ -1,3 +1,4 @@
+import { Countdown, useNow } from "../../shared/components/Countdown";
 import { Select } from "../../shared/components/Select";
 import { formatDateTime } from "../../shared/components/dateTime";
 import { categories, EventArtwork } from "./EventArtwork";
@@ -99,11 +100,21 @@ export function PublicEventsPage() {
               <h2>
                 <Link to={`/events/${e.id}`}>{e.title}</Link>
               </h2>
-              <p>
-                {e.location} · {formatDateTime(e.startsAt)}
-              </p>
-              <p>{e.description}</p>
-              <Link to={`/events/${e.id}`}>View event →</Link>
+              <dl className="event-facts">
+                <div>
+                  <dt>When</dt>
+                  <dd>{formatDateTime(e.startsAt)}</dd>
+                </div>
+                <div>
+                  <dt>Where</dt>
+                  <dd>{e.location}</dd>
+                </div>
+              </dl>
+              <p className="event-excerpt">{e.description}</p>
+              <div className="event-card-footer">
+                <span className="status-chip">Free admission</span>
+                <Link to={`/events/${e.id}`}>Details & registration ↗</Link>
+              </div>
             </article>
           ))}
         </section>
@@ -124,6 +135,7 @@ export function PublicEventsPage() {
   );
 }
 export function PublicEventDetail() {
+  const now = useNow();
   const { id } = useParams();
   const [event, setEvent] = useState<Event | null>(null);
   const [tickets, setTickets] = useState<
@@ -155,34 +167,95 @@ export function PublicEventDetail() {
       {error && <p role="alert">{error}</p>}
       {event && (
         <>
-          <EventArtwork category={event.category} theme={event.cardTheme} />
-          <h1>{event.title}</h1>
-          <p>{event.location}</p>
-          <p>
-            {formatDateTime(event.startsAt)} – {formatDateTime(event.endsAt)}
-          </p>
-          <section className="card">
-            <p>{event.description}</p>
-          </section>
-          <h2>Admission options</h2>
-          {tickets.map((t) => (
-            <article key={t.id} className="card">
-              <h3>{t.name} · Free</h3>
-              <p>{t.available} places available</p>
-              <p>
-                Sales: {formatDateTime(t.opensAt)} –{" "}
-                {formatDateTime(t.closesAt)}
+          <header className="event-detail-hero">
+            <div>
+              <p className="eyebrow">
+                {categories.find((c) => c[0] === event.category)?.[1] ??
+                  "Community event"}{" "}
+                / FREE ADMISSION
               </p>
-              <BookingForm
-                requirements={event.registrationRequirements}
-                eventId={event.id}
-                ticketTypeId={t.id}
-                available={t.available}
-                opensAt={t.opensAt}
-                closesAt={t.closesAt}
-              />
-            </article>
-          ))}
+              <h1>{event.title}</h1>
+              <dl className="event-facts">
+                <div>
+                  <dt>When · Singapore time</dt>
+                  <dd>
+                    {formatDateTime(event.startsAt)}
+                    <br />
+                    to {formatDateTime(event.endsAt)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Where</dt>
+                  <dd>{event.location}</dd>
+                </div>
+              </dl>
+              {now < Date.parse(event.startsAt) ? (
+                <Countdown target={event.startsAt} label="Event starts in" />
+              ) : (
+                <span className="status-chip">
+                  {now < Date.parse(event.endsAt)
+                    ? "Event in progress"
+                    : "Event ended"}
+                </span>
+              )}
+            </div>
+            <EventArtwork category={event.category} theme={event.cardTheme} />
+          </header>
+          <div className="event-detail-grid">
+            <section className="card event-description">
+              <p className="eyebrow">THE EXPERIENCE</p>
+              <h2>About this event</h2>
+              <p>{event.description}</p>
+              <h3>How registration works</h3>
+              <p>
+                Choose a ticket option and complete the requested contact
+                details. Before opening, save a pre-registration; once open,
+                confirm to receive your tickets.
+              </p>
+            </section>
+            <section aria-label="Admission options" className="admission-panel">
+              <h2>Admission options</h2>
+              {tickets.map((t) => (
+                <article key={t.id} className="card admission-card">
+                  <div className="event-card-footer">
+                    <h3>{t.name}</h3>
+                    <strong className="ticket-price">Free</strong>
+                  </div>
+                  <span className="status-chip">
+                    {now < Date.parse(t.opensAt)
+                      ? "Opening soon"
+                      : now >= Date.parse(t.closesAt)
+                        ? "Registration closed"
+                        : t.available === 0
+                          ? "Sold out"
+                          : "Registration open"}
+                  </span>
+                  <p>
+                    <strong>{t.available}</strong>{" "}
+                    {t.available === 1 ? "place" : "places"} available
+                  </p>
+                  <dl className="sales-facts">
+                    <div>
+                      <dt>Opens</dt>
+                      <dd>{formatDateTime(t.opensAt)}</dd>
+                    </div>
+                    <div>
+                      <dt>Closes</dt>
+                      <dd>{formatDateTime(t.closesAt)}</dd>
+                    </div>
+                  </dl>
+                  <BookingForm
+                    requirements={event.registrationRequirements}
+                    eventId={event.id}
+                    ticketTypeId={t.id}
+                    available={t.available}
+                    opensAt={t.opensAt}
+                    closesAt={t.closesAt}
+                  />
+                </article>
+              ))}
+            </section>
+          </div>
         </>
       )}
     </main>
