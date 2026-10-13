@@ -1,0 +1,6 @@
+# Local development only: enable Navicat without exposing PostgreSQL on the LAN.
+# Use together with deployment/compose.yaml.
+services:
+  postgres:
+    ports:
+      - "127.0.0.1:15432:5432"

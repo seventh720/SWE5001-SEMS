@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Real HTTP/PostgreSQL acceptance against the Compose stack; creates unique test accounts."""
 import concurrent.futures, datetime, json, os, urllib.request, urllib.error, uuid
-BASE=os.environ.get('SEMS_BASE_URL','http://localhost:8080')
+BASE=os.environ.get('SEMS_BASE_URL','http://localhost:18080')
 def call(method,path,body=None,token=None,expected=200):
     headers={'Content-Type':'application/json'}
     if token: headers['Authorization']='Bearer '+token

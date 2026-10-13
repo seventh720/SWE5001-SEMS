@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-base_url="${SEMS_BASE_URL:-http://localhost:8080}"
+base_url="${SEMS_BASE_URL:-http://localhost:18080}"
 for service in identity event-catalog admission; do
   ready=false
   for attempt in {1..30}; do
