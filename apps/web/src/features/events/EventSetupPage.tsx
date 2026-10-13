@@ -1,3 +1,8 @@
+import { DateTimeField } from "../../shared/components/DateTimeField";
+import {
+  singaporeInput as local,
+  toInstant,
+} from "../../shared/components/dateTime";
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
@@ -23,12 +28,6 @@ interface Inventory {
   version: number;
   state: string;
   ticketTypes: Ticket[];
-}
-function local(value: string) {
-  const d = new Date(value);
-  return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 16);
 }
 export function EventSetupPage() {
   const { id } = useParams();
@@ -103,8 +102,8 @@ export function EventSetupPage() {
             version: inventory.version,
             ticketTypes: tickets.map((t) => ({
               ...t,
-              opensAt: new Date(t.opensAt).toISOString(),
-              closesAt: new Date(t.closesAt).toISOString(),
+              opensAt: toInstant(t.opensAt),
+              closesAt: toInstant(t.closesAt),
             })),
           }),
         },
@@ -225,26 +224,19 @@ export function EventSetupPage() {
                           }
                         />
                       </label>
-                      <label>
-                        Sales open {n + 1}
-                        <input
-                          type="datetime-local"
-                          required
-                          value={t.opensAt}
-                          onChange={(e) => change(n, "opensAt", e.target.value)}
-                        />
-                      </label>
-                      <label>
-                        Sales close {n + 1}
-                        <input
-                          type="datetime-local"
-                          required
-                          value={t.closesAt}
-                          onChange={(e) =>
-                            change(n, "closesAt", e.target.value)
-                          }
-                        />
-                      </label>
+                      <DateTimeField
+                        label={`Sales open ${n + 1}`}
+                        value={t.opensAt}
+                        onChange={(value) => change(n, "opensAt", value)}
+                        atOrBefore={local(event.startsAt)}
+                      />
+                      <DateTimeField
+                        label={`Sales close ${n + 1}`}
+                        value={t.closesAt}
+                        after={t.opensAt}
+                        atOrBefore={local(event.startsAt)}
+                        onChange={(value) => change(n, "closesAt", value)}
+                      />
                     </div>
                     {tickets.length > 1 && (
                       <button

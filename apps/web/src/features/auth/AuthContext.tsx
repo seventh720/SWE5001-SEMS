@@ -61,6 +61,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }
 
   function logout() {
+    const prefix = `sems-booking:${state?.user.id}:`;
+    Object.keys(sessionStorage)
+      .filter((key) => key.startsWith(prefix))
+      .forEach((key) => sessionStorage.removeItem(key));
     sessionStorage.removeItem(STORAGE_KEY);
     setState(null);
   }

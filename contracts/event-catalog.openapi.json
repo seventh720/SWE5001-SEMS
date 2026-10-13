@@ -2,12 +2,12 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SEMS Event Catalog API",
-    "version": "0.1.0",
+    "version": "0.4.0",
     "description": "Draft management and durable publication. ORGANIZER/ADMIN cannot bypass ownership. Starting ticket setup fixes time and capacity; other draft details remain editable until publication. All published configuration is immutable in this release."
   },
   "servers": [
     {
-      "url": "http://localhost:8080"
+      "url": "http://localhost:18080"
     }
   ],
   "security": [
@@ -88,6 +88,32 @@
             "type": "integer",
             "format": "int64",
             "minimum": 0
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "GENERAL",
+              "TECH",
+              "EDUCATION",
+              "MUSIC",
+              "SPORT",
+              "ART",
+              "COMMUNITY"
+            ],
+            "default": "GENERAL"
+          },
+          "cardTheme": {
+            "type": "string",
+            "enum": [
+              "LILAC",
+              "LIME",
+              "PEACH",
+              "SKY"
+            ],
+            "default": "LILAC"
+          },
+          "registrationRequirements": {
+            "$ref": "#/components/schemas/RegistrationRequirements"
           }
         },
         "required": [
@@ -135,6 +161,32 @@
             "type": "integer",
             "format": "int64",
             "minimum": 0
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "GENERAL",
+              "TECH",
+              "EDUCATION",
+              "MUSIC",
+              "SPORT",
+              "ART",
+              "COMMUNITY"
+            ],
+            "default": "GENERAL"
+          },
+          "cardTheme": {
+            "type": "string",
+            "enum": [
+              "LILAC",
+              "LIME",
+              "PEACH",
+              "SKY"
+            ],
+            "default": "LILAC"
+          },
+          "registrationRequirements": {
+            "$ref": "#/components/schemas/RegistrationRequirements"
           }
         },
         "required": [
@@ -210,6 +262,32 @@
           "publicationError": {
             "type": "string",
             "nullable": true
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "GENERAL",
+              "TECH",
+              "EDUCATION",
+              "MUSIC",
+              "SPORT",
+              "ART",
+              "COMMUNITY"
+            ],
+            "default": "GENERAL"
+          },
+          "cardTheme": {
+            "type": "string",
+            "enum": [
+              "LILAC",
+              "LIME",
+              "PEACH",
+              "SKY"
+            ],
+            "default": "LILAC"
+          },
+          "registrationRequirements": {
+            "$ref": "#/components/schemas/RegistrationRequirements"
           }
         },
         "required": [
@@ -261,6 +339,32 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "GENERAL",
+              "TECH",
+              "EDUCATION",
+              "MUSIC",
+              "SPORT",
+              "ART",
+              "COMMUNITY"
+            ],
+            "default": "GENERAL"
+          },
+          "cardTheme": {
+            "type": "string",
+            "enum": [
+              "LILAC",
+              "LIME",
+              "PEACH",
+              "SKY"
+            ],
+            "default": "LILAC"
+          },
+          "registrationRequirements": {
+            "$ref": "#/components/schemas/RegistrationRequirements"
           }
         },
         "required": [
@@ -297,6 +401,15 @@
           },
           "status": {
             "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "registrationRequirements": {
+            "$ref": "#/components/schemas/RegistrationRequirements"
           }
         },
         "required": [
@@ -305,8 +418,42 @@
           "capacity",
           "startsAt",
           "endsAt",
-          "status"
+          "status",
+          "title",
+          "location",
+          "registrationRequirements"
         ]
+      },
+      "RegistrationRequirements": {
+        "type": "object",
+        "properties": {
+          "realName": {
+            "type": "boolean",
+            "default": false
+          },
+          "email": {
+            "type": "boolean",
+            "default": false
+          },
+          "phone": {
+            "type": "boolean",
+            "default": false
+          },
+          "studentId": {
+            "type": "boolean",
+            "default": false
+          },
+          "passport": {
+            "type": "boolean",
+            "default": false
+          },
+          "customFieldLabel": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100,
+            "description": "A nonblank label makes customAnswer required."
+          }
+        }
       }
     }
   },
@@ -710,6 +857,25 @@
               "maxLength": 200,
               "default": ""
             }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "GENERAL",
+                "TECH",
+                "EDUCATION",
+                "MUSIC",
+                "SPORT",
+                "ART",
+                "COMMUNITY"
+              ],
+              "default": "GENERAL"
+            },
+            "description": "Omit for all categories. Combined with title keyword search before pagination."
           }
         ],
         "responses": {
@@ -857,7 +1023,8 @@
               "format": "uuid"
             }
           }
-        ]
+        ],
+        "description": " Internal event snapshots also include title and location for historical booking records; Admission stores these without cross-schema joins."
       }
     },
     "/internal/v1/events/{id}/prepare-sales": {
@@ -932,7 +1099,8 @@
               }
             }
           }
-        }
+        },
+        "description": " Internal event snapshots also include title and location for historical booking records; Admission stores these without cross-schema joins."
       }
     },
     "/internal/v1/events/{id}/published": {
@@ -982,7 +1150,8 @@
           "409": {
             "description": "State/version/quota conflict"
           }
-        }
+        },
+        "description": " Internal event snapshots also include title and location for historical booking records; Admission stores these without cross-schema joins."
       }
     }
   }

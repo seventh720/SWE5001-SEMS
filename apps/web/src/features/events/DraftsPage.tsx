@@ -1,3 +1,16 @@
+import { DateTimeField } from "../../shared/components/DateTimeField";
+import { Select } from "../../shared/components/Select";
+import {
+  singaporeInput,
+  toInstant,
+  formatDateTime,
+} from "../../shared/components/dateTime";
+import { categories, themes, EventArtwork } from "./EventArtwork";
+import {
+  noRequirements,
+  registrationFields,
+  type Requirements,
+} from "../bookings/registration";
 import { type FormEvent, useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
@@ -13,6 +26,9 @@ interface Draft {
   version: number;
   status: string;
   salesConfigured?: boolean;
+  category?: string;
+  cardTheme?: string;
+  registrationRequirements?: Requirements;
 }
 interface Page {
   items: Draft[];
@@ -26,13 +42,10 @@ const empty = {
   startsAt: "",
   endsAt: "",
   capacity: 1,
+  category: "GENERAL",
+  cardTheme: "LILAC",
+  registrationRequirements: noRequirements,
 };
-function localDate(value: string) {
-  const d = new Date(value);
-  return new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 16);
-}
 export function DraftsPage() {
   const { user, token } = useAuth();
   const allowed = user?.roles.some((r) => r === "ORGANIZER" || r === "ADMIN");
@@ -80,8 +93,11 @@ export function DraftsPage() {
       setEditing(d);
       setForm({
         ...d,
-        startsAt: localDate(d.startsAt),
-        endsAt: localDate(d.endsAt),
+        category: d.category ?? "GENERAL",
+        cardTheme: d.cardTheme ?? "LILAC",
+        registrationRequirements: d.registrationRequirements ?? noRequirements,
+        startsAt: singaporeInput(d.startsAt),
+        endsAt: singaporeInput(d.endsAt),
       });
       setShow(true);
       setMessage("");
@@ -101,8 +117,8 @@ export function DraftsPage() {
           method: editing ? "PUT" : "POST",
           body: JSON.stringify({
             ...form,
-            startsAt: new Date(form.startsAt).toISOString(),
-            endsAt: new Date(form.endsAt).toISOString(),
+            startsAt: toInstant(form.startsAt),
+            endsAt: toInstant(form.endsAt),
             ...(editing ? { version: editing.version } : {}),
           }),
         },
@@ -187,30 +203,22 @@ export function DraftsPage() {
               <p>Event time and capacity are fixed after ticket setup.</p>
             )}
             <p className="muted">
-              Times use your browser timezone:{" "}
-              {Intl.DateTimeFormat().resolvedOptions().timeZone}.
+              All event times use Singapore time (UTC+08:00).
             </p>
             <div className="form-grid">
-              <label>
-                Starts at
-                <input
-                  type="datetime-local"
-                  required
-                  value={form.startsAt}
-                  onChange={(e) =>
-                    setForm({ ...form, startsAt: e.target.value })
-                  }
-                />
-              </label>
-              <label>
-                Ends at
-                <input
-                  type="datetime-local"
-                  required
-                  value={form.endsAt}
-                  onChange={(e) => setForm({ ...form, endsAt: e.target.value })}
-                />
-              </label>
+              <DateTimeField
+                label="Starts at"
+                value={form.startsAt}
+                disabled={busy || editing?.salesConfigured}
+                onChange={(value) => setForm({ ...form, startsAt: value })}
+              />
+              <DateTimeField
+                label="Ends at"
+                value={form.endsAt}
+                after={form.startsAt}
+                disabled={busy || editing?.salesConfigured}
+                onChange={(value) => setForm({ ...form, endsAt: value })}
+              />
               <label>
                 Capacity
                 <input
@@ -226,6 +234,76 @@ export function DraftsPage() {
                 />
               </label>
             </div>
+            <div className="presentation-editor">
+              <div>
+                <Select
+                  label="Event category"
+                  value={form.category}
+                  options={categories.map(([value, label]) => ({
+                    value,
+                    label,
+                  }))}
+                  disabled={busy}
+                  onChange={(value) => setForm({ ...form, category: value })}
+                />
+                <Select
+                  label="Card background"
+                  value={form.cardTheme}
+                  options={themes.map(([value, label]) => ({ value, label }))}
+                  disabled={busy}
+                  onChange={(value) => setForm({ ...form, cardTheme: value })}
+                />
+              </div>
+              <EventArtwork category={form.category} theme={form.cardTheme} />
+            </div>
+            <fieldset className="registration-settings" disabled={busy}>
+              <legend>Registration information</legend>
+              <p>
+                Choose what the booking contact must provide. One contact covers
+                all places in an order. Only request information your event
+                needs.
+              </p>
+              <div className="registration-options">
+                {registrationFields.map((f) => (
+                  <label className="role-option" key={f.rule}>
+                    <input
+                      type="checkbox"
+                      checked={form.registrationRequirements[f.rule]}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          registrationRequirements: {
+                            ...form.registrationRequirements,
+                            [f.rule]: e.target.checked,
+                          },
+                        })
+                      }
+                    />
+                    {f.label}
+                  </label>
+                ))}
+              </div>
+              <label>
+                Custom question (optional)
+                <input
+                  maxLength={100}
+                  value={form.registrationRequirements.customFieldLabel ?? ""}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      registrationRequirements: {
+                        ...form.registrationRequirements,
+                        customFieldLabel: e.target.value || null,
+                      },
+                    })
+                  }
+                />
+              </label>
+              <p className="muted">
+                A custom question becomes required when you add it. Registration
+                settings are fixed after publication.
+              </p>
+            </fieldset>
             <div className="actions">
               <button type="submit" className="primary-button" disabled={busy}>
                 {busy ? "Saving…" : "Save draft"}
@@ -250,11 +328,12 @@ export function DraftsPage() {
           ) : (
             data.items.map((d) => (
               <article className="card event-card" key={d.id}>
+                <EventArtwork category={d.category} theme={d.cardTheme} />
                 <div>
                   <span className="badge">{d.status}</span>
                   <h2>{d.title}</h2>
                   <p>
-                    {d.location} · {new Date(d.startsAt).toLocaleString()}
+                    {d.location} · {formatDateTime(d.startsAt)}
                   </p>
                   <p className="muted">Capacity {d.capacity}</p>
                 </div>
@@ -262,6 +341,9 @@ export function DraftsPage() {
                   {d.status === "DRAFT" && (
                     <button onClick={() => edit(d.id)}>Edit draft</button>
                   )}
+                  <Link to={`/organizer/events/${d.id}/bookings`}>
+                    Registration list →
+                  </Link>
                   <Link to={`/organizer/events/${d.id}/setup`}>
                     Ticket setup & publication →
                   </Link>

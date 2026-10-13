@@ -10,9 +10,9 @@ import org.springframework.web.server.ResponseStatusException;
 public class PublicationState {
     private final EventRepository events;
     public PublicationState(EventRepository events) { this.events=events; }
-    public record Snapshot(UUID id,UUID organizerId,int capacity,Instant startsAt,Instant endsAt,String status) {}
+    public record Snapshot(UUID id,UUID organizerId,int capacity,Instant startsAt,Instant endsAt,String status,String title,String location,RegistrationRequirements registrationRequirements) {}
     public record Operation(UUID eventId,UUID operationId,UUID organizerId,int capacity,Instant startsAt,Instant endsAt,long ticketVersion,String status) {}
-    private Snapshot snapshot(Event e) { return new Snapshot(e.id,e.organizerId,e.capacity,e.startsAt,e.endsAt,e.status); }
+    private Snapshot snapshot(Event e) { return new Snapshot(e.id,e.organizerId,e.capacity,e.startsAt,e.endsAt,e.status,e.title,e.location,e.registrationRequirements); }
     private Operation operation(Event e) { return new Operation(e.id,e.publicationId,e.organizerId,e.capacity,e.startsAt,e.endsAt,e.ticketVersion,e.status); }
     private Event owned(UUID owner,UUID id) {
         var e=events.lockById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found"));

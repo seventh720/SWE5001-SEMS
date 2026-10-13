@@ -2,12 +2,12 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SEMS Admission API",
-    "version": "0.2.0",
-    "description": "Free ticket configuration, inventory and internal idempotent sales activation. Bookings and ticket issuance are not yet implemented."
+    "version": "0.4.0",
+    "description": "Free inventory, retry-safe bookings, per-place ticket credentials and attendee cancellation. Staff check-in and event-wide cancellation are pending."
   },
   "servers": [
     {
-      "url": "http://localhost:8080"
+      "url": "http://localhost:18080"
     }
   ],
   "security": [
@@ -164,6 +164,276 @@
           "version",
           "ticketTypes"
         ]
+      },
+      "BookingRequest": {
+        "type": "object",
+        "properties": {
+          "requestKey": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticketTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "attendeeInfo": {
+            "$ref": "#/components/schemas/AttendeeInfo"
+          }
+        },
+        "required": [
+          "requestKey",
+          "eventId",
+          "ticketTypeId",
+          "quantity"
+        ]
+      },
+      "IssuedTicket": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "credential": {
+            "type": "string",
+            "description": "Private, unique 48-character hexadecimal credential. QR payload is exactly this value; manual entry uses the same value."
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "VALID",
+              "CHECKED_IN",
+              "CANCELLED"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "credential",
+          "state"
+        ]
+      },
+      "Booking": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticketTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "CONFIRMED",
+              "CANCELLED"
+            ]
+          },
+          "eventTitle": {
+            "type": "string"
+          },
+          "eventLocation": {
+            "type": "string"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ticketName": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer",
+            "enum": [
+              0
+            ],
+            "description": "Free bookings only; calculated by the server."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tickets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IssuedTicket"
+            }
+          },
+          "attendeeInfo": {
+            "$ref": "#/components/schemas/AttendeeInfo"
+          },
+          "customFieldLabel": {
+            "type": "string",
+            "nullable": true,
+            "description": "Historical event question at booking time."
+          }
+        },
+        "required": [
+          "id",
+          "eventId",
+          "ticketTypeId",
+          "quantity",
+          "status",
+          "eventTitle",
+          "eventLocation",
+          "startsAt",
+          "endsAt",
+          "ticketName",
+          "amount",
+          "createdAt",
+          "tickets"
+        ]
+      },
+      "BookingPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Booking"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "size",
+          "totalElements",
+          "totalPages"
+        ]
+      },
+      "AttendeeInfo": {
+        "type": "object",
+        "description": "One booking contact per order, not one form per ticket. Only requested fields may be supplied. Values are trimmed; blank values normalize to null. Requested fields must be nonblank.",
+        "properties": {
+          "realName": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 254,
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 40
+          },
+          "studentId": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          },
+          "passportNumber": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          },
+          "customAnswer": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500
+          }
+        }
+      },
+      "OrganizerBooking": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "CONFIRMED",
+              "CANCELLED"
+            ]
+          },
+          "ticketName": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "attendeeInfo": {
+            "$ref": "#/components/schemas/AttendeeInfo"
+          },
+          "customFieldLabel": {
+            "type": "string",
+            "nullable": true,
+            "description": "Historical event question at booking time."
+          }
+        },
+        "description": "No ticket credentials or user account details are returned."
+      },
+      "OrganizerBookingPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizerBooking"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
       }
     }
   },
@@ -374,6 +644,261 @@
           },
           "409": {
             "description": "State/version/quota conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/bookings": {
+      "post": {
+        "summary": "Confirm a free booking and issue one ticket per place",
+        "description": "Authenticated account is the owner. Same user + requestKey + payload returns the existing booking, even after cancellation or when Catalog is down. A changed payload returns 409. Catalog publication is verified before the Admission transaction; database locks and a conditional inventory update prevent overselling. Initial and replay responses both return 200. A transport error may occur after commit: retry the same payload and key. No payment fields are accepted as pricing authority. Registration requirements come from the authenticated Catalog snapshot. Normalized attendeeInfo is part of the idempotency payload. A changed contact field with the same key returns 409. Missing requested fields, unrequested personal fields and invalid email/length return 400 before inventory changes.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "no-store"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Booking"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request or invalid quantity/pagination"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Resource unavailable or owned by another attendee"
+          },
+          "409": {
+            "description": "Request key payload mismatch, insufficient inventory, closed sales or cancellation forbidden"
+          },
+          "503": {
+            "description": "Catalog unavailable before reservation; retry with the same request key"
+          }
+        }
+      },
+      "get": {
+        "summary": "List only the authenticated attendee\u2019s bookings, including cancelled bookings",
+        "description": "Sorted by createdAt DESC, id DESC. Credentials are private; do not cache or log response bodies.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "no-store"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request or invalid quantity/pagination"
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      }
+    },
+    "/api/v1/bookings/{id}": {
+      "get": {
+        "summary": "Retrieve own booking, historical event snapshot and ticket credentials",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "no-store"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Booking"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Resource unavailable or owned by another attendee"
+          }
+        }
+      }
+    },
+    "/api/v1/bookings/{id}/cancel": {
+      "post": {
+        "summary": "Cancel all tickets in an owned booking and release capacity once",
+        "description": "Allowed before event start only if none of the tickets is checked in. Repeated cancellation of a cancelled booking returns its current state without releasing more inventory. Other attendees and administrators receive 404 for another user\u2019s booking.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; Cache-Control: no-store",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "no-store"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Booking"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Resource unavailable or owned by another attendee"
+          },
+          "409": {
+            "description": "Request key payload mismatch, insufficient inventory, closed sales or cancellation forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/organizer/events/{id}/bookings": {
+      "get": {
+        "summary": "List booking contacts for an event owned by the caller",
+        "description": "ORGANIZER or ADMIN role plus Catalog ownership verification required. ADMIN does not bypass ownership. Includes confirmed and cancelled orders, sorted createdAt DESC/id DESC. Response uses Cache-Control: no-store; credentials are never returned.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Private booking contacts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizerBookingPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid pagination"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Organizer role required"
+          },
+          "404": {
+            "description": "Event unavailable or owned by another organizer"
+          },
+          "503": {
+            "description": "Catalog unavailable"
           }
         }
       }

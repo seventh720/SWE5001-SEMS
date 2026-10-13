@@ -4,7 +4,7 @@
 
 SEMS 是面向独立组织者与参与者的共享活动与票务平台。采用 React + TypeScript、三个独立 Spring Boot 服务和 PostgreSQL。
 
-本轮已实现：注册登录、RSA JWT、管理员角色授权、组织者活动草稿创建/列表/详情/编辑、所有权隔离及乐观版本冲突。本轮另已实现免费票种、配额/销售窗口校验、可重试发布和公开活动浏览。预订、取消、出票和签到仍待实现。
+本轮已实现：注册登录、RSA JWT、管理员角色授权、组织者活动草稿创建/列表/详情/编辑、所有权隔离及乐观版本冲突。本轮另已实现免费票种、配额/销售窗口校验、可重试发布和公开活动浏览。现已接入幂等免费预订、参与者取消订单，以及每名额独立的二维码/手动码票券。工作人员分配与核销、整场活动取消和组织者统计仍待实现。
 
 ## 1. 架构与角色
 
@@ -42,7 +42,7 @@ bash scripts/smoke.sh
 docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.dev.yaml down
 ```
 
-开发前端可执行 `npm --prefix apps/web run dev`，访问15173端口，API代理到18080网关。生产构建的页面运行在网关根路径。日期输入使用浏览器时区，提交为UTC。本地开发覆盖配置仅向 `127.0.0.1:15432` 开放数据库；CI 使用的基础 Compose 文件不开放数据库端口。
+开发前端可执行 `npm --prefix apps/web run dev`，访问15173端口，API代理到18080网关。生产构建的页面运行在网关根路径。日期输入使用应用自定义英文日历和时间选择器，统一为新加坡时间（UTC+08:00），提交为 UTC。本地开发覆盖配置仅向 `127.0.0.1:15432` 开放数据库；CI 使用的基础 Compose 文件不开放数据库端口。
 
 这是本地HTTP配置，云端仍需HTTPS、密钥管理和部署配置。
 
@@ -56,6 +56,8 @@ docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.
 
 6. 打开“Ticket setup & publication”，配置总配额不超过容量的免费票种并保存。开始票种配置后活动时间和容量固定。
 7. 确认发布后进入公开活动页。依赖故障时活动保持发布中且不公开，恢复任务自动继续处理。
+8. 参与者登录后，在已开放销售的票种下预订 1–10 个名额，从首页或 Explore 的 **My tickets** 查看每张二维码/手动码票券。
+9. 活动开始前可取消尚未签到的订单，该订单全部票券作废，库存仅归还一次。网络异常后重试沿用保存的请求键；工作人员核销尚未开放。
 
 ## 4. 测试与 CI
 
@@ -68,7 +70,7 @@ bash scripts/check-db-isolation.sh
 set -a
 source .env
 set +a
-python3 scripts/publication-acceptance.py
+python3 scripts/registration-acceptance.py
 ```
 
 最后两项需要运行中的 Compose 环境；发布验收会主动停止/重启测试容器，务必使用独立测试环境；验收脚本会创建带唯一后缀的测试账号与草稿，建议使用独立测试数据卷。CI 分别展示后端、前端和集成验收状态，生成 JaCoCo/Vitest 行与分支覆盖率，并在临时环境运行同样检查，涵盖认证、权限、schema隔离、输入校验、持久化和并发版本冲突。构建结果经已有Telegram通知发送，日志/JAR保留7天。详见 [CI说明](docs/ci.md)。
@@ -239,3 +241,17 @@ git push
 上一个 PR 合并后再开始下一个任务，避免同一 PR 累积无关改动。短期任务分支可以使用 **Squash and merge**，合并后删除，下个任务重新从最新 `origin/main` 创建。如果仓库仅允许 squash，则使用短期任务分支发 PR，不对长期个人分支反复 squash 合并。
 
 以上为团队约定，README 不会自动开启 GitHub 保护。仓库管理员应给 `main` 配置分支保护或 ruleset：必须通过 PR、至少 1 名其他组员批准、更新后重新批准、解决全部讨论、通过上述三项检查，并禁止强推和删除主分支。如果开启了合并后自动删除分支，应关闭该设置或保留／恢复 `victor` 等长期个人分支。
+
+预订设计、API 规则、迁移与验证记录见 [本轮票务说明](docs/booking-increment.md)。
+
+## 9. 活动展示与报名信息
+
+编辑草稿时选择 **Event category**，并独立选择 **Card background**（Lilac、Lime、Peach、Sky）。公开目录支持分类与标题组合筛选。背景图形由本地代码生成，沿用动画暂停及减少动态效果设置。
+
+在 **Registration information** 中勾选实际需要的姓名、联系邮箱、电话、学号、护照号，或添加一个自定义问题。每笔订单填写一份联系人资料，不是每张票填写一份；发布后配置固定。参与者报名时填写对应字段，在 **My tickets** 查看历史快照；组织者从活动卡片的 **Registration list** 查看本活动报名资料。其他组织者无权访问，列表不会返回票码。
+
+日期可用英文日历及小时/分钟控件选择，也可输入 `YYYY-MM-DD HH:mm`。活动与销售时间统一标注 Singapore time；历史 UTC 时刻保持不变，组件会校验无效日期和时间范围。
+
+升级顺序为 Catalog（V3 迁移）、Admission（V4），再更新网关与前端；启用报名字段后不能混用旧 Admission 写入版本。已有活动默认 General/Lilac 且无必填资料；已有订单报名资料为空，不修改历史迁移。
+
+[实现说明与语言／主题工作量评估](docs/registration-and-display.md)。本轮仅评估切换功能，未启用中英文或深浅色切换。
