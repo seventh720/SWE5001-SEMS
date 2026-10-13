@@ -1017,3 +1017,36 @@ textarea {
     scroll-behavior: auto !important;
   }
 }
+
+.booking-form {
+  border-top: 1px solid var(--line);
+  margin-top: 22px;
+  padding-top: 22px;
+}
+.booking-form input {
+  max-width: 120px;
+}
+.issued-ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 20px;
+  margin: 28px 0;
+}
+.issued-ticket {
+  text-align: center;
+  border-top: 5px solid #c8b2ed;
+}
+.issued-ticket img {
+  max-width: 100%;
+  height: auto;
+}
+.ticket-credential {
+  display: block;
+  overflow-wrap: anywhere;
+  user-select: all;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 12px;
+  background: #f4f0f8;
+  border-radius: 8px;
+}

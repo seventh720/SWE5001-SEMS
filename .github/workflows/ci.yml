@@ -97,7 +97,7 @@ jobs:
           path: apps/web/dist/
       - run: bash scripts/setup-local.sh
       - run: docker compose --env-file .env -f deployment/compose.yaml config --quiet
-      - run: docker compose --env-file .env -f deployment/compose.yaml up --build -d
+      - run: docker compose --env-file .env -f deployment/compose.yaml up --build -d --scale admission=2
       - run: bash scripts/smoke.sh
       - name: Database and business acceptance
         run: |
@@ -105,7 +105,7 @@ jobs:
           set -a
           source .env
           set +a
-          python3 scripts/publication-acceptance.py
+          python3 scripts/booking-acceptance.py
       - name: Collect diagnostics
         if: always()
         run: |

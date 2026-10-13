@@ -11,6 +11,7 @@ import {
 } from "../features/events/PublicEventsPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 
+import { BookingDetail, BookingsPage } from "../features/bookings/BookingsPage";
 function Home() {
   const { user } = useAuth();
   const organizer = user?.roles.some((r) => r === "ORGANIZER" || r === "ADMIN");
@@ -96,6 +97,9 @@ function Home() {
             </p>
           </div>
           <div className="actions">
+            <Link className="secondary-button" to="/bookings">
+              My tickets ↗
+            </Link>
             {organizer && (
               <Link className="secondary-button" to="/organizer/events">
                 My events ↗
@@ -218,9 +222,18 @@ function ExploreMenu({ onClose }: { onClose: () => void }) {
               ↗
             </span>
           </Link>
+          {user && (
+            <Link to="/bookings" onClick={onClose}>
+              <span className="overlay-index">03</span>
+              <span className="overlay-label">My tickets</span>
+              <span className="overlay-arrow" aria-hidden="true">
+                ↗
+              </span>
+            </Link>
+          )}
           {user?.roles.some((r) => r === "ORGANIZER" || r === "ADMIN") && (
             <Link to="/organizer/events" onClick={onClose}>
-              <span className="overlay-index">03</span>
+              <span className="overlay-index">04</span>
               <span className="overlay-label">My events</span>
               <span className="overlay-arrow" aria-hidden="true">
                 ↗
@@ -229,7 +242,7 @@ function ExploreMenu({ onClose }: { onClose: () => void }) {
           )}
           {user?.roles.includes("ADMIN") && (
             <Link to="/admin/users" onClick={onClose}>
-              <span className="overlay-index">04</span>
+              <span className="overlay-index">05</span>
               <span className="overlay-label">Manage users</span>
               <span className="overlay-arrow" aria-hidden="true">
                 ↗
@@ -318,6 +331,8 @@ export function App() {
           <Route path="/events/:id" element={<PublicEventDetail />} />
           <Route path="/login" element={<AuthPage />} />
           <Route element={<ProtectedRoute />}>
+            <Route path="/bookings" element={<BookingsPage />} />
+            <Route path="/bookings/:id" element={<BookingDetail />} />
             <Route
               path="/organizer/events/:id/setup"
               element={<EventSetupPage />}

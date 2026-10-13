@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { apiRequest } from "../../shared/api/client";
+import { BookingForm } from "../bookings/BookingForm";
 interface Event {
   id: string;
   title: string;
@@ -149,9 +150,15 @@ export function PublicEventDetail() {
                 Sales: {new Date(t.opensAt).toLocaleString()} –{" "}
                 {new Date(t.closesAt).toLocaleString()}
               </p>
+              <BookingForm
+                eventId={event.id}
+                ticketTypeId={t.id}
+                available={t.available}
+                opensAt={t.opensAt}
+                closesAt={t.closesAt}
+              />
             </article>
           ))}
-          <p>Booking is not available yet.</p>
         </>
       )}
     </main>

@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8080"
+      "url": "http://localhost:18080"
     }
   ],
   "security": [
@@ -297,6 +297,12 @@
           },
           "status": {
             "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
           }
         },
         "required": [
@@ -305,7 +311,9 @@
           "capacity",
           "startsAt",
           "endsAt",
-          "status"
+          "status",
+          "title",
+          "location"
         ]
       }
     }
@@ -857,7 +865,8 @@
               "format": "uuid"
             }
           }
-        ]
+        ],
+        "description": " Internal event snapshots also include title and location for historical booking records; Admission stores these without cross-schema joins."
       }
     },
     "/internal/v1/events/{id}/prepare-sales": {
@@ -932,7 +941,8 @@
               }
             }
           }
-        }
+        },
+        "description": " Internal event snapshots also include title and location for historical booking records; Admission stores these without cross-schema joins."
       }
     },
     "/internal/v1/events/{id}/published": {
@@ -982,7 +992,8 @@
           "409": {
             "description": "State/version/quota conflict"
           }
-        }
+        },
+        "description": " Internal event snapshots also include title and location for historical booking records; Admission stores these without cross-schema joins."
       }
     }
   }

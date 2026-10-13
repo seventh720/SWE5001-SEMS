@@ -4,7 +4,7 @@
 
 SEMS is a shared event and ticketing platform for independent organizers and attendees, using React + TypeScript, three independent Spring Boot services and PostgreSQL.
 
-Implemented: registration/login, RSA JWT, administrator role assignment, organizer draft creation/list/detail/edit, owner isolation and optimistic version conflicts. Free ticket configuration, quota/sales-window validation, retry-safe publication and public event browsing are also implemented. Booking, cancellation, ticket issuance and check-in remain pending.
+Implemented: registration/login, RSA JWT, administrator role assignment, organizer draft creation/list/detail/edit, owner isolation and optimistic version conflicts. Free ticket configuration, quota/sales-window validation, retry-safe publication and public event browsing are also implemented. Retry-safe free booking, attendee cancellation and individual QR/manual-code tickets are implemented. Staff assignment/check-in, event-wide cancellation and organizer summaries remain pending.
 
 ## 1. Architecture and roles
 
@@ -56,6 +56,8 @@ This is local HTTP configuration. Cloud HTTPS, secret management and deployment 
 
 6. Open “Ticket setup & publication”, configure free ticket types within event capacity and save. Starting setup fixes the event time and capacity.
 7. Confirm publication and open the public event page. A dependency outage leaves the event pending/private until automatic recovery completes.
+8. Use an attendee account to book an open ticket type (1–10 places). Open **My tickets** from the home page or Explore menu to see each QR/manual code.
+9. Cancel before event start; all tickets in that booking become invalid and inventory is returned once. Retrying an uncertain request uses the same saved key. Staff check-in is not available yet.
 
 ## 4. Tests and CI
 
@@ -68,7 +70,7 @@ bash scripts/check-db-isolation.sh
 set -a
 source .env
 set +a
-python3 scripts/publication-acceptance.py
+python3 scripts/booking-acceptance.py
 ```
 
 The last two checks need a running Compose stack. Publication acceptance intentionally stops/restarts test containers; use a disposable environment. Acceptance creates uniquely named test accounts and drafts; use an isolated test volume. CI exposes separate backend, frontend and integration jobs, reports JaCoCo/Vitest line and branch coverage, and runs these checks in an ephemeral environment, covering authentication, authorization, schema isolation, validation, persistence and concurrent version conflicts. Telegram reports results; logs/JARs are retained for seven days. See [CI operations](docs/ci.md).
@@ -239,3 +241,5 @@ git push
 Start the next task only after the previous PR is merged, so unrelated changes do not accumulate in one PR. Short-lived task branches may use **Squash and merge** and be deleted afterward; start their next task from current `origin/main`. If repository settings permit only squash merges, use short-lived task branches for PRs instead of repeatedly squash-merging the persistent personal branch.
 
 These are team conventions; README changes do not enable GitHub protection. The repository administrator should configure `main` protection/rulesets to require PRs, one approval from another teammate, renewed approval after updates, resolved discussions and the three checks above, and prohibit force pushes/deletion. If automatic branch deletion is enabled, disable it or preserve/restore persistent personal branches such as `victor`.
+
+Booking design, API rules, migration notes and verification: [Booking increment](docs/booking-increment.md).
