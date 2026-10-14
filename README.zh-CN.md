@@ -54,7 +54,7 @@ docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.
 4. 创建草稿，刷新后编辑；第二个账号列表不显示第一个账号的草稿。
 5. 同一草稿在两个窗口编辑，后提交的旧版本返回冲突，可点击重新加载。
 
-6. 打开“Ticket setup & publication”，配置总配额不超过容量的免费票种并保存。开始票种配置后活动时间和容量固定。
+6. 在同一编辑页填写活动详情和票种，使用票种下方的按钮统一保存。
 7. 确认发布后进入公开活动页。依赖故障时活动保持发布中且不公开，恢复任务自动继续处理。
 8. 参与者登录后，在已开放销售的票种下预订 1–10 个名额，从首页或 Explore 的 **My tickets** 查看每张二维码/手动码票券。
 9. 活动开始前可取消尚未签到的订单，该订单全部票券作废，库存仅归还一次。网络异常后重试沿用保存的请求键；工作人员核销尚未开放。
@@ -258,7 +258,7 @@ git push
 
 ## 10. 个人资料、预约报名与倒计时
 
-**Explore** 在页面内展开导航。在 **My profile** 保存可选个人资料，报名时点击 **Apply saved details**，只带入活动要求的字段，仍可修改。自定义问题按活动填写，不保存到通用个人资料；清除个人资料不修改已有订单或预约。
+在 **My profile** 修改用户名，并在 **Saved registration details** 管理多份有名称的联系人资料。报名时点击 **Apply saved details** 选择一份，再核对活动要求的字段。通用联系人不保存 Student ID 或自定义回答；每笔订单仍对应一位报名联系人。活动详情与票务设置合并到一个编辑页，**Publication preview** 用于检查已保存内容并确认发布。详见[联系人与编辑流程](docs/saved-contacts-and-editor.md)。
 
 开售前点击 **Save pre-registration**，每个用户对每场活动保存一份预约，不占名额。**My pre-registrations** 展示开售倒计时和修改入口。开售后表单切换为 **Confirm free booking**，必须手动确认，后端重新检查名额。报名成功时同一事务移除对应预约。删除预约不等于取消订单。
 
@@ -270,6 +270,8 @@ git push
 
 登录后首页展示 Dashboard，包括近期已确认行程及已保存预约。组织者、管理员按角色看到对应管理入口；工作人员检票仍待实现。Explore 调整为右侧紧凑导航面板。
 
-**My events → Edit event** 可修改已发布活动的标题、简介、地点、分类及背景。时间、容量、报名字段和票务配置保持锁定。历史票据保留报名时的信息，最新地点以公开详情为准。**Use as template** 将自己的活动载入新草稿，需要重新填写日期、审核报名字段、配置票种并发布。
+**My events → Publication preview / Publication management → Edit details & tickets** 只打开当前活动。详情与票种统一保存；已发布活动自动更新，草稿和暂停状态保持不变。首次发布后仅报名信息规则锁定。发布管理支持明确暂停和恢复，已有票券保持有效。票种名额不得低于已出票名额，已有订单或预约引用的票种不能删除。详见[发布管理](docs/publication-management.md)。
 
 [平台定位与组织者接入说明](docs/platform-positioning.md)明确了共享平台、两个组织者场景，以及账号所有权隔离与企业租户的区别。完整验收入口为 `python3 scripts/workspace-acceptance.py`，仅在独立测试环境运行。
+
+本轮新增 Catalog V4、Admission V6 迁移，先更新 Admission，再更新 Catalog 与 Web。中断中的更新会自动恢复，见[改期规则与验证](docs/schedule-revision.md)。

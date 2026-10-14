@@ -105,7 +105,7 @@ jobs:
           set -a
           source .env
           set +a
-          python3 scripts/workspace-acceptance.py
+          python3 scripts/editor-acceptance.py
       - name: Collect diagnostics
         if: always()
         run: |

@@ -29,7 +29,7 @@ public class AuthService {
         if (rawPassword.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {
             throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Password must be at most 72 UTF-8 bytes");
         }
-        String normalizedUsername = normalizeUsername(username);
+        String normalizedUsername = UsernamePolicy.normalize(username);
         String normalizedEmail = normalizeEmail(email);
         if (users.existsByUsername(normalizedUsername)) {
             throw new DuplicateUserException("Username is already registered");
@@ -83,8 +83,27 @@ public class AuthService {
         }
     }
 
-    private String normalizeUsername(String username) {
-        return username.strip().toLowerCase(Locale.ROOT);
+    public record UsernameAvailability(String username, boolean available) {}
+
+    @Transactional(readOnly = true)
+    public UsernameAvailability usernameAvailability(String subject, String requested) {
+        String name = UsernamePolicy.normalize(requested);
+        UserAccount user = users.findById(java.util.UUID.fromString(subject)).orElseThrow(InvalidCredentialsException::new);
+        return new UsernameAvailability(name, name.equals(user.getUsername()) || !users.existsByUsername(name));
+    }
+
+    @Transactional
+    public UserView rename(String subject, String requested) {
+        String name = UsernamePolicy.normalize(requested);
+        UserAccount user = users.findById(java.util.UUID.fromString(subject)).orElseThrow(InvalidCredentialsException::new);
+        if (!user.isActive()) throw new InvalidCredentialsException();
+        if (name.equals(user.getUsername())) return user.toView();
+        if (users.existsByUsername(name)) throw new DuplicateUserException("Username is already registered");
+        user.rename(name);
+        try { return users.saveAndFlush(user).toView(); }
+        catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new DuplicateUserException("Username is already registered");
+        }
     }
 
     private String normalizeEmail(String email) {

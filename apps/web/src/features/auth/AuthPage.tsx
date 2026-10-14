@@ -1,5 +1,6 @@
+import { HomeLink } from "../../shared/components/HomeLink";
 import { type FormEvent, useState } from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { ApiError } from "../../shared/api/client";
 import { useAuth } from "./AuthContext";
 
@@ -60,9 +61,7 @@ export function AuthPage() {
       </section>
 
       <section className="form-panel">
-        <Link className="text-link" to="/">
-          Back to home →
-        </Link>
+        <HomeLink />
         <div
           className="auth-tabs"
           role="tablist"

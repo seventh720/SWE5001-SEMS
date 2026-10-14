@@ -46,13 +46,13 @@ public class BookingService {
         Booking prior=replay(user,input);
         if (prior!=null) return prior;
         eventLock(input.eventId());
-        var rows=jdbc.queryForList("SELECT s.state,s.starts_at,s.ends_at,t.name,t.opens_at,t.closes_at FROM sales s JOIN ticket_types t ON t.event_id=s.event_id WHERE s.event_id=? AND t.id=?",input.eventId(),input.ticketTypeId());
+        var rows=jdbc.queryForList("SELECT s.state,s.capacity,s.starts_at,s.ends_at,t.name,t.opens_at,t.closes_at FROM sales s JOIN ticket_types t ON t.event_id=s.event_id WHERE s.event_id=? AND t.id=?",input.eventId(),input.ticketTypeId());
         if (rows.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Ticket type not found for this event");
         var row=rows.getFirst();
         Instant now=Instant.now();
         Instant starts=((Timestamp)row.get("starts_at")).toInstant();
         if (!snapshot.id().equals(input.eventId()) || !snapshot.status().equals("PUBLISHED") || !row.get("state").equals("ACTIVE")) conflict("Event is not available for booking");
-        if (!starts.equals(snapshot.startsAt()) || !starts.isAfter(now)) conflict("Event has started or changed");
+        if (!starts.equals(snapshot.startsAt()) || !((Timestamp)row.get("ends_at")).toInstant().equals(snapshot.endsAt()) || ((Number)row.get("capacity")).intValue()!=snapshot.capacity() || !starts.isAfter(now)) conflict("Event has started or changed");
         if (now.isBefore(((Timestamp)row.get("opens_at")).toInstant()) || !now.isBefore(((Timestamp)row.get("closes_at")).toInstant())) conflict("Ticket sales are not open");
         input.attendeeInfo().validate(snapshot.registrationRequirements());
         int updated=jdbc.update("UPDATE ticket_types SET reserved=reserved+? WHERE id=? AND ?<=quota-reserved",input.quantity(),input.ticketTypeId(),input.quantity());
@@ -80,10 +80,14 @@ public class BookingService {
         return new Booking(id,rs.getObject("event_id",UUID.class),rs.getObject("ticket_type_id",UUID.class),rs.getInt("quantity"),rs.getString("status"),rs.getString("event_title"),rs.getString("event_location"),rs.getTimestamp("starts_at").toInstant(),rs.getTimestamp("ends_at").toInstant(),rs.getString("ticket_name"),rs.getInt("amount"),rs.getTimestamp("created_at").toInstant(),tickets,readInfo(rs.getString("attendee_info")),rs.getString("custom_field_label"));
     }
     @Transactional(readOnly=true, isolation=org.springframework.transaction.annotation.Isolation.REPEATABLE_READ)
-    public Page list(UUID user,int page,int size) {
+    public Page list(UUID user,int page,int size,String status) {
         if (page<0 || page>100000 || size<1 || size>50) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Page must be 0–100000 and size 1–50");
-        long total=jdbc.queryForObject("SELECT count(*) FROM bookings WHERE user_id=?",Long.class,user);
-        var items=jdbc.query("SELECT * FROM bookings WHERE user_id=? ORDER BY created_at DESC,id DESC LIMIT ? OFFSET ?",this::map,user,size,(long)page*size);
+        if (status!=null && !status.equals("CONFIRMED") && !status.equals("CANCELLED")) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Status must be CONFIRMED or CANCELLED");
+        String filter=status==null ? "user_id=?" : "user_id=? AND status=?";
+        Object[] countArgs=status==null ? new Object[]{user} : new Object[]{user,status};
+        Object[] pageArgs=status==null ? new Object[]{user,size,(long)page*size} : new Object[]{user,status,size,(long)page*size};
+        long total=jdbc.queryForObject("SELECT count(*) FROM bookings WHERE "+filter,Long.class,countArgs);
+        var items=jdbc.query("SELECT * FROM bookings WHERE "+filter+" ORDER BY created_at DESC,id DESC LIMIT ? OFFSET ?",this::map,pageArgs);
         return new Page(items,page,size,total,(total+size-1)/size);
     }
     @Transactional(readOnly=true,isolation=org.springframework.transaction.annotation.Isolation.REPEATABLE_READ)

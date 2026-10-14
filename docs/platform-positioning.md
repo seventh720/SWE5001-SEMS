@@ -37,7 +37,7 @@ Supporting those capabilities would require an organization/membership model and
 
 ## Presentation editing contract
 
-Published presentation updates use PATCH /api/v1/organizer/events/{id}/presentation with owner/role and optimistic-version checks. Only title, description, venue, category and artwork can change. Dates, capacity, sales windows, registration fields and existing tickets remain unchanged. Historical booking snapshots retain the details confirmed at booking time; the public event page shows the current venue. No automatic change-notification delivery is implemented. Changes requiring schedule/inventory reconciliation need a separate lifecycle workflow.
+Published presentation updates use PATCH /api/v1/organizer/events/{id}/presentation with owner/role and optimistic-version checks. Only title, description, venue, category and artwork can change. Dates, capacity, sales windows, registration fields and existing tickets remain unchanged. Historical booking snapshots retain the details confirmed at booking time; the public event page shows the current venue. No automatic change-notification delivery is implemented. Schedule/capacity edits are now available through the separate recoverable revision workflow described in [schedule revision](schedule-revision.md). The presentation-only PATCH contract above remains available.
 
 ## Dashboard and navigation
 

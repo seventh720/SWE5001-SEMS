@@ -1,5 +1,7 @@
+import { HomeLink } from "../../shared/components/HomeLink";
+import { FeedbackNotice } from "../../shared/components/FeedbackNotice";
 import { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { apiRequest, ApiError } from "../../shared/api/client";
 import { hasRole, roleLabel } from "../../shared/auth/roles";
@@ -9,6 +11,7 @@ export function AdminUsersPage() {
   const { user: currentUser, token } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [savingId, setSavingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,6 +41,7 @@ export function AdminUsersPage() {
   }
 
   async function saveRoles(target: User) {
+    setMessage("");
     setSavingId(target.id);
     setError("");
     try {
@@ -46,6 +50,7 @@ export function AdminUsersPage() {
         { method: "PUT", body: JSON.stringify({ roles: target.roles }) },
         token!,
       );
+      setMessage(`Roles saved for ${updated.username}. Changes apply after their next sign-in.`);
       setUsers((current) =>
         current.map((item) => (item.id === updated.id ? updated : item)),
       );
@@ -62,9 +67,7 @@ export function AdminUsersPage() {
     <main className="app-shell">
       <header className="app-header">
         <div>
-          <Link className="text-link" to="/">
-            Back to dashboard
-          </Link>
+          <HomeLink />
           <h1>User and role management</h1>
         </div>
       </header>
@@ -74,6 +77,7 @@ export function AdminUsersPage() {
         expire within 30 minutes.
       </p>
       {error && <p className="error-message">{error}</p>}
+      <FeedbackNotice message={message} />
       <section className="user-list">
         {users.map((item) => (
           <article className="card user-card" key={item.id}>

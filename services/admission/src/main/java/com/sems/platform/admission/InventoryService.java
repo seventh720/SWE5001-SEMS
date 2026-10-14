@@ -30,7 +30,7 @@ public class InventoryService {
     @Transactional
     public Inventory configure(Snapshot event, Configuration input) {
         validate(event,input.ticketTypes()); lock(event.id());
-        var rows=jdbc.queryForList("SELECT * FROM sales WHERE event_id=?",event.id());
+        var rows=jdbc.queryForList("SELECT * FROM sales WHERE event_id=? FOR UPDATE",event.id());
         if (rows.isEmpty()) {
             if (input.version()!=0) conflict("Inventory changed; reload");
             jdbc.update("INSERT INTO sales(event_id,organizer_id,capacity,starts_at,ends_at,state,version) VALUES (?,?,?,?,?,'DRAFT',0)",
@@ -38,6 +38,7 @@ public class InventoryService {
         } else {
             var current=rows.getFirst();
             if (!current.get("organizer_id").equals(event.organizerId())) conflict("Event owner mismatch");
+            if(((Number)current.get("capacity")).intValue()!=event.capacity()||!((java.sql.Timestamp)current.get("starts_at")).toInstant().equals(event.startsAt())||!((java.sql.Timestamp)current.get("ends_at")).toInstant().equals(event.endsAt())) conflict("Event schedule changed; reload");
             if (!current.get("state").equals("DRAFT")) conflict("Published ticket configuration is immutable");
             if (((Number)current.get("version")).longValue()!=input.version()) conflict("Inventory changed; reload");
         }
@@ -62,6 +63,7 @@ public class InventoryService {
             if (input.operationId().equals(row.get("activation_id"))) return;
             conflict("Sales already activated by another operation");
         }
+        if (!row.get("state").equals("DRAFT")) conflict("Use publication management to resume paused sales");
         if (!input.startsAt().isAfter(Instant.now())) conflict("Event already started");
         if (inventory(event).ticketTypes().isEmpty()) conflict("At least one ticket type is required");
         jdbc.update("UPDATE sales SET state='ACTIVE',activation_id=? WHERE event_id=?",input.operationId(),event);

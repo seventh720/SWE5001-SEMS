@@ -32,7 +32,7 @@ public class PublicationState {
     }
     @Transactional public Operation begin(UUID owner,UUID id,long version,long ticketVersion) {
         var e=owned(owner,id);
-        if (e.publicationId!=null && Objects.equals(e.publicationVersion,version) && Objects.equals(e.ticketVersion,ticketVersion)) return operation(e);
+        if ((e.status.equals("PUBLISHING")||e.status.equals("PUBLISHED")) && e.publicationId!=null && Objects.equals(e.publicationVersion,version) && Objects.equals(e.ticketVersion,ticketVersion)) return operation(e);
         if (!e.status.equals("DRAFT") || e.version!=version) conflict("Event changed; reload");
         if (!e.salesConfigured || !e.startsAt.isAfter(Instant.now())) conflict("Configure tickets for a future event before publishing");
         e.publicationId=UUID.randomUUID();e.publicationVersion=version;e.ticketVersion=ticketVersion;

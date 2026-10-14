@@ -54,7 +54,7 @@ This is local HTTP configuration. Cloud HTTPS, secret management and deployment 
 4. Create a draft, refresh and edit it. The second organizer must not see the first organizer’s draft.
 5. Edit one draft in two windows: a stale submission returns a conflict and can reload the latest version.
 
-6. Open “Ticket setup & publication”, configure free ticket types within event capacity and save. Starting setup fixes the event time and capacity.
+6. Edit event details and ticket types together, then save using the buttons below ticket settings.
 7. Confirm publication and open the public event page. A dependency outage leaves the event pending/private until automatic recovery completes.
 8. Use an attendee account to book an open ticket type (1–10 places). Open **My tickets** from the home page or Explore menu to see each QR/manual code.
 9. Cancel before event start; all tickets in that booking become invalid and inventory is returned once. Retrying an uncertain request uses the same saved key. Staff check-in is not available yet.
@@ -258,7 +258,7 @@ Deploy Catalog (V3 migration), then Admission (V4), then gateway/Web; do not ser
 
 ## 10. Profile, pre-registration and countdowns
 
-Explore expands navigation inside the page. Open **My profile** to save optional registration details; **Apply saved details** copies only fields requested by an event and leaves them editable. Custom answers are event-specific and are not stored in the reusable profile. Clearing a profile does not modify existing bookings or pre-registrations.
+Open **My profile** to update your username and manage named contacts under **Saved registration details**. **Apply saved details** lets you choose a contact, then review the requested fields before booking. Student IDs and custom answers are not saved in reusable contacts. Each order still has one booking contact. Event details and ticket settings now share one editor; **Publication preview** reviews the saved configuration before publishing. See [contacts and editor behavior](docs/saved-contacts-and-editor.md).
 
 Before a ticket's opening time, **Save pre-registration** saves one selection per user/event without holding inventory. **My pre-registrations** shows an opening countdown and a review link. At opening, the form switches to **Confirm free booking**; confirmation is always manual and availability is checked again by Admission. Successful booking removes the matching pre-registration in the same transaction. Removing a pre-registration does not cancel a booking.
 
@@ -270,6 +270,8 @@ Upgrade Identity V2 and Admission V5 using newly built service jars, then rebuil
 
 Signed-in Home is a role-aware Dashboard with upcoming confirmed bookings and saved pre-registrations. Organizer and administrator tools appear only for the corresponding roles; staff check-in remains pending. Explore is a compact right-anchored navigation panel.
 
-**My events → Edit event** updates published title, description, venue, category and artwork. Dates, capacity, registration requirements and ticket settings remain fixed. Existing tickets retain booking-time details; use the public event page for the latest venue. **Use as template** loads your own event into a new draft; enter new dates, review contact requirements, then configure ticket types and publish separately.
+**My events → Publication preview / Publication management → Edit details & tickets** opens only the selected event. Save applies details and ticket changes together; published edits go live automatically, while drafts and paused events retain their status. Registration information stays locked after first publication. Pause/resume is explicit and existing tickets remain valid. Quotas cannot fall below issued places, and referenced ticket types cannot be deleted. See [publication management](docs/publication-management.md).
 
 [Platform positioning and organization onboarding](docs/platform-positioning.md) explains the shared platform, two organizer scenarios and the boundary between account ownership and enterprise tenancy. Full regression now runs `python3 scripts/workspace-acceptance.py` in an isolated test environment.
+
+Schedule updates add Catalog V4 and Admission V6 migrations. Deploy Admission first, then Catalog, then Web. Pending updates recover automatically. See [schedule revision semantics and verification](docs/schedule-revision.md).
