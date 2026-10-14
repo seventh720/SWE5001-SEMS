@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SEMS Identity API",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "servers": [
     {
@@ -116,12 +116,87 @@
           "studentId": {
             "type": "string",
             "nullable": true,
-            "maxLength": 100
+            "maxLength": 100,
+            "description": "Deprecated: ignored on write and always null on read. Student IDs are not retained in reusable contacts.",
+            "deprecated": true
           },
           "passportNumber": {
             "type": "string",
             "nullable": true,
             "maxLength": 100
+          }
+        }
+      },
+      "SavedContact": {
+        "type": "object",
+        "required": [
+          "label"
+        ],
+        "properties": {
+          "realName": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 254,
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 40
+          },
+          "passportNumber": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 100
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Required for edits; stale updates return 409."
+          }
+        }
+      },
+      "SavedContactUpdate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SavedContact"
+          },
+          {
+            "type": "object",
+            "required": [
+              "version"
+            ]
+          }
+        ]
+      },
+      "UsernameChange": {
+        "type": "object",
+        "required": [
+          "username"
+        ],
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "pattern": "[A-Za-z0-9._-]+",
+            "description": "Normalized to lowercase. Must include an alphanumeric character; admin, administrator, support, system, root and sems are reserved. Saving rechecks uniqueness."
           }
         }
       }
@@ -536,7 +611,9 @@
           "401": {
             "description": "Authentication required"
           }
-        }
+        },
+        "deprecated": true,
+        "description": "Legacy default contact only (id equals user id). Use /profile/contacts for named contacts. Student ID is not retained."
       },
       "put": {
         "summary": "Replace own saved optional contact fields; does not change account email or existing bookings",
@@ -567,7 +644,9 @@
           "401": {
             "description": "Authentication required"
           }
-        }
+        },
+        "deprecated": true,
+        "description": "Legacy default contact only (id equals user id). Use /profile/contacts for named contacts. Student ID is not retained."
       },
       "delete": {
         "summary": "Clear own saved profile; order and pre-registration snapshots remain",
@@ -577,6 +656,218 @@
           },
           "401": {
             "description": "Authentication required"
+          }
+        },
+        "deprecated": true,
+        "description": "Legacy default contact only (id equals user id). Use /profile/contacts for named contacts. Student ID is not retained."
+      }
+    },
+    "/api/v1/profile/contacts": {
+      "get": {
+        "summary": "List all contacts owned by the current user",
+        "responses": {
+          "200": {
+            "description": "Success; private data uses Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SavedContact"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      },
+      "post": {
+        "summary": "Save a new named contact; no student ID is stored",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavedContact"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success; private data uses Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedContact"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      }
+    },
+    "/api/v1/profile/contacts/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "put": {
+        "summary": "Replace an owned contact using its current version",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavedContactUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success; private data uses Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedContact"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Not owned or missing"
+          },
+          "409": {
+            "description": "Stale version"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an owned contact without changing submitted bookings",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Not owned or missing"
+          },
+          "409": {
+            "description": "Stale version"
+          }
+        }
+      }
+    },
+    "/api/v1/profile/username": {
+      "get": {
+        "summary": "Check syntax, reserved names and availability; not a reservation",
+        "parameters": [
+          {
+            "name": "value",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success; private data uses Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "available": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      },
+      "put": {
+        "summary": "Change own username; account email, ID, roles and bookings remain unchanged",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsernameChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success; private data uses Cache-Control: no-store",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "409": {
+            "description": "Username already registered"
           }
         }
       }

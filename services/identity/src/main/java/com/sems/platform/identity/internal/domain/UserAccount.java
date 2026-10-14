@@ -101,6 +101,8 @@ public class UserAccount {
         return id;
     }
 
+    public void rename(String username) { this.username = username; }
+
     public String getUsername() {
         return username;
     }

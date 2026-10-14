@@ -2,7 +2,7 @@
 """Profile and pre-registration lifecycle against disposable PostgreSQL containers."""
 import runpy
 globals().update(runpy.run_path('scripts/registration-acceptance.py'))
-profile={'realName':'Saved Person','email':'saved@example.com','phone':'+65 1234 5678','studentId':'TEST','passportNumber':'SYNTHETIC'}
+profile={'realName':'Saved Person','email':'saved@example.com','phone':'+65 1234 5678','studentId':None,'passportNumber':'SYNTHETIC'}
 call('GET','/api/v1/profile',expected=401)
 assert call('PUT','/api/v1/profile',profile,attendee)==profile
 assert call('GET','/api/v1/profile',token=attendee)==profile

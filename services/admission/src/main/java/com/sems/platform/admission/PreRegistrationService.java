@@ -30,11 +30,12 @@ public class PreRegistrationService {
  }
  @Transactional(readOnly=true) public View get(UUID user,UUID event){var rows=jdbc.query(SELECT+"WHERE p.user_id=? AND p.event_id=?",this::map,user,event);if(rows.isEmpty())throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Pre-registration not found");return rows.getFirst();}
  @Transactional public View save(UUID user,UUID event,Input input,TicketContracts.Snapshot snapshot){
-  var sales=jdbc.queryForList("SELECT state,starts_at FROM sales WHERE event_id=? FOR UPDATE",event);
+  var sales=jdbc.queryForList("SELECT state,starts_at,ends_at,capacity FROM sales WHERE event_id=? FOR UPDATE",event);
   if(sales.isEmpty())throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found");
   var tickets=jdbc.queryForList("SELECT opens_at,quota FROM ticket_types WHERE event_id=? AND id=?",event,input.ticketTypeId());
   if(tickets.isEmpty())throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Ticket type not found");
   var now=Instant.now();
+  var sale=sales.getFirst();if(!((Timestamp)sale.get("starts_at")).toInstant().equals(snapshot.startsAt())||!((Timestamp)sale.get("ends_at")).toInstant().equals(snapshot.endsAt())||((Number)sale.get("capacity")).intValue()!=snapshot.capacity())throw new ResponseStatusException(HttpStatus.CONFLICT,"Event changed; reload");
   if(!snapshot.id().equals(event)||!snapshot.status().equals("PUBLISHED")||!sales.getFirst().get("state").equals("ACTIVE")||!snapshot.startsAt().isAfter(now)||!now.isBefore(((Timestamp)tickets.getFirst().get("opens_at")).toInstant()))throw new ResponseStatusException(HttpStatus.CONFLICT,"Pre-registration is only available before registration opens");
   if(input.quantity()>((Number)tickets.getFirst().get("quota")).intValue())throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Quantity exceeds ticket quota");
   input.attendeeInfo().validate(snapshot.registrationRequirements());

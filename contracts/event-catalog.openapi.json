@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SEMS Event Catalog API",
-    "version": "0.5.0",
+    "version": "0.7.0",
     "description": "Draft management and durable publication. ORGANIZER/ADMIN cannot bypass ownership. Starting ticket setup fixes time and capacity; other draft details remain editable until publication. All published configuration is immutable in this release."
   },
   "servers": [
@@ -245,7 +245,9 @@
             "enum": [
               "DRAFT",
               "PUBLISHING",
-              "PUBLISHED"
+              "PUBLISHED",
+              "UPDATING",
+              "PAUSED"
             ]
           },
           "createdAt": {
@@ -507,6 +509,81 @@
             "minimum": 0
           }
         }
+      },
+      "TicketRevision": {
+        "type": "object",
+        "required": [
+          "version",
+          "ticketTypes"
+        ],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "ticketTypes": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "quota",
+                "opensAt",
+                "closesAt"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Existing ticket ID, omitted for a new ticket type."
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "quota": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "opensAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "closesAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      },
+      "RevisionInput": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DraftUpdate"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "ticketConfiguration": {
+                "$ref": "#/components/schemas/TicketRevision"
+              },
+              "publicationStatus": {
+                "type": "string",
+                "enum": [
+                  "PUBLISHED",
+                  "PAUSED"
+                ],
+                "description": "Only for events that have already been published. Omit to retain current state."
+              }
+            }
+          }
+        ]
       }
     }
   },
@@ -1256,6 +1333,60 @@
           },
           "409": {
             "description": "Version conflict or event not published"
+          }
+        }
+      }
+    },
+    "/api/v1/organizer/events/{id}/revision": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "put": {
+        "summary": "Save event details and tickets together, or pause/resume an already-published event",
+        "description": "Owner/event/inventory versions are enforced. Existing ticket IDs and issued credentials are retained; quotas cannot fall below reserved places, used types cannot be removed, and published registration information is immutable. Optional ticketConfiguration supplies explicit sales windows; without it, moving start shifts existing windows. Pending synchronization uses UPDATING and durable recovery. First publication still requires /publish. Editing retains publication status unless publicationStatus is supplied.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevisionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated or UPDATING; reload owner detail to observe completion",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid dates/fields"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Organizer role required"
+          },
+          "404": {
+            "description": "Not owned"
+          },
+          "409": {
+            "description": "Version/pending conflict, locked requirements, insufficient capacity or invalid transition; definitive rejection preserves prior event settings"
           }
         }
       }

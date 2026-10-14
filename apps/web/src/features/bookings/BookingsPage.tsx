@@ -1,3 +1,4 @@
+import { HomeLink } from "../../shared/components/HomeLink";
 import { RegistrationSummary, type AttendeeInfo } from "./registration";
 import { formatDateTime } from "../../shared/components/dateTime";
 import { useEffect, useState } from "react";
@@ -59,6 +60,7 @@ function TicketCode({ credential }: { credential: string }) {
 export function BookingsPage() {
   const { token } = useAuth();
   const [page, setPage] = useState(0);
+  const [status, setStatus] = useState("CONFIRMED");
   const [data, setData] = useState<{
     items: Booking[];
     totalPages: number;
@@ -70,7 +72,7 @@ export function BookingsPage() {
     setData(null);
     setError("");
     apiRequest<{ items: Booking[]; totalPages: number }>(
-      `/api/v1/bookings?page=${page}&size=10`,
+      `/api/v1/bookings?page=${page}&size=10&status=${status}`,
       {},
       token!,
     )
@@ -83,14 +85,27 @@ export function BookingsPage() {
     return () => {
       active = false;
     };
-  }, [page, token, retry]);
+  }, [page, status, token, retry]);
   return (
     <main className="app-shell">
+      <HomeLink />
       <p className="eyebrow">YOUR NEXT SHARED MOMENT</p>
       <h1>My tickets</h1>
       <p>
-        Your confirmed bookings, individual tickets and cancellation history.
+        Confirmed bookings and cancelled bookings are shown separately. Saved pre-registrations are not confirmed tickets.
       </p>
+      <div className="booking-status-switch" role="group" aria-label="Booking status">
+        {(["CONFIRMED", "CANCELLED"] as const).map(value => (
+          <button key={value} aria-pressed={status === value} onClick={() => {
+            if (status === value) return;
+            setData(null);
+            setPage(0);
+            setStatus(value);
+          }}>{value === "CONFIRMED" ? "Confirmed" : "Cancelled"}</button>
+        ))}
+      </div>
+      <h2>{status === "CONFIRMED" ? "Confirmed bookings" : "Cancelled bookings"}</h2>
+      {status === "CANCELLED" && <p className="muted">These bookings have been cancelled. Their tickets cannot be used for admission.</p>}
       {error ? (
         <p role="alert" className="error-message">
           {error} <button onClick={() => setRetry(retry + 1)}>Retry</button>
@@ -101,14 +116,14 @@ export function BookingsPage() {
         <>
           {data.items.length === 0 && (
             <section className="card">
-              <h2>Your next experience starts here.</h2>
+              <h3>{status === "CONFIRMED" ? "No confirmed bookings yet." : "No cancelled bookings."}</h3>
               <Link to="/events">Discover events →</Link>
             </section>
           )}
           {data.items.map((b) => (
             <article className="card event-card" key={b.id}>
               <div>
-                <span className="badge">{b.status}</span>
+                <span className={`badge ${b.status === "CANCELLED" ? "badge-cancelled" : ""}`}>{b.status === "CANCELLED" ? "Cancelled" : "Confirmed"}</span>
                 <h2>{b.eventTitle}</h2>
                 <p>
                   {b.ticketName} · {b.quantity}{" "}
@@ -119,7 +134,7 @@ export function BookingsPage() {
                 </p>
               </div>
               <Link className="secondary-button" to={`/bookings/${b.id}`}>
-                View booking ↗
+                {b.status === "CANCELLED" ? "View cancellation" : "View tickets"} ↗
               </Link>
             </article>
           ))}
@@ -185,7 +200,7 @@ export function BookingDetail() {
   }
   return (
     <main className="app-shell">
-      <Link to="/bookings">← My tickets</Link>
+      <div className="page-breadcrumbs"><HomeLink /><Link className="back-link" to="/bookings">← Back to my tickets</Link></div>
       {error && (
         <p className="error-message" role="alert">
           {error}{" "}

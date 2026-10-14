@@ -86,3 +86,17 @@ subprocess.run(compose+['exec','-T','postgres','psql','-U','postgres','-d','sems
 call('POST','/api/v1/bookings/'+other['id']+'/cancel',token=attendee,expected=409)
 assert availability(event)==0
 print('PASS: 100 requests/10 places, database inventory-booking-ticket invariants, sales windows, wrong-event ticket and cancellation guards')
+
+# Status filtering must apply before pagination, including totals and owner scope.
+all_rows=call('GET','/api/v1/bookings?size=50',token=attendee)
+for status in ('CONFIRMED','CANCELLED'):
+    expected=[row for row in all_rows['items'] if row['status']==status]
+    filtered=call('GET','/api/v1/bookings?status='+status+'&size=1',token=attendee)
+    assert filtered['totalElements']==len(expected) and filtered['totalPages']==len(expected)
+    assert all(row['status']==status for row in filtered['items'])
+    if len(expected)>1:
+        second=call('GET','/api/v1/bookings?status='+status+'&size=1&page=1',token=attendee)
+        assert second['items'][0]['id']!=filtered['items'][0]['id']
+    assert call('GET','/api/v1/bookings?status='+status,token=b)['totalElements']==0
+call('GET','/api/v1/bookings?status=UNKNOWN',token=attendee,expected=400)
+print('PASS: booking status filters, pagination totals, separate pages and owner isolation')

@@ -1,3 +1,6 @@
+import { HomeLink } from "../../shared/components/HomeLink";
+import { FeedbackNotice } from "../../shared/components/FeedbackNotice";
+import { TicketEditor, initialTicket, type TicketInventory, type TicketRow } from "./TicketEditor";
 import { DateTimeField } from "../../shared/components/DateTimeField";
 import { Select } from "../../shared/components/Select";
 import {
@@ -12,7 +15,7 @@ import {
   type Requirements,
 } from "../bookings/registration";
 import { type FormEvent, useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { apiRequest, ApiError } from "../../shared/api/client";
 interface Draft {
@@ -25,6 +28,7 @@ interface Draft {
   capacity: number;
   version: number;
   status: string;
+  publicationError?: string | null;
   salesConfigured?: boolean;
   category?: string;
   cardTheme?: string;
@@ -48,6 +52,7 @@ const empty = {
 };
 export function DraftsPage() {
   const { user, token } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const allowed = user?.roles.some((r) => r === "ORGANIZER" || r === "ADMIN");
   const [data, setData] = useState<Page>({
     items: [],
@@ -59,7 +64,10 @@ export function DraftsPage() {
   const [editing, setEditing] = useState<Draft | null>(null);
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
+  const [pendingId, setPendingId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [tickets, setTickets] = useState<TicketRow[]>([initialTicket()]);
+  const [inventory, setInventory] = useState<TicketInventory>({version:0,ticketTypes:[]});
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(0);
@@ -81,8 +89,39 @@ export function DraftsPage() {
       active = false;
     };
   }, [token, allowed, page, refresh]);
+  useEffect(() => {
+    if (!data.items.some((e) => e.status === "UPDATING")) return;
+    const timer = window.setInterval(() => setRefresh((v) => v + 1), 3000);
+    return () => window.clearInterval(timer);
+  }, [data.items]);
+  useEffect(() => {
+    const id = searchParams.get("edit");
+    if (allowed && token && id) { void edit(id); setSearchParams({}, {replace: true}); }
+  }, [allowed, token, searchParams]);
+  useEffect(() => {
+    if (!pendingId || !token) return;
+    let active = true;
+    let timer: ReturnType<typeof setTimeout>;
+    async function check() {
+      try {
+        const completed = await apiRequest<Draft>(`/api/v1/organizer/events/${pendingId}`, {}, token!);
+        if (!active) return;
+        if (completed.status !== "UPDATING") {
+          setPendingId(null);
+          setMessage(completed.publicationError ? `Update rejected. ${completed.publicationError}` : "Event changes saved. Ticket settings are synchronized.");
+          setRefresh(v => v + 1);
+          return;
+        }
+      } catch {
+        // Keep the pending notice and retry; a failed read is not a successful save.
+      }
+      if (active) timer = setTimeout(check, 3000);
+    }
+    void check();
+    return () => { active = false; clearTimeout(timer); };
+  }, [pendingId, token]);
   if (!allowed) return <Navigate to="/" replace />;
-  async function edit(id: string, template = false) {
+  async function edit(id: string, template = false, scroll = true) {
     setError("");
     try {
       const d = await apiRequest<Draft>(
@@ -90,6 +129,9 @@ export function DraftsPage() {
         {},
         token!,
       );
+      const i = template ? {version:0,ticketTypes:[]} : await apiRequest<TicketInventory>(`/api/v1/organizer/events/${id}/ticket-types`,{},token!);
+      setInventory(i);
+      setTickets(i.ticketTypes.length ? i.ticketTypes.map(t=>({...t,opensAt:singaporeInput(t.opensAt),closesAt:singaporeInput(t.closesAt)})) : [initialTicket(d.capacity,template ? "" : singaporeInput(d.startsAt))]);
       setEditing(template ? null : d);
       setForm({
         ...d,
@@ -106,7 +148,7 @@ export function DraftsPage() {
           ? "Template loaded. Choose new dates, save the draft, then configure its ticket types."
           : "",
       );
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (scroll) window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unable to load draft");
     }
@@ -117,40 +159,30 @@ export function DraftsPage() {
     setError("");
     setMessage("");
     try {
-      await apiRequest<Draft>(
-        `/api/v1/organizer/events${editing ? `/${editing.id}${editing.status === "PUBLISHED" ? "/presentation" : ""}` : ""}`,
-        {
-          method: editing
-            ? editing.status === "PUBLISHED"
-              ? "PATCH"
-              : "PUT"
-            : "POST",
-          body: JSON.stringify(
-            editing?.status === "PUBLISHED"
-              ? {
-                  title: form.title,
-                  description: form.description,
-                  location: form.location,
-                  category: form.category,
-                  cardTheme: form.cardTheme,
-                  version: editing.version,
-                }
-              : {
-                  ...form,
-                  startsAt: toInstant(form.startsAt),
-                  endsAt: toInstant(form.endsAt),
-                  ...(editing ? { version: editing.version } : {}),
-                },
-          ),
-        },
-        token!,
-      );
-      setShow(false);
-      setEditing(null);
+      const details = {
+        ...form,
+        startsAt: editing && form.startsAt === singaporeInput(editing.startsAt) ? editing.startsAt : toInstant(form.startsAt),
+        endsAt: editing && form.endsAt === singaporeInput(editing.endsAt) ? editing.endsAt : toInstant(form.endsAt),
+      };
+      let target = editing;
+      if (!target) {
+        target = await apiRequest<Draft>("/api/v1/organizer/events",{method:"POST",body:JSON.stringify(details)},token!);
+        // Keep the created ID if ticket validation fails so retry never creates another draft.
+        setEditing(target);
+      }
+      const saved = await apiRequest<Draft>(`/api/v1/organizer/events/${target.id}/revision`,{
+        method:"PUT",body:JSON.stringify({...details,version:target.version,ticketConfiguration:{version:inventory.version,ticketTypes:tickets.map(t=>{
+          const old=inventory.ticketTypes.find(v=>v.id===t.id);
+          return {...t,opensAt:old && t.opensAt===singaporeInput(old.opensAt)?old.opensAt:toInstant(t.opensAt),closesAt:old && t.closesAt===singaporeInput(old.closesAt)?old.closesAt:toInstant(t.closesAt)};
+        })}})},token!);
+      if(saved.status === "UPDATING") {setPendingId(saved.id);setShow(false);setEditing(saved);}
+      else await edit(saved.id, false, false);
       setMessage(
-        editing?.status === "PUBLISHED"
-          ? "Published event updated. Existing tickets retain their booking-time details."
-          : "Draft saved.",
+        saved.status === "UPDATING"
+          ? "Update is syncing with ticketing. The event is temporarily unavailable for new bookings; this list will refresh automatically."
+          : (editing?.status === "PUBLISHED" || editing?.status === "PAUSED")
+            ? "Published event updated. Confirmed tickets use the updated event schedule."
+            : "Draft saved.",
       );
       setRefresh((v) => v + 1);
     } catch (e) {
@@ -161,18 +193,18 @@ export function DraftsPage() {
   }
   return (
     <main className="app-shell organizer-workspace">
-      <Link className="back-link" to="/">
-        ← Dashboard
-      </Link>
+      <HomeLink />
       <header className="app-header">
         <div>
           <p className="eyebrow">ORGANIZER WORKSPACE</p>
-          <h1>My events</h1>
-          <p className="muted">Your drafts are private to your account.</p>
+          <h1>{show ? "Event editor" : "My events"}</h1>
+          <p className="muted">{show ? "Review the details and tickets, then save all changes below." : "Your drafts are private to your account."}</p>
         </div>
-        <button
+        {!show && <button
           className="primary-button"
           onClick={() => {
+            setTickets([initialTicket()]);
+            setInventory({version:0,ticketTypes:[]});
             setForm(empty);
             setEditing(null);
             setShow(true);
@@ -181,7 +213,7 @@ export function DraftsPage() {
           }}
         >
           Create event
-        </button>
+        </button>}
       </header>
       {error && (
         <p role="alert" className="error-message">
@@ -193,25 +225,25 @@ export function DraftsPage() {
           )}
         </p>
       )}
-      {message && <p role="status">{message}</p>}
+      <FeedbackNotice message={message} tone={message.startsWith("Update rejected") ? "error" : message.includes("syncing") || message.startsWith("Template") ? "info" : "success"} />
       {show && (
         <section className="card event-editor">
           <h2>
             {editing
-              ? editing.status === "PUBLISHED"
+              ? editing.status !== "DRAFT"
                 ? "Edit published event"
                 : "Edit draft"
               : "New event draft"}
           </h2>
-          {editing?.status === "PUBLISHED" && (
+          {(editing?.status === "PUBLISHED" || editing?.status === "PAUSED") && (
             <p className="editor-notice">
-              You can update public details and artwork. Existing tickets keep
-              their booking-time details; attendees can check the public event
-              for the latest venue. Schedule, capacity and registration
-              requirements stay fixed.
+              Event dates and capacity are editable. Confirmed tickets follow
+              the updated schedule. Registration requirements stay fixed after
+              publication.
             </p>
           )}
           <form onSubmit={save}>
+            <fieldset disabled={busy} className="event-detail-fields">
             <label>
               Title
               <input
@@ -242,7 +274,9 @@ export function DraftsPage() {
               />
             </label>
             {editing?.salesConfigured && (
-              <p>Event time and capacity are fixed after ticket setup.</p>
+              <p>
+                Details and tickets are saved together. Review ticket sales windows when changing the event date.
+              </p>
             )}
             <p className="muted">
               All event times use Singapore time (UTC+08:00).
@@ -251,20 +285,20 @@ export function DraftsPage() {
               <DateTimeField
                 label="Starts at"
                 value={form.startsAt}
-                disabled={busy || editing?.salesConfigured}
-                onChange={(value) => setForm({ ...form, startsAt: value })}
+                disabled={busy}
+                onChange={(value) => {setForm({ ...form, startsAt: value });setTickets(rows=>rows.map(t=>t.closesAt?t:{...t,closesAt:value}));}}
               />
               <DateTimeField
                 label="Ends at"
                 value={form.endsAt}
                 after={form.startsAt}
-                disabled={busy || editing?.salesConfigured}
+                disabled={busy}
                 onChange={(value) => setForm({ ...form, endsAt: value })}
               />
               <label>
                 Capacity
                 <input
-                  disabled={editing?.salesConfigured}
+                  disabled={busy}
                   type="number"
                   min={1}
                   max={2147483647}
@@ -300,7 +334,7 @@ export function DraftsPage() {
             </div>
             <fieldset
               className="registration-settings"
-              disabled={busy || editing?.status === "PUBLISHED"}
+              disabled={busy || (editing?.status === "PUBLISHED" || editing?.status === "PAUSED")}
             >
               <legend>Registration information</legend>
               <p>
@@ -349,11 +383,12 @@ export function DraftsPage() {
                 settings are fixed after publication.
               </p>
             </fieldset>
+            <TicketEditor tickets={tickets} onChange={setTickets} capacity={form.capacity} startsAt={form.startsAt} disabled={busy} />
             <div className="actions">
-              <button type="submit" className="primary-button" disabled={busy}>
+              <button type="submit" className="primary-button" disabled={busy || tickets.reduce((n,t)=>n+t.quota,0)>form.capacity}>
                 {busy
                   ? "Saving…"
-                  : editing?.status === "PUBLISHED"
+                  : (editing?.status === "PUBLISHED" || editing?.status === "PAUSED")
                     ? "Save event changes"
                     : "Save draft"}
               </button>
@@ -365,9 +400,12 @@ export function DraftsPage() {
                 Close editor
               </button>
             </div>
+            </fieldset>
           </form>
+
         </section>
       )}
+      {!show && <>
       {loading ? (
         <p role="status">Loading drafts…</p>
       ) : (
@@ -385,13 +423,11 @@ export function DraftsPage() {
                     {d.location} · {formatDateTime(d.startsAt)}
                   </p>
                   <p className="muted">Capacity {d.capacity}</p>
+                  {d.publicationError && (
+                    <p role="alert">{d.publicationError}</p>
+                  )}
                 </div>
                 <div className="actions">
-                  {(d.status === "DRAFT" || d.status === "PUBLISHED") && (
-                    <button onClick={() => edit(d.id)}>
-                      {d.status === "PUBLISHED" ? "Edit event" : "Edit draft"}
-                    </button>
-                  )}
                   <button
                     className="secondary-button"
                     onClick={() => edit(d.id, true)}
@@ -402,7 +438,7 @@ export function DraftsPage() {
                     Registration list →
                   </Link>
                   <Link to={`/organizer/events/${d.id}/setup`}>
-                    Ticket setup & publication →
+                    {d.status === "DRAFT" ? "Publication preview →" : "Publication management →"}
                   </Link>
                 </div>
               </article>
@@ -424,6 +460,7 @@ export function DraftsPage() {
           Next
         </button>
       </div>
+      </>}
     </main>
   );
 }

@@ -13,16 +13,17 @@ public class BookingProfileController {
  private final JdbcTemplate jdbc;
  public BookingProfileController(JdbcTemplate jdbc){this.jdbc=jdbc;}
  public record Profile(@Size(max=100) String realName,@Email @Size(max=254) String email,@Size(max=40) String phone,@Size(max=100) String studentId,@Size(max=100) String passportNumber) {
-  public Profile {realName=clean(realName);email=clean(email);phone=clean(phone);studentId=clean(studentId);passportNumber=clean(passportNumber);}
+  public Profile {realName=clean(realName);email=clean(email);phone=clean(phone);studentId=null;passportNumber=clean(passportNumber);}
   private static String clean(String s){return s==null||s.isBlank()?null:s.trim();}
  }
  private ResponseEntity<Profile> response(Profile p){return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(p);}
  @GetMapping public ResponseEntity<Profile> get(@AuthenticationPrincipal Jwt jwt){
-  var rows=jdbc.query("SELECT * FROM booking_profiles WHERE user_id=?",(rs,n)->new Profile(rs.getString("real_name"),rs.getString("email"),rs.getString("phone"),rs.getString("student_id"),rs.getString("passport_number")),UUID.fromString(jwt.getSubject()));
+  var rows=jdbc.query("SELECT * FROM booking_profiles WHERE user_id=? AND id=user_id",(rs,n)->new Profile(rs.getString("real_name"),rs.getString("email"),rs.getString("phone"),null,rs.getString("passport_number")),UUID.fromString(jwt.getSubject()));
   return response(rows.isEmpty()?new Profile(null,null,null,null,null):rows.getFirst());
  }
  @PutMapping public ResponseEntity<Profile> save(@AuthenticationPrincipal Jwt jwt,@Valid @RequestBody Profile p){
-  jdbc.update("INSERT INTO booking_profiles(user_id,real_name,email,phone,student_id,passport_number) VALUES (?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET real_name=EXCLUDED.real_name,email=EXCLUDED.email,phone=EXCLUDED.phone,student_id=EXCLUDED.student_id,passport_number=EXCLUDED.passport_number",UUID.fromString(jwt.getSubject()),p.realName(),p.email(),p.phone(),p.studentId(),p.passportNumber());return response(p);
+  var owner=UUID.fromString(jwt.getSubject());
+  jdbc.update("INSERT INTO booking_profiles(id,user_id,real_name,email,phone,passport_number) VALUES (?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET real_name=EXCLUDED.real_name,email=EXCLUDED.email,phone=EXCLUDED.phone,passport_number=EXCLUDED.passport_number,version=booking_profiles.version+1",owner,owner,p.realName(),p.email(),p.phone(),p.passportNumber());return response(p);
  }
- @DeleteMapping public ResponseEntity<Void> clear(@AuthenticationPrincipal Jwt jwt){jdbc.update("DELETE FROM booking_profiles WHERE user_id=?",UUID.fromString(jwt.getSubject()));return ResponseEntity.noContent().cacheControl(CacheControl.noStore()).build();}
+ @DeleteMapping public ResponseEntity<Void> clear(@AuthenticationPrincipal Jwt jwt){jdbc.update("DELETE FROM booking_profiles WHERE user_id=? AND id=user_id",UUID.fromString(jwt.getSubject()));return ResponseEntity.noContent().cacheControl(CacheControl.noStore()).build();}
 }

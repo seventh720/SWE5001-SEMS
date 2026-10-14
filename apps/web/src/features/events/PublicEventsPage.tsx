@@ -1,10 +1,11 @@
+import { HomeLink } from "../../shared/components/HomeLink";
 import { Countdown, useNow } from "../../shared/components/Countdown";
 import { Select } from "../../shared/components/Select";
 import { formatDateTime } from "../../shared/components/dateTime";
 import { categories, EventArtwork } from "./EventArtwork";
 import type { Requirements } from "../bookings/registration";
 import { useEffect, useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import { apiRequest } from "../../shared/api/client";
 import { BookingForm } from "../bookings/BookingForm";
 interface Event {
@@ -58,9 +59,7 @@ export function PublicEventsPage() {
   }
   return (
     <main className="app-shell discovery-workspace">
-      <Link className="back-link" to="/">
-        ← Home / Dashboard
-      </Link>
+      <HomeLink />
       <p className="eyebrow">DISCOVER YOUR COMMUNITY</p>
       <h1>Upcoming events</h1>
       <div className="discovery-filters">
@@ -142,6 +141,7 @@ export function PublicEventsPage() {
 export function PublicEventDetail() {
   const now = useNow();
   const { id } = useParams();
+  const location = useLocation();
   const [event, setEvent] = useState<Event | null>(null);
   const [tickets, setTickets] = useState<
     {
@@ -166,15 +166,28 @@ export function PublicEventDetail() {
       })
       .catch((e) => setError(e.message));
   }, [id]);
+  useEffect(() => {
+    const selected = new URLSearchParams(location.search).get("preRegistration");
+    if (!event || !selected || !tickets.some(t => t.id === selected)) return;
+    const timer = window.setTimeout(() => {
+      const target = document.getElementById(`ticket-${selected}`);
+      target?.scrollIntoView({block:"start", behavior:"auto"});
+      target?.focus({preventScroll:true});
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [event, tickets, location.search]);
   return (
-    <main className="app-shell">
+    <main className="app-shell event-detail-page">
       <div className="page-breadcrumbs">
-        <Link to="/">← Home / Dashboard</Link>
+        <HomeLink />
         <Link to="/events">All events →</Link>
       </div>
       {error && <p role="alert">{error}</p>}
       {event && (
         <>
+          <div className="event-detail-grid">
+          <section className="card event-overview">
+          <EventArtwork category={event.category} theme={event.cardTheme} />
           <header className="event-detail-hero">
             <div>
               <p className="eyebrow">
@@ -207,24 +220,17 @@ export function PublicEventDetail() {
                 </span>
               )}
             </div>
-            <EventArtwork category={event.category} theme={event.cardTheme} />
           </header>
-          <div className="event-detail-grid">
-            <section className="card event-description">
-              <p className="eyebrow">THE EXPERIENCE</p>
+            <section className="event-description">
               <h2>About this event</h2>
               <p>{event.description}</p>
-              <h3>How registration works</h3>
-              <p>
-                Choose a ticket option and complete the requested contact
-                details. Before opening, save a pre-registration; once open,
-                confirm to receive your tickets.
-              </p>
+
             </section>
+          </section>
             <section aria-label="Admission options" className="admission-panel">
               <h2>Admission options</h2>
               {tickets.map((t) => (
-                <article key={t.id} className="card admission-card">
+                <article key={t.id} id={`ticket-${t.id}`} tabIndex={-1} className="card admission-card">
                   <div className="event-card-footer">
                     <h3>{t.name}</h3>
                     <strong className="ticket-price">Free</strong>

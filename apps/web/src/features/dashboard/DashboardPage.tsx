@@ -1,5 +1,5 @@
 import { EventArtwork } from "../events/EventArtwork";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { apiRequest } from "../../shared/api/client";
@@ -107,6 +107,11 @@ export function DashboardPage() {
     category: string;
     cardTheme: string;
   }>("/api/v1/events?page=0&size=3", token);
+  const checkedOpenings = useRef(new Set<string>());
+  useEffect(() => {
+    const due=pre.items.filter(p=>p.status==="WAITING" && now>=Date.parse(p.opensAt) && now<Date.parse(p.closesAt) && !checkedOpenings.current.has(`${p.eventId}:${p.opensAt}`));
+    if(due.length){due.forEach(p=>checkedOpenings.current.add(`${p.eventId}:${p.opensAt}`));pre.retry();}
+  }, [now, pre.items]);
   if (!user) return null;
   const organizer = user.roles.some((r) => r === "ORGANIZER" || r === "ADMIN");
   return (
@@ -163,31 +168,33 @@ export function DashboardPage() {
           <Feedback state={pre} />
           {pre.items.map((p) => {
             const waiting = now < Date.parse(p.opensAt),
-              closed = now >= Date.parse(p.closesAt) || p.status === "CLOSED";
+              closed = now >= Date.parse(p.closesAt) || now >= Date.parse(p.startsAt) || p.status === "CLOSED",
+              soldOut = p.status === "SOLD_OUT";
             return (
               <article className="dashboard-reservation" key={p.eventId}>
                 <strong>{p.eventTitle}</strong>
-                {waiting ? (
+                {waiting && !closed ? (
                   <Countdown label="Opens in" target={p.opensAt} />
                 ) : (
                   <p>
                     {closed
                       ? "Registration closed"
-                      : "Registration is open — confirm your place"}
+                      : soldOut ? "Currently sold out" : "Registration is open — confirm your place"}
                   </p>
                 )}
                 <Link
+                  className={!closed && !waiting && !soldOut ? "primary-button" : "secondary-button"}
                   to={
                     closed
                       ? "/pre-registrations"
-                      : `/events/${p.eventId}?preRegistration=${p.ticketTypeId}`
+                      : `/events/${p.eventId}?preRegistration=${p.ticketTypeId}#ticket-${p.ticketTypeId}`
                   }
                 >
                   {closed
                     ? "Manage saved selection"
                     : waiting
                       ? "Review pre-registration →"
-                      : "Review and book →"}
+                      : soldOut ? "Check availability →" : "Register now →"}
                 </Link>
               </article>
             );

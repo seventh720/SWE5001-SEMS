@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SEMS Admission API",
-    "version": "0.5.0",
+    "version": "0.7.0",
     "description": "Free inventory, retry-safe bookings, per-place ticket credentials and attendee cancellation. Staff check-in and event-wide cancellation are pending."
   },
   "servers": [
@@ -120,7 +120,8 @@
             "type": "string",
             "enum": [
               "DRAFT",
-              "ACTIVE"
+              "ACTIVE",
+              "PAUSED"
             ]
           },
           "ticketTypes": {
@@ -528,6 +529,138 @@
             "type": "integer"
           }
         }
+      },
+      "EventRevision": {
+        "type": "object",
+        "required": [
+          "operationId",
+          "eventId",
+          "organizerId",
+          "sourceStatus",
+          "oldCapacity",
+          "oldStartsAt",
+          "oldEndsAt",
+          "desired"
+        ],
+        "properties": {
+          "operationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "organizerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sourceStatus": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "PUBLISHED",
+              "PAUSED"
+            ]
+          },
+          "oldCapacity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "oldStartsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "oldEndsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "desired": {
+            "type": "object",
+            "required": [
+              "capacity",
+              "startsAt",
+              "endsAt"
+            ],
+            "properties": {
+              "capacity": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "startsAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "endsAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "ticketConfiguration": {
+                "$ref": "#/components/schemas/TicketRevision"
+              },
+              "publicationStatus": {
+                "type": "string",
+                "enum": [
+                  "PUBLISHED",
+                  "PAUSED"
+                ],
+                "description": "Only for events that have already been published. Omit to retain current state."
+              }
+            }
+          }
+        }
+      },
+      "TicketRevision": {
+        "type": "object",
+        "required": [
+          "version",
+          "ticketTypes"
+        ],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "ticketTypes": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "quota",
+                "opensAt",
+                "closesAt"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "Existing ticket ID, omitted for a new ticket type."
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "quota": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "opensAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "closesAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -793,7 +926,7 @@
         }
       },
       "get": {
-        "summary": "List only the authenticated attendee\u2019s bookings, including cancelled bookings",
+        "summary": "List the authenticated attendee\u2019s bookings, optionally filtered by status",
         "description": "Sorted by createdAt DESC, id DESC. Credentials are private; do not cache or log response bodies.",
         "parameters": [
           {
@@ -814,6 +947,19 @@
               "default": 10,
               "minimum": 1,
               "maximum": 50
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Filter records and pagination totals by booking status. Omit to include both statuses.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CONFIRMED",
+                "CANCELLED"
+              ]
             }
           }
         ],
@@ -837,7 +983,7 @@
             }
           },
           "400": {
-            "description": "Malformed request or invalid quantity/pagination"
+            "description": "Invalid pagination or unsupported status"
           },
           "401": {
             "description": "Authentication required"
@@ -1143,6 +1289,52 @@
           },
           "401": {
             "description": "Authentication required"
+          }
+        }
+      }
+    },
+    "/internal/v1/events/{id}/revise": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "serviceToken": []
+          }
+        ],
+        "summary": "Apply Catalog event revision once per operation ID; serialize with inventory and booking writes",
+        "description": "Service network only. Receipt and changes commit together. Repeated matching operations return success without shifting times again. Unchanged ticket quotas and credentials; confirmed order times update.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventRevision"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Applied or replayed"
+          },
+          "400": {
+            "description": "Malformed request"
+          },
+          "401": {
+            "description": "Invalid service token"
+          },
+          "409": {
+            "description": "Metadata mismatch, capacity below allocation, invalid times or checked-in event"
           }
         }
       }

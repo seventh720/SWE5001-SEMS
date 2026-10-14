@@ -173,11 +173,12 @@ it("submits requested contact fields and preserves them for retry", async () => 
 
 it("applies only requested profile fields and allows editing them", async () => {
   fetchMock.mockResolvedValueOnce(
-    response({
+    response([{
+      id: "c1", label: "Myself", version: 0,
       realName: "Saved Person",
       email: "private@example.com",
       passportNumber: "private",
-    }),
+    }, {id: "c2", label: "Friend", version: 0, realName: "Friend Name"}]),
   );
   render(
     <AuthProvider>
@@ -201,7 +202,12 @@ it("applies only requested profile fields and allows editing them", async () => 
     </AuthProvider>,
   );
   fireEvent.click(screen.getByRole("button", { name: "Apply saved details" }));
+  fireEvent.click(await screen.findByRole("button", {name: "Apply selected contact"}));
   await screen.findByDisplayValue("Saved Person");
+  fireEvent.click(screen.getByRole("combobox", {name: /Saved contact/}));
+  fireEvent.click(screen.getByRole("option", {name: /Friend/}));
+  fireEvent.click(screen.getByRole("button", {name: "Apply selected contact"}));
+  await screen.findByDisplayValue("Friend Name");
   expect(screen.queryByDisplayValue("private@example.com")).toBeNull();
   fireEvent.change(screen.getByLabelText("Full name"), {
     target: { value: "Edited Person" },

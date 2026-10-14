@@ -1,3 +1,4 @@
+import { HomeLink } from "../../shared/components/HomeLink";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { apiRequest } from "../../shared/api/client";
@@ -45,7 +46,7 @@ export function OrganizerBookingsPage() {
   }, [id, page, token, retry]);
   return (
     <main className="app-shell">
-      <Link to="/organizer/events">← My events</Link>
+      <div className="page-breadcrumbs"><HomeLink /><Link className="back-link" to="/organizer/events">← Back to my events</Link></div>
       <p className="eyebrow">ORGANIZER WORKSPACE</p>
       <h1>Registration list</h1>
       <p>

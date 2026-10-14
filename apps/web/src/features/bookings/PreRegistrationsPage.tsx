@@ -1,3 +1,4 @@
+import { HomeLink } from "../../shared/components/HomeLink";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiRequest } from "../../shared/api/client";
@@ -65,6 +66,7 @@ export function PreRegistrationsPage() {
   }
   return (
     <main className="app-shell">
+      <HomeLink />
       <p className="eyebrow">READY WHEN YOU ARE</p>
       <h1>My pre-registrations</h1>
       <p>
@@ -110,7 +112,7 @@ export function PreRegistrationsPage() {
               {!closed && (
                 <Link
                   className="primary-button"
-                  to={`/events/${item.eventId}?preRegistration=${item.ticketTypeId}`}
+                  to={`/events/${item.eventId}?preRegistration=${item.ticketTypeId}#ticket-${item.ticketTypeId}`}
                 >
                   {waiting ? "Edit pre-registration" : "Review and book"}
                 </Link>

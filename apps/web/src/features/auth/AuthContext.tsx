@@ -23,6 +23,7 @@ interface AuthContextValue {
     password: string,
   ) => Promise<void>;
   logout: () => void;
+  updateUser: (user: User) => void;
 }
 
 const STORAGE_KEY = "sems-auth";
@@ -60,6 +61,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
     await login(email, password);
   }
 
+  function updateUser(user: User) {
+    if (!state) return;
+    const next = { ...state, user };
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    setState(next);
+  }
+
   function logout() {
     const prefix = `sems-booking:${state?.user.id}:`;
     Object.keys(sessionStorage)
@@ -76,6 +84,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       login,
       register,
       logout,
+      updateUser,
     }),
     [state],
   );

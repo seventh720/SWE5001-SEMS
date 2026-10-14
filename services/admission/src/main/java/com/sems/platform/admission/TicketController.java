@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import static com.sems.platform.admission.TicketContracts.*;
 @RestController
 public class TicketController {
-    private final InventoryService inventory; private final CatalogClient catalog;
-    public TicketController(InventoryService inventory,CatalogClient catalog) { this.inventory=inventory;this.catalog=catalog; }
+    private final EventRevisionService revisions; private final InventoryService inventory; private final CatalogClient catalog;
+    public TicketController(InventoryService inventory,CatalogClient catalog,EventRevisionService revisions) { this.inventory=inventory;this.catalog=catalog;this.revisions=revisions; }
     @GetMapping("/api/v1/organizer/events/{id}/ticket-types") @PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
     public Inventory owned(@PathVariable UUID id,@AuthenticationPrincipal Jwt jwt) {
         catalog.owned(id,UUID.fromString(jwt.getSubject())); return inventory.inventory(id);
@@ -25,6 +25,7 @@ public class TicketController {
     public Inventory published(@PathVariable UUID id) {
         catalog.published(id); return inventory.inventory(id);
     }
+    @PostMapping("/internal/v1/events/{id}/revise") public void revise(@PathVariable UUID id,@Valid @RequestBody EventRevisionService.Operation input){revisions.revise(id,input);}
     @PostMapping("/internal/v1/events/{id}/activate-sales")
     public void activate(@PathVariable UUID id,@Valid @RequestBody Activate input) { inventory.activate(id,input); }
 }

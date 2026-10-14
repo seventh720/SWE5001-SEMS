@@ -4,143 +4,51 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "../auth/AuthContext";
 import { DraftsPage } from "./DraftsPage";
-const fetchMock = vi.fn<typeof fetch>();
-const draft = {
-  id: "e1",
-  title: "Seminar",
-  description: "A seminar",
-  location: "Campus",
-  startsAt: "2030-01-01T10:00:00Z",
-  endsAt: "2030-01-01T11:00:00Z",
-  capacity: 10,
-  version: 2,
-  status: "DRAFT",
-};
-const response = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status });
-function mount(roles = ["ORGANIZER"]) {
-  sessionStorage.setItem(
-    "sems-auth",
-    JSON.stringify({ token: "token", user: { username: "organizer", roles } }),
-  );
-  render(
-    <AuthProvider>
-      <MemoryRouter initialEntries={["/organizer/events"]}>
-        <Routes>
-          <Route path="/organizer/events" element={<DraftsPage />} />
-          <Route path="/" element={<p>Home</p>} />
-        </Routes>
-      </MemoryRouter>
-    </AuthProvider>,
-  );
-}
-beforeEach(() => {
-  vi.stubGlobal("scrollTo", vi.fn());
-  fetchMock.mockReset();
-  vi.stubGlobal("fetch", fetchMock);
-  sessionStorage.clear();
+const fetchMock=vi.fn<typeof fetch>();
+const event={id:"e1",title:"Workshop",description:"Description",location:"Campus",startsAt:"2030-01-01T10:00:00Z",endsAt:"2030-01-01T12:00:00Z",capacity:20,version:2,status:"PUBLISHED",salesConfigured:true};
+const inventory={version:4,ticketTypes:[{id:"t1",name:"General",quota:10,opensAt:"2029-01-01T10:00:00Z",closesAt:event.startsAt}]};
+const response=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status});
+function mount(roles=["ORGANIZER"],path="/organizer/events?edit=e1") {sessionStorage.setItem("sems-auth",JSON.stringify({token:"token",user:{roles}}));render(<AuthProvider><MemoryRouter initialEntries={[path]}><Routes><Route path="/organizer/events" element={<DraftsPage/>}/><Route path="/" element={<p>Home</p>}/></Routes></MemoryRouter></AuthProvider>);}
+beforeEach(()=>{vi.stubGlobal("scrollTo",vi.fn());vi.stubGlobal("fetch",fetchMock);fetchMock.mockReset();fetchMock.mockImplementation(async(input)=>response(String(input).includes("ticket-types")?inventory:String(input).includes("?page=")?{items:[event,{...event,id:"e2",title:"Other event"}],totalPages:1,totalElements:2}:event));});
+afterEach(()=>{cleanup();vi.unstubAllGlobals();sessionStorage.clear();});
+it("keeps organizer data private from attendees",async()=>{mount(["ATTENDEE"]);await screen.findByText("Home");expect(fetchMock).not.toHaveBeenCalled();});
+it("edits only the selected event, locks only registration rules, and saves details and tickets together below the ticket fields",async()=>{
+ mount();await screen.findByLabelText("Ticket name 1");
+ expect(screen.queryByText("Other event")).toBeNull();expect(screen.queryByRole("link",{name:"View public event"})).toBeNull();
+ expect(screen.getByLabelText("Full name").closest("fieldset")?.disabled).toBe(true);
+ expect(screen.getByLabelText("Quota 1").closest("fieldset")?.disabled).toBe(false);
+ fireEvent.change(screen.getByLabelText("Ticket name 1"),{target:{value:"Updated ticket"}});
+ fireEvent.change(screen.getByLabelText("Title"),{target:{value:"Updated title"}});
+ const save=screen.getByRole("button",{name:"Save event changes"});
+ expect(screen.getByLabelText("Quota 1").compareDocumentPosition(save)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+ fireEvent.click(save);await screen.findByText(/Published event updated/);
+ expect(window.scrollTo).toHaveBeenCalledTimes(1);
+ const call=fetchMock.mock.calls.find(([,opts])=>opts?.method==="PUT")!;
+ expect(call[0]).toBe("/api/v1/organizer/events/e1/revision");
+ expect(JSON.parse(call[1]!.body as string)).toMatchObject({title:"Updated title",version:2,ticketConfiguration:{version:4,ticketTypes:[{id:"t1",name:"Updated ticket",quota:10}]}});
 });
-afterEach(() => {
-  cleanup();
-  vi.unstubAllGlobals();
-  sessionStorage.clear();
+it("uses publication management for published events and keeps edit inside that page",async()=>{
+ mount(["ORGANIZER"],"/organizer/events");await screen.findByText("Workshop");expect(screen.getAllByRole("link",{name:"Publication management →"})).toHaveLength(2);expect(screen.queryByRole("button",{name:"Edit event"})).toBeNull();
 });
-it("does not request organizer data for an attendee", async () => {
-  mount(["ATTENDEE"]);
-  await screen.findByText("Home");
-  expect(fetchMock).not.toHaveBeenCalled();
+it("keeps the editor open after rejected combined changes",async()=>{
+ fetchMock.mockImplementation(async(input,opts)=>opts?.method==="PUT"?response({detail:"Ticket quota is below issued places"},409):response(String(input).includes("ticket-types")?inventory:String(input).includes("?page=")?{items:[event],totalPages:1,totalElements:1}:event));
+ mount();await screen.findByLabelText("Quota 1");fireEvent.click(screen.getByRole("button",{name:"Save event changes"}));await screen.findByText(/Ticket quota is below/);expect(screen.getByLabelText("Ticket name 1")).toBeTruthy();
 });
-it("submits an edit with its loaded version and refreshes the list", async () => {
-  fetchMock
-    .mockResolvedValueOnce(
-      response({ items: [draft], totalPages: 1, totalElements: 1 }),
-    )
-    .mockResolvedValueOnce(response(draft))
-    .mockResolvedValueOnce(response({ ...draft, version: 3 }))
-    .mockResolvedValueOnce(
-      response({ items: [draft], totalPages: 1, totalElements: 1 }),
-    );
-  mount();
-  fireEvent.click(await screen.findByRole("button", { name: "Edit draft" }));
-  await screen.findByDisplayValue("Seminar");
-  fireEvent.change(screen.getByLabelText("Title"), {
-    target: { value: "Updated seminar" },
-  });
-  fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
-  await screen.findByText("Draft saved.");
-  const options = fetchMock.mock.calls[2][1]!;
-  expect(options.method).toBe("PUT");
-  expect(JSON.parse(options.body as string)).toMatchObject({
-    version: 2,
-    title: "Updated seminar",
-  });
-});
-it("keeps edits visible and offers reload after a version conflict", async () => {
-  fetchMock
-    .mockResolvedValueOnce(
-      response({ items: [draft], totalPages: 1, totalElements: 1 }),
-    )
-    .mockResolvedValueOnce(response(draft))
-    .mockResolvedValueOnce(
-      response({ detail: "Event changed; reload before editing" }, 409),
-    );
-  mount();
-  fireEvent.click(await screen.findByRole("button", { name: "Edit draft" }));
-  await screen.findByDisplayValue("Seminar");
-  fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
-  expect((await screen.findByRole("alert")).textContent).toContain(
-    "Event changed",
-  );
-  expect(screen.getByLabelText("Title")).toBeTruthy();
-  expect(
-    screen.getByRole("button", { name: "Reload latest draft" }),
-  ).toBeTruthy();
-});
-
-it("reuses a published event as a new draft with empty dates", async () => {
-  const published = { ...draft, status: "PUBLISHED", salesConfigured: true };
-  fetchMock
-    .mockResolvedValueOnce(
-      response({ items: [published], totalPages: 1, totalElements: 1 }),
-    )
-    .mockResolvedValueOnce(response(published));
-  mount();
-  fireEvent.click(
-    await screen.findByRole("button", { name: "Use as template" }),
-  );
-  await screen.findByDisplayValue("Seminar (copy)");
-  expect((screen.getByLabelText("Starts at") as HTMLInputElement).value).toBe(
-    "",
-  );
-  expect(
-    (screen.getByLabelText("Starts at") as HTMLInputElement).disabled,
-  ).toBe(false);
-  expect(screen.getByRole("button", { name: "Save draft" })).toBeTruthy();
-});
-it("updates published presentation without submitting ticket settings", async () => {
-  const published = { ...draft, status: "PUBLISHED", salesConfigured: true };
-  fetchMock
-    .mockResolvedValueOnce(
-      response({ items: [published], totalPages: 1, totalElements: 1 }),
-    )
-    .mockResolvedValueOnce(response(published))
-    .mockResolvedValueOnce(response(published))
-    .mockResolvedValueOnce(
-      response({ items: [published], totalPages: 1, totalElements: 1 }),
-    );
-  mount();
-  fireEvent.click(await screen.findByRole("button", { name: "Edit event" }));
-  await screen.findByDisplayValue("Seminar");
-  fireEvent.change(screen.getByLabelText("Title"), {
-    target: { value: "Updated" },
-  });
-  fireEvent.click(screen.getByRole("button", { name: "Save event changes" }));
-  await screen.findByText(/Published event updated/);
-  expect(fetchMock.mock.calls[2][0]).toBe(
-    "/api/v1/organizer/events/e1/presentation",
-  );
-  expect(fetchMock.mock.calls[2][1]?.method).toBe("PATCH");
-  expect(
-    JSON.parse(fetchMock.mock.calls[2][1]!.body as string).startsAt,
-  ).toBeUndefined();
+it("keeps syncing feedback until the updated event itself is confirmed, even when the list is stale",async()=>{
+ let submitted=false;
+ let finish:((value:Response)=>void)|undefined;
+ fetchMock.mockImplementation(async(input,opts)=>{
+  if(opts?.method==="PUT"){submitted=true;return response({...event,status:"UPDATING"});}
+  if(String(input).includes("?page="))return response({items:[event],totalPages:1,totalElements:1});
+  if(String(input).includes("ticket-types"))return response(inventory);
+  if(submitted)return new Promise<Response>(resolve=>{finish=resolve;});
+  return response(event);
+ });
+ mount();await screen.findByLabelText("Ticket name 1");
+ fireEvent.click(screen.getByRole("button",{name:"Save event changes"}));
+ await screen.findByText(/Update is syncing with ticketing/);
+ expect(screen.queryByText(/Event changes saved/)).toBeNull();
+ const {act}=await import("@testing-library/react");
+ await act(async()=>{finish!(response({...event,version:3}));});
+ await screen.findByText(/Event changes saved/);
 });

@@ -1,3 +1,6 @@
+import { FeedbackNotice } from "../../shared/components/FeedbackNotice";
+import { Select } from "../../shared/components/Select";
+import type { SavedContact } from "../profile/contacts";
 import { Countdown, useNow } from "../../shared/components/Countdown";
 import type { PreRegistration } from "./PreRegistrationsPage";
 import {
@@ -49,6 +52,7 @@ export function BookingForm({
   const [error, setError] = useState("");
   const now = useNow();
   const beforeOpening = now < Date.parse(opensAt);
+  const [saveNotice, setSaveNotice] = useState("");
   const [message, setMessage] = useState("");
   const [applying, setApplying] = useState(false);
   const requestedPreRegistration =
@@ -93,22 +97,28 @@ export function BookingForm({
       active = false;
     };
   }, [eventId, ticketTypeId, token, requestedPreRegistration]);
+  const [contacts, setContacts] = useState<SavedContact[] | null>(null);
+  const [contactId, setContactId] = useState("");
   async function applyProfile() {
     if (busy || pending || applying || loadingSaved) return;
     setApplying(true);
     setMessage("");
     try {
-      const saved = await apiRequest<AttendeeInfo>(
-        "/api/v1/profile",
-        {},
-        token!,
-      );
+      if (!contacts) {
+        const rows = await apiRequest<SavedContact[]>("/api/v1/profile/contacts", {}, token!);
+        setContacts(rows);
+        setContactId(rows[0]?.id ?? "");
+        if (!rows.length) setMessage("No saved contacts. Add one in My profile.");
+        return;
+      }
+      const saved = contacts.find(c => c.id === contactId);
+      if (!saved) return;
       const selected = Object.fromEntries(
         registrationFields
-          .filter((f) => requirements[f.rule] && saved[f.key])
-          .map((f) => [f.key, saved[f.key]]),
+          .filter((f) => requirements[f.rule])
+          .map((f) => [f.key, f.key === "studentId" ? "" : saved[f.key as keyof SavedContact] ?? ""]),
       );
-      setInfo((current) => ({ ...current, ...selected }));
+      setInfo((current) => ({ ...current, ...selected, customAnswer: "" }));
       setMessage(
         Object.keys(selected).length
           ? "Saved details applied. Review and edit them for this registration."
@@ -124,6 +134,7 @@ export function BookingForm({
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (busy || applying || loadingSaved) return;
+    setSaveNotice("");
     if (beforeOpening && !pending) {
       setBusy(true);
       setError("");
@@ -141,7 +152,7 @@ export function BookingForm({
           },
           token!,
         );
-        setMessage(
+        setSaveNotice(
           "Pre-registration saved. No places are held. Return when registration opens to confirm.",
         );
       } catch (e) {
@@ -205,6 +216,7 @@ export function BookingForm({
     );
   return (
     <form onSubmit={submit} className="booking-form">
+      <FeedbackNotice message={saveNotice} />
       <label>
         Quantity
         <input
@@ -229,13 +241,14 @@ export function BookingForm({
             One contact for this booking. These details are shared with the
             event organizer.
           </p>
+          {contacts && contacts.length > 0 && <Select label="Saved contact" value={contactId} options={contacts.map(c => ({value:c.id, label:c.label + (c.realName ? ` · ${c.realName}` : "")}))} onChange={setContactId} />}
           <div className="actions">
             <button
               type="button"
               className="secondary-button"
               onClick={applyProfile}
             >
-              Apply saved details
+              {contacts?.length ? "Apply selected contact" : "Apply saved details"}
             </button>
             <Link to="/profile">Manage saved details</Link>
           </div>

@@ -1,6 +1,6 @@
 # Profile and pre-registration increment
 
-Identity owns optional reusable contact details (V2 booking_profiles); authenticated users can GET/PUT/DELETE /api/v1/profile. JWT subject determines ownership. Profile email is independent of login email. Blank fields normalize to null. Private responses use no-store. The UI explicitly applies only event-requested fields; custom answers and historical bookings are never overwritten by profile updates.
+Identity owns reusable contact details. V3 extends the original V2 profile into multiple named contacts and removes saved Student IDs; see [current contact behavior](saved-contacts-and-editor.md). The legacy GET/PUT/DELETE /api/v1/profile endpoints only operate on the default contact. JWT subject determines ownership. Profile email is independent of login email. Blank fields normalize to null. Private responses use no-store. The UI explicitly applies only event-requested fields; custom answers and historical bookings are never overwritten by profile updates.
 
 Admission owns pre-registrations (V5) with one row per user/event. PUT before opening validates the published Catalog snapshot, ticket ownership, quantity and required information. Upserts are serialized by the event sales lock and hold no inventory. GET computes WAITING/READY/SOLD_OUT/CLOSED from server time and current inventory; DELETE is scoped to the JWT subject. Profiles are not queried across schemas. Organizers cannot browse pre-registration contacts through the confirmed registration list.
 
