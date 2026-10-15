@@ -114,6 +114,18 @@
           },
           "registrationRequirements": {
             "$ref": "#/components/schemas/RegistrationRequirements"
+          },
+          "organizationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "ORGANIZATION_ONLY"
+            ],
+            "description": "PUBLIC default on creation; fixed after first publication. Organization is immutable."
           }
         },
         "required": [
@@ -122,7 +134,8 @@
           "location",
           "startsAt",
           "endsAt",
-          "capacity"
+          "capacity",
+          "organizationId"
         ]
       },
       "DraftUpdate": {
@@ -187,6 +200,18 @@
           },
           "registrationRequirements": {
             "$ref": "#/components/schemas/RegistrationRequirements"
+          },
+          "organizationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "ORGANIZATION_ONLY"
+            ],
+            "description": "PUBLIC default on creation; fixed after first publication. Organization is immutable."
           }
         },
         "required": [
@@ -290,6 +315,25 @@
           },
           "registrationRequirements": {
             "$ref": "#/components/schemas/RegistrationRequirements"
+          },
+          "organizationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "ORGANIZATION_ONLY"
+            ],
+            "description": "PUBLIC default on creation; fixed after first publication. Organization is immutable."
+          },
+          "organizationName": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string",
+            "format": "uuid"
           }
         },
         "required": [
@@ -367,6 +411,21 @@
           },
           "registrationRequirements": {
             "$ref": "#/components/schemas/RegistrationRequirements"
+          },
+          "organizationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "ORGANIZATION_ONLY"
+            ],
+            "description": "PUBLIC default on creation; fixed after first publication. Organization is immutable."
+          },
+          "organizationName": {
+            "type": "string"
           }
         },
         "required": [
@@ -412,6 +471,18 @@
           },
           "registrationRequirements": {
             "$ref": "#/components/schemas/RegistrationRequirements"
+          },
+          "organizationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "ORGANIZATION_ONLY"
+            ],
+            "description": "PUBLIC default on creation; fixed after first publication. Organization is immutable."
           }
         },
         "required": [
@@ -590,7 +661,7 @@
   "paths": {
     "/api/v1/organizer/events": {
       "get": {
-        "summary": "ORGANIZER or ADMIN: list only own drafts",
+        "summary": "List events in the selected organization",
         "responses": {
           "200": {
             "description": "Success",
@@ -685,11 +756,21 @@
               "maximum": 50,
               "default": 10
             }
+          },
+          {
+            "name": "organizationId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
-        ]
+        ],
+        "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context."
       },
       "post": {
-        "summary": "Create own draft; owner comes from token",
+        "summary": "Create organization draft; owner comes from token",
         "responses": {
           "201": {
             "description": "Success",
@@ -747,7 +828,8 @@
               }
             }
           }
-        }
+        },
+        "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context."
       }
     },
     "/api/v1/organizer/events/{id}": {
@@ -763,7 +845,7 @@
         }
       ],
       "get": {
-        "summary": "Read own draft; other owners get 404",
+        "summary": "Read organization draft; other organizations get 404",
         "responses": {
           "200": {
             "description": "Success",
@@ -811,10 +893,11 @@
               }
             }
           }
-        }
+        },
+        "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context."
       },
       "put": {
-        "summary": "Update own draft with optimistic version",
+        "summary": "Update organization draft with optimistic version",
         "responses": {
           "200": {
             "description": "Success",
@@ -872,7 +955,8 @@
               }
             }
           }
-        }
+        },
+        "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context."
       }
     },
     "/api/v1/organizer/events/{id}/publish": {
@@ -888,8 +972,8 @@
         }
       ],
       "post": {
-        "summary": "ORGANIZER/ADMIN: publish own event; exact request replay is idempotent",
-        "description": "Admission activation must succeed before public visibility. 202 is a durable pending operation reconciled automatically. A stale ticket version returns the event to DRAFT with publicationError.",
+        "summary": "Organization manager: publish own event; exact request replay is idempotent",
+        "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context.",
         "requestBody": {
           "required": true,
           "content": {
@@ -1006,6 +1090,15 @@
               "default": "GENERAL"
             },
             "description": "Omit for all categories. Combined with title keyword search before pagination."
+          },
+          {
+            "name": "organizationId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -1057,7 +1150,8 @@
           "400": {
             "description": "Invalid input"
           }
-        }
+        },
+        "description": "Without organizationId returns public events only. Organization-scoped discovery requires active membership and includes internal offerings. Anonymous access never reveals internal events."
       }
     },
     "/api/v1/events/{id}": {
@@ -1092,7 +1186,8 @@
           "404": {
             "description": "Missing or not owned"
           }
-        }
+        },
+        "description": "Internal offering requires authenticated active organization membership; otherwise 404."
       }
     },
     "/internal/v1/events/{id}": {
@@ -1281,7 +1376,18 @@
             "description": "State/version/quota conflict"
           }
         },
-        "description": " Internal event snapshots also include title and location for historical booking records; Admission stores these without cross-schema joins."
+        "description": "Caller user ID is required for ORGANIZATION_ONLY eligibility. Internal service credentials remain mandatory.",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
       }
     },
     "/api/v1/organizer/events/{id}/presentation": {
@@ -1297,7 +1403,7 @@
         }
       ],
       "patch": {
-        "summary": "Update presentation of an owned published event; time, capacity, requirements and historical booking snapshots remain unchanged",
+        "summary": "Update presentation of an organization published event; time, capacity, requirements and historical booking snapshots remain unchanged",
         "requestBody": {
           "required": true,
           "content": {
@@ -1334,7 +1440,8 @@
           "409": {
             "description": "Version conflict or event not published"
           }
-        }
+        },
+        "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context."
       }
     },
     "/api/v1/organizer/events/{id}/revision": {
@@ -1351,7 +1458,7 @@
       ],
       "put": {
         "summary": "Save event details and tickets together, or pause/resume an already-published event",
-        "description": "Owner/event/inventory versions are enforced. Existing ticket IDs and issued credentials are retained; quotas cannot fall below reserved places, used types cannot be removed, and published registration information is immutable. Optional ticketConfiguration supplies explicit sales windows; without it, moving start shifts existing windows. Pending synchronization uses UPDATING and durable recovery. First publication still requires /publish. Editing retains publication status unless publicationStatus is supplied.",
+        "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context.",
         "requestBody": {
           "required": true,
           "content": {
@@ -1387,6 +1494,54 @@
           },
           "409": {
             "description": "Version/pending conflict, locked requirements, insufficient capacity or invalid transition; definitive rejection preserves prior event settings"
+          }
+        }
+      }
+    },
+    "/internal/v1/events/{id}/member": {
+      "get": {
+        "summary": "Service-only event snapshot for an active organization member; Admission uses it after selecting assigned tasks",
+        "security": [
+          {
+            "serviceToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "user",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event snapshot",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesSnapshot"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No active membership or event unavailable"
+          },
+          "503": {
+            "description": "Membership lookup unavailable"
           }
         }
       }

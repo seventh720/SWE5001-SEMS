@@ -1,0 +1,18 @@
+# In-app notifications
+
+Notifications are available from the signed-in navigation bar and /notifications. Its badge combines actionable organization invitations and unread ticket/event updates. The inbox and badge refresh every 30 seconds; the badge also refreshes on focus and inbox actions. This is a persistent in-app inbox, not email, browser push, or a background OS notification.
+
+## Invitations
+Identity owns the existing invitation records. Registered recipients see the organization, proposed role and expiry, and can accept or decline using their authenticated account. An invitation ID alone cannot grant another account access. The account-bound sharing link remains available as an alternative to the inbox. Pending duplicates are rejected; an administrator can revoke and recreate if necessary. Accepted/revoked/declined/expired invitations remain in history. Marking business updates read does not dismiss an actionable invitation.
+
+## Ticket and event updates
+Admission writes booking confirmations and cancellation notices in the same transaction as the corresponding operation. Per-user unique delivery keys prevent request replay from producing duplicate notifications. No historical booking notices are backfilled.
+
+Catalog queues a durable outbox record in the same transaction as a successful published/paused revision. Presentation changes also enqueue via a database trigger. Draft publication and rejected changes do not notify. A scheduled delivery worker forwards committed changes to Admission over the existing authenticated service connection; delivery retries use the outbox ID for recipient deduplication. Active booking holders and saved pre-registration users receive the event's current name, time, location, publication status and visibility. Existing ticket rights are unchanged, and notification links do not bypass access checks.
+
+Admission checks saved pre-registrations every 15 seconds. A reminder is persisted when a ticket's opening is in the next five minutes, sales are active, the event has not started and places remain available. This refers to the registration window, not the event start time. New saves inside that window are eligible on the next check. Deduplication includes the ticket opening time, so rescheduling a future opening can produce a new reminder. Removed pre-registrations and already booked ticket types are not selected. If the entire service is offline through the window, no retroactive 'opens soon' notice is claimed.
+
+## Storage and deployment
+Additive migrations: Identity V5 (declined invitation status), Catalog V8 (notification outbox/trigger), Admission V9 (notifications and unread indexes). Each service reads/writes only its own schema. New gateway routes /api/v1/me/invitations* to Identity and /api/v1/me/notifications* to Admission. Preserve .env credentials and existing database volume. Back up and deploy the three services together before reopening traffic.
+
+Run scripts/notifications-acceptance.py only in a disposable environment. It checks invitation identity and actions, booking replay/cancellation, stale/rejected event updates, outbox retry, reminders through two replicas, per-user read state and cross-account isolation.

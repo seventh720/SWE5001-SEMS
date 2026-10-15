@@ -9,7 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 class PublicationServiceTest {
     PublicationState state=mock(PublicationState.class);
     RestClient client=mock(RestClient.class,RETURNS_DEEP_STUBS);
-    PublicationState.Operation op=new PublicationState.Operation(UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID(),10,Instant.now().plusSeconds(600),Instant.now().plusSeconds(1200),1,"PUBLISHING");
+    PublicationState.Operation op=new PublicationState.Operation(UUID.randomUUID(),UUID.randomUUID(),UUID.randomUUID(),10,Instant.now().plusSeconds(600),Instant.now().plusSeconds(1200),1,"PUBLISHING",UUID.randomUUID());
     @Test void unavailableAdmissionKeepsDurablePendingState(){
         when(client.post().uri("/internal/v1/events/{id}/activate-sales",op.eventId()).body(op).retrieve().toBodilessEntity()).thenThrow(new ResourceAccessException("timeout"));
         assertFalse(new PublicationService(state,client).advance(op));verifyNoInteractions(state);

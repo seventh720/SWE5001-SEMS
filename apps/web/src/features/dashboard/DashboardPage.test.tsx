@@ -44,16 +44,14 @@ it("replaces marketing with attendee plans without requesting organizer data", a
 it("shows organizer and administrator workspaces for assigned roles", async () => {
   mount(["ADMIN"]);
   await screen.findByRole("heading", { name: "Organizer workspace" });
-  expect(screen.getByRole("link", { name: "Manage users" })).toBeTruthy();
+  expect(screen.getByRole("link", { name: "Manage organizations" })).toBeTruthy();
 });
 it("shows the real staff availability without fabricated assignments", async () => {
   mount(["STAFF"]);
   await screen.findByText(
-    /Staff assignment and check-in are not available yet/,
+    /Check tickets only for events assigned to you/,
   );
-  expect(
-    screen.queryByRole("heading", { name: "Organizer workspace" }),
-  ).toBeNull();
+  expect(screen.getByRole("link", {name:"My check-in tasks →"})).toBeTruthy();
 });
 
 it("turns an opening pre-registration into a direct registration button", async () => {

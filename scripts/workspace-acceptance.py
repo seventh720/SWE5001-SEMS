@@ -8,7 +8,7 @@ event=call('GET',ep,token=a)
 old_booking=call('POST','/api/v1/bookings',req(event,ticket),attendee)
 change={'title':'Updated offering '+suffix,'description':'Updated public details','location':'New training venue','category':'EDUCATION','cardTheme':'SKY','version':event['version']}
 call('PATCH',ep+'/presentation',change,b,404)
-call('PATCH',ep+'/presentation',change,attendee,403)
+call('PATCH',ep+'/presentation',change,attendee,404)
 updated=call('PATCH',ep+'/presentation',change,a)
 assert updated['status']=='PUBLISHED' and updated['startsAt']==event['startsAt'] and updated['capacity']==event['capacity']
 assert updated['registrationRequirements']==event['registrationRequirements']

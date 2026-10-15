@@ -105,7 +105,11 @@ jobs:
           set -a
           source .env
           set +a
-          python3 scripts/editor-acceptance.py
+          python3 scripts/organization-acceptance.py
+          python3 scripts/organization-security-acceptance.py
+          python3 scripts/visibility-acceptance.py
+          python3 scripts/notifications-acceptance.py
+          python3 scripts/organization-migration-acceptance.py
       - name: Collect diagnostics
         if: always()
         run: |

@@ -33,8 +33,8 @@ public class InventoryService {
         var rows=jdbc.queryForList("SELECT * FROM sales WHERE event_id=? FOR UPDATE",event.id());
         if (rows.isEmpty()) {
             if (input.version()!=0) conflict("Inventory changed; reload");
-            jdbc.update("INSERT INTO sales(event_id,organizer_id,capacity,starts_at,ends_at,state,version) VALUES (?,?,?,?,?,'DRAFT',0)",
-                    event.id(),event.organizerId(),event.capacity(),java.sql.Timestamp.from(event.startsAt()),java.sql.Timestamp.from(event.endsAt()));
+            jdbc.update("INSERT INTO sales(event_id,organizer_id,capacity,starts_at,ends_at,state,version,organization_id) VALUES (?,?,?,?,?,'DRAFT',0,?)",
+                    event.id(),event.organizerId(),event.capacity(),java.sql.Timestamp.from(event.startsAt()),java.sql.Timestamp.from(event.endsAt()),event.organizationId());
         } else {
             var current=rows.getFirst();
             if (!current.get("organizer_id").equals(event.organizerId())) conflict("Event owner mismatch");
@@ -54,7 +54,7 @@ public class InventoryService {
         var rows=jdbc.queryForList("SELECT * FROM sales WHERE event_id=?",event);
         if (rows.isEmpty()) conflict("Configure ticket types before publication");
         var row=rows.getFirst();
-        boolean matches=row.get("organizer_id").equals(input.organizerId()) && ((Number)row.get("capacity")).intValue()==input.capacity()
+        boolean matches=row.get("organizer_id").equals(input.organizerId()) && Objects.equals(row.get("organization_id"),input.organizationId()) && ((Number)row.get("capacity")).intValue()==input.capacity()
                 && ((java.sql.Timestamp)row.get("starts_at")).toInstant().equals(input.startsAt())
                 && ((java.sql.Timestamp)row.get("ends_at")).toInstant().equals(input.endsAt())
                 && ((Number)row.get("version")).longValue()==input.ticketVersion();

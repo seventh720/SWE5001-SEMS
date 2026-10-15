@@ -2,7 +2,7 @@
 """Runs foundation acceptance, then inventory/publication and durable recovery checks."""
 from acceptance import *
 import subprocess,time
-compose=['docker','compose','--env-file','.env','-f','deployment/compose.yaml']
+compose=['docker','compose','--env-file',os.environ.get('SEMS_ENV_FILE','.env'),'-f',os.environ.get('SEMS_COMPOSE_FILE','deployment/compose.yaml')]
 def current(event_path):return call('GET',event_path,token=a)
 def configuration(event_path,ticket_version=0,quotas=(20,10)):
     return {'eventVersion':current(event_path)['version'],'version':ticket_version,'ticketTypes':[

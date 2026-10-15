@@ -48,13 +48,13 @@ it("prevents removing the last role and saves additional roles with authenticati
   fetchMock
     .mockResolvedValueOnce(response([user]))
     .mockResolvedValueOnce(
-      response({ ...user, roles: ["ATTENDEE", "ORGANIZER"] }),
+      response({ ...user, roles: ["ATTENDEE", "ADMIN"] }),
     );
   mount();
   const attendee = await screen.findByLabelText("Attendee");
   fireEvent.click(attendee);
   expect((attendee as HTMLInputElement).checked).toBe(true);
-  fireEvent.click(screen.getByLabelText("Event Organizer"));
+  fireEvent.click(screen.getByLabelText("System Administrator"));
   fireEvent.click(screen.getByRole("button", { name: "Save roles" }));
   await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
   expect(fetchMock.mock.calls[1][0]).toBe("/api/v1/admin/users/alice/roles");
@@ -63,7 +63,7 @@ it("prevents removing the last role and saves additional roles with authenticati
   });
   expect(JSON.parse(fetchMock.mock.calls[1][1]?.body as string).roles).toEqual([
     "ATTENDEE",
-    "ORGANIZER",
+    "ADMIN",
   ]);
   await screen.findByRole("button", { name: "Save roles" });
 });
@@ -71,13 +71,13 @@ it("retains selected roles after a failed save and permits retry", async () => {
   fetchMock
     .mockResolvedValueOnce(response([user]))
     .mockResolvedValueOnce(response({ detail: "Unable to save roles" }, 500))
-    .mockResolvedValueOnce(response({ ...user, roles: ["ATTENDEE", "STAFF"] }));
+    .mockResolvedValueOnce(response({ ...user, roles: ["ATTENDEE", "ADMIN"] }));
   mount();
-  fireEvent.click(await screen.findByLabelText("Event Staff"));
+  fireEvent.click(await screen.findByLabelText("System Administrator"));
   fireEvent.click(screen.getByRole("button", { name: "Save roles" }));
   await screen.findByText("Unable to save roles");
   expect(
-    (screen.getByLabelText("Event Staff") as HTMLInputElement).checked,
+    (screen.getByLabelText("System Administrator") as HTMLInputElement).checked,
   ).toBe(true);
   fireEvent.click(screen.getByRole("button", { name: "Save roles" }));
   await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));

@@ -607,6 +607,10 @@
                 "description": "Only for events that have already been published. Omit to retain current state."
               }
             }
+          },
+          "organizationId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },
@@ -661,6 +665,129 @@
             }
           }
         }
+      },
+      "StaffAssignment": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "StaffTask": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "organizationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CheckInResult": {
+        "type": "object",
+        "properties": {
+          "ticketId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "CHECKED_IN"
+            ]
+          },
+          "checkedInAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "alreadyCheckedIn": {
+            "type": "boolean"
+          }
+        }
+      },
+      "EventSummary": {
+        "type": "object",
+        "properties": {
+          "confirmedTickets": {
+            "type": "integer"
+          },
+          "availableCapacity": {
+            "type": "integer"
+          },
+          "attendance": {
+            "type": "integer"
+          }
+        }
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "readAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "NotificationPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Notification"
+            }
+          },
+          "unreadCount": {
+            "type": "integer"
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        }
       }
     }
   },
@@ -705,11 +832,12 @@
           "503": {
             "description": "Dependency unavailable"
           }
-        }
+        },
+        "description": "Requires live organization manager membership via Catalog. No global role bypass."
       },
       "put": {
         "summary": "Replace draft ticket types using event and inventory versions",
-        "description": "First setup fixes event time and capacity in Catalog. Total quotas cannot exceed capacity. Duplicate names and invalid windows are rejected. Ticket IDs can change on replacement; editing after activation is rejected.",
+        "description": "Requires live organization manager membership via Catalog. No global role bypass.",
         "requestBody": {
           "required": true,
           "content": {
@@ -878,7 +1006,7 @@
     "/api/v1/bookings": {
       "post": {
         "summary": "Confirm a free booking and issue one ticket per place",
-        "description": "Authenticated account is the owner. Same user + requestKey + payload returns the existing booking, even after cancellation or when Catalog is down. A changed payload returns 409. Catalog publication is verified before the Admission transaction; database locks and a conditional inventory update prevent overselling. Initial and replay responses both return 200. A transport error may occur after commit: retry the same payload and key. No payment fields are accepted as pricing authority. Registration requirements come from the authenticated Catalog snapshot. Normalized attendeeInfo is part of the idempotency payload. A changed contact field with the same key returns 409. Missing requested fields, unrequested personal fields and invalid email/length return 400 before inventory changes.",
+        "description": "New internal-event requests require active organization membership. Existing owned booking replay remains available after membership removal.",
         "requestBody": {
           "required": true,
           "content": {
@@ -1082,7 +1210,7 @@
     "/api/v1/organizer/events/{id}/bookings": {
       "get": {
         "summary": "List booking contacts for an event owned by the caller",
-        "description": "ORGANIZER or ADMIN role plus Catalog ownership verification required. ADMIN does not bypass ownership. Includes confirmed and cancelled orders, sorted createdAt DESC/id DESC. Response uses Cache-Control: no-store; credentials are never returned.",
+        "description": "Requires live organization manager membership via Catalog. No global role bypass.",
         "parameters": [
           {
             "name": "id",
@@ -1335,6 +1463,343 @@
           },
           "409": {
             "description": "Metadata mismatch, capacity below allocation, invalid times or checked-in event"
+          }
+        }
+      }
+    },
+    "/api/v1/organizer/events/{id}/staff": {
+      "get": {
+        "summary": "Organization manager: event assignments",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StaffAssignment"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Resource unavailable or outside caller scope"
+          },
+          "409": {
+            "description": "State/version conflict"
+          },
+          "503": {
+            "description": "Authorization dependency unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "description": "Requires live organization manager membership via Catalog. No global role bypass."
+      },
+      "put": {
+        "summary": "Organization manager: assign an active member or revoke assignment",
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Resource unavailable or outside caller scope"
+          },
+          "409": {
+            "description": "State/version conflict"
+          },
+          "503": {
+            "description": "Authorization dependency unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "active": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "active"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "description": "Requires live organization manager membership via Catalog. No global role bypass."
+      }
+    },
+    "/api/v1/me/staff-assignments": {
+      "get": {
+        "summary": "Current event assignments filtered by live organization membership",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StaffTask"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Resource unavailable or outside caller scope"
+          },
+          "409": {
+            "description": "State/version conflict"
+          },
+          "503": {
+            "description": "Authorization dependency unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/events/{id}/check-ins": {
+      "post": {
+        "summary": "Active member assigned to this event: check in once; duplicate returns alreadyCheckedIn=true",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckInResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Resource unavailable or outside caller scope"
+          },
+          "409": {
+            "description": "State/version conflict"
+          },
+          "503": {
+            "description": "Authorization dependency unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "credential": {
+                    "type": "string",
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "credential"
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/organizer/events/{id}/summary": {
+      "get": {
+        "summary": "Organization manager: confirmed ticket count, remaining allocated ticket places and attendance",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventSummary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Permission denied"
+          },
+          "404": {
+            "description": "Resource unavailable or outside caller scope"
+          },
+          "409": {
+            "description": "State/version conflict"
+          },
+          "503": {
+            "description": "Authorization dependency unavailable"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "description": "Requires live organization manager membership via Catalog. No global role bypass."
+      }
+    },
+    "/api/v1/me/notifications": {
+      "get": {
+        "summary": "Current account notification history, 20 per page",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/notifications/unread-count": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/notifications/{id}/read": {
+      "post": {
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Read"
+          },
+          "404": {
+            "description": "Not found or not owned"
+          }
+        }
+      }
+    },
+    "/api/v1/me/notifications/read-all": {
+      "post": {
+        "responses": {
+          "204": {
+            "description": "All current account updates marked read; invitations unaffected"
           }
         }
       }

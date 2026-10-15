@@ -25,6 +25,7 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/sems?currentSchema=identity
       DB_USERNAME: identity_app
       DB_PASSWORD: ${IDENTITY_DB_PASSWORD:?Required}
+      ORGANIZATION_ACCESS_TOKEN: ${ORGANIZATION_ACCESS_TOKEN:?Run scripts/setup-local.sh}
       JWT_PUBLIC_KEY: /run/keys/jwt-public.pem
       JWT_PRIVATE_KEY: /run/keys/jwt-private.pem
       SEMS_BOOTSTRAP_ADMIN_EMAIL: ${SEMS_BOOTSTRAP_ADMIN_EMAIL:-}
@@ -45,6 +46,7 @@ services:
       ADMISSION_TO_CATALOG_TOKEN: ${ADMISSION_TO_CATALOG_TOKEN:?Required}
       DB_USERNAME: catalog_app
       DB_PASSWORD: ${CATALOG_DB_PASSWORD:?Required}
+      ORGANIZATION_ACCESS_TOKEN: ${ORGANIZATION_ACCESS_TOKEN:?Run scripts/setup-local.sh}
       JWT_PUBLIC_KEY: /run/keys/jwt-public.pem
     volumes:
       - ../.secrets/jwt-public.pem:/run/keys/jwt-public.pem:ro
@@ -61,6 +63,7 @@ services:
       ADMISSION_TO_CATALOG_TOKEN: ${ADMISSION_TO_CATALOG_TOKEN:?Required}
       DB_USERNAME: admission_app
       DB_PASSWORD: ${ADMISSION_DB_PASSWORD:?Required}
+      ORGANIZATION_ACCESS_TOKEN: ${ORGANIZATION_ACCESS_TOKEN:?Run scripts/setup-local.sh}
       JWT_PUBLIC_KEY: /run/keys/jwt-public.pem
     volumes:
       - ../.secrets/jwt-public.pem:/run/keys/jwt-public.pem:ro

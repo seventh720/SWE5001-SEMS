@@ -3,7 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 if [[ -f .env && -d .secrets ]]; then
   umask 077
-  for key in CATALOG_TO_ADMISSION_TOKEN ADMISSION_TO_CATALOG_TOKEN; do
+  for key in CATALOG_TO_ADMISSION_TOKEN ADMISSION_TO_CATALOG_TOKEN ORGANIZATION_ACCESS_TOKEN; do
     if ! grep -q "^${key}=" .env; then
       printf '\n%s=%s\n' "$key" "$(openssl rand -hex 32)" >> .env
     fi
@@ -22,6 +22,7 @@ openssl pkey -in .secrets/jwt-private.pem -pubout -out .secrets/jwt-public.pem 2
 # Containers run as a non-root UID. Only the Identity container mounts the private key.
 chmod 644 .secrets/*.pem
 {
+  printf 'ORGANIZATION_ACCESS_TOKEN=%s\n' "$(openssl rand -hex 32)"
   printf 'CATALOG_TO_ADMISSION_TOKEN=%s\n' "$(openssl rand -hex 32)"
   printf 'ADMISSION_TO_CATALOG_TOKEN=%s\n' "$(openssl rand -hex 32)"
   printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 24)"

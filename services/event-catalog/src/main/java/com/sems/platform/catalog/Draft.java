@@ -10,9 +10,10 @@ public record Draft(
  @Min(0) Long version, EventCategory category, CardTheme cardTheme,
  @jakarta.validation.Valid RegistrationRequirements registrationRequirements,
  @jakarta.validation.Valid TicketRevision ticketConfiguration,
- @Pattern(regexp="PUBLISHED|PAUSED") String publicationStatus) {
+ @Pattern(regexp="PUBLISHED|PAUSED") String publicationStatus, java.util.UUID organizationId, @Pattern(regexp="PUBLIC|ORGANIZATION_ONLY") String visibility) {
+ public Draft(String title,String description,String location,Instant startsAt,Instant endsAt,Integer capacity,Long version,EventCategory category,CardTheme cardTheme,RegistrationRequirements requirements,TicketRevision tickets,String publicationStatus){this(title,description,location,startsAt,endsAt,capacity,version,category,cardTheme,requirements,tickets,publicationStatus,null,null);}
  public Draft { category=category==null?EventCategory.GENERAL:category; cardTheme=cardTheme==null?CardTheme.LILAC:cardTheme; registrationRequirements=registrationRequirements==null?RegistrationRequirements.none():registrationRequirements; }
  public Draft(String title,String description,String location,Instant startsAt,Instant endsAt,Integer capacity,Long version) {
-  this(title,description,location,startsAt,endsAt,capacity,version,EventCategory.GENERAL,CardTheme.LILAC,RegistrationRequirements.none(),null,null);
+  this(title,description,location,startsAt,endsAt,capacity,version,EventCategory.GENERAL,CardTheme.LILAC,RegistrationRequirements.none(),null,null,null,null);
  }
 }

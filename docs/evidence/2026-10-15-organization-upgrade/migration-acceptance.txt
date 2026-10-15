@@ -1,0 +1,3 @@
+PASS: organization mapping complete; booking IDs/request keys, ticket IDs/credentials/states and inventory unchanged. Safe to rerun this plan.
+PASS: organization mapping complete; booking IDs/request keys, ticket IDs/credentials/states and inventory unchanged. Safe to rerun this plan.
+PASS: reviewed legacy organization mapping, preserved bookings/ticket credentials/inventory, idempotent migration replay and new organization authorization

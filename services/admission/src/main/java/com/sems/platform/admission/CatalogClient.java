@@ -17,8 +17,9 @@ public class CatalogClient {
         return request(() -> client.post().uri("/internal/v1/events/{id}/prepare-sales",event)
                 .body(Map.of("owner",owner,"version",version)).retrieve().body(Snapshot.class));
     }
-    public Snapshot published(UUID event) {
-        return request(() -> client.get().uri("/internal/v1/events/{id}/published",event).retrieve().body(Snapshot.class));
+    public Snapshot member(UUID event,UUID user) {return request(()->client.get().uri("/internal/v1/events/{id}/member?user={user}",event,user).retrieve().body(Snapshot.class));}
+    public Snapshot published(UUID event,UUID user) {
+        return request(() -> client.get().uri(b->b.path("/internal/v1/events/{id}/published").queryParamIfPresent("user",Optional.ofNullable(user)).build(event)).retrieve().body(Snapshot.class));
     }
     private Snapshot request(java.util.function.Supplier<Snapshot> call) {
         try { return Objects.requireNonNull(call.get()); }

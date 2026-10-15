@@ -3,16 +3,15 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 @RestController @RequestMapping("/api/v1/organizer/events")
-@PreAuthorize("hasAnyRole('ORGANIZER','ADMIN')")
+
 public class OrganizerEventController {
  private final DraftService drafts;private final RevisionService revisions;
  public OrganizerEventController(DraftService drafts,RevisionService revisions){this.drafts=drafts;this.revisions=revisions;}
- @GetMapping public DraftService.EventPage list(@AuthenticationPrincipal Jwt jwt,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="10") int size){return drafts.list(UUID.fromString(jwt.getSubject()),page,size);}
+ @GetMapping public DraftService.EventPage list(@AuthenticationPrincipal Jwt jwt,@RequestParam UUID organizationId,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="10") int size){return drafts.list(UUID.fromString(jwt.getSubject()),organizationId,page,size);}
  @GetMapping("/{id}") public Event.View detail(@AuthenticationPrincipal Jwt jwt,@PathVariable UUID id){return drafts.detail(UUID.fromString(jwt.getSubject()),id);}
  @PostMapping public ResponseEntity<Event.View> create(@AuthenticationPrincipal Jwt jwt,@Valid @RequestBody Draft body){
   var event=drafts.create(UUID.fromString(jwt.getSubject()),body);return ResponseEntity.created(URI.create("/api/v1/organizer/events/"+event.id())).body(event);

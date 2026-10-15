@@ -33,7 +33,7 @@ orders=call('GET',ep+'/bookings',token=a)
 assert orders['items'][0]['attendeeInfo']==info and 'tickets' not in orders['items'][0]
 call('GET',ep+'/bookings',token=b,expected=404)
 call('GET',ep+'/bookings',token=admin,expected=404)
-call('GET',ep+'/bookings',token=attendee,expected=403)
+call('GET',ep+'/bookings',token=attendee,expected=404)
 call('GET',ep+'/bookings',expected=401)
 event=call('GET',ep,token=a)
 call('PUT',ep,{**body,'version':event['version'],'registrationRequirements':{}},a,409)

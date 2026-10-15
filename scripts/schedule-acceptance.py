@@ -8,7 +8,7 @@ booking=call('POST','/api/v1/bookings',req(event,ticket,2),attendee)
 new_start=start+datetime.timedelta(days=1);new_end=new_start+datetime.timedelta(hours=3)
 change={**event,'startsAt':new_start.isoformat(),'endsAt':new_end.isoformat(),'capacity':20}
 call('PUT',ep+'/revision',change,b,404)
-call('PUT',ep+'/revision',change,attendee,403)
+call('PUT',ep+'/revision',change,attendee,404)
 updated=call('PUT',ep+'/revision',change,a)
 assert updated['status']=='PUBLISHED' and updated['capacity']==20
 assert datetime.datetime.fromisoformat(updated['startsAt'].replace('Z','+00:00'))==new_start

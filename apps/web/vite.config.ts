@@ -1,7 +1,10 @@
 import { defineConfig } from "vitest/config";
+import { loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const target = loadEnv(mode, process.cwd(), "").API_PROXY_TARGET || "http://localhost:18080";
+  return {
   plugins: [react()],
   test: {
     coverage: {
@@ -17,13 +20,14 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       "/api": {
-        target: "http://localhost:18080",
+        target,
         changeOrigin: true,
       },
       "/actuator": {
-        target: "http://localhost:18080",
+        target,
         changeOrigin: true,
       },
     },
   },
+  };
 });
