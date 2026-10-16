@@ -6,6 +6,9 @@ import java.util.UUID;
 public class Event {
  @Id UUID id;
  @Column(name="organizer_id",nullable=false) UUID organizerId;
+ @Column(name="organization_name",nullable=false) String organizationName="Organization";
+ @Column(name="organization_id") UUID organizationId;
+ @Column(nullable=false,length=30) String visibility="PUBLIC";
  @Column(nullable=false,length=200) String title;
  @Column(nullable=false,length=10000) String description;
  @Column(nullable=false,length=500) String location;
@@ -26,8 +29,8 @@ public class Event {
  @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
  @Column(name="registration_requirements",nullable=false,columnDefinition="jsonb") RegistrationRequirements registrationRequirements=RegistrationRequirements.none();
  protected Event(){}
- Event(UUID owner, Draft input){id=UUID.randomUUID();organizerId=owner;createdAt=Instant.now();apply(input);}
- void apply(Draft input){category=input.category();cardTheme=input.cardTheme();registrationRequirements=input.registrationRequirements();title=input.title().strip();description=input.description().strip();location=input.location().strip();startsAt=input.startsAt();endsAt=input.endsAt();capacity=input.capacity();updatedAt=Instant.now();}
- View view(){return new View(id,title,description,location,startsAt,endsAt,capacity,status,version,createdAt,updatedAt,salesConfigured,publicationError,category,cardTheme,registrationRequirements);}
- public record View(UUID id,String title,String description,String location,Instant startsAt,Instant endsAt,int capacity,String status,long version,Instant createdAt,Instant updatedAt,boolean salesConfigured,String publicationError,EventCategory category,CardTheme cardTheme,RegistrationRequirements registrationRequirements){}
+ Event(UUID owner, Draft input){id=UUID.randomUUID();organizerId=owner;organizationId=input.organizationId();createdAt=Instant.now();apply(input);}
+ void apply(Draft input){if(input.visibility()!=null)visibility=input.visibility();category=input.category();cardTheme=input.cardTheme();registrationRequirements=input.registrationRequirements();title=input.title().strip();description=input.description().strip();location=input.location().strip();startsAt=input.startsAt();endsAt=input.endsAt();capacity=input.capacity();updatedAt=Instant.now();}
+ View view(){return new View(id,title,description,location,startsAt,endsAt,capacity,status,version,createdAt,updatedAt,salesConfigured,publicationError,category,cardTheme,registrationRequirements,organizationId,organizerId,visibility,organizationName);}
+ public record View(UUID id,String title,String description,String location,Instant startsAt,Instant endsAt,int capacity,String status,long version,Instant createdAt,Instant updatedAt,boolean salesConfigured,String publicationError,EventCategory category,CardTheme cardTheme,RegistrationRequirements registrationRequirements,UUID organizationId,UUID createdBy,String visibility,String organizationName){}
 }

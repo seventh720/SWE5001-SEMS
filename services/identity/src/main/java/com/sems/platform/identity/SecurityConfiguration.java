@@ -29,7 +29,7 @@ public class SecurityConfiguration {
   };
   decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(JwtValidators.createDefaultWithIssuer(issuer),required));return decoder;
  }
- @Bean SecurityFilterChain security(HttpSecurity http) throws Exception {
+ @Bean @org.springframework.core.annotation.Order(2) SecurityFilterChain security(HttpSecurity http) throws Exception {
   var roles=new JwtGrantedAuthoritiesConverter();roles.setAuthoritiesClaimName("roles");roles.setAuthorityPrefix("ROLE_");
   var converter=new JwtAuthenticationConverter();converter.setJwtGrantedAuthoritiesConverter(roles);
   return http.csrf(c->c.disable()).sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

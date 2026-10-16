@@ -1,5 +1,8 @@
 # Smart Event Management and Ticketing Platform
 
+
+> 组织升级：已新增组织级角色、内部活动、邀请、活动工作人员与核销。已有环境必须先按[升级与验证说明](docs/organization-upgrade.md)完成维护窗口迁移，再使用本版本；下文早期增量记录保留历史背景。
+
 [English](README.md) | [简体中文](README.zh-CN.md)
 
 SEMS 是面向独立组织者与参与者的共享活动与票务平台。采用 React + TypeScript、三个独立 Spring Boot 服务和 PostgreSQL。

@@ -1,3 +1,4 @@
+import type {Organization} from "../organizations/OrganizationsPage";
 import { HomeLink } from "../../shared/components/HomeLink";
 import { FeedbackNotice } from "../../shared/components/FeedbackNotice";
 import { TicketEditor, initialTicket, type TicketInventory, type TicketRow } from "./TicketEditor";
@@ -33,6 +34,8 @@ interface Draft {
   category?: string;
   cardTheme?: string;
   registrationRequirements?: Requirements;
+  organizationId?: string;
+  visibility?: string;
 }
 interface Page {
   items: Draft[];
@@ -46,6 +49,7 @@ const empty = {
   startsAt: "",
   endsAt: "",
   capacity: 1,
+  visibility: "PUBLIC",
   category: "GENERAL",
   cardTheme: "LILAC",
   registrationRequirements: noRequirements,
@@ -53,7 +57,10 @@ const empty = {
 export function DraftsPage() {
   const { user, token } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const allowed = user?.roles.some((r) => r === "ORGANIZER" || r === "ADMIN");
+  const allowed = !!user;
+  const [organizations,setOrganizations]=useState<Organization[]>([]);
+  const [organizationId,setOrganizationId]=useState(searchParams.get("organizationId")??"");
+  useEffect(()=>{let active=true;apiRequest<Organization[]>("/api/v1/me/organizations",{},token!).then(rows=>{if(active)setOrganizations(rows.filter(o=>o.role!=="MEMBER"))}).catch(e=>{if(active)setError(e.message)});return()=>{active=false}},[token]);
   const [data, setData] = useState<Page>({
     items: [],
     totalPages: 0,
@@ -62,7 +69,7 @@ export function DraftsPage() {
   const [page, setPage] = useState(0);
   const [form, setForm] = useState(empty);
   const [editing, setEditing] = useState<Draft | null>(null);
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(searchParams.get("create")==="true");
   const [error, setError] = useState("");
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
@@ -72,10 +79,10 @@ export function DraftsPage() {
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(0);
   useEffect(() => {
-    if (!allowed || !token) return;
+    if (!allowed || !token || !organizationId) {setLoading(false);return;}
     let active = true;
     setLoading(true);
-    apiRequest<Page>(`/api/v1/organizer/events?page=${page}&size=10`, {}, token)
+    apiRequest<Page>(`/api/v1/organizer/events?organizationId=${organizationId}&page=${page}&size=10`, {}, token)
       .then((d) => {
         if (active) setData(d);
       })
@@ -88,7 +95,7 @@ export function DraftsPage() {
     return () => {
       active = false;
     };
-  }, [token, allowed, page, refresh]);
+  }, [token, allowed, page, refresh,organizationId]);
   useEffect(() => {
     if (!data.items.some((e) => e.status === "UPDATING")) return;
     const timer = window.setInterval(() => setRefresh((v) => v + 1), 3000);
@@ -96,7 +103,7 @@ export function DraftsPage() {
   }, [data.items]);
   useEffect(() => {
     const id = searchParams.get("edit");
-    if (allowed && token && id) { void edit(id); setSearchParams({}, {replace: true}); }
+    if (allowed && token && id) { void edit(id); setSearchParams(organizationId?{organizationId}:{}, {replace: true}); }
   }, [allowed, token, searchParams]);
   useEffect(() => {
     if (!pendingId || !token) return;
@@ -130,11 +137,13 @@ export function DraftsPage() {
         token!,
       );
       const i = template ? {version:0,ticketTypes:[]} : await apiRequest<TicketInventory>(`/api/v1/organizer/events/${id}/ticket-types`,{},token!);
+      if(d.organizationId)setOrganizationId(d.organizationId);
       setInventory(i);
       setTickets(i.ticketTypes.length ? i.ticketTypes.map(t=>({...t,opensAt:singaporeInput(t.opensAt),closesAt:singaporeInput(t.closesAt)})) : [initialTicket(d.capacity,template ? "" : singaporeInput(d.startsAt))]);
       setEditing(template ? null : d);
       setForm({
         ...d,
+        visibility: d.visibility ?? "PUBLIC",
         category: d.category ?? "GENERAL",
         cardTheme: d.cardTheme ?? "LILAC",
         registrationRequirements: d.registrationRequirements ?? noRequirements,
@@ -161,6 +170,7 @@ export function DraftsPage() {
     try {
       const details = {
         ...form,
+        organizationId,
         startsAt: editing && form.startsAt === singaporeInput(editing.startsAt) ? editing.startsAt : toInstant(form.startsAt),
         endsAt: editing && form.endsAt === singaporeInput(editing.endsAt) ? editing.endsAt : toInstant(form.endsAt),
       };
@@ -198,10 +208,11 @@ export function DraftsPage() {
         <div>
           <p className="eyebrow">ORGANIZER WORKSPACE</p>
           <h1>{show ? "Event editor" : "My events"}</h1>
-          <p className="muted">{show ? "Review the details and tickets, then save all changes below." : "Your drafts are private to your account."}</p>
+          <p className="muted">{show ? "Review the details and tickets, then save all changes below." : "Manage events for the selected organization."}</p>
         </div>
         {!show && <button
           className="primary-button"
+          disabled={!organizationId}
           onClick={() => {
             setTickets([initialTicket()]);
             setInventory({version:0,ticketTypes:[]});
@@ -215,6 +226,8 @@ export function DraftsPage() {
           Create event
         </button>}
       </header>
+      <Select label="Organization" disabled={show||busy} value={organizationId} onChange={value=>{setOrganizationId(value);setSearchParams({organizationId:value});setData({items:[],totalPages:0,totalElements:0});setPage(0);setEditing(null);setMessage("");setError("")}} options={[{value:"",label:"Select an organization"},...organizations.map(o=>({value:o.id,label:o.name}))]} />
+      <Link to="/organizations">Organization memberships →</Link>
       {error && (
         <p role="alert" className="error-message">
           {error}
@@ -244,6 +257,7 @@ export function DraftsPage() {
           )}
           <form onSubmit={save}>
             <fieldset disabled={busy} className="event-detail-fields">
+            <Select label="Event visibility" value={form.visibility} onChange={value=>setForm({...form,visibility:value})} options={[{value:"PUBLIC",label:"Public — everyone can discover and book"},{value:"ORGANIZATION_ONLY",label:"Organization only — active members"}]} /><p className="muted">Visibility changes apply when you save. Existing tickets remain valid; organization-only events accept new bookings from active members.</p>
             <label>
               Title
               <input
@@ -434,6 +448,7 @@ export function DraftsPage() {
                   >
                     Use as template
                   </button>
+                  <Link to={`/organizer/events/${d.id}/staff`}>Staff and attendance →</Link>
                   <Link to={`/organizer/events/${d.id}/bookings`}>
                     Registration list →
                   </Link>

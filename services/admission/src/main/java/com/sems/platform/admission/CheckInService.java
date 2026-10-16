@@ -1,0 +1,24 @@
+package com.sems.platform.admission;
+import java.util.*;
+import java.time.Instant;
+import org.springframework.stereotype.Service;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+@Service
+public class CheckInService {
+ private final JdbcTemplate jdbc;
+ public CheckInService(JdbcTemplate jdbc){this.jdbc=jdbc;}
+ public record Assignment(UUID eventId,UUID userId,boolean active){}
+ public record Task(UUID eventId,UUID organizationId,String title,Instant startsAt,Instant endsAt){}
+ public record Result(UUID ticketId,String status,Instant checkedInAt,boolean alreadyCheckedIn){}
+ public record Summary(long confirmedTickets,long availableCapacity,long attendance){}
+ public List<Assignment> assignments(UUID event){return jdbc.query("SELECT * FROM event_staff_assignments WHERE event_id=? ORDER BY user_id",(r,n)->new Assignment(event,r.getObject("user_id",UUID.class),r.getBoolean("active")),event);}
+ @Transactional public void assign(UUID event,UUID user,UUID actor,boolean active){lock(event);jdbc.update("INSERT INTO event_staff_assignments(event_id,user_id,assigned_by,active) VALUES(?,?,?,?) ON CONFLICT(event_id,user_id) DO UPDATE SET active=EXCLUDED.active,assigned_by=EXCLUDED.assigned_by,assigned_at=CURRENT_TIMESTAMP",event,user,actor,active);}
+ public List<Task> tasks(UUID user){return jdbc.query("SELECT s.* FROM sales s JOIN event_staff_assignments a ON a.event_id=s.event_id WHERE a.user_id=? AND a.active=true ORDER BY starts_at",(r,n)->new Task(r.getObject("event_id",UUID.class),r.getObject("organization_id",UUID.class),"",r.getTimestamp("starts_at").toInstant(),r.getTimestamp("ends_at").toInstant()),user);}
+ public UUID organization(UUID event){var rows=jdbc.queryForList("SELECT organization_id FROM sales WHERE event_id=?",UUID.class,event);if(rows.isEmpty()||rows.getFirst()==null)throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found");return rows.getFirst();}
+ private void lock(UUID event){if(jdbc.queryForList("SELECT event_id FROM sales WHERE event_id=? FOR UPDATE",event).isEmpty())throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found");}
+ @Transactional public Result check(UUID event,UUID user,String credential){lock(event);if(!Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM event_staff_assignments WHERE event_id=? AND user_id=? AND active=true)",Boolean.class,event,user)))throw new ResponseStatusException(HttpStatus.FORBIDDEN,"You are not assigned to this event");var rows=jdbc.queryForList("SELECT t.*,b.status AS booking_status FROM tickets t JOIN bookings b ON b.id=t.booking_id WHERE b.event_id=? AND t.credential=?",event,credential.strip());if(rows.isEmpty())throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Ticket not found for this event");var row=rows.getFirst();if(!row.get("booking_status").equals("CONFIRMED")||row.get("state").equals("CANCELLED"))throw new ResponseStatusException(HttpStatus.CONFLICT,"Ticket is cancelled");UUID id=(UUID)row.get("id");if(row.get("state").equals("CHECKED_IN"))return new Result(id,"CHECKED_IN",row.get("checked_in_at")==null?null:((java.sql.Timestamp)row.get("checked_in_at")).toInstant(),true);jdbc.update("UPDATE tickets SET state='CHECKED_IN',checked_in_at=CURRENT_TIMESTAMP,checked_in_by=? WHERE id=? AND state='VALID'",user,id);return new Result(id,"CHECKED_IN",jdbc.queryForObject("SELECT checked_in_at FROM tickets WHERE id=?",java.sql.Timestamp.class,id).toInstant(),false);}
+ @Transactional(readOnly=true,isolation=org.springframework.transaction.annotation.Isolation.REPEATABLE_READ) public Summary summary(UUID event){long confirmed=jdbc.queryForObject("SELECT COALESCE(sum(quantity),0) FROM bookings WHERE event_id=? AND status='CONFIRMED'",Long.class,event);long available=jdbc.queryForObject("SELECT COALESCE(sum(quota-reserved),0) FROM ticket_types WHERE event_id=?",Long.class,event);long attendance=jdbc.queryForObject("SELECT count(*) FROM tickets t JOIN bookings b ON b.id=t.booking_id WHERE b.event_id=? AND t.state='CHECKED_IN'",Long.class,event);return new Summary(confirmed,available,attendance);}
+}

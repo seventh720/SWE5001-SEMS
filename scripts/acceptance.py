@@ -30,25 +30,28 @@ admin=login(os.environ['SEMS_BOOTSTRAP_ADMIN_EMAIL'],os.environ['SEMS_BOOTSTRAP_
 attendee=login(users[2]['email'])
 call('GET','/api/v1/admin/users',token=attendee,expected=403)
 call('GET','/api/v1/organizer/events',expected=401)
-call('GET','/api/v1/organizer/events',token=attendee,expected=403)
+
 for user in users[:2]:call('PUT',f"/api/v1/admin/users/{user['id']}/roles",{'roles':['ATTENDEE','ORGANIZER']},admin)
 call('PUT',f"/api/v1/admin/users/{users[0]['id']}/roles",{'roles':[None]},admin,expected=400)
 a,b=[login(u['email']) for u in users[:2]]
+org_a=call('POST','/api/v1/admin/organizations',{'name':'Society '+suffix,'slug':'society-'+suffix,'adminEmail':users[0]['email']},admin)
+org_b=call('POST','/api/v1/admin/organizations',{'name':'Training '+suffix,'slug':'training-'+suffix,'adminEmail':users[1]['email']},admin)
+call('GET','/api/v1/organizer/events?organizationId='+org_a['id'],token=attendee,expected=404)
 assert call('GET','/api/v1/auth/me',token=a)['id']==users[0]['id']
 # Verify signed tokens cannot be altered.
 parts=a.split('.');parts[2]=('A' if parts[2][0]!='A' else 'B')+parts[2][1:]
 call('GET','/api/v1/organizer/events',token='.'.join(parts),expected=401)
 start=datetime.datetime.now(datetime.timezone.utc)+datetime.timedelta(days=7)
-body={'title':'Acceptance seminar '+suffix,'description':'Draft isolation acceptance','location':'Campus','startsAt':start.isoformat(),'endsAt':(start+datetime.timedelta(hours=2)).isoformat(),'capacity':30}
+body={'organizationId':org_a['id'],'visibility':'PUBLIC','title':'Acceptance seminar '+suffix,'description':'Draft isolation acceptance','location':'Campus','startsAt':start.isoformat(),'endsAt':(start+datetime.timedelta(hours=2)).isoformat(),'capacity':30}
 draft=call('POST','/api/v1/organizer/events',body,a,201);path='/api/v1/organizer/events/'+draft['id']
 assert draft['status']=='DRAFT'
 assert call('GET',path,token=a)['title']==body['title']
-assert call('GET','/api/v1/organizer/events',token=b)['totalElements']==0
+assert call('GET','/api/v1/organizer/events?organizationId='+org_b['id'],token=b)['totalElements']==0
 call('GET',path,token=b,expected=404)
 call('GET',path,token=admin,expected=404)
 call('PUT',path,{**body,'version':draft['version']},b,404)
-call('PUT',path,{**body,'version':draft['version']},attendee,403)
-call('GET','/api/v1/organizer/events?size=51',token=a,expected=400)
+call('PUT',path,{**body,'version':draft['version']},attendee,404)
+call('GET','/api/v1/organizer/events?size=51&organizationId='+org_a['id'],token=a,expected=400)
 call('GET','/api/v1/organizer/events/not-a-uuid',token=a,expected=400)
 call('POST','/api/v1/organizer/events',{**body,'endsAt':body['startsAt']},a,400)
 call('POST','/api/v1/organizer/events',{**body,'capacity':0},a,400)

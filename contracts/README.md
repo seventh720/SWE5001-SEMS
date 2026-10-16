@@ -1,5 +1,8 @@
 # API contracts
 
+> Current organization upgrade supersedes the earlier account-owner-only and pending-check-in descriptions below. See [organization upgrade](../docs/organization-upgrade.md). Flat organizations and event assignments are now implemented; SSO and enterprise hierarchy remain outside scope.
+
+
 - `identity.openapi.json`: registration, login, current account and ADMIN role management.
 - `event-catalog.openapi.json`: owned drafts, durable publication, public search/detail and internal event snapshots.
 - `admission.openapi.json`: free ticket configuration, availability, retry-safe bookings, individual ticket credentials, attendee cancellation and internal sales activation.

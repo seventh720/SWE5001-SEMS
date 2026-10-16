@@ -65,7 +65,7 @@ export function Select({
         <span id={`${id}-value`}>
           {options.find((o) => o.value === value)?.label ?? "Choose an option"}
         </span>
-        <span aria-hidden="true">⌄</span>
+
       </button>
       {open && (
         <div

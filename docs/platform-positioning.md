@@ -1,5 +1,8 @@
 # Platform positioning and producer onboarding
 
+> Current organization upgrade supersedes the earlier account-owner-only and pending-check-in descriptions below. See [organization upgrade](organization-upgrade.md). Flat organizations and event assignments are now implemented; SSO and enterprise hierarchy remain outside scope.
+
+
 ## What is being built
 
 The revised proposal (sections 3.1–3.3, 5.2 and 5.5) defines a shared event/ticketing platform plus one Web Application. Producers are independent organizers, consumers are participants, and the reusable offering is a published event with ticket types and limited capacity. Identity, Event Catalog and Admission expose shared APIs; the Web Application composes these APIs into role-specific workflows. Business rules live on the server and persist to service-owned schemas.

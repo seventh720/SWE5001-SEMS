@@ -1,5 +1,8 @@
 # ADR 0001：服务边界与一致性
 
+> Current organization upgrade supersedes the earlier account-owner-only and pending-check-in descriptions below. See [organization upgrade](../organization-upgrade.md). Flat organizations and event assignments are now implemented; SSO and enterprise hierarchy remain outside scope.
+
+
 状态：采用 proposal 边界。当前已实现 Identity、Catalog 草稿、三服务认证与独立 schema、发布及自动恢复、免费预订、独立出票和参与者取消订单；整场活动取消协议与工作人员核销仍待实现。
 
 Identity 拥有用户和角色；Catalog 拥有活动、owner、发布状态；Admission 拥有销售状态、票种、库存、订单、票券、staff assignment、签到。共享物理 PostgreSQL 时仍隔离 schema/凭据，撤销公共建表权限，每服务独立迁移。跨服务仅存 ID/必要快照，禁止共享 JPA 或 repository。

@@ -1,5 +1,8 @@
 # Smart Event Management and Ticketing Platform
 
+
+> Organization upgrade: organization-scoped roles, internal offerings, invitations and event staff/check-in are implemented. Existing installations require a coordinated maintenance migration before using this version. See [upgrade and validation](docs/organization-upgrade.md). Older increment notes below describe prior releases.
+
 [English](README.md) | [简体中文](README.zh-CN.md)
 
 SEMS is a shared event and ticketing platform for independent organizers and attendees, using React + TypeScript, three independent Spring Boot services and PostgreSQL.

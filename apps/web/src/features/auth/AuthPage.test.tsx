@@ -161,3 +161,17 @@ it("shows a duplicate username error and lets the user choose another name", asy
   fireEvent.click(screen.getByRole("button", { name: "Register and login" }));
   await screen.findByText("Account: alice2");
 });
+
+it("shows English validation without submitting invalid credentials", async () => {
+  mount();
+  const form = screen.getByLabelText("Email").closest("form")!;
+  expect(form.noValidate).toBe(true);
+  fireEvent.change(screen.getByLabelText("Email"), {target: {value: "ad"}});
+  fireEvent.submit(form);
+  expect((await screen.findByRole("alert")).textContent).toContain("Enter a valid email address");
+  fireEvent.change(screen.getByLabelText("Email"), {target: {value: user.email}});
+  fireEvent.change(screen.getByLabelText("Password"), {target: {value: "abc"}});
+  fireEvent.submit(form);
+  expect((await screen.findByRole("alert")).textContent).toBe("Password must contain 8–72 characters.");
+  expect(fetchMock).not.toHaveBeenCalled();
+});

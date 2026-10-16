@@ -79,7 +79,7 @@ call('POST','/api/v1/bookings',req(closed,ct),attendee,409)
 call('POST','/api/v1/bookings',req(future,ticket),attendee,404)
 # Seed checked-in/start-time conditions to test cancellation guards before staff UI exists.
 win=next(r[1] for r in results if r[0]==200)
-subprocess.run(compose+['exec','-T','postgres','psql','-U','postgres','-d','sems','-c',f"UPDATE admission.tickets SET state='CHECKED_IN' WHERE booking_id='{win['id']}'"],check=True,stdout=subprocess.DEVNULL)
+subprocess.run(compose+['exec','-T','postgres','psql','-U','postgres','-d','sems','-c',f"UPDATE admission.tickets SET state='CHECKED_IN',checked_in_at=now() WHERE booking_id='{win['id']}'"],check=True,stdout=subprocess.DEVNULL)
 call('POST','/api/v1/bookings/'+win['id']+'/cancel',token=attendee,expected=409)
 other=next(r[1] for r in results if r[0]==200 and r[1]['id']!=win['id'])
 subprocess.run(compose+['exec','-T','postgres','psql','-U','postgres','-d','sems','-c',f"UPDATE admission.bookings SET starts_at=now()-interval '1 minute' WHERE id='{other['id']}'"],check=True,stdout=subprocess.DEVNULL)

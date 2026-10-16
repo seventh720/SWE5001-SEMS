@@ -1,0 +1,2 @@
+PASS: registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits
+PASS: invitation inbox accept/decline/isolation, duplicate invitations, booking replay/cancel dedup, event edits/outbox retry/rejected changes, five-minute reminder with two replicas, read state and user isolation

@@ -73,7 +73,7 @@ export function AdminUsersPage() {
       </header>
 
       <p className="muted">
-        Role changes take effect after the user signs in again. Existing tokens
+        Organization roles are managed in My organizations; check-in access is assigned per event. Platform role changes take effect after the user signs in again. Existing tokens
         expire within 30 minutes.
       </p>
       {error && <p className="error-message">{error}</p>}
@@ -88,7 +88,7 @@ export function AdminUsersPage() {
             </div>
             <fieldset>
               <legend>Roles</legend>
-              {roles.map((role) => (
+              {roles.filter(role => role === "ATTENDEE" || role === "ADMIN").map((role) => (
                 <label className="role-option" key={role}>
                   <input
                     type="checkbox"

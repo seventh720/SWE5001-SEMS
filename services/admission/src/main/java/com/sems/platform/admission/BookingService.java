@@ -66,6 +66,7 @@ public class BookingService {
             jdbc.update("INSERT INTO tickets(id,booking_id,credential,state) VALUES (?,?,?,'VALID')",UUID.randomUUID(),id,code);
         }
         jdbc.update("DELETE FROM pre_registrations WHERE user_id=? AND event_id=? AND ticket_type_id=?",user,input.eventId(),input.ticketTypeId());
+        NotificationService.add(jdbc,user,"booking-confirmed:"+id,"BOOKING_CONFIRMED","Booking confirmed",snapshot.title()+" · "+input.quantity()+" ticket(s). Your tickets are ready.","/bookings/"+id);
         return owned(user,id);
     }
     @Transactional(readOnly=true, isolation=org.springframework.transaction.annotation.Isolation.REPEATABLE_READ)
@@ -110,6 +111,7 @@ public class BookingService {
         jdbc.update("UPDATE tickets SET state='CANCELLED' WHERE booking_id=?",id);
         int released=jdbc.update("UPDATE ticket_types SET reserved=reserved-? WHERE id=? AND reserved>=?",booking.quantity(),booking.ticketTypeId(),booking.quantity());
         if (released!=1) throw new IllegalStateException("Inventory invariant violated");
+        NotificationService.add(jdbc,user,"booking-cancelled:"+id,"BOOKING_CANCELLED","Booking cancelled",booking.eventTitle()+" · Your booking has been cancelled and the places released.","/bookings/"+id);
         return owned(user,id);
     }
     private String writeInfo(AttendeeInfo info) {try{return json.writeValueAsString(info);}catch(com.fasterxml.jackson.core.JsonProcessingException e){throw new IllegalStateException(e);}}

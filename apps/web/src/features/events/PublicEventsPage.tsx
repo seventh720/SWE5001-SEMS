@@ -1,3 +1,4 @@
+import {useAuth} from "../auth/AuthContext";
 import { HomeLink } from "../../shared/components/HomeLink";
 import { Countdown, useNow } from "../../shared/components/Countdown";
 import { Select } from "../../shared/components/Select";
@@ -5,7 +6,7 @@ import { formatDateTime } from "../../shared/components/dateTime";
 import { categories, EventArtwork } from "./EventArtwork";
 import type { Requirements } from "../bookings/registration";
 import { useEffect, useState, type FormEvent } from "react";
-import { Link, useParams, useLocation } from "react-router-dom";
+import { Link, useParams, useLocation, useSearchParams } from "react-router-dom";
 import { apiRequest } from "../../shared/api/client";
 import { BookingForm } from "../bookings/BookingForm";
 interface Event {
@@ -19,12 +20,16 @@ interface Event {
   category?: string;
   cardTheme?: string;
   registrationRequirements?: Requirements;
+  organizationId?: string;
+  visibility?: string;
+  organizationName?: string;
 }
 interface Page {
   items: Event[];
   totalPages: number;
 }
 export function PublicEventsPage() {
+  const {token}=useAuth();const [params]=useSearchParams();const organizationId=params.get("organizationId");
   const [data, setData] = useState<Page>({ items: [], totalPages: 0 });
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState("");
@@ -34,10 +39,11 @@ export function PublicEventsPage() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     let active = true;
+    setData({items:[],totalPages:0});
     setLoading(true);
     setError("");
     apiRequest<Page>(
-      `/api/v1/events?page=${page}&size=10&keyword=${encodeURIComponent(keyword)}${category ? `&category=${category}` : ""}`,
+      `/api/v1/events?page=${page}&size=10&keyword=${encodeURIComponent(keyword)}${category ? `&category=${category}` : ""}${organizationId ? `&organizationId=${organizationId}` : ""}`,{},token??undefined,
     )
       .then((d) => {
         if (active) setData(d);
@@ -51,7 +57,7 @@ export function PublicEventsPage() {
     return () => {
       active = false;
     };
-  }, [page, keyword, category]);
+  }, [page, keyword, category,organizationId,token]);
   function submit(e: FormEvent) {
     e.preventDefault();
     setPage(0);
@@ -104,6 +110,7 @@ export function PublicEventsPage() {
               <h2>
                 <Link to={`/events/${e.id}`}>{e.title}</Link>
               </h2>
+              <p className="muted">{e.organizationName} · {e.visibility === "ORGANIZATION_ONLY" ? "Members only" : "Public event"}</p>
               <dl className="event-facts">
                 <div>
                   <dt>When</dt>
@@ -139,6 +146,7 @@ export function PublicEventsPage() {
   );
 }
 export function PublicEventDetail() {
+  const {token}=useAuth();
   const now = useNow();
   const { id } = useParams();
   const location = useLocation();
@@ -154,18 +162,21 @@ export function PublicEventDetail() {
   >([]);
   const [error, setError] = useState("");
   useEffect(() => {
+    let active=true;setEvent(null);setTickets([]);setError("");
     Promise.all([
-      apiRequest<Event>(`/api/v1/events/${id}`),
+      apiRequest<Event>(`/api/v1/events/${id}`,{},token??undefined),
       apiRequest<{ ticketTypes: typeof tickets }>(
-        `/api/v1/events/${id}/ticket-types`,
+        `/api/v1/events/${id}/ticket-types`,{},token??undefined,
       ),
     ])
       .then(([e, i]) => {
+        if(!active)return;
         setEvent(e);
         setTickets(i.ticketTypes);
       })
-      .catch((e) => setError(e.message));
-  }, [id]);
+      .catch((e) => {if(active)setError(e.message)});
+    return()=>{active=false};
+  }, [id,token]);
   useEffect(() => {
     const selected = new URLSearchParams(location.search).get("preRegistration");
     if (!event || !selected || !tickets.some(t => t.id === selected)) return;
@@ -195,7 +206,7 @@ export function PublicEventDetail() {
                   "Community event"}{" "}
                 / FREE ADMISSION
               </p>
-              <h1>{event.title}</h1>
+              <h1>{event.title}</h1><p>{event.organizationName} · {event.visibility === "ORGANIZATION_ONLY" ? "Members only" : "Public"}</p>
               <dl className="event-facts">
                 <div>
                   <dt>When · Singapore time</dt>

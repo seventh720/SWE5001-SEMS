@@ -1,3 +1,6 @@
+import {NotificationBell,NotificationsPage} from "../features/notifications/Notifications";
+import {OrganizationsPage,AdminOrganizationsPage,AcceptInvitationPage} from "../features/organizations/OrganizationsPage";
+import {StaffTasksPage,CheckInPage,EventStaffPage} from "../features/organizations/StaffPage";
 import { DashboardPage } from "../features/dashboard/DashboardPage";
 import { ProfilePage } from "../features/profile/ProfilePage";
 import { PreRegistrationsPage } from "../features/bookings/PreRegistrationsPage";
@@ -113,7 +116,8 @@ function Landing() {
                 My events ↗
               </Link>
             )}
-            {user.roles.includes("ADMIN") && (
+            <Link to="/staff">My check-in tasks <span>Assigned events</span></Link>
+          {user.roles.includes("ADMIN") && (
               <Link className="text-link" to="/admin/users">
                 Manage users and roles →
               </Link>
@@ -196,11 +200,12 @@ function ExploreMenu({ onClose }: { onClose: () => void }) {
           <Link to="/profile" onClick={onClose}>
             My profile <span>Saved registration details</span>
           </Link>
-          {user.roles.some((r) => r === "ORGANIZER" || r === "ADMIN") && (
-            <Link to="/organizer/events" onClick={onClose}>
-              My events <span>Create and manage</span>
+          {true && (
+            <Link to="/organizations" onClick={onClose}>
+              My organizations <span>Memberships and events</span>
             </Link>
           )}
+          <Link to="/staff" onClick={onClose}>My check-in tasks <span>Assigned events</span></Link>
           {user.roles.includes("ADMIN") && (
             <Link to="/admin/users" onClick={onClose}>
               Manage users <span>Roles and access</span>
@@ -271,7 +276,7 @@ export function App() {
             </button>
             {user ? (
               <>
-                <span className="nav-username">{user.username}</span>
+                <NotificationBell/><span className="nav-username">{user.username}</span>
                 <button onClick={logout}>Sign out</button>
               </>
             ) : (
@@ -304,7 +309,8 @@ export function App() {
           <Route path="/events/:id" element={<PublicEventDetail />} />
           <Route path="/login" element={<AuthPage />} />
           <Route element={<ProtectedRoute />}>
-            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/organizations" element={<OrganizationsPage/>}/><Route path="/admin/organizations" element={<AdminOrganizationsPage/>}/><Route path="/invitations/accept" element={<AcceptInvitationPage/>}/><Route path="/staff" element={<StaffTasksPage/>}/><Route path="/staff/events/:id" element={<CheckInPage/>}/><Route path="/organizer/events/:id/staff" element={<EventStaffPage/>}/>
+            <Route path="/notifications" element={<NotificationsPage/>}/><Route path="/profile" element={<ProfilePage />} />
             <Route
               path="/pre-registrations"
               element={<PreRegistrationsPage />}

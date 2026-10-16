@@ -19,7 +19,7 @@ public class BookingController {
         var prior=bookings.replay(user,input);
         if (prior!=null) return privateResponse(prior);
         // Verify publication over HTTP before starting the local reservation transaction.
-        return privateResponse(bookings.create(user,input,catalog.published(input.eventId())));
+        return privateResponse(bookings.create(user,input,catalog.published(input.eventId(),UUID.fromString(jwt.getSubject()))));
     }
     @GetMapping public ResponseEntity<Page> list(@AuthenticationPrincipal Jwt jwt,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="10") int size,@RequestParam(required=false) String status) {return privateResponse(bookings.list(UUID.fromString(jwt.getSubject()),page,size,status));}
     @GetMapping("/upcoming") public ResponseEntity<Page> upcoming(@AuthenticationPrincipal Jwt jwt){return privateResponse(bookings.upcoming(UUID.fromString(jwt.getSubject())));}

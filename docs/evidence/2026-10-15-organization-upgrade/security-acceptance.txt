@@ -1,0 +1,2 @@
+PASS: registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits
+PASS: invitation expiry, live promotion/demotion, assigned task title before bookings and after edits, staff revocation and platform-admin isolation

@@ -16,16 +16,28 @@ export function AuthPage() {
 
   if (user) {
     const from = (
-      location.state as { from?: { pathname?: string; search?: string } } | null
+      location.state as { from?: { pathname?: string; search?: string; hash?: string } } | null
     )?.from;
     const destination = from?.pathname
-      ? `${from.pathname}${from.search ?? ""}`
+      ? `${from.pathname}${from.search ?? ""}${from.hash ?? ""}`
       : "/";
     return <Navigate to={destination} replace />;
   }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
+    const validationError =
+      mode === "register" && !/^[A-Za-z0-9._-]{3,50}$/.test(username)
+        ? "Choose a username with 3–50 letters, numbers, dots, underscores or hyphens."
+        : !email.trim() || !/^[^\s@]+@[^\s@]+$/.test(email.trim())
+          ? "Enter a valid email address, such as name@example.com."
+          : password.length < 8 || password.length > 72
+            ? "Password must contain 8–72 characters."
+            : "";
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     setSubmitting(true);
     setError("");
     try {
@@ -81,7 +93,7 @@ export function AuthPage() {
           </button>
         </div>
 
-        <form onSubmit={submit}>
+        <form noValidate onSubmit={submit}>
           <h2>
             {mode === "login" ? "Welcome back" : "Create attendee account"}
           </h2>

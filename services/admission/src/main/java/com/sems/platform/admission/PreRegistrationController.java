@@ -13,6 +13,6 @@ public class PreRegistrationController {
  private <T> ResponseEntity<T> response(T body){return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(body);}
  @GetMapping public ResponseEntity<PreRegistrationService.Page> list(@AuthenticationPrincipal Jwt jwt,@RequestParam(defaultValue="0") int page,@RequestParam(defaultValue="10") int size){return response(service.list(UUID.fromString(jwt.getSubject()),page,size));}
  @GetMapping("/{event}") public ResponseEntity<PreRegistrationService.View> get(@AuthenticationPrincipal Jwt jwt,@PathVariable UUID event){return response(service.get(UUID.fromString(jwt.getSubject()),event));}
- @PutMapping("/{event}") public ResponseEntity<PreRegistrationService.View> save(@AuthenticationPrincipal Jwt jwt,@PathVariable UUID event,@Valid @RequestBody PreRegistrationService.Input input){return response(service.save(UUID.fromString(jwt.getSubject()),event,input,catalog.published(event)));}
+ @PutMapping("/{event}") public ResponseEntity<PreRegistrationService.View> save(@AuthenticationPrincipal Jwt jwt,@PathVariable UUID event,@Valid @RequestBody PreRegistrationService.Input input){return response(service.save(UUID.fromString(jwt.getSubject()),event,input,catalog.published(event,UUID.fromString(jwt.getSubject()))));}
  @DeleteMapping("/{event}") public ResponseEntity<Void> delete(@AuthenticationPrincipal Jwt jwt,@PathVariable UUID event){service.delete(UUID.fromString(jwt.getSubject()),event);return ResponseEntity.noContent().cacheControl(CacheControl.noStore()).build();}
 }

@@ -23,5 +23,5 @@ it.each([["PUBLISHED","Pause publication","Confirm pause","PAUSED"],["PAUSED","R
  expect(fetchMock.mock.calls[2][0]).toBe("/api/v1/organizer/events/e1/revision");expect(JSON.parse(fetchMock.mock.calls[2][1]!.body as string).publicationStatus).toBe(next);
 });
 it("reports pending synchronization without claiming publication completed",async()=>{
- fetchMock.mockResolvedValueOnce(response(event)).mockResolvedValueOnce(response(inventory)).mockResolvedValueOnce(response({...event,status:"PUBLISHING"},202));mount();fireEvent.click(await screen.findByRole("button",{name:"Publish event"}));fireEvent.click(screen.getByRole("button",{name:"Confirm publication"}));await screen.findByText(/Publication change is syncing/);expect(screen.queryByRole("link",{name:"View public event"})).toBeNull();
+ fetchMock.mockResolvedValueOnce(response(event)).mockResolvedValueOnce(response(inventory)).mockResolvedValueOnce(response({...event,status:"PUBLISHING"},202));mount();fireEvent.click(await screen.findByRole("button",{name:"Publish event"}));fireEvent.click(screen.getByRole("button",{name:"Confirm publication"}));await screen.findByText(/Publication change is syncing/);expect(screen.queryByRole("link",{name:"View event"})).toBeNull();
 });

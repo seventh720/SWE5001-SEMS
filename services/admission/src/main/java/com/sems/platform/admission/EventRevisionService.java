@@ -17,7 +17,7 @@ public class EventRevisionService {
  public record Desired(@Min(1) int capacity,@NotNull Instant startsAt,@NotNull Instant endsAt,@Valid TicketRevision ticketConfiguration,@Pattern(regexp="PUBLISHED|PAUSED") String publicationStatus){}
  public record TicketRevision(@NotNull @Min(0) Long version,@NotEmpty @Size(max=20) List<@NotNull @Valid TicketEdit> ticketTypes){}
  public record TicketEdit(UUID id,@NotBlank @Size(max=100) String name,@Min(1) int quota,@NotNull Instant opensAt,@NotNull Instant closesAt){}
- public record Operation(@NotNull UUID operationId,@NotNull UUID eventId,@NotNull UUID organizerId,@NotBlank String sourceStatus,@Min(1) int oldCapacity,@NotNull Instant oldStartsAt,@NotNull Instant oldEndsAt,@Valid @NotNull Desired desired){}
+ public record Operation(@NotNull UUID operationId,@NotNull UUID eventId,@NotNull UUID organizerId,@NotBlank String sourceStatus,@Min(1) int oldCapacity,@NotNull Instant oldStartsAt,@NotNull Instant oldEndsAt,@Valid @NotNull Desired desired,UUID organizationId){}
  private String write(Operation o){try{return json.writeValueAsString(o);}catch(Exception e){throw new IllegalStateException(e);}}
  @Transactional public void revise(UUID event,Operation op){
   if(!event.equals(op.eventId()))conflict("Event mismatch");
@@ -28,10 +28,10 @@ public class EventRevisionService {
   var d=op.desired();if(((!d.startsAt().equals(op.oldStartsAt())||op.sourceStatus().equals("DRAFT"))&&!d.startsAt().isAfter(Instant.now()))||!d.endsAt().isAfter(d.startsAt()))conflict("Invalid event schedule");
   if(rows.isEmpty()){
    if(!op.sourceStatus().equals("DRAFT"))conflict("Sales not found");
-   jdbc.update("INSERT INTO sales(event_id,organizer_id,capacity,starts_at,ends_at,state,version) VALUES (?,?,?,?,?,'DRAFT',0)",event,op.organizerId(),d.capacity(),Timestamp.from(d.startsAt()),Timestamp.from(d.endsAt()));
+   jdbc.update("INSERT INTO sales(event_id,organizer_id,capacity,starts_at,ends_at,state,version,organization_id) VALUES (?,?,?,?,?,'DRAFT',0,?)",event,op.organizerId(),d.capacity(),Timestamp.from(d.startsAt()),Timestamp.from(d.endsAt()),op.organizationId());
   }else{
    var row=rows.getFirst();String expected=op.sourceStatus().equals("PUBLISHED")?"ACTIVE":op.sourceStatus().equals("PAUSED")?"PAUSED":"DRAFT";
-   if(!row.get("organizer_id").equals(op.organizerId())||!row.get("state").equals(expected)||((Number)row.get("capacity")).intValue()!=op.oldCapacity()||!((Timestamp)row.get("starts_at")).toInstant().equals(op.oldStartsAt())||!((Timestamp)row.get("ends_at")).toInstant().equals(op.oldEndsAt()))conflict("Event changed; reload");
+   if(!row.get("organizer_id").equals(op.organizerId())||!Objects.equals(row.get("organization_id"),op.organizationId())||!row.get("state").equals(expected)||((Number)row.get("capacity")).intValue()!=op.oldCapacity()||!((Timestamp)row.get("starts_at")).toInstant().equals(op.oldStartsAt())||!((Timestamp)row.get("ends_at")).toInstant().equals(op.oldEndsAt()))conflict("Event changed; reload");
    long allocated=jdbc.queryForObject("SELECT COALESCE(sum(quota),0) FROM ticket_types WHERE event_id=?",Long.class,event);
    if(d.ticketConfiguration()==null && d.capacity()<allocated)conflict("Capacity cannot be less than allocated ticket quota");
    boolean timeChanged=!d.startsAt().equals(op.oldStartsAt())||!d.endsAt().equals(op.oldEndsAt());

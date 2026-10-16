@@ -1,5 +1,8 @@
 # 平台实施计划
 
+> Current organization upgrade supersedes the earlier account-owner-only and pending-check-in descriptions below. See [organization upgrade](organization-upgrade.md). Flat organizations and event assignments are now implemented; SSO and enterprise hierarchy remain outside scope.
+
+
 ## 服务职责
 
 Identity 管理账号、认证与角色；Event Catalog 管理活动、所有权、发布与发现；Admission 管理票种、库存、订单、票券、工作人员分配与签到。Web 应用通过网关调用版本化 API。

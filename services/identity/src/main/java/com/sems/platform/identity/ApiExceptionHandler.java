@@ -40,6 +40,9 @@ public class ApiExceptionHandler {
                 "Invalid value for parameter: " + exception.getName());
     }
 
+    @ExceptionHandler(org.springframework.dao.DuplicateKeyException.class)
+    ProblemDetail duplicateKey() { return problem(HttpStatus.CONFLICT,"Already exists","This organization or membership already exists. Reload and retry."); }
+
     @ExceptionHandler(DuplicateUserException.class)
     ProblemDetail duplicateUser(DuplicateUserException exception) {
         return problem(HttpStatus.CONFLICT, "Account already exists", exception.getMessage());

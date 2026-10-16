@@ -7,12 +7,6 @@ import { formatDateTime } from "../../shared/components/dateTime";
 import { Countdown, useNow } from "../../shared/components/Countdown";
 import type { Booking } from "../bookings/BookingsPage";
 import type { PreRegistration } from "../bookings/PreRegistrationsPage";
-interface OwnEvent {
-  id: string;
-  title: string;
-  status: string;
-  startsAt: string;
-}
 interface State<T> {
   items: T[];
   error: string;
@@ -55,41 +49,7 @@ function Feedback({
   ) : null;
 }
 function OrganizerPanel() {
-  const { token } = useAuth();
-  const data = useItems<OwnEvent>(
-    "/api/v1/organizer/events?page=0&size=4",
-    token,
-  );
-  return (
-    <section className="card dashboard-panel">
-      <div className="section-heading">
-        <h2>Organizer workspace</h2>
-        <Link to="/organizer/events">Manage all →</Link>
-      </div>
-      <Feedback state={data} />
-      {data.items.map((e) => (
-        <Link
-          className="dashboard-row"
-          key={e.id}
-          to={`/organizer/events/${e.id}/setup`}
-        >
-          <span>
-            <strong>{e.title}</strong>
-            <small>{formatDateTime(e.startsAt)}</small>
-          </span>
-          <span className="status-chip">{e.status}</span>
-        </Link>
-      ))}
-      {!data.loading && !data.error && !data.items.length && (
-        <p>
-          Create your first event, or reuse one of your events as a template.
-        </p>
-      )}
-      <Link className="secondary-button" to="/organizer/events">
-        Create or reuse an event
-      </Link>
-    </section>
-  );
+ return <section className="card dashboard-panel"><h2>Organizer workspace</h2><p>Select an organization to manage its events, or view events available to its members.</p><Link className="secondary-button" to="/organizations">My organizations →</Link></section>;
 }
 export function DashboardPage() {
   const { user, token } = useAuth();
@@ -113,7 +73,7 @@ export function DashboardPage() {
     if(due.length){due.forEach(p=>checkedOpenings.current.add(`${p.eventId}:${p.opensAt}`));pre.retry();}
   }, [now, pre.items]);
   if (!user) return null;
-  const organizer = user.roles.some((r) => r === "ORGANIZER" || r === "ADMIN");
+  const organizer = true;
   return (
     <main className="app-shell dashboard-shell" id="main-content">
       <header className="dashboard-header">
@@ -211,19 +171,18 @@ export function DashboardPage() {
           <section className="card dashboard-panel">
             <p className="eyebrow">PLATFORM ADMINISTRATION</p>
             <h2>Users & access</h2>
-            <p>Manage platform accounts and assign organizer or staff roles.</p>
-            <Link className="secondary-button" to="/admin/users">
-              Manage users
+            <p>Open organizations, appoint organization administrators and manage platform accounts.</p>
+            <Link className="secondary-button" to="/admin/organizations">
+              Manage organizations
             </Link>
           </section>
         )}
-        {user.roles.includes("STAFF") && (
+        {true && (
           <section className="card dashboard-panel">
             <p className="eyebrow">STAFF WORKSPACE</p>
-            <h2>Event operations</h2>
+            <h2>Event operations</h2><Link to="/staff">My check-in tasks →</Link>
             <p>
-              Staff assignment and check-in are not available yet. Your assigned
-              event workspace will appear here when that workflow is released.
+              Check tickets only for events assigned to you by an organization manager.
             </p>
           </section>
         )}
