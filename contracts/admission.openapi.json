@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SEMS Admission API",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "description": "Free inventory, retry-safe bookings, per-place ticket credentials and attendee cancellation. Staff check-in and event-wide cancellation are pending."
   },
   "servers": [
@@ -121,7 +121,8 @@
             "enum": [
               "DRAFT",
               "ACTIVE",
-              "PAUSED"
+              "PAUSED",
+              "CANCELLED"
             ]
           },
           "ticketTypes": {
@@ -289,6 +290,11 @@
             "type": "string",
             "nullable": true,
             "description": "Historical event question at booking time."
+          },
+          "eventCancellationReason": {
+            "type": "string",
+            "nullable": true,
+            "description": "Present when cancelled by the organizer. Checked-in ticket history is retained, but none of the tickets may be admitted again."
           }
         },
         "required": [
@@ -739,6 +745,15 @@
           },
           "attendance": {
             "type": "integer"
+          },
+          "salesState": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ACTIVE",
+              "PAUSED",
+              "CANCELLED"
+            ]
           }
         }
       },
@@ -786,6 +801,29 @@
           },
           "hasMore": {
             "type": "boolean"
+          }
+        }
+      },
+      "CancellationOperation": {
+        "type": "object",
+        "required": [
+          "eventId",
+          "operationId",
+          "reason"
+        ],
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "operationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
           }
         }
       }
@@ -1618,6 +1656,7 @@
     },
     "/api/v1/events/{id}/check-ins": {
       "post": {
+        "description": "New check-ins open 15 minutes before the current event start (inclusive), enforced using database time under the sales lock. Earlier attempts return 409. Already checked-in tickets return the original result without a new check-in.",
         "summary": "Active member assigned to this event: check in once; duplicate returns alreadyCheckedIn=true",
         "responses": {
           "200": {
@@ -1800,6 +1839,45 @@
         "responses": {
           "204": {
             "description": "All current account updates marked read; invitations unaffected"
+          }
+        }
+      }
+    },
+    "/internal/v1/events/{id}/cancel": {
+      "post": {
+        "summary": "Atomically cancel admission and record an idempotent receipt",
+        "security": [
+          {
+            "serviceToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancellationOperation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Committed or matching replay. Sales closed, confirmed bookings cancelled, valid tickets invalidated, reservations released, notifications recorded in one transaction."
+          },
+          "409": {
+            "description": "Invalid state or receipt/payload mismatch"
           }
         }
       }

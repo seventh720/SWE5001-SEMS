@@ -1,12 +1,13 @@
 # API contracts
 
-> Current organization upgrade supersedes the earlier account-owner-only and pending-check-in descriptions below. See [organization upgrade](../docs/organization-upgrade.md). Flat organizations and event assignments are now implemented; SSO and enterprise hierarchy remain outside scope.
+OpenAPI 3.0.3; these documents describe the current organization-scoped APIs.
 
+- `identity.openapi.json`: accounts, platform administration, organizations, membership/invitations, organization change/closure requests, soft deletion and membership notifications.
+- `event-catalog.openapi.json`: event drafts, discovery, durable publication/revision, pause/resume, terminal whole-event cancellation and internal eligibility snapshots.
+- `admission.openapi.json`: ticket configuration, availability, retry-safe bookings, ticket credentials, attendee cancellation, pre-registration, assigned-staff check-in, summaries, notifications and internal activation/revision/cancellation.
 
-- `identity.openapi.json`: registration, login, current account and ADMIN role management.
-- `event-catalog.openapi.json`: owned drafts, durable publication, public search/detail and internal event snapshots.
-- `admission.openapi.json`: free ticket configuration, availability, retry-safe bookings, individual ticket credentials, attendee cancellation and internal sales activation.
+Event metadata routes to Catalog. Ticket types, bookings, staff assignments and attendance route to Admission. Organization and account administration routes to Identity. The gateway blocks `/internal`; authenticated service-to-service HTTP uses `X-Service-Token` with separate credentials per direction.
 
-OpenAPI 3.0.3. `/api/v1/events/{id}/ticket-types` and the organizer equivalent route to Admission, while event metadata routes to Catalog. `/internal` is blocked by the gateway; service-only paths use their own network addresses and `X-Service-Token`. The two call directions have separate credentials.
+Organization membership controls business access; platform ADMIN and legacy global ORGANIZER/STAFF claims do not replace membership or event assignment. Published ticket settings are edited through the recoverable revision protocol. Pause preserves tickets; whole-event cancellation invalidates unused tickets and retains check-in history. See [business rules](../docs/functional-guide.md) and [publication/cancellation](../docs/publication-management.md).
 
-Starting ticket setup fixes event capacity and time. Other draft details can still be edited. Publication freezes ticket configuration. Bookings and attendee cancellation are implemented; event-wide cancellation and staff check-in remain pending. `/api/v1/bookings` and its subpaths route to Admission.
+The files parse and their local schema references resolve. Automated request/response conformance testing against OpenAPI is not yet wired into CI; API acceptance tests are separate and do not establish full contract conformance.

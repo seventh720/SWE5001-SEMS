@@ -22,13 +22,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class InternalSecurityConfiguration {
     @Bean @Order(1)
     SecurityFilterChain internalSecurity(HttpSecurity http,
-            @Value("${sems.internal.inbound-token}") String secret) throws Exception {
+            @Value("${sems.internal.inbound-token}") String secret,@Value("${ORGANIZATION_ACCESS_TOKEN}") String organizationSecret) throws Exception {
         if (secret.length() < 32) throw new IllegalArgumentException("Internal token must be at least 32 characters");
         var filter = new OncePerRequestFilter() {
             @Override protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                     FilterChain chain) throws ServletException, IOException {
                 String supplied = request.getHeader("X-Service-Token");
-                if (supplied == null || !MessageDigest.isEqual(secret.getBytes(StandardCharsets.UTF_8), supplied.getBytes(StandardCharsets.UTF_8))) {
+                String expected=request.getRequestURI().startsWith("/internal/v1/organization-closures/")?organizationSecret:secret;
+                if (supplied == null || !MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8), supplied.getBytes(StandardCharsets.UTF_8))) {
                     response.sendError(401); return;
                 }
                 SecurityContextHolder.getContext().setAuthentication(

@@ -26,7 +26,7 @@ call('PUT',path+'/staff',{'userId':users[2]['id'],'active':False},a,204)
 assert call('GET','/api/v1/me/staff-assignments',token=attendee)==[]
 call('POST','/api/v1/events/'+event['id']+'/check-ins',{'credential':booked['tickets'][0]['credential']},attendee,403)
 mp=f"/api/v1/organizations/{org_a['id']}/members/{users[2]['id']}"
-member=next(m for m in call('GET',f"/api/v1/organizations/{org_a['id']}/members",token=a) if m['userId']==users[2]['id'])
+member=next(m for m in call('GET',f"/api/v1/organizations/{org_a['id']}/members",token=a)['items'] if m['userId']==users[2]['id'])
 call('PUT',mp,{**member,'role':'MEMBER'},a,204)
 call('GET',path,token=attendee,expected=404)
 assert call('GET','/api/v1/bookings/'+booked['id'],token=attendee)['id']==booked['id']

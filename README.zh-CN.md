@@ -1,25 +1,17 @@
 # Smart Event Management and Ticketing Platform
 
-
-> 组织升级：已新增组织级角色、内部活动、邀请、活动工作人员与核销。已有环境必须先按[升级与验证说明](docs/organization-upgrade.md)完成维护窗口迁移，再使用本版本；下文早期增量记录保留历史背景。
-
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-SEMS 是面向独立组织者与参与者的共享活动与票务平台。采用 React + TypeScript、三个独立 Spring Boot 服务和 PostgreSQL。
+SEMS 是 React + TypeScript、三个 Spring Boot 服务与 PostgreSQL 构成的共享活动票务平台。
 
-本轮已实现：注册登录、RSA JWT、管理员角色授权、组织者活动草稿创建/列表/详情/编辑、所有权隔离及乐观版本冲突。本轮另已实现免费票种、配额/销售窗口校验、可重试发布和公开活动浏览。现已接入幂等免费预订、参与者取消订单，以及每名额独立的二维码/手动码票券。工作人员分配与核销、整场活动取消和组织者统计仍待实现。
+已实现组织与成员权限、活动发布/编辑/暂停、免费预订、独立二维码票券、参与者及整场活动取消、工作人员核销、基础统计及站内通知。云部署、扩容/故障实验和安全交付流水线仍需完成。当前进度见 [Proposal 对照与下一步](docs/implementation-plan.zh-CN.md)。
 
-## 1. 架构与角色
+超管降权即时失效、可恢复的组织注销和成员服务端分页已修复。交付流水线、安全门禁、云部署与实测仍需完成，详见[本轮整体检查](docs/implementation-plan.zh-CN.md#本轮整体检查还不只是部署)。
+## 1. 架构与权限
 
-| Service | Data ownership | Status |
-|---|---|---|
-| Identity | Accounts, passwords, roles | Implemented |
-| Event Catalog | Organizer-owned event drafts | Implemented |
-| Admission | Inventory, bookings, tickets, check-in | Free ticket inventory and sales activation |
+Identity 管理账号、组织、成员及邀请；Event Catalog 管理活动、可见性、发布及修订；Admission 管理库存、订单、票券、签到及通知。三服务有独立 schema、凭据和迁移，通过认证 HTTP 协作。
 
-三服务分别拥有 schema、数据库账号和 Flyway 迁移，无跨服务外键或查询。Identity 持 RSA 私钥，另外两个服务只持公钥；令牌校验签名、issuer、audience 和有效期。
-
-角色为 `ATTENDEE`、`ORGANIZER`、`STAFF`、`ADMIN`。注册默认 ATTENDEE；管理员可分配角色。ADMIN 不绕过活动所有权。角色变更后重新登录；已有令牌最多继续有效30分钟，本轮无即时撤销机制。
+平台 ADMIN 管理平台账号及组织；组织内 ORG_ADMIN、ORGANIZER、MEMBER 决定业务权限；检票还要求活动分配。旧全局 ORGANIZER/STAFF 不再授予业务访问。已有环境先阅读[组织升级](docs/organization-upgrade.md)与[通知升级](docs/in-app-notifications.md)。
 
 ## 2. 本地启动
 
@@ -49,48 +41,38 @@ docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.
 
 这是本地HTTP配置，云端仍需HTTPS、密钥管理和部署配置。
 
-## 3. 验收流程
+## 3. 验收流程 / Acceptance walkthrough
 
-1. 注册两个普通账号。
-2. 以管理员登录“Manage users and roles”，为两个账号勾选 ORGANIZER 并保存。
-3. 两个账号分别重新登录，进入“My events”。
-4. 创建草稿，刷新后编辑；第二个账号列表不显示第一个账号的草稿。
-5. 同一草稿在两个窗口编辑，后提交的旧版本返回冲突，可点击重新加载。
+1. 注册组织管理员、成员、参与者账号；平台管理员创建两个组织并指定管理员。
+2. 组织管理员邀请成员，成员在 Notifications 接受；创建 seminar 与 workshop，配置免费票种并发布。
+3. 参与者浏览、预订并查看二维码/手动票码；检查他人和其他组织无法访问管理数据。
+4. 为活动分配工作人员，核销票码两次，确认 attendance 仅增加一次；检查未分配人员被拒绝。
+5. 取消另一笔尚未签到且未开始的订单，检查库存仅释放一次；演示暂停/恢复与第三组织无代码入驻。
 
-6. 在同一编辑页填写活动详情和票种，使用票种下方的按钮统一保存。
-7. 确认发布后进入公开活动页。依赖故障时活动保持发布中且不公开，恢复任务自动继续处理。
-8. 参与者登录后，在已开放销售的票种下预订 1–10 个名额，从首页或 Explore 的 **My tickets** 查看每张二维码/手动码票券。
-9. 活动开始前可取消尚未签到的订单，该订单全部票券作废，库存仅归还一次。网络异常后重试沿用保存的请求键；工作人员核销尚未开放。
-
-## 4. 测试与 CI
-
+## 4. Tests and CI
 
 ```bash
 mvn verify
-npm --prefix apps/web test
+npm --prefix apps/web run test:coverage
 npm --prefix apps/web run build
-bash scripts/check-db-isolation.sh
-set -a
-source .env
-set +a
-python3 scripts/registration-acceptance.py
 ```
 
-最后两项需要运行中的 Compose 环境；发布验收会主动停止/重启测试容器，务必使用独立测试环境；验收脚本会创建带唯一后缀的测试账号与草稿，建议使用独立测试数据卷。CI 分别展示后端、前端和集成验收状态，生成 JaCoCo/Vitest 行与分支覆盖率，并在临时环境运行同样检查，涵盖认证、权限、schema隔离、输入校验、持久化和并发版本冲突。构建结果经已有Telegram通知发送，日志/JAR保留7天。详见 [CI说明](docs/ci.md)。
+数据库/API 验收需要独立、可丢弃的 Compose 环境；部分脚本会停止服务、重启及制造故障。完整入口、隔离要求和现有流水线能力见 [CI operations](docs/ci.md)。历史证据见 [docs/evidence](docs/evidence/)。
 
-## 5. 目录与文档
+## 5. Layout and documentation
 
-- `services/`: independent backend services and migrations.
-- `apps/web/`: React application and UI tests.
-- `contracts/`: current OpenAPI specifications.
-- `deployment/`: gateway, database initialization and Compose.
-- `scripts/`: local setup, readiness and acceptance checks.
-- [Implementation plan](docs/implementation-plan.zh-CN.md)
-- [API contracts](contracts/README.md)
-- [Architecture](docs/adr/0001-service-boundaries.md)
-- [Acceptance targets](docs/acceptance-matrix.md)
+- `services/` — backend services, migrations and tests.
+- `apps/web/` — frontend and UI tests.
+- `contracts/` — [OpenAPI contracts](contracts/README.md).
+- `deployment/` — local Compose, gateway and database setup.
+- `scripts/` — setup and reusable acceptance checks.
+- [文档索引 / Documentation index](docs/README.md)
+- [Proposal 对照与下一步](docs/implementation-plan.zh-CN.md)
+- [当前业务规则](docs/functional-guide.md)
+- [架构决策](docs/adr/0001-service-boundaries.md)
+- [验收矩阵](docs/acceptance-matrix.md)
 
-按下方团队流程通过 PR 集成，业务变更同时提交测试和契约。Proposal 与配图独立存放，不纳入代码仓库。
+Proposal 与配图独立存放，不纳入代码仓库。
 
 ## 6. 前后端日常开发
 
@@ -244,37 +226,3 @@ git push
 上一个 PR 合并后再开始下一个任务，避免同一 PR 累积无关改动。短期任务分支可以使用 **Squash and merge**，合并后删除，下个任务重新从最新 `origin/main` 创建。如果仓库仅允许 squash，则使用短期任务分支发 PR，不对长期个人分支反复 squash 合并。
 
 以上为团队约定，README 不会自动开启 GitHub 保护。仓库管理员应给 `main` 配置分支保护或 ruleset：必须通过 PR、至少 1 名其他组员批准、更新后重新批准、解决全部讨论、通过上述三项检查，并禁止强推和删除主分支。如果开启了合并后自动删除分支，应关闭该设置或保留／恢复 `victor` 等长期个人分支。
-
-预订设计、API 规则、迁移与验证记录见 [本轮票务说明](docs/booking-increment.md)。
-
-## 9. 活动展示与报名信息
-
-编辑草稿时选择 **Event category**，并独立选择 **Card background**（Lilac、Lime、Peach、Sky）。公开目录支持分类与标题组合筛选。背景图形由本地代码生成，沿用动画暂停及减少动态效果设置。
-
-在 **Registration information** 中勾选实际需要的姓名、联系邮箱、电话、学号、护照号，或添加一个自定义问题。每笔订单填写一份联系人资料，不是每张票填写一份；发布后配置固定。参与者报名时填写对应字段，在 **My tickets** 查看历史快照；组织者从活动卡片的 **Registration list** 查看本活动报名资料。其他组织者无权访问，列表不会返回票码。
-
-日期可用英文日历及小时/分钟控件选择，也可输入 `YYYY-MM-DD HH:mm`。活动与销售时间统一标注 Singapore time；历史 UTC 时刻保持不变，组件会校验无效日期和时间范围。
-
-升级顺序为 Catalog（V3 迁移）、Admission（V4），再更新网关与前端；启用报名字段后不能混用旧 Admission 写入版本。已有活动默认 General/Lilac 且无必填资料；已有订单报名资料为空，不修改历史迁移。
-
-[实现说明与语言／主题工作量评估](docs/registration-and-display.md)。本轮仅评估切换功能，未启用中英文或深浅色切换。
-
-## 10. 个人资料、预约报名与倒计时
-
-在 **My profile** 修改用户名，并在 **Saved registration details** 管理多份有名称的联系人资料。报名时点击 **Apply saved details** 选择一份，再核对活动要求的字段。通用联系人不保存 Student ID 或自定义回答；每笔订单仍对应一位报名联系人。活动详情与票务设置合并到一个编辑页，**Publication preview** 用于检查已保存内容并确认发布。详见[联系人与编辑流程](docs/saved-contacts-and-editor.md)。
-
-开售前点击 **Save pre-registration**，每个用户对每场活动保存一份预约，不占名额。**My pre-registrations** 展示开售倒计时和修改入口。开售后表单切换为 **Confirm free booking**，必须手动确认，后端重新检查名额。报名成功时同一事务移除对应预约。删除预约不等于取消订单。
-
-活动卡片分开显示分类、时间、地点和简介；详情展示活动开始、报名开放／截止倒计时，统一使用新加坡时间。倒计时用于提示，实际时间与名额由后端校验。
-
-升级需应用 Identity V2、Admission V5；使用新构建的 JAR，先构建前端 dist 再重建 Web 容器，最后重启网关。数据库端口保持 **15432**。完整回归命令：`python3 scripts/pre-registration-acceptance.py`，仅在独立测试环境执行。见[设计与验证说明](docs/pre-registration-increment.md)。
-
-## 11. 分角色工作台与活动复用
-
-登录后首页展示 Dashboard，包括近期已确认行程及已保存预约。组织者、管理员按角色看到对应管理入口；工作人员检票仍待实现。Explore 调整为右侧紧凑导航面板。
-
-**My events → Publication preview / Publication management → Edit details & tickets** 只打开当前活动。详情与票种统一保存；已发布活动自动更新，草稿和暂停状态保持不变。首次发布后仅报名信息规则锁定。发布管理支持明确暂停和恢复，已有票券保持有效。票种名额不得低于已出票名额，已有订单或预约引用的票种不能删除。详见[发布管理](docs/publication-management.md)。
-
-[平台定位与组织者接入说明](docs/platform-positioning.md)明确了共享平台、两个组织者场景，以及账号所有权隔离与企业租户的区别。完整验收入口为 `python3 scripts/workspace-acceptance.py`，仅在独立测试环境运行。
-
-本轮新增 Catalog V4、Admission V6 迁移，先更新 Admission，再更新 Catalog 与 Web。中断中的更新会自动恢复，见[改期规则与验证](docs/schedule-revision.md)。

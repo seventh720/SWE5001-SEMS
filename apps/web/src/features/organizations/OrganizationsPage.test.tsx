@@ -7,14 +7,15 @@ import {CheckInPage} from "./StaffPage";
 vi.mock("../auth/AuthContext",()=>({useAuth:()=>({token:"token",user:{id:"u",roles:["ATTENDEE"]}})}));
 afterEach(()=>{cleanup();vi.unstubAllGlobals();window.history.replaceState(null,"","/")});
 const json=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status});
+const memberPage=(items:unknown[])=>json({items,totalElements:items.length,totalMembers:items.length,totalPages:items.length?1:0,page:0,size:3});
 it("uses membership roles rather than global ORGANIZER and clears the old organization on switch",async()=>{
- const fetch=vi.fn(async(input:RequestInfo|URL)=>{const p=String(input);if(p.includes("/me/organizations"))return json([{id:"a",name:"Society",role:"ORG_ADMIN"},{id:"b",name:"Training",role:"MEMBER"}]);if(p.includes("/events?"))return json({items:[],totalElements:0,totalPages:0});if(p.endsWith("invitations"))return json([]);if(p.includes("/a/"))return json([{userId:"alice",username:"Alice",email:"a@test",role:"ORG_ADMIN",status:"ACTIVE",version:0}]);return json([{userId:"bob",username:"Bob",email:"b@test",role:"MEMBER",status:"ACTIVE",version:0}]);});vi.stubGlobal("fetch",fetch);
+ const fetch=vi.fn(async(input:RequestInfo|URL)=>{const p=String(input);if(p.includes("/me/organizations"))return json([{id:"a",name:"Society",role:"ORG_ADMIN"},{id:"b",name:"Training",role:"MEMBER"}]);if(p.includes("/events?"))return json({items:[],totalElements:0,totalPages:0});if(p.endsWith("invitations"))return json([]);if(p.includes("/a/")&&p.includes("/members?"))return memberPage([{userId:"alice",username:"Alice",email:"a@test",role:"ORG_ADMIN",status:"ACTIVE",version:0}]);if(p.includes("/members?"))return memberPage([{userId:"bob",username:"Bob",email:"b@test",role:"MEMBER",status:"ACTIVE",version:0}]);return json([]);});vi.stubGlobal("fetch",fetch);
  render(<MemoryRouter initialEntries={["/organizations?organizationId=a&section=members"]}><OrganizationsPage/></MemoryRouter>);
  await screen.findByText("Alice");expect(screen.getByRole("link",{name:"Events"}).getAttribute("href")).toContain("organizationId=a");
  fireEvent.click(screen.getByRole("button",{name:/Training/}));fireEvent.click(await screen.findByRole("link",{name:"Members"}));await screen.findByText("Bob");expect(screen.queryByText("Alice")).toBeNull();expect(screen.queryByRole("link",{name:"Manage events →"})).toBeNull();expect(screen.queryByRole("button",{name:"Send invitation"})).toBeNull();
 });
 it("shows an account-bound invitation link only after successful creation",async()=>{
- let created=false;const fetch=vi.fn(async(input:RequestInfo|URL,opts?:RequestInit)=>{const p=String(input);if(opts?.method==="POST"){created=true;return json({token:"secret-invite",id:"i",expiresAt:"2099-01-01T00:00:00Z"});}if(p.endsWith("/invitations")&&created)return json([{id:"i",email:"member@example.com",role:"MEMBER",status:"PENDING",expiresAt:"2099-01-01T00:00:00Z"}]);if(p.includes("/me/organizations"))return json([{id:"a",name:"Society",role:"ORG_ADMIN"}]);return json([])});vi.stubGlobal("fetch",fetch);render(<MemoryRouter initialEntries={["/organizations?organizationId=a&section=members"]}><OrganizationsPage/></MemoryRouter>);fireEvent.change(await screen.findByLabelText("Email"),{target:{value:"member@example.com"}});fireEvent.click(screen.getByRole("button",{name:"Send invitation"}));await screen.findByDisplayValue(/invitations\/accept#secret-invite/);expect(JSON.parse(fetch.mock.calls.find(c=>c[1]?.method==="POST")![1]!.body as string)).toEqual({email:"member@example.com",role:"MEMBER"});
+ let created=false;const fetch=vi.fn(async(input:RequestInfo|URL,opts?:RequestInit)=>{const p=String(input);if(opts?.method==="POST"){created=true;return json({token:"secret-invite",id:"i",expiresAt:"2099-01-01T00:00:00Z"});}if(p.endsWith("/invitations")&&created)return json([{id:"i",email:"member@example.com",role:"MEMBER",status:"PENDING",expiresAt:"2099-01-01T00:00:00Z"}]);if(p.includes("/me/organizations"))return json([{id:"a",name:"Society",role:"ORG_ADMIN"}]);if(p.includes("/members?"))return memberPage([]);return json([])});vi.stubGlobal("fetch",fetch);render(<MemoryRouter initialEntries={["/organizations?organizationId=a&section=members"]}><OrganizationsPage/></MemoryRouter>);fireEvent.change(await screen.findByLabelText("Email"),{target:{value:"member@example.com"}});fireEvent.click(screen.getByRole("button",{name:"Send invitation"}));await screen.findByDisplayValue(/invitations\/accept#secret-invite/);expect(JSON.parse(fetch.mock.calls.find(c=>c[1]?.method==="POST")![1]!.body as string)).toEqual({email:"member@example.com",role:"MEMBER"});
 });
 it("accepts a token from the URL fragment and removes it after success",async()=>{
  window.history.replaceState(null,"","/invitations/accept#bound-token");const fetch=vi.fn(async()=>new Response(null,{status:204}));vi.stubGlobal("fetch",fetch);render(<MemoryRouter><AcceptInvitationPage/></MemoryRouter>);fireEvent.click(screen.getByRole("button",{name:"Accept invitation"}));await screen.findByText(/Invitation accepted/);expect(window.location.hash).toBe("");expect(fetch.mock.calls).toHaveLength(1);
@@ -36,7 +37,7 @@ it("defaults to scoped events and separates member management",async()=>{
   const p=String(input);
   if(p.includes("/me/organizations"))return json([{id:"a",name:"Society",role:"ORG_ADMIN"}]);
   if(p.includes("/organizer/events?"))return json({items:[{id:"e",title:"Society seminar",startsAt:"2030-01-01T00:00:00Z",location:"Campus",status:"DRAFT",visibility:"ORGANIZATION_ONLY"}],totalElements:1,totalPages:1});
-  return json([]);
+  if(p.includes("/members?"))return memberPage([]);return json([]);
  });vi.stubGlobal("fetch",fetch);
  const {container}=render(<MemoryRouter initialEntries={["/organizations?organizationId=a"]}><OrganizationsPage/></MemoryRouter>);
  await screen.findByText("Society seminar");
@@ -64,7 +65,7 @@ it("uses member discovery without manager controls",async()=>{
 });
 
 it("explains duplicate members before creating an invitation",async()=>{
- const fetch=vi.fn(async(input:RequestInfo|URL)=>String(input).includes("/me/organizations")?json([{id:"a",name:"Society",role:"ORG_ADMIN"}]):String(input).endsWith("/members")?json([{userId:"m",username:"Team",email:"tm10@123.com",role:"MEMBER",status:"ACTIVE",version:0}]):json([]));
+ const fetch=vi.fn(async(input:RequestInfo|URL)=>String(input).includes("/me/organizations")?json([{id:"a",name:"Society",role:"ORG_ADMIN"}]):String(input).includes("/members?")?memberPage([{userId:"m",username:"Team",email:"tm10@123.com",role:"MEMBER",status:"ACTIVE",version:0}]):json([]));
  vi.stubGlobal("fetch",fetch);
  render(<MemoryRouter initialEntries={["/organizations?organizationId=a&section=members"]}><OrganizationsPage/></MemoryRouter>);
  await screen.findByText("Team");
@@ -75,7 +76,7 @@ it("explains duplicate members before creating an invitation",async()=>{
 });
 
 it("shows registration guidance returned by the invitation endpoint",async()=>{
- vi.stubGlobal("fetch",vi.fn(async(input:RequestInfo|URL,opts?:RequestInit)=>opts?.method==="POST"?json({detail:"This email is not registered. Ask the person to create an account first, then invite them again."},404):String(input).includes("/me/organizations")?json([{id:"a",name:"Society",role:"ORG_ADMIN"}]):json([])));
+ vi.stubGlobal("fetch",vi.fn(async(input:RequestInfo|URL,opts?:RequestInit)=>opts?.method==="POST"?json({detail:"This email is not registered. Ask the person to create an account first, then invite them again."},404):String(input).includes("/me/organizations")?json([{id:"a",name:"Society",role:"ORG_ADMIN"}]):String(input).includes("/members?")?memberPage([]):json([])));
  render(<MemoryRouter initialEntries={["/organizations?organizationId=a&section=members"]}><OrganizationsPage/></MemoryRouter>);
  fireEvent.change(await screen.findByLabelText("Email"),{target:{value:"new@example.com"}});
  fireEvent.click(screen.getByRole("button",{name:"Send invitation"}));

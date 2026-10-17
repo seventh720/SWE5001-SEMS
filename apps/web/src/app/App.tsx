@@ -1,3 +1,4 @@
+import {OrganizationMembersPage} from "../features/organizations/OrganizationMembersPage";
 import {NotificationBell,NotificationsPage} from "../features/notifications/Notifications";
 import {OrganizationsPage,AdminOrganizationsPage,AcceptInvitationPage} from "../features/organizations/OrganizationsPage";
 import {StaffTasksPage,CheckInPage,EventStaffPage} from "../features/organizations/StaffPage";
@@ -309,7 +310,7 @@ export function App() {
           <Route path="/events/:id" element={<PublicEventDetail />} />
           <Route path="/login" element={<AuthPage />} />
           <Route element={<ProtectedRoute />}>
-            <Route path="/organizations" element={<OrganizationsPage/>}/><Route path="/admin/organizations" element={<AdminOrganizationsPage/>}/><Route path="/invitations/accept" element={<AcceptInvitationPage/>}/><Route path="/staff" element={<StaffTasksPage/>}/><Route path="/staff/events/:id" element={<CheckInPage/>}/><Route path="/organizer/events/:id/staff" element={<EventStaffPage/>}/>
+            <Route path="/organizations" element={<OrganizationsPage/>}/><Route path="/organizations/:id/members" element={<OrganizationMembersPage/>}/><Route path="/admin/organizations" element={<AdminOrganizationsPage/>}/><Route path="/invitations/accept" element={<AcceptInvitationPage/>}/><Route path="/staff" element={<StaffTasksPage/>}/><Route path="/staff/events/:id" element={<CheckInPage/>}/><Route path="/organizer/events/:id/staff" element={<EventStaffPage/>}/>
             <Route path="/notifications" element={<NotificationsPage/>}/><Route path="/profile" element={<ProfilePage />} />
             <Route
               path="/pre-registrations"

@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import com.sems.platform.admission.BookingContracts.Booking;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.web.server.ResponseStatusException;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class BookingListTest {
@@ -20,12 +18,12 @@ class BookingListTest {
         var service=new BookingService(jdbc,new ObjectMapper());
         for (String status : List.of("CONFIRMED","CANCELLED")) {
             when(jdbc.queryForObject(anyString(),eq(Long.class),eq(user),eq(status))).thenReturn(12L);
-            when(jdbc.query(anyString(),ArgumentMatchers.<RowMapper<Booking>>any(),eq(user),eq(status),eq(10),eq(10L))).thenReturn(List.of());
+            when(jdbc.query(anyString(),org.mockito.ArgumentMatchers.<RowMapper<Booking>>any(),eq(user),eq(status),eq(10),eq(10L))).thenReturn(List.of());
             var result=service.list(user,1,10,status);
             assertEquals(12,result.totalElements());
             assertEquals(2,result.totalPages());
             verify(jdbc).queryForObject("SELECT count(*) FROM bookings WHERE user_id=? AND status=?",Long.class,user,status);
-            verify(jdbc).query(eq("SELECT * FROM bookings WHERE user_id=? AND status=? ORDER BY created_at DESC,id DESC LIMIT ? OFFSET ?"),ArgumentMatchers.<RowMapper<Booking>>any(),eq(user),eq(status),eq(10),eq(10L));
+            verify(jdbc).query(eq("SELECT * FROM bookings WHERE user_id=? AND status=? ORDER BY created_at DESC,id DESC LIMIT ? OFFSET ?"),org.mockito.ArgumentMatchers.<RowMapper<Booking>>any(),eq(user),eq(status),eq(10),eq(10L));
         }
     }
     @Test void invalidStatusIsRejectedBeforeQuerying() {
@@ -39,7 +37,7 @@ class BookingListTest {
         var jdbc=mock(JdbcTemplate.class);
         var user=UUID.randomUUID();
         when(jdbc.queryForObject(anyString(),eq(Long.class),eq(user))).thenReturn(0L);
-        when(jdbc.query(anyString(),ArgumentMatchers.<RowMapper<Booking>>any(),eq(user),eq(10),eq(0L))).thenReturn(List.of());
+        when(jdbc.query(anyString(),org.mockito.ArgumentMatchers.<RowMapper<Booking>>any(),eq(user),eq(10),eq(0L))).thenReturn(List.of());
         var result=new BookingService(jdbc,new ObjectMapper()).list(user,0,10,null);
         assertEquals(0,result.totalElements());
         verify(jdbc).queryForObject("SELECT count(*) FROM bookings WHERE user_id=?",Long.class,user);

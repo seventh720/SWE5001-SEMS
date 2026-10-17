@@ -136,6 +136,7 @@ export function DraftsPage() {
         {},
         token!,
       );
+      if(!template&&["CANCELLING","CANCELLED"].includes(d.status))throw new Error("This event is cancelled or cancellation is pending. Open publication management to view its status.");
       const i = template ? {version:0,ticketTypes:[]} : await apiRequest<TicketInventory>(`/api/v1/organizer/events/${id}/ticket-types`,{},token!);
       if(d.organizationId)setOrganizationId(d.organizationId);
       setInventory(i);

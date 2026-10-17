@@ -8,7 +8,7 @@ assert call('GET','/api/v1/me/organizations',token=attendee)==[]
 call('POST','/api/v1/organizer/events',{**body,'organizationId':org_b['id']},a,404)
 call('GET',f"/api/v1/organizations/{org_a['id']}/members",token=b,expected=403)
 # Last admin and optimistic membership versions.
-members=call('GET',f"/api/v1/organizations/{org_a['id']}/members",token=a)
+members=call('GET',f"/api/v1/organizations/{org_a['id']}/members",token=a)['items']
 owner=next(m for m in members if m['userId']==users[0]['id'])
 mp=f"/api/v1/organizations/{org_a['id']}/members/{users[0]['id']}"
 call('PUT',mp,{**owner,'role':'MEMBER'},a,409)
@@ -51,6 +51,12 @@ call('PUT',sp,{'userId':users[1]['id'],'active':True},a,404)
 call('PUT',sp,{'userId':users[2]['id'],'active':True},a,204)
 assert private['id'] in [t['eventId'] for t in call('GET','/api/v1/me/staff-assignments',token=attendee)]
 checkpath='/api/v1/events/'+private['id']+'/check-ins'
+# Too early: reject without recording attendance. Then reschedule into the opening window.
+call('POST',checkpath,{'credential':booked['tickets'][0]['credential']},attendee,409)
+assert call('GET',pp+'/summary',token=a)['attendance']==0
+near_start=datetime.datetime.now(datetime.timezone.utc)+datetime.timedelta(minutes=10)
+private=call('GET',pp,token=a)
+private=call('PUT',pp+'/revision',{**private,'startsAt':near_start.isoformat(),'endsAt':(near_start+datetime.timedelta(hours=1)).isoformat()},a)
 with concurrent.futures.ThreadPoolExecutor(8) as pool:
  checks=list(pool.map(lambda _:call('POST',checkpath,{'credential':booked['tickets'][0]['credential']},attendee),range(12)))
 assert sum(not c['alreadyCheckedIn'] for c in checks)==1
@@ -62,7 +68,7 @@ ob=call('POST','/api/v1/bookings',req(other,ot),attendee)
 call('POST',checkpath,{'credential':ob['tickets'][0]['credential']},attendee,404)
 call('POST','/api/v1/events/'+other['id']+'/check-ins',{'credential':ob['tickets'][0]['credential']},attendee,403)
 # Remove membership with the existing JWT: all organization-specific grants stop.
-member=next(m for m in call('GET',f"/api/v1/organizations/{org_a['id']}/members",token=a) if m['userId']==users[2]['id'])
+member=next(m for m in call('GET',f"/api/v1/organizations/{org_a['id']}/members",token=a)['items'] if m['userId']==users[2]['id'])
 memberpath=f"/api/v1/organizations/{org_a['id']}/members/{users[2]['id']}"
 call('PUT',memberpath,{**member,'status':'REMOVED'},a,204)
 call('GET','/api/v1/events/'+private['id'],token=attendee,expected=404)

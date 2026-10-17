@@ -1,0 +1,3 @@
+identity: tests=6, failures=0, errors=0, skipped=0
+event-catalog: tests=11, failures=0, errors=0, skipped=0
+admission: tests=15, failures=0, errors=0, skipped=0

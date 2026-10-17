@@ -26,6 +26,14 @@ public class ApiExceptionHandler {
                 "This record was changed by another request. Reload before editing.");
     }
 
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    ProblemDetail closedOrganization(org.springframework.dao.DataIntegrityViolationException exception) {
+        for(Throwable cause=exception;cause!=null;cause=cause.getCause())
+            if(cause instanceof org.hibernate.exception.ConstraintViolationException violation && "organization_closure_fence".equals(violation.getConstraintName()))
+                return problem(HttpStatus.CONFLICT,"Organization closing","Organization closure has started. New event changes are no longer allowed.");
+        throw exception;
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     ProblemDetail requestFailure(ResponseStatusException exception) {
         return exception.getBody();

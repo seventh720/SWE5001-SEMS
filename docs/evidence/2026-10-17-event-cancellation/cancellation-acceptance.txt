@@ -1,0 +1,22 @@
+ Container sems-cancellation-review-admission-1 Stopping
+ Container sems-cancellation-review-admission-2 Stopping
+ Container sems-cancellation-review-admission-2 Stopped
+ Container sems-cancellation-review-admission-1 Stopped
+ Container sems-cancellation-review-event-catalog-1 Restarting
+ Container sems-cancellation-review-event-catalog-1 Started
+ Container sems-cancellation-review-postgres-1 Waiting
+ Container sems-cancellation-review-postgres-1 Healthy
+ Container sems-cancellation-review-admission-2 Starting
+ Container sems-cancellation-review-admission-2 Started
+ Container sems-cancellation-review-admission-1 Starting
+ Container sems-cancellation-review-admission-1 Started
+ Container sems-cancellation-review-gateway-1 Restarting
+ Container sems-cancellation-review-gateway-1 Started
+Ready through gateway: identity
+Ready through gateway: event-catalog
+Ready through gateway: admission
+PASS: registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits
+PASS: cancellation permissions/version, double-instance booking/check-in/personal-cancel races, ticket invalidation, checked-in history, closed pre-registration, deduplicated notifications and terminal guards
+PASS: pause preserves tickets; whole-event cancellation invalidates them
+PASS: late transaction failure rolls back all effects and recovers after repair
+PASS: Admission outage, Catalog restart, automatic recovery, lost acknowledgement and replay without duplicate effects
