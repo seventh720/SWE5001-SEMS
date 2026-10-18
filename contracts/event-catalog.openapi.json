@@ -2,8 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SEMS Event Catalog API",
-    "version": "0.7.0",
-    "description": "Draft management and durable publication. ORGANIZER/ADMIN cannot bypass ownership. Starting ticket setup fixes time and capacity; other draft details remain editable until publication. All published configuration is immutable in this release."
+    "version": "0.9.0",
+    "description": "Organization-scoped event management, recoverable publication, revisions and terminal whole-event cancellation."
   },
   "servers": [
     {
@@ -272,7 +272,9 @@
               "PUBLISHING",
               "PUBLISHED",
               "UPDATING",
-              "PAUSED"
+              "PAUSED",
+              "CANCELLING",
+              "CANCELLED"
             ]
           },
           "createdAt": {
@@ -334,6 +336,11 @@
           "createdBy": {
             "type": "string",
             "format": "uuid"
+          },
+          "cancellationReason": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 500
           }
         },
         "required": [
@@ -1542,6 +1549,160 @@
           },
           "503": {
             "description": "Membership lookup unavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/organizer/events/{id}/cancel": {
+      "post": {
+        "summary": "Permanently cancel a published or paused event",
+        "description": "Organization managers only. Persists CANCELLING before contacting Admission. Pending operations recover automatically; all confirmed bookings and unused tickets are cancelled, historical check-ins retained. A replay must use the original version and reason. Pending publication/revision must complete first. This terminal operation cannot be resumed.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "version",
+                  "reason"
+                ],
+                "properties": {
+                  "version": {
+                    "type": "integer",
+                    "format": "int64",
+                    "minimum": 0
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cancellation completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Cancellation durably pending; poll organizer detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Event not visible to manager"
+          },
+          "409": {
+            "description": "Stale version, incompatible state or different prior cancellation"
+          }
+        }
+      }
+    },
+    "/internal/v1/organization-closures/{id}": {
+      "post": {
+        "summary": "Fence organization event writes and advance permanent closure",
+        "description": "Identity-only organization service token (ORGANIZATION_ACCESS_TOKEN), distinct from Admission inbound token. Immutable operation ID and requestedAt. Stages cancellation of events unfinished at requestedAt, waits for prior publication/revision and cancellation to settle. Retries are safe; no transaction spans HTTP. Public gateway denies this route.",
+        "security": [
+          {
+            "serviceToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "organizationId",
+                  "operationId",
+                  "requestedAt"
+                ],
+                "properties": {
+                  "organizationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "operationId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "requestedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Durable progress result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "complete"
+                  ],
+                  "properties": {
+                    "complete": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid internal token"
+          },
+          "409": {
+            "description": "Operation identity/payload mismatch"
           }
         }
       }

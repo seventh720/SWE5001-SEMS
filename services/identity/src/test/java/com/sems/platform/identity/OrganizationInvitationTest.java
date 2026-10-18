@@ -20,7 +20,7 @@ class OrganizationInvitationTest {
  }
  @Test void existingMemberIsRejectedWithoutCreatingAnInvitation(){
   var jdbc=mock(JdbcTemplate.class);var org=UUID.randomUUID();var actor=UUID.randomUUID();var user=UUID.randomUUID();
-  when(jdbc.queryForList("SELECT id FROM organizations WHERE id=? FOR UPDATE",org)).thenReturn(List.of(Map.of("id",org)));
+  when(jdbc.queryForList("SELECT id FROM organizations WHERE id=? AND status<>'DELETED' FOR UPDATE",org)).thenReturn(List.of(Map.of("id",org)));
   when(jdbc.queryForList("SELECT id,status FROM users WHERE lower(email)=?","member@example.com")).thenReturn(List.of(Map.of("id",user,"status","ACTIVE")));
   when(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM organization_memberships WHERE organization_id=? AND user_id=? AND status IN ('ACTIVE','SUSPENDED'))",Boolean.class,org,user)).thenReturn(true);
   var service=spy(new OrganizationService(jdbc));doNothing().when(service).require(org,actor,true);

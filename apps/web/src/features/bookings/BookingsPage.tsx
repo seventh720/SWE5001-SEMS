@@ -18,6 +18,7 @@ export interface Booking {
   quantity: number;
   amount: number;
   attendeeInfo?: AttendeeInfo;
+  eventCancellationReason?: string | null;
   customFieldLabel?: string | null;
   tickets: { id: string; credential: string; state: string }[];
 }
@@ -220,9 +221,9 @@ export function BookingDetail() {
         <>
           <p className="eyebrow">BOOKING / {booking.status}</p>
           <h1>{booking.eventTitle}</h1>
-          <Link to={`/events/${booking.eventId}`}>
+          {!booking.eventCancellationReason&&<Link to={`/events/${booking.eventId}`}>
             View current event details →
-          </Link>
+          </Link>}
           <p>
             {booking.eventLocation} · {formatDateTime(booking.startsAt)}
           </p>
@@ -232,13 +233,12 @@ export function BookingDetail() {
           <p className="muted">Booking reference: {booking.id}</p>
           {booking.status === "CANCELLED" ? (
             <p role="status">
-              Booking cancelled. Its tickets are no longer valid and the places
-              have been returned.
+              {booking.eventCancellationReason?`Event cancelled: ${booking.eventCancellationReason} Tickets are no longer valid. Previous check-ins are retained as history.`:"Booking cancelled. Its tickets are no longer valid and the places have been returned."}
             </p>
           ) : (
             <p>
               Each ticket admits one person. Keep its QR and manual code
-              private. Staff check-in is being added in the next increment.
+              private. Show your QR code to event staff for check-in.
             </p>
           )}
           <section className="card">
@@ -253,7 +253,7 @@ export function BookingDetail() {
               <article className="card issued-ticket" key={ticket.id}>
                 <span className="badge">{ticket.state}</span>
                 <h2>Ticket {n + 1}</h2>
-                {ticket.state === "VALID" ? (
+                {booking.status === "CONFIRMED" && ticket.state === "VALID" ? (
                   <TicketCode credential={ticket.credential} />
                 ) : (
                   <p>

@@ -1,25 +1,17 @@
 # Smart Event Management and Ticketing Platform
 
-
-> Organization upgrade: organization-scoped roles, internal offerings, invitations and event staff/check-in are implemented. Existing installations require a coordinated maintenance migration before using this version. See [upgrade and validation](docs/organization-upgrade.md). Older increment notes below describe prior releases.
-
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-SEMS is a shared event and ticketing platform for independent organizers and attendees, using React + TypeScript, three independent Spring Boot services and PostgreSQL.
+SEMS is a shared event and ticketing platform built with React/TypeScript, three Spring Boot services and PostgreSQL.
 
-Implemented: registration/login, RSA JWT, administrator role assignment, organizer draft creation/list/detail/edit, owner isolation and optimistic version conflicts. Free ticket configuration, quota/sales-window validation, retry-safe publication and public event browsing are also implemented. Retry-safe free booking, attendee cancellation and individual QR/manual-code tickets are implemented. Staff assignment/check-in, event-wide cancellation and organizer summaries remain pending.
+Implemented: organizations and memberships, publication/editing/pause, free bookings, individual QR tickets, attendee and whole-event cancellation, assigned-staff check-in, basic summaries and in-app notifications. A [Lightsail HTTPS staging environment](docs/cloud-staging.md) is deployed. Scaling/recovery experiments, automated deployment and security delivery gates remain outstanding. See the [proposal review and next steps](docs/implementation-plan.zh-CN.md) (Chinese).
 
-## 1. Architecture and roles
+Platform-role revocation, recoverable organization closure and server-side member pagination are now implemented. Deployment automation, security gates and cloud measurements remain; see the [current review](docs/implementation-plan.zh-CN.md#本轮整体检查还不只是部署).
+## 1. Architecture and permissions
 
-| Service | Data ownership | Status |
-|---|---|---|
-| Identity | Accounts, passwords, roles | Implemented |
-| Event Catalog | Organizer-owned event drafts | Implemented |
-| Admission | Inventory, bookings, tickets, check-in | Free ticket inventory and sales activation |
+Identity owns accounts, organizations, memberships and invitations. Event Catalog owns events, visibility, publication and revisions. Admission owns inventory, bookings, tickets, check-in and notifications. Each service has separate schemas, credentials and migrations; cross-service operations use authenticated HTTP.
 
-Each service owns a schema, database account and Flyway migrations, with no cross-service foreign keys or queries. Only Identity holds the RSA private key; the other services validate signatures, issuer, audience and token lifetime using the public key.
-
-Roles are `ATTENDEE`, `ORGANIZER`, `STAFF` and `ADMIN`. Registration grants ATTENDEE; administrators assign roles. ADMIN does not bypass event ownership. Sign in again after role changes; existing tokens remain valid for up to 30 minutes. Immediate revocation is not implemented.
+Platform ADMIN manages platform accounts and organization provisioning. Organization ORG_ADMIN, ORGANIZER and MEMBER roles govern business access; check-in also requires event assignment. Legacy global ORGANIZER/STAFF claims do not grant business access. Existing installations must follow the [organization upgrade](docs/organization-upgrade.md) and [notification deployment](docs/in-app-notifications.md) instructions.
 
 ## 2. Local setup
 
@@ -49,48 +41,38 @@ For frontend development, run `npm --prefix apps/web run dev`; port 15173 proxie
 
 This is local HTTP configuration. Cloud HTTPS, secret management and deployment remain pending.
 
-## 3. Acceptance walkthrough
+## 3. 验收流程 / Acceptance walkthrough
 
-1. Register two accounts.
-2. Sign in as admin, open “Manage users and roles”, grant ORGANIZER to both accounts and save.
-3. Sign in again as each organizer and open “My events”.
-4. Create a draft, refresh and edit it. The second organizer must not see the first organizer’s draft.
-5. Edit one draft in two windows: a stale submission returns a conflict and can reload the latest version.
-
-6. Edit event details and ticket types together, then save using the buttons below ticket settings.
-7. Confirm publication and open the public event page. A dependency outage leaves the event pending/private until automatic recovery completes.
-8. Use an attendee account to book an open ticket type (1–10 places). Open **My tickets** from the home page or Explore menu to see each QR/manual code.
-9. Cancel before event start; all tickets in that booking become invalid and inventory is returned once. Retrying an uncertain request uses the same saved key. Staff check-in is not available yet.
+1. 注册组织管理员、成员、参与者账号；平台管理员创建两个组织并指定管理员。
+2. 组织管理员邀请成员，成员在 Notifications 接受；创建 seminar 与 workshop，配置免费票种并发布。
+3. 参与者浏览、预订并查看二维码/手动票码；检查他人和其他组织无法访问管理数据。
+4. 为活动分配工作人员，核销票码两次，确认 attendance 仅增加一次；检查未分配人员被拒绝。
+5. 取消另一笔尚未签到且未开始的订单，检查库存仅释放一次；演示暂停/恢复与第三组织无代码入驻。
 
 ## 4. Tests and CI
 
-
 ```bash
 mvn verify
-npm --prefix apps/web test
+npm --prefix apps/web run test:coverage
 npm --prefix apps/web run build
-bash scripts/check-db-isolation.sh
-set -a
-source .env
-set +a
-python3 scripts/registration-acceptance.py
 ```
 
-The last two checks need a running Compose stack. Publication acceptance intentionally stops/restarts test containers; use a disposable environment. Acceptance creates uniquely named test accounts and drafts; use an isolated test volume. CI exposes separate backend, frontend and integration jobs, reports JaCoCo/Vitest line and branch coverage, and runs these checks in an ephemeral environment, covering authentication, authorization, schema isolation, validation, persistence and concurrent version conflicts. Telegram reports results; logs/JARs are retained for seven days. See [CI operations](docs/ci.md).
+数据库/API 验收需要独立、可丢弃的 Compose 环境；部分脚本会停止服务、重启及制造故障。完整入口、隔离要求和现有流水线能力见 [CI operations](docs/ci.md)。历史证据见 [docs/evidence](docs/evidence/)。
 
 ## 5. Layout and documentation
 
-- `services/`: independent backend services and migrations.
-- `apps/web/`: React application and UI tests.
-- `contracts/`: current OpenAPI specifications.
-- `deployment/`: gateway, database initialization and Compose.
-- `scripts/`: local setup, readiness and acceptance checks.
-- [Implementation plan](docs/implementation-plan.zh-CN.md)
-- [API contracts](contracts/README.md)
-- [Architecture](docs/adr/0001-service-boundaries.md)
-- [Acceptance targets](docs/acceptance-matrix.md)
+- `services/` — backend services, migrations and tests.
+- `apps/web/` — frontend and UI tests.
+- `contracts/` — [OpenAPI contracts](contracts/README.md).
+- `deployment/` — local Compose, gateway and database setup.
+- `scripts/` — setup and reusable acceptance checks.
+- [文档索引 / Documentation index](docs/README.md)
+- [Proposal 对照与下一步](docs/implementation-plan.zh-CN.md)
+- [当前业务规则](docs/functional-guide.md)
+- [架构决策](docs/adr/0001-service-boundaries.md)
+- [验收矩阵](docs/acceptance-matrix.md)
 
-Use the team workflow below for changes. The proposal and its figures are maintained separately.
+Proposal 与配图独立存放，不纳入代码仓库。
 
 ## 6. Daily frontend and backend development
 
@@ -244,37 +226,3 @@ git push
 Start the next task only after the previous PR is merged, so unrelated changes do not accumulate in one PR. Short-lived task branches may use **Squash and merge** and be deleted afterward; start their next task from current `origin/main`. If repository settings permit only squash merges, use short-lived task branches for PRs instead of repeatedly squash-merging the persistent personal branch.
 
 These are team conventions; README changes do not enable GitHub protection. The repository administrator should configure `main` protection/rulesets to require PRs, one approval from another teammate, renewed approval after updates, resolved discussions and the three checks above, and prohibit force pushes/deletion. If automatic branch deletion is enabled, disable it or preserve/restore persistent personal branches such as `victor`.
-
-Booking design, API rules, migration notes and verification: [Booking increment](docs/booking-increment.md).
-
-## 9. Event presentation and registration details
-
-While editing a draft, choose an **Event category** and an independent **Card background** (Lilac, Lime, Peach or Sky). The public catalog filters categories together with title search. Background artwork is generated locally and supports the existing motion toggle/reduced-motion setting.
-
-Under **Registration information**, select only the contact fields the event requires: full name, contact email, phone, student ID, passport number, and/or one custom question. One contact covers all places in a booking. These settings can change in drafts and become fixed on publication. Attendees submit the requested fields when booking; **My tickets** shows the historical information. Organizers open **Registration list** from their event card; other organizers cannot access it, and ticket credentials are excluded.
-
-Use the English calendar, hour/minute controls or type `YYYY-MM-DD HH:mm`. All event and sales times are explicitly Singapore time; existing UTC instants are unchanged. The components reject impossible dates and invalid time ranges.
-
-Deploy Catalog (V3 migration), then Admission (V4), then gateway/Web; do not serve registration-required events through older Admission writers. Existing rows default to General/Lilac with no requested registration fields; old orders retain empty information. No existing migration is edited.
-
-[Implementation and language/theme effort assessment](docs/registration-and-display.md). Language/theme switching is assessed, not implemented.
-
-## 10. Profile, pre-registration and countdowns
-
-Open **My profile** to update your username and manage named contacts under **Saved registration details**. **Apply saved details** lets you choose a contact, then review the requested fields before booking. Student IDs and custom answers are not saved in reusable contacts. Each order still has one booking contact. Event details and ticket settings now share one editor; **Publication preview** reviews the saved configuration before publishing. See [contacts and editor behavior](docs/saved-contacts-and-editor.md).
-
-Before a ticket's opening time, **Save pre-registration** saves one selection per user/event without holding inventory. **My pre-registrations** shows an opening countdown and a review link. At opening, the form switches to **Confirm free booking**; confirmation is always manual and availability is checked again by Admission. Successful booking removes the matching pre-registration in the same transaction. Removing a pre-registration does not cancel a booking.
-
-Event cards separate category, date, venue and description; details show event-start and registration opening/closing countdowns. All times remain Singapore time. Countdown updates are informational and do not override server-side time or capacity checks.
-
-Upgrade Identity V2 and Admission V5 using newly built service jars, then rebuild the Web dist before its Docker image and restart the gateway. Database port stays **15432**. Full regression: `python3 scripts/pre-registration-acceptance.py` against an isolated test stack. See [design and verification](docs/pre-registration-increment.md).
-
-## 11. Workspaces and offering reuse
-
-Signed-in Home is a role-aware Dashboard with upcoming confirmed bookings and saved pre-registrations. Organizer and administrator tools appear only for the corresponding roles; staff check-in remains pending. Explore is a compact right-anchored navigation panel.
-
-**My events → Publication preview / Publication management → Edit details & tickets** opens only the selected event. Save applies details and ticket changes together; published edits go live automatically, while drafts and paused events retain their status. Registration information stays locked after first publication. Pause/resume is explicit and existing tickets remain valid. Quotas cannot fall below issued places, and referenced ticket types cannot be deleted. See [publication management](docs/publication-management.md).
-
-[Platform positioning and organization onboarding](docs/platform-positioning.md) explains the shared platform, two organizer scenarios and the boundary between account ownership and enterprise tenancy. Full regression now runs `python3 scripts/workspace-acceptance.py` in an isolated test environment.
-
-Schedule updates add Catalog V4 and Admission V6 migrations. Deploy Admission first, then Catalog, then Web. Pending updates recover automatically. See [schedule revision semantics and verification](docs/schedule-revision.md).

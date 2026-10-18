@@ -25,3 +25,28 @@ it.each([["PUBLISHED","Pause publication","Confirm pause","PAUSED"],["PAUSED","R
 it("reports pending synchronization without claiming publication completed",async()=>{
  fetchMock.mockResolvedValueOnce(response(event)).mockResolvedValueOnce(response(inventory)).mockResolvedValueOnce(response({...event,status:"PUBLISHING"},202));mount();fireEvent.click(await screen.findByRole("button",{name:"Publish event"}));fireEvent.click(screen.getByRole("button",{name:"Confirm publication"}));await screen.findByText(/Publication change is syncing/);expect(screen.queryByRole("link",{name:"View event"})).toBeNull();
 });
+it("requires a reason for permanent cancellation and removes edit/resume controls",async()=>{
+ fetchMock.mockResolvedValueOnce(response({...event,status:"PAUSED"})).mockResolvedValueOnce(response(inventory)).mockResolvedValueOnce(response({...event,status:"CANCELLED",cancellationReason:"Venue unavailable"}));mount();
+ fireEvent.click(await screen.findByRole("button",{name:"Cancel entire event"}));
+ const confirm=screen.getByRole("button",{name:"Confirm event cancellation"}) as HTMLButtonElement;
+ expect(confirm.disabled).toBe(true);
+ fireEvent.change(screen.getByLabelText("Cancellation reason"),{target:{value:"Venue unavailable"}});
+ fireEvent.click(confirm);await screen.findByText("Event cancelled. Tickets are invalid; history is retained.");
+ expect(fetchMock.mock.calls[2][0]).toBe("/api/v1/organizer/events/e1/cancel");
+ expect(JSON.parse(fetchMock.mock.calls[2][1]!.body as string)).toEqual({version:1,reason:"Venue unavailable"});
+ expect(screen.queryByRole("link",{name:"Edit details & tickets"})).toBeNull();
+ expect(screen.queryByRole("button",{name:"Resume publication"})).toBeNull();
+});
+it("shows durable pending cancellation without allowing edits or another cancellation",async()=>{
+ fetchMock.mockResolvedValueOnce(response({...event,status:"CANCELLING"})).mockResolvedValueOnce(response(inventory));mount();
+ await screen.findByText("CANCELLING");expect(screen.queryByRole("button",{name:"Cancel entire event"})).toBeNull();
+ expect(screen.queryByRole("link",{name:"Edit details & tickets"})).toBeNull();
+ expect((screen.getByRole("button",{name:"Cancellation pending"}) as HTMLButtonElement).disabled).toBe(true);
+});
+
+it("shows durable cancellation status even when ticket inventory is unavailable",async()=>{
+ fetchMock.mockResolvedValueOnce(response({...event,status:"CANCELLING",cancellationReason:"Venue unavailable"})).mockResolvedValueOnce(response({detail:"Admission unavailable"},503));mount();
+ await screen.findByText("CANCELLING");await screen.findByText("Syncing event status…");
+ expect(screen.getByText("Cancellation reason: Venue unavailable")).toBeTruthy();
+ await screen.findByRole("alert");expect(screen.queryByRole("button",{name:"Cancel entire event"})).toBeNull();
+});

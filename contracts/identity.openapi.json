@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "SEMS Identity API",
-    "version": "0.3.0"
+    "version": "0.9.0"
   },
   "servers": [
     {
@@ -222,7 +222,9 @@
             "type": "string",
             "enum": [
               "ACTIVE",
-              "SUSPENDED"
+              "CLOSING",
+              "SUSPENDED",
+              "DELETED"
             ]
           },
           "role": {
@@ -232,6 +234,15 @@
               "ORGANIZER",
               "MEMBER"
             ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "closureRequested": {
+            "type": "boolean",
+            "description": "True for permanent closure/deletion; these organizations cannot be reactivated or reassigned."
           }
         }
       },
@@ -359,6 +370,206 @@
           },
           "hasMore": {
             "type": "boolean"
+          }
+        }
+      },
+      "MembershipNotice": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "readAt": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "MembershipNoticePage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MembershipNotice"
+            }
+          },
+          "unreadCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        }
+      },
+      "OrganizationProfileUpdate": {
+        "type": "object",
+        "required": [
+          "name",
+          "slug",
+          "version"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{1,99}$"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "OrganizationRequestInput": {
+        "type": "object",
+        "required": [
+          "kind",
+          "reason",
+          "version"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "UPDATE",
+              "CLOSE"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "OrganizationReview": {
+        "type": "object",
+        "required": [
+          "approve",
+          "note"
+        ],
+        "properties": {
+          "approve": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      },
+      "OrganizationRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "organizationId": {
+            "type": "string"
+          },
+          "organizationName": {
+            "type": "string"
+          },
+          "requesterId": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "reviewNote": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "baseVersion": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "OrganizationMemberPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "size",
+          "totalElements",
+          "totalMembers",
+          "totalPages"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationMember"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "totalElements": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "totalMembers": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "totalPages": {
+            "type": "integer",
+            "minimum": 0
           }
         }
       }
@@ -660,7 +871,8 @@
               }
             }
           }
-        }
+        },
+        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry."
       }
     },
     "/api/v1/admin/users/{userId}/roles": {
@@ -753,7 +965,8 @@
               }
             }
           }
-        }
+        },
+        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry."
       }
     },
     "/api/v1/profile": {
@@ -1107,7 +1320,8 @@
           "503": {
             "description": "Authorization dependency unavailable"
           }
-        }
+        },
+        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry."
       },
       "post": {
         "summary": "Platform ADMIN: create organization and appoint an existing active account",
@@ -1168,7 +1382,8 @@
               }
             }
           }
-        }
+        },
+        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry."
       }
     },
     "/api/v1/admin/organizations/{org}": {
@@ -1230,22 +1445,64 @@
               "format": "uuid"
             }
           }
-        ]
+        ],
+        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry."
+      },
+      "delete": {
+        "summary": "Platform ADMIN: soft delete organization and revoke organization access; retain accounts/tickets",
+        "responses": {
+          "204": {
+            "description": "Permanent soft-deletion intent accepted. Organization enters CLOSING, then is removed once unfinished events are cancelled. Poll the admin organization list; personal/history records remain."
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Unavailable organization/request"
+          },
+          "409": {
+            "description": "Stale version, duplicate pending request, slug collision or already reviewed"
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        ],
+        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry."
       }
     },
     "/api/v1/organizations/{org}/members": {
       "get": {
-        "summary": "Active organization member: directory; mutation requires ORG_ADMIN",
+        "summary": "Search and page the organization member directory",
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "A bounded page, including total counts",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OrganizationMember"
-                  }
+                  "$ref": "#/components/schemas/OrganizationMemberPage"
                 }
               }
             }
@@ -1278,8 +1535,37 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "size",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 12
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "maxLength": 200,
+              "default": ""
+            }
           }
-        ]
+        ],
+        "description": "Live organization membership is required. Username/email search is case-insensitive and treats wildcard characters literally. Stable ordering by normalized username then user ID; totalElements is filtered and totalMembers is unfiltered."
       }
     },
     "/api/v1/organizations/{org}/members/{member}": {
@@ -1747,6 +2033,347 @@
             "description": "No longer actionable"
           }
         }
+      }
+    },
+    "/api/v1/me/membership-notifications": {
+      "get": {
+        "summary": "Read or acknowledge the authenticated user's organization role notifications",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembershipNoticePage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "400": {
+            "description": "Invalid page"
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/me/membership-notifications/unread-count": {
+      "get": {
+        "summary": "Read or acknowledge the authenticated user's organization role notifications",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      }
+    },
+    "/api/v1/me/membership-notifications/{id}/read": {
+      "post": {
+        "summary": "Read or acknowledge the authenticated user's organization role notifications",
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Notification not found or belongs to another user"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/me/membership-notifications/read-all": {
+      "post": {
+        "summary": "Read or acknowledge the authenticated user's organization role notifications",
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/organizations/{org}/profile": {
+      "put": {
+        "summary": "Platform ADMIN: edit organization name/address with version check",
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Unavailable organization/request"
+          },
+          "409": {
+            "description": "Stale version, duplicate pending request, slug collision or already reviewed"
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationProfileUpdate"
+              }
+            }
+          }
+        },
+        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry."
+      }
+    },
+    "/api/v1/organizations/{org}/requests": {
+      "post": {
+        "summary": "ORG_ADMIN: submit profile change or closure request",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationRequest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Unavailable organization/request"
+          },
+          "409": {
+            "description": "Stale version, duplicate pending request, slug collision or already reviewed"
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationRequestInput"
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "ORG_ADMIN: view organization request history",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationRequest"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Unavailable organization/request"
+          },
+          "409": {
+            "description": "Stale version, duplicate pending request, slug collision or already reviewed"
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/organizations/requests": {
+      "get": {
+        "summary": "Platform ADMIN: review pending and historical requests",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrganizationRequest"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Unavailable organization/request"
+          },
+          "409": {
+            "description": "Stale version, duplicate pending request, slug collision or already reviewed"
+          }
+        },
+        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry."
+      }
+    },
+    "/api/v1/admin/organizations/requests/{id}/review": {
+      "post": {
+        "summary": "Platform ADMIN: approve or reject a pending request",
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Unavailable organization/request"
+          },
+          "409": {
+            "description": "Stale version, duplicate pending request, slug collision or already reviewed"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrganizationReview"
+              }
+            }
+          }
+        },
+        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry. Approving CLOSE records a durable CLOSING operation; approval is not completion. Catalog/Admission cancellation and notifications complete before membership revocation and SUSPENDED. Recovery runs after outages/restarts."
+      }
+    },
+    "/internal/v1/organizations/active": {
+      "get": {
+        "summary": "Internal authenticated active organization directory for discovery and eligibility",
+        "responses": {
+          "200": {
+            "description": "Active organizations with current names"
+          },
+          "401": {
+            "description": "Missing/invalid service token"
+          }
+        },
+        "security": [
+          {
+            "serviceToken": []
+          }
+        ]
       }
     }
   }

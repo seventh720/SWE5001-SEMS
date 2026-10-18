@@ -9,12 +9,13 @@ const response=(value:unknown)=>new Response(JSON.stringify(value));
 it("counts pending invitations and unread updates in the navigation",async()=>{
  vi.stubGlobal("fetch",vi.fn(async(input)=>response(String(input).includes("pending-count")?2:3)));
  render(<MemoryRouter><NotificationBell/></MemoryRouter>);
- await screen.findByRole("link",{name:"Notifications, 5 unread or pending"});
+ await screen.findByRole("link",{name:"Notifications, 8 unread or pending"});
 });
 it("accepts an invitation in the inbox and keeps updates separate",async()=>{
  let accepted=false;
  const fetch=vi.fn(async(input,opts)=>{
   const p=String(input);
+  if(p.includes("membership-notifications"))return response({items:[],unreadCount:0,hasMore:false});
   if(opts?.method==="POST"){accepted=true;return new Response(null,{status:204})}
   if(p.includes("/invitations"))return response({items:[{id:"i",organizationId:"o",organizationName:"Student Society",role:"MEMBER",status:accepted?"ACCEPTED":"PENDING",expiresAt:"2099-01-01T00:00:00Z"}],pendingCount:accepted?0:1,hasMore:false});
   return response({items:[{id:"n",kind:"BOOKING_CONFIRMED",title:"Booking confirmed",message:"Seminar",link:"/bookings/b",createdAt:"2030-01-01T00:00:00Z",readAt:null}],unreadCount:1,hasMore:false});
@@ -34,4 +35,17 @@ it("keeps a rejected action visible",async()=>{
  render(<MemoryRouter><NotificationsPage/></MemoryRouter>);
  fireEvent.click(await screen.findByRole("button",{name:"Accept"}));
  await waitFor(()=>expect(screen.getByRole("alert").textContent).toContain("expired or revoked"));
+});
+it("shows organization role changes and marks only the recipient notice read",async()=>{
+ let read=false;
+ const fetch=vi.fn(async(input,opts)=>{
+  const path=String(input);
+  if(opts?.method==="POST"){read=true;return new Response(null,{status:204})}
+  if(path.includes("membership-notifications"))return response({items:[{id:"role1",kind:"ORGANIZATION_MEMBERSHIP",title:"Organization access updated: Society",message:"Your role changed from Member to Event organizer.",link:"/organizations?organizationId=o",createdAt:"2030-01-01T00:00:00Z",readAt:read?"2030-01-01T01:00:00Z":null}],unreadCount:read?0:1,hasMore:false});
+  return response(path.includes("invitations")?{items:[],pendingCount:0,hasMore:false}:{items:[],unreadCount:0,hasMore:false});
+ });vi.stubGlobal("fetch",fetch);render(<MemoryRouter><NotificationsPage/></MemoryRouter>);
+ await screen.findByText("Your role changed from Member to Event organizer.");
+ fireEvent.click(screen.getByRole("button",{name:"Mark role update as read"}));
+ await waitFor(()=>expect(screen.queryByRole("button",{name:"Mark role update as read"})).toBeNull());
+ expect(fetch.mock.calls.some(([p,o])=>String(p)==="/api/v1/me/membership-notifications/role1/read"&&o?.method==="POST")).toBe(true);
 });

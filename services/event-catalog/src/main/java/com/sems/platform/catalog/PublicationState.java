@@ -23,6 +23,7 @@ public class PublicationState {
         var e=events.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found"));
         if ((published&&(!e.status.equals("PUBLISHED")||!e.startsAt.isAfter(Instant.now()))))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found");
+        if(published)access.active(e.organizationId);
         if(!published)access.require(e.organizationId,owner,true);
         else if(e.visibility.equals("ORGANIZATION_ONLY"))access.require(e.organizationId,owner,false);
         return snapshot(e);

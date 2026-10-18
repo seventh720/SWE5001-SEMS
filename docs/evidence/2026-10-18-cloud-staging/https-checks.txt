@@ -1,0 +1,18 @@
+/ 200 bytes 470
+/health/identity 200 bytes 15
+/health/event-catalog 200 bytes 15
+/health/admission 200 bytes 15
+/api/v1/events 200 bytes 64
+Admin login: 200 response fields: accessToken,tokenType,expiresIn,user
+/internal/ 404
+/api/v1/admin/users 401
+NAME                      IMAGE                   COMMAND                  SERVICE         CREATED         STATUS                   PORTS
+swe5001-admission-1       swe5001-admission       "java -jar /app/app.…"   admission       7 minutes ago   Up 7 minutes             8083/tcp
+swe5001-caddy-1           caddy:2-alpine          "caddy run --config …"   caddy           7 minutes ago   Up 7 minutes             0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:443->443/tcp, [::]:443->443/tcp, 443/udp, 2019/tcp
+swe5001-event-catalog-1   swe5001-event-catalog   "java -jar /app/app.…"   event-catalog   7 minutes ago   Up 7 minutes             8082/tcp
+swe5001-gateway-1         nginx:1.28-alpine       "/docker-entrypoint.…"   gateway         7 minutes ago   Up 7 minutes             127.0.0.1:18080->80/tcp
+swe5001-identity-1        swe5001-identity        "java -jar /app/app.…"   identity        7 minutes ago   Up 7 minutes             8081/tcp
+swe5001-postgres-1        swe5001-postgres        "docker-entrypoint.s…"   postgres        7 minutes ago   Up 7 minutes (healthy)   5432/tcp
+swe5001-web-1             swe5001-web             "/docker-entrypoint.…"   web             7 minutes ago   Up 7 minutes             80/tcp
+
+PASS HTTPS, readiness, public API, admin login and access checks

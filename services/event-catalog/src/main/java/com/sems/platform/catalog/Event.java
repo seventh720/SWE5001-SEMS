@@ -24,6 +24,7 @@ public class Event {
  @Column(name="publication_version") Long publicationVersion;
  @Column(name="ticket_version") Long ticketVersion;
  @Column(name="publication_error",length=500) String publicationError;
+ @Column(name="cancellation_reason",length=500) String cancellationReason;
  @Enumerated(EnumType.STRING) @Column(nullable=false) EventCategory category=EventCategory.GENERAL;
  @Enumerated(EnumType.STRING) @Column(name="card_theme",nullable=false) CardTheme cardTheme=CardTheme.LILAC;
  @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
@@ -31,6 +32,6 @@ public class Event {
  protected Event(){}
  Event(UUID owner, Draft input){id=UUID.randomUUID();organizerId=owner;organizationId=input.organizationId();createdAt=Instant.now();apply(input);}
  void apply(Draft input){if(input.visibility()!=null)visibility=input.visibility();category=input.category();cardTheme=input.cardTheme();registrationRequirements=input.registrationRequirements();title=input.title().strip();description=input.description().strip();location=input.location().strip();startsAt=input.startsAt();endsAt=input.endsAt();capacity=input.capacity();updatedAt=Instant.now();}
- View view(){return new View(id,title,description,location,startsAt,endsAt,capacity,status,version,createdAt,updatedAt,salesConfigured,publicationError,category,cardTheme,registrationRequirements,organizationId,organizerId,visibility,organizationName);}
- public record View(UUID id,String title,String description,String location,Instant startsAt,Instant endsAt,int capacity,String status,long version,Instant createdAt,Instant updatedAt,boolean salesConfigured,String publicationError,EventCategory category,CardTheme cardTheme,RegistrationRequirements registrationRequirements,UUID organizationId,UUID createdBy,String visibility,String organizationName){}
+ View view(){return new View(id,title,description,location,startsAt,endsAt,capacity,status,version,createdAt,updatedAt,salesConfigured,publicationError,category,cardTheme,registrationRequirements,organizationId,organizerId,visibility,organizationName,cancellationReason);}
+ public record View(UUID id,String title,String description,String location,Instant startsAt,Instant endsAt,int capacity,String status,long version,Instant createdAt,Instant updatedAt,boolean salesConfigured,String publicationError,EventCategory category,CardTheme cardTheme,RegistrationRequirements registrationRequirements,UUID organizationId,UUID createdBy,String visibility,String organizationName,String cancellationReason){}
 }

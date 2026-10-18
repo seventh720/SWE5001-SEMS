@@ -51,7 +51,7 @@ public class InventoryService {
     @Transactional
     public void activate(UUID event, Activate input) {
         lock(event);
-        var rows=jdbc.queryForList("SELECT * FROM sales WHERE event_id=?",event);
+        var rows=jdbc.queryForList("SELECT * FROM sales WHERE event_id=? FOR UPDATE",event);
         if (rows.isEmpty()) conflict("Configure ticket types before publication");
         var row=rows.getFirst();
         boolean matches=row.get("organizer_id").equals(input.organizerId()) && Objects.equals(row.get("organization_id"),input.organizationId()) && ((Number)row.get("capacity")).intValue()==input.capacity()
@@ -73,7 +73,7 @@ public class InventoryService {
         var rows=jdbc.queryForList("SELECT version,state FROM sales WHERE event_id=?",event);
         if (rows.isEmpty()) return new Inventory(event,0,"DRAFT",List.of());
         var tickets=jdbc.query("SELECT * FROM ticket_types WHERE event_id=? ORDER BY name,id",(rs,n)->new TicketView(
-                rs.getObject("id",UUID.class),rs.getString("name"),rs.getInt("quota"),rs.getInt("quota")-rs.getInt("reserved"),
+                rs.getObject("id",UUID.class),rs.getString("name"),rs.getInt("quota"),rows.getFirst().get("state").equals("CANCELLED")?0:rs.getInt("quota")-rs.getInt("reserved"),
                 rs.getTimestamp("opens_at").toInstant(),rs.getTimestamp("closes_at").toInstant(),0),event);
         return new Inventory(event,((Number)rows.getFirst().get("version")).longValue(),rows.getFirst().get("state").toString(),tickets);
     }

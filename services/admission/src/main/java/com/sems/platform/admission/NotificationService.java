@@ -28,6 +28,8 @@ public class NotificationService {
  }
  @Transactional public void readAll(UUID user){jdbc.update("UPDATE notifications SET read_at=CURRENT_TIMESTAMP WHERE user_id=? AND read_at IS NULL",user);}
  @Transactional public void eventChanged(UUID delivery,EventChange e){
+  var states=jdbc.queryForList("SELECT state FROM sales WHERE event_id=? FOR UPDATE",String.class,e.eventId());
+  if(states.isEmpty()||states.getFirst().equals("CANCELLED"))return;
   var users=jdbc.queryForList("SELECT user_id FROM bookings WHERE event_id=? AND status='CONFIRMED' UNION SELECT user_id FROM pre_registrations WHERE event_id=?",UUID.class,e.eventId(),e.eventId());
   String when=java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm 'SGT'").withZone(ZoneId.of("Asia/Singapore")).format(e.startsAt());
   for(var user:users)add(jdbc,user,"event-change:"+delivery,"EVENT_UPDATED","Event updated: "+e.title(),"The organizer updated this event. Starts "+when+" at "+e.location()+". Status: "+e.status()+". Visibility: "+e.visibility()+". Review the latest event details.","/events/"+e.eventId());

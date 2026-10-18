@@ -1,0 +1,13 @@
+identity|9
+catalog|11
+admission|10
+swe5001-caddy-1 26.91MiB / 128MiB
+swe5001-gateway-1 2.676MiB / 96MiB
+swe5001-identity-1 268.2MiB / 768MiB
+swe5001-admission-1 242.8MiB / 768MiB
+swe5001-event-catalog-1 297.8MiB / 768MiB
+swe5001-postgres-1 83.85MiB / 512MiB
+swe5001-web-1 3.383MiB / 96MiB
+Asset /assets/index-DpHsYYeK.js 200 372320
+Asset /assets/index-BOO1UgLz.css 200 41112
+PASS initial backup copied privately; database migrations and frontend assets checked

@@ -1,0 +1,134 @@
+Ready through gateway: identity
+Ready through gateway: event-catalog
+Ready through gateway: admission
+PASS: upgrade repairs legacy approved closure tickets and preserves ordinary temporary suspension
+Running predeployment-fixes-acceptance.py
+ Container sems-cancellation-review-admission-2 Stopping
+ Container sems-cancellation-review-admission-1 Stopping
+ Container sems-cancellation-review-admission-2 Stopped
+ Container sems-cancellation-review-admission-1 Stopped
+ Container sems-cancellation-review-event-catalog-1 Restarting
+ Container sems-cancellation-review-identity-1 Restarting
+ Container sems-cancellation-review-identity-1 Started
+ Container sems-cancellation-review-event-catalog-1 Started
+ Container sems-cancellation-review-postgres-1 Waiting
+ Container sems-cancellation-review-postgres-1 Healthy
+ Container sems-cancellation-review-admission-1 Starting
+ Container sems-cancellation-review-admission-1 Started
+ Container sems-cancellation-review-admission-2 Starting
+ Container sems-cancellation-review-admission-2 Started
+ Container sems-cancellation-review-gateway-1 Restarting
+ Container sems-cancellation-review-gateway-1 Started
+Ready through gateway: identity
+Ready through gateway: event-catalog
+Ready through gateway: admission
+PASS: registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits
+PASS: the original admin JWT is immediately denied after demotion; independent organization membership still works
+PASS: stable bounded SQL pages, whole-directory username/email search, literal wildcards, limits and organization isolation
+PASS: approval closure waits for pending revisions, fences stale publication, survives Identity/Catalog restart and Admission outage, cancels outsiders tickets once and preserves check-in history
+PASS: platform soft deletion uses the same cancellation protocol and retains personal accounts/history
+Running organization-governance-acceptance.py
+PASS: registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits
+PASS: scoped requests, rejection/approval, stale review, direct edits, closure, public event visibility, cancelled tickets with preserved history and isolated soft deletion
+Running membership-notifications-acceptance.py
+PASS: registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits
+PASS: initial appointment, invitation acceptance, role/status changes, no-op/stale suppression, recipient isolation and read state
+Running organization-acceptance.py
+ Container sems-cancellation-review-admission-1 Stopping
+ Container sems-cancellation-review-admission-2 Stopping
+ Container sems-cancellation-review-admission-2 Stopped
+ Container sems-cancellation-review-admission-1 Stopped
+ Container sems-cancellation-review-event-catalog-1 Restarting
+ Container sems-cancellation-review-event-catalog-1 Started
+ Container sems-cancellation-review-postgres-1 Waiting
+ Container sems-cancellation-review-postgres-1 Healthy
+ Container sems-cancellation-review-admission-1 Starting
+ Container sems-cancellation-review-admission-1 Started
+ Container sems-cancellation-review-admission-2 Starting
+ Container sems-cancellation-review-admission-2 Started
+ Container sems-cancellation-review-gateway-1 Restarting
+ Container sems-cancellation-review-gateway-1 Started
+Ready through gateway: identity
+Ready through gateway: event-catalog
+Ready through gateway: admission
+ Container sems-cancellation-review-event-catalog-1 Stopping
+ Container sems-cancellation-review-event-catalog-1 Stopped
+ Container sems-cancellation-review-postgres-1 Waiting
+ Container sems-cancellation-review-postgres-1 Healthy
+ Container sems-cancellation-review-event-catalog-1 Starting
+ Container sems-cancellation-review-event-catalog-1 Started
+ Container sems-cancellation-review-gateway-1 Restarting
+ Container sems-cancellation-review-gateway-1 Started
+Ready through gateway: identity
+Ready through gateway: event-catalog
+Ready through gateway: admission
+ Container sems-cancellation-review-admission-2 Stopping
+ Container sems-cancellation-review-admission-1 Stopping
+ Container sems-cancellation-review-admission-2 Stopped
+ Container sems-cancellation-review-admission-1 Stopped
+ Container sems-cancellation-review-event-catalog-1 Restarting
+ Container sems-cancellation-review-event-catalog-1 Started
+ Container sems-cancellation-review-postgres-1 Waiting
+ Container sems-cancellation-review-postgres-1 Healthy
+ Container sems-cancellation-review-admission-1 Starting
+ Container sems-cancellation-review-admission-1 Started
+ Container sems-cancellation-review-admission-2 Starting
+ Container sems-cancellation-review-admission-2 Started
+ Container sems-cancellation-review-gateway-1 Restarting
+ Container sems-cancellation-review-gateway-1 Started
+Ready through gateway: identity
+Ready through gateway: event-catalog
+Ready through gateway: admission
+ Container sems-cancellation-review-admission-2 Stopping
+ Container sems-cancellation-review-admission-1 Stopping
+ Container sems-cancellation-review-admission-1 Stopped
+ Container sems-cancellation-review-admission-2 Stopped
+ Container sems-cancellation-review-postgres-1 Waiting
+ Container sems-cancellation-review-postgres-1 Healthy
+ Container sems-cancellation-review-admission-1 Starting
+ Container sems-cancellation-review-admission-1 Started
+ Container sems-cancellation-review-admission-2 Starting
+ Container sems-cancellation-review-admission-2 Started
+ Container sems-cancellation-review-gateway-1 Restarting
+ Container sems-cancellation-review-gateway-1 Started
+Ready through gateway: identity
+Ready through gateway: event-catalog
+Ready through gateway: admission
+PASS: registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits
+PASS: ticket allocation, sales windows, owner isolation, configuration race, retry-safe publication and public discovery
+PASS: pending events stay private; publication survives Catalog restart and Admission outage
+PASS: ownership, request validation, per-place credentials, safe retries during Catalog outage, concurrent cancellation and same-key submission
+PASS: 100 requests/10 places, database inventory-booking-ticket invariants, sales windows, wrong-event ticket and cancellation guards
+PASS: booking status filters, pagination totals, separate pages and owner isolation
+PASS: category/theme persistence and filtering, registration validation, information-aware idempotency, private owner registration list and immutable published requirements
+PASS: profile persistence/privacy/validation, pre-registration upsert and ownership, unchanged inventory, opening transition, explicit confirmation and atomic cleanup
+PASS: published presentation ownership/version checks, unchanged ticket contract and historical snapshots, upcoming dashboard privacy/order, independent draft template reuse
+PASS: editable schedule/capacity, unchanged inventory and locked requirements, updated confirmed tickets/sales windows, rejection rollback, owner isolation, retry and restart/outage recovery
+PASS: multiple contacts, student ID not retained, ownership/version/delete validation, username rules/normalization/availability, login continuity and uniqueness race
+PASS: combined event/ticket updates, stable IDs and credentials, quota/version/owner rejection with rollback, name swaps and reference-safe removal, pause/resume outage recovery, existing tickets preserved, new draft setup
+PASS: organization provisioning, invitations, membership isolation/revocation, internal offerings, scoped staff, concurrent one-time check-in, attendance and preserved tickets
+Running event-cancellation-acceptance.py
+ Container sems-cancellation-review-admission-2 Stopping
+ Container sems-cancellation-review-admission-1 Stopping
+ Container sems-cancellation-review-admission-2 Stopped
+ Container sems-cancellation-review-admission-1 Stopped
+ Container sems-cancellation-review-event-catalog-1 Restarting
+ Container sems-cancellation-review-event-catalog-1 Started
+ Container sems-cancellation-review-postgres-1 Waiting
+ Container sems-cancellation-review-postgres-1 Healthy
+ Container sems-cancellation-review-admission-1 Starting
+ Container sems-cancellation-review-admission-1 Started
+ Container sems-cancellation-review-admission-2 Starting
+ Container sems-cancellation-review-admission-2 Started
+ Container sems-cancellation-review-gateway-1 Restarting
+ Container sems-cancellation-review-gateway-1 Started
+Ready through gateway: identity
+Ready through gateway: event-catalog
+Ready through gateway: admission
+PASS: registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits
+PASS: cancellation permissions/version, double-instance booking/check-in/personal-cancel races, ticket invalidation, checked-in history, closed pre-registration, deduplicated notifications and terminal guards
+PASS: pause preserves tickets; whole-event cancellation invalidates them
+PASS: late transaction failure rolls back all effects and recovers after repair
+PASS: Admission outage, Catalog restart, automatic recovery, lost acknowledgement and replay without duplicate effects
+PASS: service schema isolation and denied cross-service query
+PASS: final regression suite and schema isolation

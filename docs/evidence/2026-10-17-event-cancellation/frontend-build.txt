@@ -1,0 +1,18 @@
+
+> sems-platform-web@0.1.0 build
+> npm run typecheck && vite build
+
+
+> sems-platform-web@0.1.0 typecheck
+> tsc --noEmit --pretty false && tsc -p tsconfig.node.json --noEmit --pretty false
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 127 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.47 kB │ gzip:   0.32 kB
+dist/assets/index-BOO1UgLz.css   41.11 kB │ gzip:   9.58 kB
+dist/assets/jsQR-CXfN1hkx.js    130.72 kB │ gzip:  47.46 kB
+dist/assets/index-M-AIgkBw.js   370.42 kB │ gzip: 115.23 kB
+✓ built in 583ms

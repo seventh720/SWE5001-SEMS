@@ -78,7 +78,7 @@ public class BookingService {
     private Booking map(ResultSet rs,int n) throws SQLException {
         UUID id=rs.getObject("id",UUID.class);
         var tickets=jdbc.query("SELECT * FROM tickets WHERE booking_id=? ORDER BY id",(r,i)->new Ticket(r.getObject("id",UUID.class),r.getString("credential"),r.getString("state")),id);
-        return new Booking(id,rs.getObject("event_id",UUID.class),rs.getObject("ticket_type_id",UUID.class),rs.getInt("quantity"),rs.getString("status"),rs.getString("event_title"),rs.getString("event_location"),rs.getTimestamp("starts_at").toInstant(),rs.getTimestamp("ends_at").toInstant(),rs.getString("ticket_name"),rs.getInt("amount"),rs.getTimestamp("created_at").toInstant(),tickets,readInfo(rs.getString("attendee_info")),rs.getString("custom_field_label"));
+        return new Booking(id,rs.getObject("event_id",UUID.class),rs.getObject("ticket_type_id",UUID.class),rs.getInt("quantity"),rs.getString("status"),rs.getString("event_title"),rs.getString("event_location"),rs.getTimestamp("starts_at").toInstant(),rs.getTimestamp("ends_at").toInstant(),rs.getString("ticket_name"),rs.getInt("amount"),rs.getTimestamp("created_at").toInstant(),tickets,readInfo(rs.getString("attendee_info")),rs.getString("custom_field_label"),rs.getString("event_cancellation_reason"));
     }
     @Transactional(readOnly=true, isolation=org.springframework.transaction.annotation.Isolation.REPEATABLE_READ)
     public Page list(UUID user,int page,int size,String status) {

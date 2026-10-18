@@ -16,3 +16,15 @@ Admission checks saved pre-registrations every 15 seconds. A reminder is persist
 Additive migrations: Identity V5 (declined invitation status), Catalog V8 (notification outbox/trigger), Admission V9 (notifications and unread indexes). Each service reads/writes only its own schema. New gateway routes /api/v1/me/invitations* to Identity and /api/v1/me/notifications* to Admission. Preserve .env credentials and existing database volume. Back up and deploy the three services together before reopening traffic.
 
 Run scripts/notifications-acceptance.py only in a disposable environment. It checks invitation identity and actions, booking replay/cancellation, stale/rejected event updates, outbox retry, reminders through two replicas, per-user read state and cross-account isolation.
+
+## Organization role updates
+
+Identity V6 adds a private membership notification inbox. An AFTER INSERT/UPDATE trigger on organization_memberships records initial administrator appointments, accepted invitations, role changes and membership status changes in the same transaction. Unchanged role/status writes and rolled-back mutations produce no notices. Existing assignments are not backfilled.
+
+The authenticated /api/v1/me/membership-notifications endpoints provide paginated history, unread count and individual/all-read actions scoped to the JWT subject. Notifications remain readable after membership removal, but links do not restore access. The web inbox has a separate Organization role updates section and includes its unread count in the navigation badge. It refreshes every 30 seconds. This change covers organization memberships, not legacy platform account roles or event staff assignments.
+
+Deploy Identity V6, the gateway route and Web together after backing up the database. No cross-service database access or external message delivery is introduced.
+
+## Permanent organization closure
+
+Identity records CLOSING and informs members that closure is pending. Catalog stages whole-event cancellation; Admission atomically cancels bookings/unused tickets and records attendee notices, including nonmembers of the closing organization. Identity sends completion notices and removes memberships only after those cancellations finish. Durable receipts prevent duplicate booking cancellation notices after restarts or lost acknowledgments. Personal notification history remains available after organization access ends.

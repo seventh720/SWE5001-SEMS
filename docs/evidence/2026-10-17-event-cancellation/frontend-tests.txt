@@ -1,0 +1,12 @@
+
+> sems-platform-web@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.11 /Users/victor/Documents/ChatGPT/SWE5001 Smart Event Management and Ticketing Platform/apps/web
+
+
+ Test Files  20 passed (20)
+      Tests  82 passed (82)
+   Start at  20:43:46
+   Duration  2.19s (transform 1.20s, setup 0ms, import 3.27s, tests 6.59s, environment 6.86s)
