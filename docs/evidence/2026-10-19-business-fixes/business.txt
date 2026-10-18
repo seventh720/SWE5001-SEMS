@@ -1,0 +1,6 @@
+PASS: registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits
+PASS: JWT exactly 3600 seconds; last administrator protected under concurrent demotions
+PASS: bounded user pages/search and admin/governance/staff pagination validation
+PASS: paused-event live venue, original snapshot, private ownership, pre-registration and start+15-minute cutoff with idempotent replay
+PASS: Catalog outage preserves ticket access; live details recover
+PASS: authentication bursts return 429; booking reads unaffected; normal login recovers

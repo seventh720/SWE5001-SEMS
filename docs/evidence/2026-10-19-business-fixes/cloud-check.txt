@@ -1,0 +1,31 @@
+DEPLOYED c0f460087986c8ac2683ff0d7a38bb216f722e46
+/home/ubuntu/swe5001/releases/c0f460087986c8ac2683ff0d7a38bb216f722e46
+swe5001-caddy-1 Up About an hour 0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:443->443/tcp, [::]:443->443/tcp, 443/udp, 2019/tcp
+swe5001-gateway-1 Up About an hour 127.0.0.1:18080->80/tcp
+swe5001-identity-1 Up About an hour 8081/tcp
+swe5001-event-catalog-1 Up About an hour 8082/tcp
+swe5001-admission-1 Up About an hour 8083/tcp
+swe5001-postgres-1 Up About an hour (healthy) 127.0.0.1:5432->5432/tcp
+swe5001-web-1 Up About an hour 80/tcp
+/dev/root        77G  6.2G   71G   9% /
+               total        used        free      shared  buff/cache   available
+Mem:            3832        1598         197          19        2335        2233
+Swap:              0           0           0
+users|1
+organizations|0
+events|0
+bookings|0
+
+/ 200 bytes 470
+asset /assets/index-DpHsYYeK.js 200
+asset /assets/index-BOO1UgLz.css 200
+/health/identity 200 bytes 15
+/health/event-catalog 200 bytes 15
+/health/admission 200 bytes 15
+/api/v1/events 200 bytes 64
+public event count 0
+anonymous /internal/ 404
+anonymous /api/v1/admin/users 401
+anonymous /api/v1/bookings 401
+admin login 200 expiresIn 1800
+PASS: read-only cloud inspection; no business data changed

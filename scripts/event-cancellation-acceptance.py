@@ -53,7 +53,7 @@ call('POST',f'/api/v1/events/{eid}/check-ins',{'credential':mixed['tickets'][0][
 call('POST',f'/api/v1/events/{eid}/check-ins',{'credential':mixed['tickets'][1]['credential']},a,409)
 call('GET','/api/v1/events/'+eid,expected=404)
 call('POST','/api/v1/bookings',{'eventId':eid,'ticketTypeId':inv['ticketTypes'][0]['id'],'quantity':1,'requestKey':str(uuid.uuid4())},attendee,404)
-assert eid not in [t['eventId'] for t in call('GET','/api/v1/me/staff-assignments',token=a)]
+assert eid not in [t['eventId'] for t in call('GET','/api/v1/me/staff-assignments',token=a)["items"]]
 summary=call('GET',p+'/summary',token=a)
 assert summary['salesState']=='CANCELLED' and summary['availableCapacity']==0 and summary['confirmedTickets']==0 and summary['attendance']>=1
 assert all(t['available']==0 for t in call('GET',p+'/ticket-types',token=a)['ticketTypes'])

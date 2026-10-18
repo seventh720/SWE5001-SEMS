@@ -9,6 +9,10 @@ import { roles, type Role, type User } from "../../shared/types/auth";
 
 export function AdminUsersPage() {
   const { user: currentUser, token } = useAuth();
+  const [page, setPage] = useState(0);
+  const [search, setSearch] = useState("");
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -16,14 +20,17 @@ export function AdminUsersPage() {
 
   useEffect(() => {
     if (!token || !currentUser || !hasRole(currentUser.roles, "ADMIN")) return;
-    apiRequest<User[]>("/api/v1/admin/users", {}, token)
-      .then(setUsers)
+    let active = true;
+    setLoading(true); setError(""); setUsers([]);
+    apiRequest<{items: User[]; totalPages: number}>(`/api/v1/admin/users?page=${page}&size=20&search=${encodeURIComponent(search)}`, {}, token)
+      .then(data => {if(active){setUsers(data.items);setTotalPages(data.totalPages)}})
       .catch((caught) =>
-        setError(
+        active && setError(
           caught instanceof ApiError ? caught.message : "Unable to load users",
         ),
-      );
-  }, [currentUser, token]);
+      ).finally(() => {if(active)setLoading(false)});
+    return () => {active=false};
+  }, [currentUser, token, page, search]);
 
   if (!currentUser || !token) return null;
   if (!hasRole(currentUser.roles, "ADMIN")) return <Navigate to="/" replace />;
@@ -50,7 +57,7 @@ export function AdminUsersPage() {
         { method: "PUT", body: JSON.stringify({ roles: target.roles }) },
         token!,
       );
-      setMessage(`Roles saved for ${updated.username}. Changes apply after their next sign-in.`);
+      setMessage(`Roles saved for ${updated.username}. New grants apply after their next sign-in. Removed administrator access stops immediately.`);
       setUsers((current) =>
         current.map((item) => (item.id === updated.id ? updated : item)),
       );
@@ -73,11 +80,12 @@ export function AdminUsersPage() {
       </header>
 
       <p className="muted">
-        Organization roles are managed in My organizations; check-in access is assigned per event. Platform role changes take effect after the user signs in again. Existing tokens
-        expire within 30 minutes.
+        Organization roles are managed in My organizations; check-in access is assigned per event. New platform grants take effect after sign-in; administrator revocation takes effect immediately. Sessions expire after one hour.
       </p>
       {error && <p className="error-message">{error}</p>}
       <FeedbackNotice message={message} />
+      <label>Search users<input type="search" maxLength={200} value={search} onChange={e=>{setSearch(e.target.value);setPage(0)}} /></label>
+      {loading && <p role="status">Loading users…</p>}
       <section className="user-list">
         {users.map((item) => (
           <article className="card user-card" key={item.id}>
@@ -109,6 +117,7 @@ export function AdminUsersPage() {
           </article>
         ))}
       </section>
+      <nav aria-label="User pages"><button disabled={loading||page===0} onClick={()=>setPage(page-1)}>Previous</button><span>Page {page+1} of {Math.max(1,totalPages)}</span><button disabled={loading||page+1>=totalPages} onClick={()=>setPage(page+1)}>Next</button></nav>
     </main>
   );
 }

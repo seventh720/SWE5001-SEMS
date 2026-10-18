@@ -1,0 +1,6 @@
+PASS: publication, booking, same-key replay, changed-payload conflict, owner isolation
+OBSERVATION: current venue = Updated venue ; ticket booking venue = Original venue
+PASS: assigned staff, repeated check-in once, checked-in booking cancellation refused
+OBSERVATION: first check-in after event ended HTTP 200 status CHECKED_IN
+RESULT: 100 requests / 10 places / one local Admission: {200: 10, 409: 90}
+PASS: double cancellation released one place; summary {'confirmedTickets': 9, 'availableCapacity': 1, 'attendance': 0, 'salesState': 'ACTIVE'}

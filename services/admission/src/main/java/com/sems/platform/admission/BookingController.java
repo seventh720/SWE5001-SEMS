@@ -12,7 +12,20 @@ import static com.sems.platform.admission.BookingContracts.*;
 public class BookingController {
     private final BookingService bookings; private final CatalogClient catalog;
     public BookingController(BookingService bookings,CatalogClient catalog) {this.bookings=bookings;this.catalog=catalog;}
-    private <T> ResponseEntity<T> privateResponse(T body) { return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(body); }
+    private java.util.Map<UUID,CatalogClient.EventDetails> details(java.util.List<UUID> ids) {
+        try {return catalog.details(ids);}
+        catch(org.springframework.web.server.ResponseStatusException e) {
+            if(e.getStatusCode().value()!=503)throw e;
+            return java.util.Map.of(); // Ticket access remains available; UI explicitly labels unavailable current details.
+        }
+    }
+    private ResponseEntity<Booking> privateResponse(Booking body) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(body.withCurrentEvent(details(java.util.List.of(body.eventId())).get(body.eventId())));
+    }
+    private ResponseEntity<Page> privateResponse(Page body) {
+        var current=details(body.items().stream().map(Booking::eventId).toList());
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(new Page(body.items().stream().map(b->b.withCurrentEvent(current.get(b.eventId()))).toList(),body.page(),body.size(),body.totalElements(),body.totalPages()));
+    }
     @PostMapping
     public ResponseEntity<Booking> create(@AuthenticationPrincipal Jwt jwt,@Valid @RequestBody Request input) {
         UUID user=UUID.fromString(jwt.getSubject());

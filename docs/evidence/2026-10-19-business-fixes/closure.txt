@@ -1,0 +1,5 @@
+PASS: registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits
+PASS: the original admin JWT is immediately denied after demotion; independent organization membership still works
+PASS: stable bounded SQL pages, whole-directory username/email search, literal wildcards, limits and organization isolation
+PASS: approval closure waits for pending revisions, fences stale publication, survives Identity/Catalog restart and Admission outage, cancels outsiders tickets once and preserves check-in history
+PASS: platform soft deletion uses the same cancellation protocol and retains personal accounts/history

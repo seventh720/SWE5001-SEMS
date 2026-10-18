@@ -5,7 +5,7 @@ import { ApiError } from "../../shared/api/client";
 import { useAuth } from "./AuthContext";
 
 export function AuthPage() {
-  const { user, login, register } = useAuth();
+  const { user, login, register, sessionExpired } = useAuth();
   const location = useLocation();
   const [mode, setMode] = useState<"login" | "register">("login");
   const [username, setUsername] = useState("");
@@ -93,6 +93,7 @@ export function AuthPage() {
           </button>
         </div>
 
+        {sessionExpired && <p role="status">Your session has expired. Sign in again to continue. Pending bookings are preserved.</p>}
         <form noValidate onSubmit={submit}>
           <h2>
             {mode === "login" ? "Welcome back" : "Create attendee account"}

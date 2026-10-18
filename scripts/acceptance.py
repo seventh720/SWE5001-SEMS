@@ -15,6 +15,13 @@ def call(method,path,body=None,token=None,expected=200):
     except json.JSONDecodeError:
         if status < 400: raise
         return None
+def paged(path,token):
+    result=[]
+    for page in range(100001):
+        data=call('GET',path+('&' if '?' in path else '?')+'page='+str(page)+'&size=50',token=token)
+        result.extend(data['items'])
+        if page+1>=data['totalPages']:return result
+    raise AssertionError('Too many pages')
 suffix=uuid.uuid4().hex[:10]
 password='Test-'+uuid.uuid4().hex
 users=[]

@@ -1,0 +1,2 @@
+PASS: 3 Admission replicas receive traffic; gateway unchanged; persisted booking count unchanged
+PASS: scale-down DNS refresh without gateway restart; 30/30 requests routed successfully

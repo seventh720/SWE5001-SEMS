@@ -31,6 +31,9 @@ export async function apiRequest<T>(
     },
   });
 
+  if (response.status === 401 && token) {
+    window.dispatchEvent(new CustomEvent("sems:unauthorized", { detail: token }));
+  }
   if (!response.ok) {
     let problem: ProblemResponse = {};
     try {

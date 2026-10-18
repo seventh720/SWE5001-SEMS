@@ -1,3 +1,4 @@
+import { SessionRecovery } from "../features/auth/SessionRecovery";
 import {OrganizationMembersPage} from "../features/organizations/OrganizationMembersPage";
 import {NotificationBell,NotificationsPage} from "../features/notifications/Notifications";
 import {OrganizationsPage,AdminOrganizationsPage,AcceptInvitationPage} from "../features/organizations/OrganizationsPage";
@@ -304,6 +305,7 @@ export function App() {
         id={location.pathname === "/" ? undefined : "main-content"}
         tabIndex={-1}
       >
+        <SessionRecovery />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/events" element={<PublicEventsPage />} />

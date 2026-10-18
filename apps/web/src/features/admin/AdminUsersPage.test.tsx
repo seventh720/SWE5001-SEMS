@@ -46,7 +46,7 @@ afterEach(() => {
 });
 it("prevents removing the last role and saves additional roles with authentication", async () => {
   fetchMock
-    .mockResolvedValueOnce(response([user]))
+    .mockResolvedValueOnce(response({items:[user],totalPages:1}))
     .mockResolvedValueOnce(
       response({ ...user, roles: ["ATTENDEE", "ADMIN"] }),
     );
@@ -69,7 +69,7 @@ it("prevents removing the last role and saves additional roles with authenticati
 });
 it("retains selected roles after a failed save and permits retry", async () => {
   fetchMock
-    .mockResolvedValueOnce(response([user]))
+    .mockResolvedValueOnce(response({items:[user],totalPages:1}))
     .mockResolvedValueOnce(response({ detail: "Unable to save roles" }, 500))
     .mockResolvedValueOnce(response({ ...user, roles: ["ATTENDEE", "ADMIN"] }));
   mount();

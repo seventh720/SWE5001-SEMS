@@ -9,17 +9,20 @@ import {apiRequest} from "../../shared/api/client";
 import {HomeLink} from "../../shared/components/HomeLink";
 interface Task {eventId:string;organizationId:string;title:string;startsAt:string;endsAt:string}
 interface Assignment {userId:string;active:boolean}
-export function StaffTasksPage(){const {token}=useAuth();const now=useNow();const [tasks,setTasks]=useState<Task[]>([]),[error,setError]=useState(""),[loading,setLoading]=useState(true);useEffect(()=>{let active=true;setLoading(true);setError("");setTasks([]);apiRequest<Task[]>("/api/v1/me/staff-assignments",{},token!).then(v=>{if(active)setTasks(v)}).catch(()=>{if(active)setError("Unable to load your check-in tasks. Please sign in again or try again later.")}).finally(()=>{if(active)setLoading(false)});return()=>{active=false}},[token]);return <main className="app-shell"><HomeLink/><h1>My check-in tasks</h1>{loading&&<p role="status">Loading check-in tasks…</p>}{error&&<p role="alert">{error}</p>}{!loading&&!error&&!tasks.length&&<p>No active event assignments.</p>}{tasks.map(t=>{
+export function StaffTasksPage(){const {token}=useAuth();const now=useNow();const [page,setPage]=useState(0),[totalPages,setTotalPages]=useState(0);const [tasks,setTasks]=useState<Task[]>([]),[error,setError]=useState(""),[loading,setLoading]=useState(true);useEffect(()=>{let active=true;setLoading(true);setError("");setTasks([]);apiRequest<{items:Task[];totalPages:number}>(`/api/v1/me/staff-assignments?page=${page}&size=20`,{},token!).then(v=>{if(active){setTasks(v.items);setTotalPages(v.totalPages)}}).catch(()=>{if(active)setError("Unable to load your check-in tasks. Please sign in again or try again later.")}).finally(()=>{if(active)setLoading(false)});return()=>{active=false}},[token,page]);return <main className="app-shell"><HomeLink/><h1>My check-in tasks</h1>{loading&&<p role="status">Loading check-in tasks…</p>}{error&&<p role="alert">{error}</p>}{!loading&&!error&&!tasks.length&&<p>No active event assignments.</p>}{tasks.map(t=>{
  const opensAt=new Date(Date.parse(t.startsAt)-15*60*1000).toISOString();
- const open=now>=Date.parse(opensAt);
+ const closesAt=new Date(Math.min(Date.parse(t.startsAt)+15*60*1000,Date.parse(t.endsAt))).toISOString();
+ const ended=now>=Date.parse(closesAt);
+ const open=now>=Date.parse(opensAt)&&!ended;
  return <article className="card staff-task-card" key={t.eventId}>
-  <div className="staff-task-heading"><h2>{t.title}</h2><span className={`check-in-badge ${open?"is-open":""}`}>{open?"Check-in open":"Not open yet"}</span></div>
+  <div className="staff-task-heading"><h2>{t.title}</h2><span className={`check-in-badge ${open?"is-open":""}`}>{ended?"Check-in closed":open?"Check-in open":"Not open yet"}</span></div>
   <p>Event starts: {formatDateTime(t.startsAt)}</p>
   <p>Check-in opens: {formatDateTime(opensAt)}</p>
-  {!open&&<div className="check-in-countdown" role="timer" aria-label="Time until check-in opens"><span>Check-in opens in</span><strong>{countdown(opensAt,now)}</strong></div>}
+  <p>Check-in closes: {formatDateTime(closesAt)}</p>
+  {!open&&!ended&&<div className="check-in-countdown" role="timer" aria-label="Time until check-in opens"><span>Check-in opens in</span><strong>{countdown(opensAt,now)}</strong></div>}
   {open?<Link className="staff-open-link" to={`/staff/events/${t.eventId}`}>Open check-in →</Link>:<button type="button" disabled>Open check-in →</button>}
  </article>;
- })}</main>}
+ })}<nav aria-label="Check-in task pages"><button disabled={loading||page===0} onClick={()=>setPage(page-1)}>Previous</button><span>Page {page+1} of {Math.max(1,totalPages)}</span><button disabled={loading||page+1>=totalPages} onClick={()=>setPage(page+1)}>Next</button></nav></main>}
 export function CheckInPage(){
  const {id}=useParams();const {token}=useAuth();
  const [code,setCode]=useState(""),[result,setResult]=useState(""),[error,setError]=useState(""),[busy,setBusy]=useState(false),[camera,setCamera]=useState(false),[scanned,setScanned]=useState(false);
@@ -32,7 +35,7 @@ export function CheckInPage(){
   catch(e){setError((e as Error).message)}finally{submitting.current=false;setBusy(false)}
  }
  function submit(e:FormEvent){e.preventDefault();void checkIn(code)}
- return <main className="app-shell check-in-page"><Link to="/staff">My check-in tasks</Link><h1>Event check-in</h1><p>Check-in opens 15 minutes before the event starts. Early check-ins are not accepted.</p>
+ return <main className="app-shell check-in-page"><Link to="/staff">My check-in tasks</Link><h1>Event check-in</h1><p>Check-in opens 15 minutes before the event starts. Check-in closes 15 minutes after the event starts, or when the event ends if earlier.</p>
   <p>Scan a ticket with your phone or computer camera. On a computer, you can also use a USB scanner or paste a ticket code.</p>
   {!camera&&<div className="attendance-actions"><button disabled={busy} onClick={()=>{setResult("");setError("");setCamera(true)}}>{scanned?"Scan next ticket":"Open camera to scan"}</button></div>}
   {camera&&<TicketCamera key={id} onClose={closeCamera} onScan={credential=>{setScanned(true);void checkIn(credential)}}/>}

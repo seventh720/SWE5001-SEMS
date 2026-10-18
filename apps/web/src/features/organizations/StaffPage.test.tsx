@@ -8,7 +8,7 @@ afterEach(()=>{cleanup();vi.useRealTimers();vi.unstubAllGlobals()});
 const json=(data:unknown)=>new Response(JSON.stringify(data),{status:200});
 it("disables entry before opening, counts down, and automatically enables entry at exactly 15 minutes before start",async()=>{
  vi.useFakeTimers();vi.setSystemTime(new Date("2030-01-01T09:44:58Z"));
- vi.stubGlobal("fetch",vi.fn(async()=>json([{eventId:"e",title:"Seminar",startsAt:"2030-01-01T10:00:00Z",endsAt:"2030-01-01T11:00:00Z"}])));
+ vi.stubGlobal("fetch",vi.fn(async()=>json({items:[{eventId:"e",title:"Seminar",startsAt:"2030-01-01T10:00:00Z",endsAt:"2030-01-01T11:00:00Z"}],totalPages:1})));
  await act(async()=>{render(<MemoryRouter><StaffTasksPage/></MemoryRouter>)});
  expect((screen.getByRole("button",{name:"Open check-in →"}) as HTMLButtonElement).disabled).toBe(true);
  expect(screen.queryByRole("link",{name:"Open check-in →"})).toBeNull();
@@ -16,6 +16,7 @@ it("disables entry before opening, counts down, and automatically enables entry 
  act(()=>vi.advanceTimersByTime(1000));expect(screen.getByRole("timer").textContent).toContain("00h 00m 01s");
  act(()=>vi.advanceTimersByTime(1000));expect(screen.getByRole("link",{name:"Open check-in →"}).getAttribute("href")).toBe("/staff/events/e");
  expect(screen.queryByRole("timer")).toBeNull();expect(screen.getByText("Check-in open")).toBeTruthy();
+ act(()=>{vi.setSystemTime(new Date("2030-01-01T10:15:00Z"));vi.advanceTimersByTime(1000)});expect(screen.getByText("Check-in closed")).toBeTruthy();expect(screen.queryByRole("link",{name:"Open check-in →"})).toBeNull();
 });
 function page(){render(<MemoryRouter initialEntries={["/organizer/events/e/staff"]}><Routes><Route path="/organizer/events/:id/staff" element={<EventStaffPage/>}/></Routes></MemoryRouter>)}
 it("shows ticket metrics and check-in progress, then updates on refresh",async()=>{

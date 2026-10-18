@@ -15,9 +15,10 @@ public class PublicationService {
         try {
             client.post().uri("/internal/v1/events/{id}/activate-sales",op.eventId()).body(op).retrieve().toBodilessEntity();
         } catch(RestClientResponseException e) {
+            org.slf4j.LoggerFactory.getLogger(getClass()).warn("Catalog command pending/rejected event={} operation={} httpStatus={}",op.eventId(),op.operationId(),e.getStatusCode().value());
             if(e.getStatusCode().value()==409) {state.rejected(op);throw new ResponseStatusException(HttpStatus.CONFLICT,"Review ticket configuration and retry publication");}
             return false;
-        } catch(RestClientException e) { return false; }
+        } catch(RestClientException e) { org.slf4j.LoggerFactory.getLogger(getClass()).warn("Publication retry pending event={} operation={} failure={}",op.eventId(),op.operationId(),e.getClass().getSimpleName()); return false; }
         state.finish(op);return true;
     }
     @Scheduled(fixedDelayString="${sems.publication.retry-ms:5000}")

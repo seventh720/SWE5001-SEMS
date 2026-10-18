@@ -13,8 +13,8 @@ public class TokenService {
  public IssuedToken issue(UserAccount user){
   var now=Instant.now();
   var claims=JwtClaimsSet.builder().issuer(issuer).subject(user.getId().toString()).audience(List.of("sems-platform"))
-   .issuedAt(now).expiresAt(now.plusSeconds(1800)).claim("roles",user.getRoles().stream().map(Enum::name).sorted().toList()).build();
-  return new IssuedToken(encoder.encode(JwtEncoderParameters.from(JwsHeader.with(SignatureAlgorithm.RS256).keyId("sems-1").build(),claims)).getTokenValue(),1800);
+   .issuedAt(now).expiresAt(now.plusSeconds(3600)).claim("roles",user.getRoles().stream().map(Enum::name).sorted().toList()).build();
+  return new IssuedToken(encoder.encode(JwtEncoderParameters.from(JwsHeader.with(SignatureAlgorithm.RS256).keyId("sems-1").build(),claims)).getTokenValue(),3600);
  }
  public record IssuedToken(String value,long expiresInSeconds){}
 }

@@ -295,6 +295,9 @@
             "type": "string",
             "nullable": true,
             "description": "Present when cancelled by the organizer. Checked-in ticket history is retained, but none of the tickets may be admitted again."
+          },
+          "currentEvent": {
+            "$ref": "#/components/schemas/CurrentEvent"
           }
         },
         "required": [
@@ -508,6 +511,9 @@
                   "SOLD_OUT",
                   "CLOSED"
                 ]
+              },
+              "currentEvent": {
+                "$ref": "#/components/schemas/CurrentEvent"
               }
             }
           }
@@ -824,6 +830,56 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 500
+          }
+        }
+      },
+      "CurrentEvent": {
+        "type": "object",
+        "nullable": true,
+        "description": "Current Catalog information; null during Catalog unavailability. Snapshot fields remain historical.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "StaffTaskPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StaffTask"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
           }
         }
       }
@@ -1625,10 +1681,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/StaffTask"
-                  }
+                  "$ref": "#/components/schemas/StaffTaskPage"
                 }
               }
             }
@@ -1651,12 +1704,34 @@
           "503": {
             "description": "Authorization dependency unavailable"
           }
-        }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        ]
       }
     },
     "/api/v1/events/{id}/check-ins": {
       "post": {
-        "description": "New check-ins open 15 minutes before the current event start (inclusive), enforced using database time under the sales lock. Earlier attempts return 409. Already checked-in tickets return the original result without a new check-in.",
+        "description": "First admission opens 15 minutes before start and closes exactly 15 minutes after start (or at the event end if earlier). A previously successful scan remains idempotent, subject to authorization and cancellation checks.",
         "summary": "Active member assigned to this event: check in once; duplicate returns alreadyCheckedIn=true",
         "responses": {
           "200": {

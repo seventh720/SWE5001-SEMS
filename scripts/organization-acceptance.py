@@ -49,7 +49,7 @@ sp=pp+'/staff'
 call('POST','/api/v1/events/'+private['id']+'/check-ins',{'credential':booked['tickets'][0]['credential']},a,403)
 call('PUT',sp,{'userId':users[1]['id'],'active':True},a,404)
 call('PUT',sp,{'userId':users[2]['id'],'active':True},a,204)
-assert private['id'] in [t['eventId'] for t in call('GET','/api/v1/me/staff-assignments',token=attendee)]
+assert private['id'] in [t['eventId'] for t in call('GET','/api/v1/me/staff-assignments',token=attendee)["items"]]
 checkpath='/api/v1/events/'+private['id']+'/check-ins'
 # Too early: reject without recording attendance. Then reschedule into the opening window.
 call('POST',checkpath,{'credential':booked['tickets'][0]['credential']},attendee,409)
@@ -73,7 +73,7 @@ memberpath=f"/api/v1/organizations/{org_a['id']}/members/{users[2]['id']}"
 call('PUT',memberpath,{**member,'status':'REMOVED'},a,204)
 call('GET','/api/v1/events/'+private['id'],token=attendee,expected=404)
 call('POST',checkpath,{'credential':booked['tickets'][1]['credential']},attendee,404)
-assert call('GET','/api/v1/me/staff-assignments',token=attendee)==[]
+assert call('GET','/api/v1/me/staff-assignments',token=attendee)["items"]==[]
 call('POST','/api/v1/invitations/accept',{'token':invite['token']},attendee,204)
 assert call('GET','/api/v1/me/organizations',token=attendee)==[]
 assert call('GET','/api/v1/bookings/'+booked['id'],token=attendee)['id']==booked['id']

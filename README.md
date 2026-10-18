@@ -4,9 +4,11 @@
 
 SEMS is a shared event and ticketing platform built with React/TypeScript, three Spring Boot services and PostgreSQL.
 
-Implemented: organizations and memberships, publication/editing/pause, free bookings, individual QR tickets, attendee and whole-event cancellation, assigned-staff check-in, basic summaries and in-app notifications. A [Lightsail HTTPS staging environment](docs/cloud-staging.md) is deployed. Scaling/recovery experiments, automated deployment and security delivery gates remain outstanding. See the [proposal review and next steps](docs/implementation-plan.zh-CN.md) (Chinese).
+Implemented: organizations and memberships, publication/editing/pause, free bookings, individual QR tickets, attendee and whole-event cancellation, assigned-staff check-in, basic summaries and in-app notifications. A [Lightsail HTTPS staging environment](docs/cloud-staging.md) is deployed. GitHub Actions has a main-only staging deployment job. Scaling/recovery experiments, image registry publication and security delivery gates remain outstanding. See the [proposal review and next steps](docs/implementation-plan.zh-CN.md) (Chinese).
 
-Platform-role revocation, recoverable organization closure and server-side member pagination are now implemented. Deployment automation, security gates and cloud measurements remain; see the [current review](docs/implementation-plan.zh-CN.md#本轮整体检查还不只是部署).
+Platform-role revocation, recoverable organization closure and server-side member pagination are now implemented. Versioned image delivery, security gates and cloud measurements remain; see the [current review](docs/implementation-plan.zh-CN.md).
+本轮业务修复、云端版本与剩余工作见[发布复查](docs/release-review-2026-10-19.md)。JWT 为 1 小时；检票窗口为开始前 15 分钟至开始后 15 分钟（截止不含，若更早结束则提前关闭）。
+
 ## 1. Architecture and permissions
 
 Identity owns accounts, organizations, memberships and invitations. Event Catalog owns events, visibility, publication and revisions. Admission owns inventory, bookings, tickets, check-in and notifications. Each service has separate schemas, credentials and migrations; cross-service operations use authenticated HTTP.
@@ -39,7 +41,7 @@ docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.
 
 For frontend development, run `npm --prefix apps/web run dev`; port 15173 proxies APIs to the gateway on 18080. The production frontend is served at the gateway root. Date inputs use the application’s English calendar/time controls in Singapore time (UTC+08:00) and submit UTC timestamps. The local development override exposes PostgreSQL only at `127.0.0.1:15432`; the base Compose file used by CI does not publish a database port.
 
-This is local HTTP configuration. Cloud HTTPS, secret management and deployment remain pending.
+This is the local HTTP configuration. The [cloud overlay](docs/cloud-staging.md) provides HTTPS and deployment automation; runtime secrets currently use host files rather than a managed cloud secret service.
 
 ## 3. 验收流程 / Acceptance walkthrough
 
