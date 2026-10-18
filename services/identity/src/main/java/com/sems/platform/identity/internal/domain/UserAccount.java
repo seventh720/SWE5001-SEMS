@@ -89,10 +89,6 @@ public class UserAccount {
         this.roles = EnumSet.copyOf(updatedRoles);
     }
 
-    public void addRole(Role role) {
-        this.roles.add(role);
-    }
-
     public boolean isActive() {
         return status == UserStatus.ACTIVE;
     }

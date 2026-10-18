@@ -38,7 +38,9 @@ assert call('GET','/api/v1/bookings',token=attendee)['items'][0]['id']==booking[
 # A committed request remains retrievable if Catalog is temporarily unavailable.
 try:
     subprocess.run(compose+['stop','event-catalog'],check=True,stdout=subprocess.DEVNULL)
-    assert call('POST','/api/v1/bookings',request,attendee)==booking
+    replay=call('POST','/api/v1/bookings',request,attendee)
+    assert replay['currentEvent'] is None
+    assert {k:v for k,v in replay.items() if k!='currentEvent'}=={k:v for k,v in booking.items() if k!='currentEvent'}
 finally:
     subprocess.run(compose+['start','event-catalog'],check=True,stdout=subprocess.DEVNULL)
     subprocess.run(compose+['restart','gateway'],check=True,stdout=subprocess.DEVNULL)

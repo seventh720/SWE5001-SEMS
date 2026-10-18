@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
@@ -19,14 +20,27 @@ public class OrganizationGovernanceService {
  private void version(Map<String,Object> org,long version){if(((Number)org.get("version")).longValue()!=version)throw new ResponseStatusException(HttpStatus.CONFLICT,"Organization changed. Reload and submit a new request.");}
  private void notice(UUID org,UUID user,String title,String message,String link){jdbc.update("INSERT INTO membership_notifications(user_id,organization_id,title,message,link,kind) VALUES(?,?,?,?,?,'ORGANIZATION_REQUEST')",user,org,title,message,link);}
  private void notifyMembers(UUID org,String message){for(UUID user:jdbc.queryForList("SELECT user_id FROM organization_memberships WHERE organization_id=? AND status<>'REMOVED'",UUID.class,org))notice(org,user,"Organization updated",message,"/organizations");}
- public List<Request> requests(UUID org,UUID user){organizations.require(org,user,true);return jdbc.query("SELECT r.*,o.name AS organization_name FROM organization_requests r JOIN organizations o ON o.id=r.organization_id WHERE r.organization_id=? ORDER BY r.created_at DESC,r.id DESC",mapper,org);}
- public List<Request> reviewQueue(){return jdbc.query("SELECT r.*,o.name AS organization_name FROM organization_requests r JOIN organizations o ON o.id=r.organization_id ORDER BY CASE WHEN r.status='PENDING' THEN 0 ELSE 1 END,r.created_at DESC,r.id DESC",mapper);}
+ public record RequestPage(List<Request> items,int page,int size,long totalElements,long totalPages,boolean hasPending){}
+ private RequestPage page(UUID org,int page,int size){
+  if(page<0||page>100000||size<1||size>50)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid pagination");
+  String filter=org==null?"":" WHERE r.organization_id=?";
+  Object[] args=org==null?new Object[]{}:new Object[]{org};
+  long total=jdbc.queryForObject("SELECT count(*) FROM organization_requests r"+filter,Long.class,args);
+  boolean pending=Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM organization_requests r"+(org==null?" WHERE":" WHERE r.organization_id=? AND")+" r.status='PENDING')",Boolean.class,args));
+  var queryArgs=new ArrayList<Object>(Arrays.asList(args));queryArgs.add(size);queryArgs.add((long)page*size);
+  var items=jdbc.query("SELECT r.*,o.name AS organization_name FROM organization_requests r JOIN organizations o ON o.id=r.organization_id"+filter+" ORDER BY CASE WHEN r.status='PENDING' THEN 0 ELSE 1 END,r.created_at DESC,r.id DESC LIMIT ? OFFSET ?",mapper,queryArgs.toArray());
+  return new RequestPage(items,page,size,total,(total+size-1)/size,pending);
+ }
+ @Transactional(readOnly=true,isolation=Isolation.REPEATABLE_READ)
+ public RequestPage requests(UUID org,UUID user,int page,int size){organizations.require(org,user,true);return page(org,page,size);}
+ @Transactional(readOnly=true,isolation=Isolation.REPEATABLE_READ)
+ public RequestPage reviewQueue(int page,int size){return page(null,page,size);}
  @Transactional public Request submit(UUID org,UUID user,String kind,String name,String slug,String reason,long baseVersion){
   var old=lock(org);organizations.require(org,user,true);version(old,baseVersion);
   if(kind.equals("UPDATE")){validateProfile(name,slug);if(old.get("name").equals(name.strip())&&old.get("slug").equals(slug))throw new ResponseStatusException(HttpStatus.CONFLICT,"No organization details changed");}
   UUID id=UUID.randomUUID();jdbc.update("INSERT INTO organization_requests(id,organization_id,requester_id,kind,name,slug,reason,base_version) VALUES(?,?,?,?,?,?,?,?)",id,org,user,kind,kind.equals("UPDATE")?name.strip():null,kind.equals("UPDATE")?slug:null,reason.strip(),baseVersion);
   for(UUID admin:jdbc.queryForList("SELECT u.id FROM users u JOIN user_roles r ON r.user_id=u.id WHERE r.role_code='ADMIN' AND u.status='ACTIVE'",UUID.class))notice(org,admin,"Organization request awaiting review",old.get("name")+": "+(kind.equals("CLOSE")?"closure":"profile change")+" requested.","/admin/organizations");
-  return requests(org,user).stream().filter(r->r.id().equals(id)).findFirst().orElseThrow();
+  return jdbc.queryForObject("SELECT r.*,o.name AS organization_name FROM organization_requests r JOIN organizations o ON o.id=r.organization_id WHERE r.id=?",mapper,id);
  }
  static void validateProfile(String name,String slug){if(name==null||name.isBlank()||name.strip().length()>160||slug==null||!slug.matches("[a-z0-9][a-z0-9-]{1,99}"))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Enter a valid organization name and address");}
  private void profile(UUID org,String name,String slug){validateProfile(name,slug);jdbc.update("UPDATE organizations SET name=?,slug=?,version=version+1 WHERE id=?",name.strip(),slug,org);notifyMembers(org,"Organization details changed to "+name.strip()+" ("+slug+").");}

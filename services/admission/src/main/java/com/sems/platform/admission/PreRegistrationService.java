@@ -15,7 +15,9 @@ public class PreRegistrationService {
  private final JdbcTemplate jdbc;private final ObjectMapper json;
  public PreRegistrationService(JdbcTemplate jdbc,ObjectMapper json){this.jdbc=jdbc;this.json=json;}
  public record Input(@NotNull UUID ticketTypeId,@Min(1) @Max(10) int quantity,@Valid AttendeeInfo attendeeInfo){public Input{attendeeInfo=attendeeInfo==null?new AttendeeInfo(null,null,null,null,null,null):attendeeInfo;}}
- public record View(UUID eventId,UUID ticketTypeId,int quantity,AttendeeInfo attendeeInfo,String eventTitle,String eventLocation,String ticketName,Instant opensAt,Instant closesAt,Instant startsAt,String status,String customFieldLabel){}
+ public record View(UUID eventId,UUID ticketTypeId,int quantity,AttendeeInfo attendeeInfo,String eventTitle,String eventLocation,String ticketName,Instant opensAt,Instant closesAt,Instant startsAt,String status,String customFieldLabel,CatalogClient.EventDetails currentEvent){
+  public View withCurrentEvent(CatalogClient.EventDetails e){return new View(eventId,ticketTypeId,quantity,attendeeInfo,eventTitle,eventLocation,ticketName,opensAt,closesAt,startsAt,status,customFieldLabel,e);}
+ }
  public record Page(List<View> items,int page,int size,long totalElements,long totalPages){}
  private static final String SELECT="SELECT p.*,t.name,t.opens_at,t.closes_at,t.quota-t.reserved AS available,s.starts_at,s.state FROM pre_registrations p JOIN ticket_types t ON t.id=p.ticket_type_id JOIN sales s ON s.event_id=p.event_id ";
  static String status(Instant now,Instant opens,Instant closes,Instant starts,String state,int available){
@@ -25,7 +27,7 @@ public class PreRegistrationService {
  }
  private View map(ResultSet rs,int n)throws SQLException{
   try {var opens=rs.getTimestamp("opens_at").toInstant();var closes=rs.getTimestamp("closes_at").toInstant();var starts=rs.getTimestamp("starts_at").toInstant();
-   return new View(rs.getObject("event_id",UUID.class),rs.getObject("ticket_type_id",UUID.class),rs.getInt("quantity"),json.readValue(rs.getString("attendee_info"),AttendeeInfo.class),rs.getString("event_title"),rs.getString("event_location"),rs.getString("name"),opens,closes,starts,status(Instant.now(),opens,closes,starts,rs.getString("state"),rs.getInt("available")),rs.getString("custom_field_label"));
+   return new View(rs.getObject("event_id",UUID.class),rs.getObject("ticket_type_id",UUID.class),rs.getInt("quantity"),json.readValue(rs.getString("attendee_info"),AttendeeInfo.class),rs.getString("event_title"),rs.getString("event_location"),rs.getString("name"),opens,closes,starts,status(Instant.now(),opens,closes,starts,rs.getString("state"),rs.getInt("available")),rs.getString("custom_field_label"),null);
   }catch(com.fasterxml.jackson.core.JsonProcessingException e){throw new IllegalStateException(e);}
  }
  @Transactional(readOnly=true) public View get(UUID user,UUID event){var rows=jdbc.query(SELECT+"WHERE p.user_id=? AND p.event_id=?",this::map,user,event);if(rows.isEmpty())throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Pre-registration not found");return rows.getFirst();}

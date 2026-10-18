@@ -17,7 +17,7 @@ Environment configuration:
 
 The deployment key uses ubuntu with Docker sudo access. It is a privileged server credential, separate from the personal Lightsail key; its authorized-key entry disables forwarding and PTY allocation. Rotate it by installing a replacement public key, updating the environment secret, then removing the old public key.
 
-Releases live under `/home/ubuntu/swe5001/releases/<commit>` and link to the existing root `.env` and `.secrets`. The Compose project stays `swe5001`, preserving database/certificate volumes. Deployment builds images, backs up PostgreSQL under `backups/`, starts the release, restarts the gateway to refresh upstream addresses, and checks internal health. Actions then checks the public HTTPS homepage and all three services. A brief interruption is possible on this single host.
+Releases live under `/home/ubuntu/swe5001/releases/<commit>` and link to the existing root `.env` and `.secrets`. The Compose project stays `swe5001`, preserving database/certificate volumes. Deployment builds images, backs up PostgreSQL under `backups/`, starts the release, restarts the gateway to load release configuration (Docker DNS refresh handles replica changes afterward), and checks internal health. Actions then checks the public HTTPS homepage and all three services. A brief interruption is possible on this single host.
 
 `deployed-sha`, `previous-deployed-sha`, and `current` record releases that passed host health checks; the Actions result additionally confirms public HTTPS. Failures retain the backup and release for inspection. Database migrations are not automatically reversed. Retry the failed deployment job for the current main commit, or manually run Platform CI on main. Before rollback, check migration compatibility; redeploy compatible binaries or explicitly restore the backup during maintenance. Never delete persistent volumes.
 
@@ -58,6 +58,8 @@ sudo docker compose --env-file .env -p swe5001 -f deployment/compose.yaml -f dep
 Download backups to a separate machine before deleting the instance. Preserve `.env` and `.secrets` securely as well. Do not run `down -v`, which deletes the database and certificate volumes. Stop/start alone does not avoid Lightsail instance charges.
 
 Database migrations run on service startup. Back up before updates, and check migration compatibility before rollback. Previous organization-lifecycle changes require compatible Catalog/Identity versions; do not blindly restore older binaries.
+
+Read-only inspection on 2026-10-19 confirmed all three readiness endpoints and HTTPS assets healthy. The deployed release was `c0f4600`, with 1 user and no organizations, events or bookings. Its JWT lifetime was still 1800 seconds; the new 3600-second/session-recovery changes require the next release. See [release review](release-review-2026-10-19.md).
 
 Remaining work: security gates, off-host scheduled backups, real-device camera checks, and cloud load/recovery measurements. Existing fault-injection acceptance scripts are intended for disposable stacks, not this shared staging instance.
 

@@ -5,7 +5,7 @@ import {OrganizationRequestPanel,PlatformOrganizationGovernance} from "./Organiz
 vi.mock("../auth/AuthContext",()=>({useAuth:()=>({token:"token"})}));
 afterEach(()=>{cleanup();vi.unstubAllGlobals()});
 const org={id:"o",name:"Society",slug:"society",status:"ACTIVE",role:"ORG_ADMIN",version:4};
-const json=(data:unknown)=>new Response(JSON.stringify(data));
+const json=(data:unknown)=>new Response(JSON.stringify(Array.isArray(data)?{items:data,totalPages:data.length?1:0,hasPending:data.some(r=>r.status==="PENDING")}:data));
 it("submits profile changes for review without applying them directly",async()=>{
  const fetch=vi.fn(async(_path,options)=>options?.method==="POST"?json({id:"r"}):json([]));vi.stubGlobal("fetch",fetch);
  render(<OrganizationRequestPanel organization={org}/>);

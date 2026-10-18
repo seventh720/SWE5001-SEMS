@@ -4,7 +4,7 @@ from acceptance import *
 import time
 def await_closed(identity,target):
  for _ in range(45):
-  orgs=call('GET','/api/v1/admin/organizations',token=admin)
+  orgs=paged('/api/v1/admin/organizations',admin)
   if target=='DELETED' and not any(o['id']==identity for o in orgs):return
   if any(o['id']==identity and o['status']==target for o in orgs):return
   time.sleep(2)
@@ -35,7 +35,7 @@ assert call('GET','/api/v1/events/'+event['id'])['organizationName']=='Direct '+
 r=request('CLOSE');review(r)
 await_closed(org_a['id'],'SUSPENDED')
 assert call('GET','/api/v1/me/organizations',token=a)==[]
-assert next(o for o in call('GET','/api/v1/admin/organizations',token=admin) if o['id']==org_a['id'])['status']=='SUSPENDED'
+assert next(o for o in paged('/api/v1/admin/organizations',admin) if o['id']==org_a['id'])['status']=='SUSPENDED'
 call('GET',path,token=a,expected=404)
 call('GET','/api/v1/events/'+event['id'],expected=404)
 assert event['id'] not in [e['id'] for e in call('GET','/api/v1/events')['items']]
@@ -52,7 +52,7 @@ call('DELETE',f"/api/v1/admin/organizations/{org_b['id']}?version={other['versio
 call('DELETE',f"/api/v1/admin/organizations/{org_b['id']}?version=999",token=admin,expected=409)
 call('DELETE',f"/api/v1/admin/organizations/{org_b['id']}?version={other['version']}",token=admin,expected=204)
 await_closed(org_b['id'],'DELETED')
-assert org_b['id'] not in [o['id'] for o in call('GET','/api/v1/admin/organizations',token=admin)]
+assert org_b['id'] not in [o['id'] for o in paged('/api/v1/admin/organizations',admin)]
 assert call('GET','/api/v1/me/organizations',token=b)==[]
 call('PATCH',f"/api/v1/admin/organizations/{org_b['id']}",{'status':'ACTIVE'},admin,404)
 assert call('GET','/api/v1/me/membership-notifications',token=a)['unreadCount']>0

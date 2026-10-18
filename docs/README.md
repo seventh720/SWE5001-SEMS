@@ -1,6 +1,7 @@
 # 项目文档索引
 
-- [Proposal 对照与下一步](implementation-plan.zh-CN.md)：当前状态、缺口、优先级与交付时间。
+- [课程要求核对与展示行动清单](implementation-plan.zh-CN.md)：课程/proposal 对照、架构判断、已发现问题、presentation 讲法及 10 月 19–24 日安排。
+- [本次发布复查](release-review-2026-10-19.md)：最终代码规则、云端实查、发布步骤与剩余工作。
 - [当前业务规则](functional-guide.md)：组织、预订、票券、核销、资料和预约。
 - [验收矩阵](acceptance-matrix.md)：目标、证据和待补实验。
 - [架构决策](adr/0001-service-boundaries.md)：服务边界及一致性协议。

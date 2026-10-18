@@ -15,17 +15,17 @@ event=call('GET',path,token=a)
 inv=call('PUT',path+'/ticket-types',{'eventVersion':event['version'],'version':0,'ticketTypes':[{'name':'General','quota':10,'opensAt':(start-datetime.timedelta(days=8)).isoformat(),'closesAt':start.isoformat()}]},a)
 call('PUT',path+'/staff',{'userId':users[2]['id'],'active':True},a,204)
 # Assigned draft with zero bookings still has a meaningful current title.
-tasks=call('GET','/api/v1/me/staff-assignments',token=attendee)
+tasks=call('GET','/api/v1/me/staff-assignments',token=attendee)["items"]
 matching=[t for t in tasks if t['eventId']==event['id']]
 assert len(matching)==1, f'Assigned draft must remain visible before publication: {tasks}'
 assert matching[0]['title']==event['title']
 event=call('GET',path,token=a)
 event=call('POST',path+'/publish',{'version':event['version'],'ticketVersion':inv['version']},a)
 call('PATCH',path+'/presentation',{'title':'Current staff task title','description':event['description'],'location':event['location'],'category':event['category'],'cardTheme':event['cardTheme'],'version':event['version']},a)
-assert call('GET','/api/v1/me/staff-assignments',token=attendee)[0]['title']=='Current staff task title'
+assert call('GET','/api/v1/me/staff-assignments',token=attendee)["items"][0]['title']=='Current staff task title'
 booked=call('POST','/api/v1/bookings',{'eventId':event['id'],'ticketTypeId':inv['ticketTypes'][0]['id'],'quantity':1,'requestKey':str(uuid.uuid4())},attendee)
 call('PUT',path+'/staff',{'userId':users[2]['id'],'active':False},a,204)
-assert call('GET','/api/v1/me/staff-assignments',token=attendee)==[]
+assert call('GET','/api/v1/me/staff-assignments',token=attendee)["items"]==[]
 call('POST','/api/v1/events/'+event['id']+'/check-ins',{'credential':booked['tickets'][0]['credential']},attendee,403)
 mp=f"/api/v1/organizations/{org_a['id']}/members/{users[2]['id']}"
 member=next(m for m in call('GET',f"/api/v1/organizations/{org_a['id']}/members",token=a)['items'] if m['userId']==users[2]['id'])

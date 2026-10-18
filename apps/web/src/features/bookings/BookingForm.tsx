@@ -189,7 +189,7 @@ export function BookingForm({
       navigate(`/bookings/${booking.id}`);
     } catch (e) {
       // A transport/server failure may have happened after commit: keep the same key and payload.
-      if (e instanceof ApiError && e.status >= 400 && e.status < 500) {
+      if (e instanceof ApiError && e.status >= 400 && e.status < 500 && e.status !== 401) {
         sessionStorage.removeItem(storageKey);
         setPending(null);
       }

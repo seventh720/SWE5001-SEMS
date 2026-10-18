@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "../auth/AuthContext";
 import { BookingForm } from "./BookingForm";
@@ -276,4 +276,28 @@ it("loads pre-registration for review and changes to booking at opening", async 
   } finally {
     vi.useRealTimers();
   }
+});
+
+it("keeps the original booking key and payload after authentication expires", async () => {
+  fetchMock.mockResolvedValueOnce(response({detail:"Session expired"},401));
+  form();
+  fireEvent.click(screen.getByRole("button",{name:"Confirm free booking"}));
+  await waitFor(()=>expect(fetchMock).toHaveBeenCalledTimes(1));
+  const request=JSON.parse(fetchMock.mock.calls[0][1]!.body as string);
+  await waitFor(()=>expect(JSON.parse(sessionStorage.getItem("sems-booking:u1:e1:t1")!)).toEqual(request));
+});
+
+it("shows the current venue for paused events while preserving booking history", async () => {
+  fetchMock.mockResolvedValueOnce(response({...booking,currentEvent:{id:"e1",title:"Updated workshop",location:"New venue",startsAt:booking.startsAt,endsAt:booking.endsAt,status:"PAUSED"}}));
+  render(<AuthProvider><MemoryRouter initialEntries={["/bookings/b1"]}><Routes><Route path="/bookings/:id" element={<BookingDetail/>}/></Routes></MemoryRouter></AuthProvider>);
+  await screen.findByText(/New venue/);
+  expect(screen.getByText("Details when booked")).toBeTruthy();
+  expect(screen.getByText(/Campus/)).toBeTruthy();
+  expect(screen.getByText("unique-code")).toBeTruthy();
+});
+it("keeps ticket access and labels saved details when Catalog is unavailable", async () => {
+  fetchMock.mockResolvedValueOnce(response({...booking,currentEvent:null}));
+  render(<AuthProvider><MemoryRouter initialEntries={["/bookings/b1"]}><Routes><Route path="/bookings/:id" element={<BookingDetail/>}/></Routes></MemoryRouter></AuthProvider>);
+  await screen.findByText(/Current event details unavailable/);
+  expect(screen.getByText("unique-code")).toBeTruthy();
 });

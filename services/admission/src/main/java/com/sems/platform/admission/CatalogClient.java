@@ -8,6 +8,16 @@ import org.springframework.web.server.ResponseStatusException;
 import static com.sems.platform.admission.TicketContracts.*;
 @Component
 public class CatalogClient {
+    public record EventDetails(UUID id,String title,String location,java.time.Instant startsAt,java.time.Instant endsAt,String status) {}
+    public Map<UUID,EventDetails> details(List<UUID> ids) {
+        if (ids.isEmpty()) return Map.of();
+        try {
+            var rows=Objects.requireNonNull(client.post().uri("/internal/v1/events/details").body(Map.of("ids",ids.stream().distinct().toList())).retrieve().body(EventDetails[].class));
+            return Arrays.stream(rows).collect(java.util.stream.Collectors.toMap(EventDetails::id,java.util.function.Function.identity()));
+        } catch(RestClientException e) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"Current event details unavailable; retry later");
+        }
+    }
     private final RestClient client;
     public CatalogClient(RestClient client) { this.client=client; }
     public Snapshot owned(UUID event, UUID owner) {

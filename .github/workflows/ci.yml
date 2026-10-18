@@ -109,6 +109,8 @@ jobs:
           set -a
           source .env
           set +a
+          python3 scripts/business-fixes-acceptance.py
+          python3 scripts/gateway-scaling-acceptance.py
           python3 scripts/organization-acceptance.py
           python3 scripts/organization-security-acceptance.py
           python3 scripts/visibility-acceptance.py

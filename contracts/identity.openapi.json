@@ -572,6 +572,103 @@
             "minimum": 0
           }
         }
+      },
+      "UserPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "size",
+          "totalElements",
+          "totalPages"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        }
+      },
+      "OrganizationPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "size",
+          "totalElements",
+          "totalPages"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Organization"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        }
+      },
+      "OrganizationRequestPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "size",
+          "totalElements",
+          "totalPages",
+          "hasPending"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrganizationRequest"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "hasPending": {
+            "type": "boolean"
+          }
+        }
       }
     }
   },
@@ -625,6 +722,9 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Gateway shared authentication budget exceeded; retry after Retry-After seconds"
           }
         },
         "requestBody": {
@@ -666,7 +766,7 @@
     },
     "/api/v1/auth/login": {
       "post": {
-        "summary": "Sign in; RSA token expires after 1800 seconds",
+        "summary": "Sign in; RSA token expires after 3600 seconds",
         "responses": {
           "200": {
             "description": "Success",
@@ -685,7 +785,10 @@
                       ]
                     },
                     "expiresIn": {
-                      "type": "integer"
+                      "type": "integer",
+                      "enum": [
+                        3600
+                      ]
                     },
                     "user": {
                       "$ref": "#/components/schemas/User"
@@ -736,6 +839,9 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Gateway shared authentication budget exceeded; retry after Retry-After seconds"
           }
         },
         "requestBody": {
@@ -820,17 +926,14 @@
     },
     "/api/v1/admin/users": {
       "get": {
-        "summary": "ADMIN: list accounts (unpaginated in this release)",
+        "summary": "ADMIN: list accounts (server-paginated)",
         "responses": {
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
+                  "$ref": "#/components/schemas/UserPage"
                 }
               }
             }
@@ -872,7 +975,38 @@
             }
           }
         },
-        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry."
+        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200,
+              "default": ""
+            }
+          }
+        ]
       }
     },
     "/api/v1/admin/users/{userId}/roles": {
@@ -966,7 +1100,7 @@
             }
           }
         },
-        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry."
+        "description": "Reject removing ADMIN from the last active platform administrator with 409. Role replacements serialize across instances."
       }
     },
     "/api/v1/profile": {
@@ -1287,17 +1421,14 @@
     },
     "/api/v1/admin/organizations": {
       "get": {
-        "summary": "Platform ADMIN: list organizations",
+        "summary": "Platform ADMIN: list organizations (server-paginated)",
         "responses": {
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Organization"
-                  }
+                  "$ref": "#/components/schemas/OrganizationPage"
                 }
               }
             }
@@ -1321,7 +1452,38 @@
             "description": "Authorization dependency unavailable"
           }
         },
-        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry."
+        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 200,
+              "default": ""
+            }
+          }
+        ]
       },
       "post": {
         "summary": "Platform ADMIN: create organization and appoint an existing active account",
@@ -2231,17 +2393,14 @@
         }
       },
       "get": {
-        "summary": "ORG_ADMIN: view organization request history",
+        "summary": "ORG_ADMIN: view organization request history (server-paginated)",
         "responses": {
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OrganizationRequest"
-                  }
+                  "$ref": "#/components/schemas/OrganizationRequestPage"
                 }
               }
             }
@@ -2271,23 +2430,40 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
           }
         ]
       }
     },
     "/api/v1/admin/organizations/requests": {
       "get": {
-        "summary": "Platform ADMIN: review pending and historical requests",
+        "summary": "Platform ADMIN: review pending and historical requests (server-paginated)",
         "responses": {
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OrganizationRequest"
-                  }
+                  "$ref": "#/components/schemas/OrganizationRequestPage"
                 }
               }
             }
@@ -2308,7 +2484,29 @@
             "description": "Stale version, duplicate pending request, slug collision or already reviewed"
           }
         },
-        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry."
+        "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100000,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          }
+        ]
       }
     },
     "/api/v1/admin/organizations/requests/{id}/review": {
@@ -2358,22 +2556,58 @@
         "description": " Platform access requires ADMIN in both the JWT and current active account roles; revocation takes effect on subsequent requests without waiting for token expiry. Approving CLOSE records a durable CLOSING operation; approval is not completion. Catalog/Admission cancellation and notifications complete before membership revocation and SUSPENDED. Recovery runs after outages/restarts."
       }
     },
-    "/internal/v1/organizations/active": {
-      "get": {
-        "summary": "Internal authenticated active organization directory for discovery and eligibility",
-        "responses": {
-          "200": {
-            "description": "Active organizations with current names"
-          },
-          "401": {
-            "description": "Missing/invalid service token"
-          }
-        },
+    "/internal/v1/organizations/lookup": {
+      "post": {
+        "summary": "Internal live lookup of up to 100 requested active organizations; no authorization cache",
         "security": [
           {
             "serviceToken": []
           }
-        ]
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ids"
+                ],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Only requested ACTIVE organizations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Organization"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid internal token"
+          },
+          "400": {
+            "description": "Invalid batch"
+          }
+        }
       }
     }
   }

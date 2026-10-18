@@ -1,0 +1,83 @@
+{
+  "observedAt": "2026-10-18T17:00:01.345297+00:00",
+  "logWindow": "10m",
+  "requests": 873,
+  "statusCounts": {
+    "201": 34,
+    "409": 151,
+    "400": 65,
+    "401": 81,
+    "200": 417,
+    "403": 19,
+    "404": 71,
+    "202": 2,
+    "502": 13,
+    "204": 20
+  },
+  "serverErrorRate": 0.014891179839633447,
+  "p95Seconds": 0.206,
+  "containers": [
+    {
+      "Name": "sems-business-review-admission-1",
+      "CPUPerc": "0.33%",
+      "MemUsage": "376.7MiB / 7.75GiB",
+      "MemPerc": "4.75%",
+      "NetIO": "27.7kB / 27.1kB",
+      "BlockIO": "0B / 0B"
+    },
+    {
+      "Name": "sems-business-review-admission-2",
+      "CPUPerc": "0.31%",
+      "MemUsage": "379.2MiB / 7.75GiB",
+      "MemPerc": "4.78%",
+      "NetIO": "43.1kB / 45.4kB",
+      "BlockIO": "69.6kB / 0B"
+    },
+    {
+      "Name": "sems-business-review-event-catalog-1",
+      "CPUPerc": "0.40%",
+      "MemUsage": "482.9MiB / 7.75GiB",
+      "MemPerc": "6.09%",
+      "NetIO": "64.5kB / 62.8kB",
+      "BlockIO": "24.6kB / 0B"
+    },
+    {
+      "Name": "sems-business-review-gateway-1",
+      "CPUPerc": "0.08%",
+      "MemUsage": "2.891MiB / 7.75GiB",
+      "MemPerc": "0.04%",
+      "NetIO": "50.5kB / 51.5kB",
+      "BlockIO": "4.1kB / 0B"
+    },
+    {
+      "Name": "sems-business-review-identity-1",
+      "CPUPerc": "2.97%",
+      "MemUsage": "465.2MiB / 7.75GiB",
+      "MemPerc": "5.86%",
+      "NetIO": "77.6kB / 73.5kB",
+      "BlockIO": "6.62MB / 0B"
+    },
+    {
+      "Name": "sems-business-review-postgres-1",
+      "CPUPerc": "1.65%",
+      "MemUsage": "96.11MiB / 7.75GiB",
+      "MemPerc": "1.21%",
+      "NetIO": "3.46MB / 3.13MB",
+      "BlockIO": "2.92MB / 66.5MB"
+    },
+    {
+      "Name": "sems-business-review-web-1",
+      "CPUPerc": "0.00%",
+      "MemUsage": "8.676MiB / 7.75GiB",
+      "MemPerc": "0.11%",
+      "NetIO": "21.5kB / 418kB",
+      "BlockIO": "28.7kB / 8.19kB"
+    }
+  ],
+  "database": {
+    "connections": 41,
+    "active": 1,
+    "waiting": 0
+  },
+  "note": "Gateway completed requests only; resource and DB samples are instantaneous. Not proof of load targets or high availability."
+}

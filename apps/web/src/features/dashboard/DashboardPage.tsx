@@ -103,9 +103,9 @@ export function DashboardPage() {
           {bookings.items.map((b) => (
             <Link className="dashboard-row" to={`/bookings/${b.id}`} key={b.id}>
               <span>
-                <strong>{b.eventTitle}</strong>
+                <strong>{b.currentEvent?.title ?? b.eventTitle}</strong>{b.currentEvent === null && <p>Current event details unavailable. Showing saved booking information.</p>}
                 <small>
-                  {formatDateTime(b.startsAt)} · {b.eventLocation}
+                  {formatDateTime(b.currentEvent?.startsAt ?? b.startsAt)} · {b.currentEvent?.location ?? b.eventLocation}
                 </small>
               </span>
               <span>
@@ -132,7 +132,7 @@ export function DashboardPage() {
               soldOut = p.status === "SOLD_OUT";
             return (
               <article className="dashboard-reservation" key={p.eventId}>
-                <strong>{p.eventTitle}</strong>
+                <strong>{p.currentEvent?.title ?? p.eventTitle}</strong>{p.currentEvent === null && <p>Current event details unavailable. Showing saved pre-registration information.</p>}
                 {waiting && !closed ? (
                   <Countdown label="Opens in" target={p.opensAt} />
                 ) : (

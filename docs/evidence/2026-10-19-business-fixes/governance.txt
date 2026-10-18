@@ -1,0 +1,2 @@
+PASS: registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits
+PASS: scoped requests, rejection/approval, stale review, direct edits, closure, public event visibility, cancelled tickets with preserved history and isolated soft deletion

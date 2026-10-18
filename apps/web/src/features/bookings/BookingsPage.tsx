@@ -1,3 +1,4 @@
+import type { CurrentEvent } from "../../shared/types/event";
 import { HomeLink } from "../../shared/components/HomeLink";
 import { RegistrationSummary, type AttendeeInfo } from "./registration";
 import { formatDateTime } from "../../shared/components/dateTime";
@@ -10,6 +11,7 @@ export interface Booking {
   id: string;
   eventId: string;
   status: string;
+  currentEvent?: CurrentEvent | null;
   eventTitle: string;
   eventLocation: string;
   startsAt: string;
@@ -125,13 +127,14 @@ export function BookingsPage() {
             <article className="card event-card" key={b.id}>
               <div>
                 <span className={`badge ${b.status === "CANCELLED" ? "badge-cancelled" : ""}`}>{b.status === "CANCELLED" ? "Cancelled" : "Confirmed"}</span>
-                <h2>{b.eventTitle}</h2>
+                <h2>{b.currentEvent?.title ?? b.eventTitle}</h2>
+                {b.currentEvent === null && <p role="status">Current event details unavailable. Showing saved booking information; reload before travelling.</p>}
                 <p>
                   {b.ticketName} · {b.quantity}{" "}
                   {b.quantity === 1 ? "ticket" : "tickets"} · Free
                 </p>
                 <p className="muted">
-                  {formatDateTime(b.startsAt)} · {b.eventLocation}
+                  {formatDateTime(b.currentEvent?.startsAt ?? b.startsAt)} · {b.currentEvent?.location ?? b.eventLocation}
                 </p>
               </div>
               <Link className="secondary-button" to={`/bookings/${b.id}`}>
@@ -220,12 +223,17 @@ export function BookingDetail() {
       {booking && (
         <>
           <p className="eyebrow">BOOKING / {booking.status}</p>
-          <h1>{booking.eventTitle}</h1>
-          {!booking.eventCancellationReason&&<Link to={`/events/${booking.eventId}`}>
+          <h1>{booking.currentEvent?.title ?? booking.eventTitle}</h1>
+          {booking.currentEvent === null && <p role="status">Current event details unavailable. Showing saved booking information; reload before travelling.</p>}
+          {booking.currentEvent && <p>Current event status: {booking.currentEvent.status}</p>}
+          {booking.currentEvent && (booking.currentEvent.title !== booking.eventTitle || booking.currentEvent.location !== booking.eventLocation) && (
+            <details><summary>Details when booked</summary><p>{booking.eventTitle} · {booking.eventLocation}</p></details>
+          )}
+          {!booking.eventCancellationReason && (!booking.currentEvent || (booking.currentEvent.status === "PUBLISHED" && Date.parse(booking.currentEvent.startsAt) > Date.now())) && <Link to={`/events/${booking.eventId}`}>
             View current event details →
           </Link>}
           <p>
-            {booking.eventLocation} · {formatDateTime(booking.startsAt)}
+            {booking.currentEvent?.location ?? booking.eventLocation} · {formatDateTime(booking.currentEvent?.startsAt ?? booking.startsAt)}
           </p>
           <p>
             {booking.ticketName} · {booking.quantity} tickets · Total: Free

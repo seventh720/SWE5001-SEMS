@@ -4,9 +4,11 @@
 
 SEMS 是 React + TypeScript、三个 Spring Boot 服务与 PostgreSQL 构成的共享活动票务平台。
 
-已实现组织与成员权限、活动发布/编辑/暂停、免费预订、独立二维码票券、参与者及整场活动取消、工作人员核销、基础统计及站内通知。[Lightsail HTTPS 测试环境](docs/cloud-staging.md)已部署，扩容/故障实验和安全交付流水线仍需完成。当前进度见 [Proposal 对照与下一步](docs/implementation-plan.zh-CN.md)。
+已实现组织与成员权限、活动发布/编辑/暂停、免费预订、独立二维码票券、参与者及整场活动取消、工作人员核销、基础统计及站内通知。[Lightsail HTTPS 测试环境](docs/cloud-staging.md)已部署，已配置 main 分支的 GitHub Actions 自动部署；扩容/故障实验、镜像仓库和安全门禁仍需完成。当前进度见 [Proposal 对照与下一步](docs/implementation-plan.zh-CN.md)。
 
-超管降权即时失效、可恢复的组织注销和成员服务端分页已修复。交付流水线、安全门禁与云端实测仍需完成，详见[本轮整体检查](docs/implementation-plan.zh-CN.md#本轮整体检查还不只是部署)。
+超管降权即时失效、可恢复的组织注销和成员服务端分页已修复。版本化镜像交付、安全门禁与云端实测仍需完成，详见[本轮整体检查](docs/implementation-plan.zh-CN.md)。
+本轮业务修复、云端版本与剩余工作见[发布复查](docs/release-review-2026-10-19.md)。JWT 为 1 小时；检票窗口为开始前 15 分钟至开始后 15 分钟（截止不含，若更早结束则提前关闭）。
+
 ## 1. 架构与权限
 
 Identity 管理账号、组织、成员及邀请；Event Catalog 管理活动、可见性、发布及修订；Admission 管理库存、订单、票券、签到及通知。三服务有独立 schema、凭据和迁移，通过认证 HTTP 协作。
@@ -15,7 +17,7 @@ Identity 管理账号、组织、成员及邀请；Event Catalog 管理活动、
 
 ## 2. 本地启动
 
-需要 Java 21、Maven 3.9+、Node.js 22、npm、OpenSSL、Python 3 和 Docker Compose v2。
+需要 Java 21、Maven 3.9+、Node.js 22、npm、OpenSSL、Python 3 和 Docker Compose v2。用 `mvn -version` 确认 Maven 实际使用 Java 21；高版本编译器的 `--release 21` 不等同于 CI 的 Java 21 编译器。
 
 ```bash
 git clone git@github.com:seventh720/SWE5001-SMES.git
@@ -39,7 +41,7 @@ docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.
 
 开发前端可执行 `npm --prefix apps/web run dev`，访问15173端口，API代理到18080网关。生产构建的页面运行在网关根路径。日期输入使用应用自定义英文日历和时间选择器，统一为新加坡时间（UTC+08:00），提交为 UTC。本地开发覆盖配置仅向 `127.0.0.1:15432` 开放数据库；CI 使用的基础 Compose 文件不开放数据库端口。
 
-这是本地HTTP配置，云端仍需HTTPS、密钥管理和部署配置。
+这是本地 HTTP 配置。[云端覆盖配置](docs/cloud-staging.md)已有 HTTPS 和自动部署；运行密钥目前存放于受限主机文件，尚未接入云托管密钥服务。
 
 ## 3. 验收流程 / Acceptance walkthrough
 

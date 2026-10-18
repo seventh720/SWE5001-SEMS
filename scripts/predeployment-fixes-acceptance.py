@@ -13,7 +13,7 @@ def wait_for(check,message):
   if check():return
   time.sleep(1)
  raise AssertionError(message)
-def admin_org(oid):return next((o for o in call('GET','/api/v1/admin/organizations',token=admin) if o['id']==oid),None)
+def admin_org(oid):return next((o for o in paged('/api/v1/admin/organizations',admin) if o['id']==oid),None)
 # The same signed administrator JWT loses platform authority after role revocation.
 call('PUT',f"/api/v1/admin/users/{users[1]['id']}/roles",{'roles':['ATTENDEE','ADMIN']},admin)
 old_admin=login(users[1]['email']);call('GET','/api/v1/admin/users',token=old_admin)

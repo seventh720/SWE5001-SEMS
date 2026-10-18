@@ -1,3 +1,4 @@
+import type { CurrentEvent } from "../../shared/types/event";
 import { HomeLink } from "../../shared/components/HomeLink";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -11,6 +12,7 @@ export interface PreRegistration {
   ticketTypeId: string;
   quantity: number;
   attendeeInfo: AttendeeInfo;
+  currentEvent?: CurrentEvent | null;
   eventTitle: string;
   eventLocation: string;
   ticketName: string;
@@ -97,9 +99,10 @@ export function PreRegistrationsPage() {
             <span className="status-chip">
               {closed ? "Closed" : waiting ? "Opening soon" : "Ready to review"}
             </span>
-            <h2>{item.eventTitle}</h2>
+            <h2>{item.currentEvent?.title ?? item.eventTitle}</h2>
+                {item.currentEvent === null && <p role="status">Current event details unavailable. Showing saved booking information; reload before travelling.</p>}
             <p>
-              {item.eventLocation} · {formatDateTime(item.startsAt)}
+              {item.currentEvent?.location ?? item.eventLocation} · {formatDateTime(item.currentEvent?.startsAt ?? item.startsAt)}
             </p>
             <p>
               {item.ticketName} · {item.quantity}{" "}

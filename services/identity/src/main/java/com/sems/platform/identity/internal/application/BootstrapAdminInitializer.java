@@ -1,6 +1,5 @@
 package com.sems.platform.identity.internal.application;
 
-import com.sems.platform.identity.Role;
 import com.sems.platform.identity.internal.domain.UserAccount;
 import com.sems.platform.identity.internal.persistence.UserAccountRepository;
 import com.sems.platform.identity.config.BootstrapAdminProperties;
@@ -34,13 +33,12 @@ public class BootstrapAdminInitializer implements ApplicationRunner {
             return;
         }
         String email = properties.email().strip().toLowerCase(Locale.ROOT);
-        users.findByEmail(email).ifPresentOrElse(existing -> {
-            if (!existing.getRoles().contains(Role.ADMIN)) {
-                existing.addRole(Role.ADMIN);
-            }
-        }, () -> users.save(UserAccount.bootstrapAdmin(
+        // Bootstrap creates the first account; subsequent starts must respect role revocation.
+        if (users.findByEmail(email).isEmpty()) {
+            users.save(UserAccount.bootstrapAdmin(
                 properties.username().strip().toLowerCase(Locale.ROOT),
                 email,
-                passwordEncoder.encode(properties.password()))));
+                passwordEncoder.encode(properties.password())));
+        }
     }
 }

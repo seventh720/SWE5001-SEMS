@@ -20,7 +20,20 @@ public class OrganizationService {
  public record Invitation(UUID id,UUID userId,String email,String role,String status,Instant expiresAt){}
  public record CreatedInvitation(UUID id,String token,Instant expiresAt){}
  public List<Organization> mine(UUID user){return jdbc.query("SELECT o.*,m.role FROM organizations o JOIN organization_memberships m ON m.organization_id=o.id JOIN users u ON u.id=m.user_id WHERE m.user_id=? AND m.status='ACTIVE' AND o.status='ACTIVE' AND u.status='ACTIVE' ORDER BY o.name,o.id",(r,n)->new Organization(r.getObject("id",UUID.class),r.getString("name"),r.getString("slug"),r.getString("status"),r.getString("role"),r.getLong("version"),false),user);}
- public List<Organization> all(){return jdbc.query("SELECT o.*,EXISTS(SELECT 1 FROM organization_closures c WHERE c.organization_id=o.id) AS closure_requested FROM organizations o WHERE status<>'DELETED' ORDER BY name,id",(r,n)->new Organization(r.getObject("id",UUID.class),r.getString("name"),r.getString("slug"),r.getString("status"),null,r.getLong("version"),r.getBoolean("closure_requested")));}
+ public record OrganizationPage(List<Organization> items,int page,int size,long totalElements,long totalPages){}
+ @Transactional(readOnly=true,isolation=Isolation.REPEATABLE_READ)
+ public OrganizationPage all(int page,int size,String search){
+  if(page<0||page>100000||size<1||size>50||search.length()>200)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid pagination or search");
+  String filter=" FROM organizations o WHERE status<>'DELETED' AND (strpos(lower(name),?)>0 OR strpos(lower(slug),?)>0)";
+  String query=search.strip().toLowerCase(Locale.ROOT);
+  long total=jdbc.queryForObject("SELECT count(*)"+filter,Long.class,query,query);
+  var items=jdbc.query("SELECT o.*,EXISTS(SELECT 1 FROM organization_closures c WHERE c.organization_id=o.id) AS closure_requested"+filter+" ORDER BY name,id LIMIT ? OFFSET ?",(r,n)->new Organization(r.getObject("id",UUID.class),r.getString("name"),r.getString("slug"),r.getString("status"),null,r.getLong("version"),r.getBoolean("closure_requested")),query,query,size,(long)page*size);
+  return new OrganizationPage(items,page,size,total,(total+size-1)/size);
+ }
+ public List<Organization> active(List<UUID> ids){
+  if(ids.isEmpty())return List.of();
+  return jdbc.query("SELECT * FROM organizations WHERE status='ACTIVE' AND id IN ("+String.join(",",Collections.nCopies(ids.size(),"?"))+")",(r,n)->new Organization(r.getObject("id",UUID.class),r.getString("name"),r.getString("slug"),r.getString("status"),null,r.getLong("version"),false),ids.toArray());
+ }
  public void require(UUID org,UUID user,boolean admin){var found=mine(user).stream().filter(o->o.id().equals(org)).findFirst();if(found.isEmpty() || (admin&&!found.get().role().equals("ORG_ADMIN")))throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Organization access denied");}
  private void lock(UUID org){if(jdbc.queryForList("SELECT id FROM organizations WHERE id=? AND status<>'DELETED' FOR UPDATE",org).isEmpty())throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Organization not found");}
  private UUID account(String email){var rows=jdbc.queryForList("SELECT id,status FROM users WHERE lower(email)=?",email.strip().toLowerCase(Locale.ROOT));if(rows.isEmpty())throw new ResponseStatusException(HttpStatus.NOT_FOUND,"This email is not registered. Ask the person to create an account first, then invite them again.");if(!rows.getFirst().get("status").equals("ACTIVE"))throw new ResponseStatusException(HttpStatus.CONFLICT,"This account is inactive. It must be reactivated before joining an organization.");return (UUID)rows.getFirst().get("id");}

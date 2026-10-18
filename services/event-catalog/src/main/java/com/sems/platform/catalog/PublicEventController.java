@@ -17,10 +17,18 @@ public class PublicEventController {
         if(page<0||size<1||size>50||(long)page*size>Integer.MAX_VALUE||keyword.length()>200)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid search or pagination");
         var paging=PageRequest.of(page,size,Sort.by("startsAt","id"));
         if(organizationId!=null)access.require(organizationId,jwt==null?null:UUID.fromString(jwt.getSubject()),false);
-        var active=access.activeOrganizations();
+        // Query only organizations represented in matching offerings, in bounded batches.
+        // No membership/status cache: suspension and closure remain immediately effective.
+        var active=new ArrayList<OrganizationAccess.Membership>();
+        var now=Instant.now();
+        for(int batch=0;;batch++){
+            var ids=events.discoveryOrganizations(organizationId,now,keyword.strip(),category,PageRequest.of(batch,100));
+            active.addAll(access.activeOrganizations(ids.getContent()));
+            if(!ids.hasNext())break;
+        }
         if(active.isEmpty())return new OfferingPage(List.of(),page,size,0,0);
         var names=new HashMap<UUID,String>();active.forEach(o->names.put(o.id(),o.name()));
-        var result=events.discover(active.stream().map(OrganizationAccess.Membership::id).toList(),organizationId,Instant.now(),keyword.strip(),category,paging);
+        var result=events.discover(active.stream().map(OrganizationAccess.Membership::id).toList(),organizationId,now,keyword.strip(),category,paging);
         return new OfferingPage(result.getContent().stream().map(e->view(e,names.get(e.organizationId))).toList(),page,size,result.getTotalElements(),result.getTotalPages());
     }
     @GetMapping("/{id}") public Offering detail(@PathVariable UUID id,@org.springframework.security.core.annotation.AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt) {
