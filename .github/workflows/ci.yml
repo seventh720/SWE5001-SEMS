@@ -9,7 +9,7 @@ permissions:
   contents: read
 concurrency:
   group: platform-ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 jobs:
   backend:
     name: Backend tests and build
@@ -96,6 +96,10 @@ jobs:
           name: web-dist
           path: apps/web/dist/
       - run: bash scripts/setup-local.sh
+      - name: Validate deployment bundle
+        run: |
+          bash -n scripts/cd/package.sh scripts/cd/deploy.sh
+          bash scripts/cd/package.sh "$RUNNER_TEMP/release.tar.gz"
       - run: docker compose --env-file .env -f deployment/compose.yaml config --quiet
       - run: docker compose --env-file .env -f deployment/compose.yaml up --build -d --scale admission=2
       - run: bash scripts/smoke.sh
@@ -134,6 +138,68 @@ jobs:
           if [ -f .env ]; then
             docker compose --env-file .env -f deployment/compose.yaml down
           fi
+
+  deploy:
+    name: Deploy Lightsail staging
+    needs: [backend, frontend, integration]
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: lightsail-staging
+      cancel-in-progress: false
+    environment:
+      name: staging
+      url: https://swe5001.seventh720.com
+    steps:
+      - uses: actions/checkout@v4
+      - name: Skip superseded main builds
+        id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          if [ "$latest" = "$GITHUB_SHA" ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "This commit was superseded on main; skipping deployment."
+          fi
+      - uses: actions/download-artifact@v4
+        if: steps.latest.outputs.deploy == 'true'
+        with:
+          name: backend-jars
+          path: services/
+      - uses: actions/download-artifact@v4
+        if: steps.latest.outputs.deploy == 'true'
+        with:
+          name: web-dist
+          path: apps/web/dist/
+      - name: Deploy tested artifacts
+        if: steps.latest.outputs.deploy == 'true'
+        env:
+          DEPLOY_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.STAGING_KNOWN_HOSTS }}
+          DEPLOY_HOST: ${{ vars.STAGING_HOST }}
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$DEPLOY_KEY" && test -n "$KNOWN_HOSTS" && test -n "$DEPLOY_HOST"
+          key="$RUNNER_TEMP/staging-key"
+          hosts="$RUNNER_TEMP/staging-known-hosts"
+          printf '%s\n' "$DEPLOY_KEY" > "$key"
+          printf '%s\n' "$KNOWN_HOSTS" > "$hosts"
+          trap 'rm -f "$key" "$hosts"' EXIT
+          bash scripts/cd/package.sh "$RUNNER_TEMP/release.tar.gz"
+          ssh_options=(-i "$key" -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$hosts" -o ConnectTimeout=15)
+          ssh "${ssh_options[@]}" "ubuntu@$DEPLOY_HOST" \
+            "mkdir -p /home/ubuntu/swe5001/releases/$GITHUB_SHA && tar -xzf - -C /home/ubuntu/swe5001/releases/$GITHUB_SHA" < "$RUNNER_TEMP/release.tar.gz"
+          ssh "${ssh_options[@]}" "ubuntu@$DEPLOY_HOST" \
+            "cd /home/ubuntu/swe5001/releases/$GITHUB_SHA && bash scripts/cd/deploy.sh $GITHUB_SHA"
+          for path in / /health/identity /health/event-catalog /health/admission; do
+            curl --fail --silent --show-error --retry 6 --retry-all-errors --retry-delay 5 --max-time 15 \
+              "https://swe5001.seventh720.com$path" > /dev/null
+          done
+          echo "Deployed commit $GITHUB_SHA to https://swe5001.seventh720.com" >> "$GITHUB_STEP_SUMMARY"
 
   notify:
     name: Telegram notification
