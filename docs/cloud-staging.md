@@ -4,6 +4,27 @@ Host: `swe5001.seventh720.com`, DNS-only A record to the instance's attached sta
 
 ## Deploy
 
+### Continuous deployment
+
+`Platform CI` deploys to the GitHub `staging` environment only for main pushes or a manual run on main, after backend, frontend and database/API acceptance pass. PRs never deploy. The JARs and web assets come from that same CI run. Superseded main commits are skipped; deployments are serialized and are not cancelled by newer pushes.
+
+Environment configuration:
+
+- Variable `STAGING_HOST`: the instance's static IPv4.
+- Secret `STAGING_SSH_KEY`: dedicated staging deployment private key.
+- Secret `STAGING_KNOWN_HOSTS`: independently verified SSH host-key entry, with strict host verification.
+- Deployment branch policy: only main.
+
+The deployment key uses ubuntu with Docker sudo access. It is a privileged server credential, separate from the personal Lightsail key; its authorized-key entry disables forwarding and PTY allocation. Rotate it by installing a replacement public key, updating the environment secret, then removing the old public key.
+
+Releases live under `/home/ubuntu/swe5001/releases/<commit>` and link to the existing root `.env` and `.secrets`. The Compose project stays `swe5001`, preserving database/certificate volumes. Deployment builds images, backs up PostgreSQL under `backups/`, starts the release, restarts the gateway to refresh upstream addresses, and checks internal health. Actions then checks the public HTTPS homepage and all three services. A brief interruption is possible on this single host.
+
+`deployed-sha`, `previous-deployed-sha`, and `current` record releases that passed host health checks; the Actions result additionally confirms public HTTPS. Failures retain the backup and release for inspection. Database migrations are not automatically reversed. Retry the failed deployment job for the current main commit, or manually run Platform CI on main. Before rollback, check migration compatibility; redeploy compatible binaries or explicitly restore the backup during maintenance. Never delete persistent volumes.
+
+Backups and release directories remain on the server. Monitor disk usage and copy important backups off-host before removing old files.
+
+### Manual deployment
+
 Build the backend JARs with `mvn package` and the frontend with `npm --prefix apps/web run build` on the development/CI machine. Upload the service Dockerfiles and JARs, web Dockerfile/nginx.conf/dist, deployment directory and setup-local.sh while preserving relative paths. Never upload the development `.env`, `.secrets`, database, or SSH private key.
 
 The server project directory is `/home/ubuntu/swe5001`. On first installation, run `bash scripts/setup-local.sh` there, set `SEMS_DOMAIN=swe5001.seventh720.com` in `.env`, and configure the bootstrap admin email. The setup generates independent random passwords and RSA keys. Keep `.env` private. The initial email is a login identifier; it does not provision an email inbox.
@@ -38,7 +59,7 @@ Download backups to a separate machine before deleting the instance. Preserve `.
 
 Database migrations run on service startup. Back up before updates, and check migration compatibility before rollback. Previous organization-lifecycle changes require compatible Catalog/Identity versions; do not blindly restore older binaries.
 
-Remaining work: automated image publication/deployment, security gates, off-host scheduled backups, real-device camera checks, and cloud load/recovery measurements. Existing fault-injection acceptance scripts are intended for disposable stacks, not this shared staging instance.
+Remaining work: security gates, off-host scheduled backups, real-device camera checks, and cloud load/recovery measurements. Existing fault-injection acceptance scripts are intended for disposable stacks, not this shared staging instance.
 
 ## Navicat access
 
