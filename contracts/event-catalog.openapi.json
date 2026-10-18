@@ -772,6 +772,16 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "Case-insensitive literal title substring, trimmed before server-side pagination. Includes all event states in the selected organization. Requires active ORG_ADMIN or ORGANIZER membership.",
+            "schema": {
+              "type": "string",
+              "maxLength": 200,
+              "default": ""
+            }
           }
         ],
         "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context."

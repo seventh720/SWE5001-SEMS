@@ -1,3 +1,4 @@
+import {EventSearch} from "../events/EventSearch";
 import {useEffect,useState} from "react";
 import {Link} from "react-router-dom";
 import {useAuth} from "../auth/AuthContext";
@@ -13,6 +14,8 @@ interface EventPage {items:EventSummary[];totalElements:number;totalPages:number
 export function OrganizationEvents({organization}:{organization:Organization}) {
   const {token}=useAuth();
   const manager=organization.role!=="MEMBER";
+  const [keyword,setKeyword]=useState("");
+  const [retry,setRetry]=useState(0);
   const [page,setPage]=useState(0);
   const [data,setData]=useState<EventPage|null>(null);
   const [error,setError]=useState("");
@@ -21,20 +24,22 @@ export function OrganizationEvents({organization}:{organization:Organization}) {
     let active=true;
     setLoading(true);setError("");setData(null);
     const endpoint=manager?"/api/v1/organizer/events":"/api/v1/events";
-    apiRequest<EventPage>(endpoint+"?organizationId="+organization.id+"&page="+page+"&size=6",{},token!)
-      .then(result=>{if(active)setData(result)})
+    apiRequest<EventPage>(endpoint+"?organizationId="+organization.id+"&page="+page+"&size=6&keyword="+encodeURIComponent(keyword),{},token!)
+      .then(result=>{if(active){if(page>0&&page>=result.totalPages)setPage(Math.max(0,result.totalPages-1));else setData(result)}})
       .catch(()=>{if(active)setError("Unable to load organization events. Please try again later.")})
       .finally(()=>{if(active)setLoading(false)});
     return()=>{active=false};
-  },[organization.id,manager,page,token]);
+  },[organization.id,manager,page,token,keyword,retry]);
   return <section className="organization-events" aria-label="Organization events">
     <div className="organization-events-heading"><div><h3>{manager?"Events":"Upcoming events"} {data&&<span className="member-count">{data.totalElements}</span>}</h3>
       <p>{manager?"Create events, manage publication and coordinate your event team.":"Discover public and members-only events from your organization."}</p></div>
       {manager&&<Link className="primary-button" to={"/organizer/events?organizationId="+organization.id+"&create=true"}>Create event</Link>}
     </div>
+    <EventSearch onSearch={value=>{setKeyword(value);setPage(0);setRetry(v=>v+1)}}/>
     {loading&&<p role="status">Loading events…</p>}
-    {error&&<p role="alert">{error}</p>}
-    {data&&!data.items.length&&<div className="organization-events-empty"><h4>{manager?"Your next event starts here":"No upcoming events yet"}</h4><p>{manager?"Create your first event for this organization.":"Check back for new activities from your organization."}</p></div>}
+    {error&&<p role="alert">{error} <button onClick={()=>setRetry(v=>v+1)}>Retry</button></p>}
+    {data&&!data.items.length&&keyword&&<p>No events match your search.</p>}
+    {data&&!data.items.length&&!keyword&&<div className="organization-events-empty"><h4>{manager?"Your next event starts here":"No upcoming events yet"}</h4><p>{manager?"Create your first event for this organization.":"Check back for new activities from your organization."}</p></div>}
     <div className="organization-event-grid">{data?.items.map(event=><article className="card organization-event-card" key={event.id}>
       <div className="organization-event-meta"><span className="badge">{event.status??"PUBLISHED"}</span><span>{event.visibility==="ORGANIZATION_ONLY"?"Members only":"Public"}</span></div>
       <h4><Link to={manager?"/organizer/events/"+event.id+"/setup":"/events/"+event.id}>{event.title}</Link></h4>

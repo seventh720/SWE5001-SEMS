@@ -87,3 +87,27 @@ it("distinguishes video playback failure from a camera permission failure",async
  expect((await screen.findByRole("alert")).textContent).toContain("video playback failed");
  expect(stop).toHaveBeenCalled();
 });
+it("fits the complete portrait camera frame and updates on orientation changes",async()=>{
+ render(<TicketCamera onScan={vi.fn()} onClose={vi.fn()}/>);
+ await screen.findByText(/Point the camera/);
+ const video=screen.getByLabelText("Camera preview") as HTMLVideoElement;
+ vi.spyOn(HTMLVideoElement.prototype,"videoWidth","get").mockReturnValue(720);
+ vi.spyOn(HTMLVideoElement.prototype,"videoHeight","get").mockReturnValue(1280);
+ fireEvent(video,new Event("resize"));
+ expect(Number(video.style.aspectRatio)).toBe(720/1280);
+ vi.spyOn(HTMLVideoElement.prototype,"videoWidth","get").mockReturnValue(1280);
+ vi.spyOn(HTMLVideoElement.prototype,"videoHeight","get").mockReturnValue(720);
+ fireEvent(video,new Event("resize"));
+ expect(Number(video.style.aspectRatio)).toBe(1280/720);
+});
+it("releases the stream when closed while waiting for a playback gesture",async()=>{
+ vi.mocked(HTMLMediaElement.prototype.play).mockRejectedValueOnce(new DOMException("Gesture required","NotAllowedError"));
+ const scan=vi.fn();const view=render(<TicketCamera onScan={scan} onClose={vi.fn()}/>);
+ await screen.findByRole("button",{name:"Start preview"});view.unmount();
+ await act(async()=>{});expect(stop).toHaveBeenCalled();expect(scan).not.toHaveBeenCalled();
+});
+it("stops the stream and reports unreadable camera frames",async()=>{
+ vi.spyOn(HTMLCanvasElement.prototype,"getContext").mockReturnValue({drawImage:()=>{throw new Error('Frame unavailable')},getImageData:vi.fn()} as unknown as CanvasRenderingContext2D);
+ render(<TicketCamera onScan={vi.fn()} onClose={vi.fn()}/>);
+ expect((await screen.findByRole('alert')).textContent).toContain('Unable to read camera frames');expect(stop).toHaveBeenCalled();
+});

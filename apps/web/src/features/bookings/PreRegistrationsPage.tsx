@@ -42,7 +42,10 @@ export function PreRegistrationsPage() {
       token!,
     )
       .then((d) => {
-        if (active) setData(d);
+        if (active) {
+          if (page > 0 && page >= d.totalPages) setPage(Math.max(0, d.totalPages - 1));
+          else setData(d);
+        }
       })
       .catch((e) => {
         if (active) setError(e.message);
@@ -132,12 +135,12 @@ export function PreRegistrationsPage() {
         );
       })}
       <div className="actions">
-        <button disabled={page === 0} onClick={() => setPage((n) => n - 1)}>
+        <button disabled={busy || !data || page === 0} onClick={() => setPage((n) => n - 1)}>
           Previous
         </button>
         <span>Page {page + 1}</span>
         <button
-          disabled={!data || page + 1 >= data.totalPages}
+          disabled={busy || !data || page + 1 >= data.totalPages}
           onClick={() => setPage((n) => n + 1)}
         >
           Next

@@ -13,6 +13,7 @@ export function TicketCamera({onScan, onClose}: {onScan: (code: string) => void;
   const video = useRef<HTMLVideoElement>(null);
   const scan = useRef(onScan);
   scan.current = onScan;
+  const [aspectRatio, setAspectRatio] = useState(4 / 3);
   const [device, setDevice] = useState("");
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [status, setStatus] = useState("Starting camera…");
@@ -125,7 +126,9 @@ export function TicketCamera({onScan, onClose}: {onScan: (code: string) => void;
   }, [device, attempt, onClose]);
 
   return <section className="ticket-camera" aria-label="Ticket camera scanner">
-    <video ref={video} autoPlay muted playsInline aria-label="Camera preview" />
+    <video ref={video} autoPlay muted playsInline aria-label="Camera preview"
+      style={{aspectRatio, width: `min(100%, ${420 * aspectRatio}px)`}}
+      onResize={() => {const preview = video.current; if (preview?.videoWidth && preview.videoHeight) setAspectRatio(preview.videoWidth / preview.videoHeight);}} />
     {error ? <p role="alert">{error}</p> : <p role="status">{status}</p>}
     {devices.length > 1 && <Select label="Camera" value={device} options={[{value: "", label: "Automatic (prefer rear camera)"}, ...devices.map((item, index) => ({value: item.deviceId, label: item.label || `Camera ${index + 1}`}))]} onChange={setDevice} />}
     <div className="camera-actions">

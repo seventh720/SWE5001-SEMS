@@ -16,4 +16,26 @@ class DraftServiceTest {
  assertEquals("New title",updated.title());assertEquals(input.startsAt(),updated.startsAt());assertEquals(input.capacity(),updated.capacity());assertEquals(RegistrationRequirements.none(),updated.registrationRequirements());assertEquals("PUBLISHED",updated.status());
  assertEquals(409,assertThrows(ResponseStatusException.class,()->service.presentation(owner,event.id,new PresentationUpdate("X","X","X",EventCategory.ART,CardTheme.SKY,5L))).getStatusCode().value());
  }
+ @Test void searchesAcrossPagesWithinAuthorizedOrganization(){
+  var owner=UUID.randomUUID();var organization=UUID.randomUUID();var access=mock(OrganizationAccess.class);var scoped=new DraftService(repo,access);
+  when(repo.searchOrganization(eq(organization),eq("Seminar"),any())).thenReturn(org.springframework.data.domain.Page.empty());
+  scoped.list(owner,organization,2,10," Seminar ");
+  verify(access).require(organization,owner,true);
+  verify(repo).searchOrganization(eq(organization),eq("Seminar"),argThat(p->p.getPageNumber()==2&&p.getPageSize()==10&&p.getSort().getOrderFor("id")!=null));
+ }
+ @Test void rejectsInvalidEventSearch(){
+  assertEquals(400,assertThrows(ResponseStatusException.class,()->service.list(UUID.randomUUID(),UUID.randomUUID(),0,10,"x".repeat(201))).getStatusCode().value());
+  verifyNoInteractions(repo);
+ }
+ @Test void deniedOrganizationDoesNotReachSearch(){
+  var access=mock(OrganizationAccess.class);var scoped=new DraftService(repo,access);var owner=UUID.randomUUID();var organization=UUID.randomUUID();
+  when(access.require(organization,owner,true)).thenThrow(new ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND));
+  assertThrows(ResponseStatusException.class,()->scoped.list(owner,organization,0,10,"Seminar"));verifyNoInteractions(repo);
+ }
+ @Test void invalidPageBoundsNeverQueryEvents(){
+  for(int[] pagination:new int[][]{{-1,10},{0,0},{0,51},{Integer.MAX_VALUE,50}}){
+   assertEquals(400,assertThrows(ResponseStatusException.class,()->service.list(UUID.randomUUID(),UUID.randomUUID(),pagination[0],pagination[1],"")).getStatusCode().value());
+  }
+  verifyNoInteractions(repo);
+ }
 }

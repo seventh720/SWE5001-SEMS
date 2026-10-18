@@ -7,7 +7,7 @@ SEMS 是 React + TypeScript、三个 Spring Boot 服务与 PostgreSQL 构成的�
 已实现组织与成员权限、活动发布/编辑/暂停、免费预订、独立二维码票券、参与者及整场活动取消、工作人员核销、基础统计及站内通知。[Lightsail HTTPS 测试环境](docs/cloud-staging.md)已部署，已配置 main 分支的 GitHub Actions 自动部署；扩容/故障实验、镜像仓库和安全门禁仍需完成。当前进度见 [Proposal 对照与下一步](docs/implementation-plan.zh-CN.md)。
 
 超管降权即时失效、可恢复的组织注销和成员服务端分页已修复。版本化镜像交付、安全门禁与云端实测仍需完成，详见[本轮整体检查](docs/implementation-plan.zh-CN.md)。
-本轮业务修复、云端版本与剩余工作见[发布复查](docs/release-review-2026-10-19.md)。JWT 为 1 小时；检票窗口为开始前 15 分钟至开始后 15 分钟（截止不含，若更早结束则提前关闭）。
+当前上线版本、本地完成项和待办见[项目进度](docs/progress.md)；测试范围见[覆盖情况](docs/test-coverage.md)。JWT 为 1 小时；检票窗口为开始前 15 分钟至开始后 15 分钟（截止不含，若更早结束则提前关闭）。
 
 ## 1. 架构与权限
 
@@ -20,8 +20,8 @@ Identity 管理账号、组织、成员及邀请；Event Catalog 管理活动、
 需要 Java 21、Maven 3.9+、Node.js 22、npm、OpenSSL、Python 3 和 Docker Compose v2。用 `mvn -version` 确认 Maven 实际使用 Java 21；高版本编译器的 `--release 21` 不等同于 CI 的 Java 21 编译器。
 
 ```bash
-git clone git@github.com:seventh720/SWE5001-SMES.git
-cd SWE5001-SMES
+git clone git@github.com:seventh720/SWE5001-SEMS.git
+cd SWE5001-SEMS
 bash scripts/setup-local.sh
 mvn verify
 npm --prefix apps/web ci

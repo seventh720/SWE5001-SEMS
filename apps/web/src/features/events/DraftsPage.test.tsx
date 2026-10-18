@@ -56,3 +56,20 @@ it("keeps syncing feedback until the updated event itself is confirmed, even whe
  await act(async()=>{finish!(response({...event,version:3}));});
  await screen.findByText(/Event changes saved/);
 });
+it("searches all event pages, resets pagination and clears stale results after a failed search",async()=>{
+ fetchMock.mockImplementation(async(input)=>{
+  const url=String(input);
+  if(url.includes('/me/organizations'))return response([{id:'org1',name:'Society',role:'ORG_ADMIN'}]);
+  const query=new URL(url,'http://localhost').searchParams;
+  if(query.get('keyword')==='missing')return response({detail:'Search unavailable'},503);
+  return response({items:[{...event,title:query.get('page')==='1'?'Older event':'Workshop'}],totalPages:2,totalElements:11});
+ });
+ mount(['ORGANIZER'],'/organizer/events?organizationId=org1');
+ await screen.findByText('Workshop');fireEvent.click(screen.getByRole('button',{name:'Next'}));
+ await screen.findByText('Older event');
+ fireEvent.change(screen.getByRole('searchbox',{name:'Search events'}),{target:{value:'missing'}});
+ fireEvent.submit(screen.getByRole('search',{name:'Search events'}));
+ await screen.findByText('Event list is unavailable.');
+ expect(screen.queryByText('Older event')).toBeNull();
+ expect(fetchMock.mock.calls.some(([url])=>String(url).includes('page=0&size=10&keyword=missing'))).toBe(true);
+});
