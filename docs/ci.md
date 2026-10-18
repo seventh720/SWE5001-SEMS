@@ -16,7 +16,7 @@ Telegram uses repository Actions secrets `TELEGRAM_TOKEN` and `TELEGRAM_TO`. Mes
 
 Local commands: `mvn verify`, `npm --prefix apps/web run test:coverage`, `npm --prefix apps/web run build`, then run Compose and `bash scripts/check-db-isolation.sh`. Load `.env` into the shell before `python3 scripts/organization-acceptance.py`. The latter creates unique test data and intentionally stops Admission and restarts Catalog/gateway; run it only against a disposable local/CI Compose environment. Use `COMPOSE_PROJECT_NAME` to select a dedicated test project.
 
-Cloud deployment, image registry publication, lint/contract conformance checks and security scan gates remain pending. Booking consistency, staff check-in and summaries have local acceptance coverage. Container restart recovery includes publication and whole-event cancellation recovery, not evidence that the final cloud recovery/scaling targets have been achieved.
+The first [cloud staging deployment](cloud-staging.md) is live. Automated cloud deployment, image registry publication, lint/contract conformance checks and security scan gates remain pending. Booking consistency, staff check-in and summaries have local acceptance coverage. Container restart recovery includes publication and whole-event cancellation recovery, not evidence that the final cloud recovery/scaling targets have been achieved.
 
 Integration now starts two Admission replicas and runs booking acceptance, including publication regression, 100 competing requests for 10 places, same-key races, per-attendee isolation and repeated cancellation. This is a local correctness check, not a cloud throughput or recovery-target measurement.
 

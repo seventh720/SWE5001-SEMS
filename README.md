@@ -4,7 +4,7 @@
 
 SEMS is a shared event and ticketing platform built with React/TypeScript, three Spring Boot services and PostgreSQL.
 
-Implemented: organizations and memberships, publication/editing/pause, free bookings, individual QR tickets, attendee and whole-event cancellation, assigned-staff check-in, basic summaries and in-app notifications. Cloud deployment, scaling/recovery experiments and security delivery gates remain outstanding. See the [proposal review and next steps](docs/implementation-plan.zh-CN.md) (Chinese).
+Implemented: organizations and memberships, publication/editing/pause, free bookings, individual QR tickets, attendee and whole-event cancellation, assigned-staff check-in, basic summaries and in-app notifications. A [Lightsail HTTPS staging environment](docs/cloud-staging.md) is deployed. Scaling/recovery experiments, automated deployment and security delivery gates remain outstanding. See the [proposal review and next steps](docs/implementation-plan.zh-CN.md) (Chinese).
 
 Platform-role revocation, recoverable organization closure and server-side member pagination are now implemented. Deployment automation, security gates and cloud measurements remain; see the [current review](docs/implementation-plan.zh-CN.md#本轮整体检查还不只是部署).
 ## 1. Architecture and permissions

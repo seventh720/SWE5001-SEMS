@@ -1,0 +1,54 @@
+# Overlay for a single-host staging environment. Use with compose.yaml.
+# Requires SEMS_DOMAIN in the deployment .env file.
+x-runtime: &runtime
+  restart: unless-stopped
+  logging:
+    driver: local
+    options:
+      max-size: "10m"
+      max-file: "3"
+services:
+  postgres:
+    <<: *runtime
+    mem_limit: 512m
+    ports:
+      - "127.0.0.1:5432:5432"
+  identity:
+    <<: *runtime
+    mem_limit: 768m
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx384m -XX:MaxMetaspaceSize=192m"
+  event-catalog:
+    <<: *runtime
+    mem_limit: 768m
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx384m -XX:MaxMetaspaceSize=192m"
+  admission:
+    <<: *runtime
+    mem_limit: 768m
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx384m -XX:MaxMetaspaceSize=192m"
+  web:
+    <<: *runtime
+    mem_limit: 96m
+  gateway:
+    <<: *runtime
+    mem_limit: 96m
+  caddy:
+    <<: *runtime
+    image: caddy:2-alpine
+    mem_limit: 128m
+    environment:
+      SEMS_DOMAIN: ${SEMS_DOMAIN:?Set the public hostname}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - gateway
+volumes:
+  caddy-data:
+  caddy-config:

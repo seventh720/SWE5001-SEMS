@@ -7,6 +7,7 @@
 - [发布管理](publication-management.md)、[改期规则](schedule-revision.md)：当前编辑协议与迁移兼容限制。
 - [组织升级](organization-upgrade.md)：权限模型、已有数据迁移及回滚边界。
 - [站内通知](in-app-notifications.md)：outbox、提醒和通知迁移。
+- [云端测试环境](cloud-staging.md)：Lightsail、HTTPS、部署命令与备份操作。
 - [CI](ci.md)：现有检查、独立验收环境与未完成的交付能力。
 - [原始验收证据](evidence/)：按日期保留，结果仅适用于记录中的版本/环境。
 

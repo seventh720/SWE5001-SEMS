@@ -4,9 +4,9 @@
 
 SEMS 是 React + TypeScript、三个 Spring Boot 服务与 PostgreSQL 构成的共享活动票务平台。
 
-已实现组织与成员权限、活动发布/编辑/暂停、免费预订、独立二维码票券、参与者及整场活动取消、工作人员核销、基础统计及站内通知。云部署、扩容/故障实验和安全交付流水线仍需完成。当前进度见 [Proposal 对照与下一步](docs/implementation-plan.zh-CN.md)。
+已实现组织与成员权限、活动发布/编辑/暂停、免费预订、独立二维码票券、参与者及整场活动取消、工作人员核销、基础统计及站内通知。[Lightsail HTTPS 测试环境](docs/cloud-staging.md)已部署，扩容/故障实验和安全交付流水线仍需完成。当前进度见 [Proposal 对照与下一步](docs/implementation-plan.zh-CN.md)。
 
-超管降权即时失效、可恢复的组织注销和成员服务端分页已修复。交付流水线、安全门禁、云部署与实测仍需完成，详见[本轮整体检查](docs/implementation-plan.zh-CN.md#本轮整体检查还不只是部署)。
+超管降权即时失效、可恢复的组织注销和成员服务端分页已修复。交付流水线、安全门禁与云端实测仍需完成，详见[本轮整体检查](docs/implementation-plan.zh-CN.md#本轮整体检查还不只是部署)。
 ## 1. 架构与权限
 
 Identity 管理账号、组织、成员及邀请；Event Catalog 管理活动、可见性、发布及修订；Admission 管理库存、订单、票券、签到及通知。三服务有独立 schema、凭据和迁移，通过认证 HTTP 协作。
