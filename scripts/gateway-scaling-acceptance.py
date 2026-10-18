@@ -12,10 +12,24 @@ def requests(n):
   assert code==401,code
   time.sleep(.05)
 def gateway_id():return output('ps','-q','gateway')
+def replicas():return set(output('ps','-q','admission').split())
+def ready_replicas(expected):
+ deadline=time.monotonic()+90
+ while time.monotonic()<deadline:
+  ids=replicas();ready=len(ids)==expected
+  for identity in ids:
+   address=subprocess.check_output(['docker','inspect','--format','{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}',identity],text=True).strip()
+   probe=subprocess.run(compose+['exec','-T','gateway','wget','-q','-O','-','-T','2','http://'+address+':8083/actuator/health/readiness'],capture_output=True,text=True)
+   try:ready=ready and probe.returncode==0 and json.loads(probe.stdout).get('status')=='UP'
+   except ValueError:ready=False
+  if ready:return
+  time.sleep(1)
+ raise AssertionError('Admission replicas did not become ready within 90 seconds')
 def count():return output('exec','-T','postgres','psql','-U','postgres','-d','sems','-Atq','-c','SELECT count(*) FROM admission.bookings')
-gateway=gateway_id();bookings=count();since=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime())
-subprocess.run(compose+['up','-d','--no-deps','--scale','admission=3','admission'],check=True,stdout=subprocess.DEVNULL)
-time.sleep(12)
+gateway=gateway_id();original=replicas();assert len(original)==2;bookings=count();since=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime())
+subprocess.run(compose+['up','-d','--no-deps','--no-recreate','--scale','admission=3','admission'],check=True,stdout=subprocess.DEVNULL)
+assert original.issubset(replicas()), 'Scaling replaced an existing replica'
+ready_replicas(3);time.sleep(7)
 requests(30)
 logs=output('logs','--no-log-prefix','--since',since,'gateway')
 upstreams=set()
@@ -26,7 +40,7 @@ for line in logs.splitlines():
 assert len(upstreams)==3,upstreams
 assert gateway_id()==gateway and count()==bookings
 print('PASS: 3 Admission replicas receive traffic; gateway unchanged; persisted booking count unchanged')
-subprocess.run(compose+['up','-d','--no-deps','--scale','admission=2','admission'],check=True,stdout=subprocess.DEVNULL)
-time.sleep(7);requests(30)
+subprocess.run(compose+['up','-d','--no-deps','--no-recreate','--scale','admission=2','admission'],check=True,stdout=subprocess.DEVNULL)
+ready_replicas(2);time.sleep(7);requests(30)
 assert gateway_id()==gateway and count()==bookings
 print('PASS: scale-down DNS refresh without gateway restart; 30/30 requests routed successfully')
