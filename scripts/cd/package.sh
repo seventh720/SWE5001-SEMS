@@ -6,7 +6,7 @@ for service in identity event-catalog admission; do
   test -s "services/$service/target/$service-service-0.1.0-SNAPSHOT.jar"
 done
 test -s apps/web/dist/index.html
-tar -czf "$archive" \
+COPYFILE_DISABLE=1 tar -czf "$archive" \
   .dockerignore deployment \
   services/identity/Dockerfile services/identity/target/identity-service-0.1.0-SNAPSHOT.jar \
   services/event-catalog/Dockerfile services/event-catalog/target/event-catalog-service-0.1.0-SNAPSHOT.jar \
