@@ -13,14 +13,14 @@ concurrency:
 jobs:
   backend:
     name: Backend tests and build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     outputs:
       line: ${{ steps.coverage.outputs.line }}
       branch: ${{ steps.coverage.outputs.branch }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-java@v6.1.0
         with:
           distribution: temurin
           java-version: '21'
@@ -30,7 +30,7 @@ jobs:
         id: coverage
         if: always()
         run: python3 scripts/ci/coverage.py backend
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: backend-test-reports
@@ -38,7 +38,7 @@ jobs:
             services/*/target/site/jacoco/
             services/*/target/surefire-reports/
           retention-days: 7
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: backend-jars
           path: services/*/target/*-SNAPSHOT.jar
@@ -46,14 +46,14 @@ jobs:
           retention-days: 7
   frontend:
     name: Frontend tests and build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
       line: ${{ steps.coverage.outputs.line }}
       branch: ${{ steps.coverage.outputs.branch }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version: '22'
           cache: npm
@@ -66,7 +66,7 @@ jobs:
         id: coverage
         if: always()
         run: python3 scripts/ci/coverage.py frontend
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: frontend-coverage
@@ -74,7 +74,7 @@ jobs:
           retention-days: 7
       - run: npm run build
         working-directory: apps/web
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: web-dist
           path: apps/web/dist/
@@ -83,15 +83,15 @@ jobs:
   integration:
     name: PostgreSQL and API acceptance
     needs: [backend, frontend]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/download-artifact@v8.0.2
         with:
           name: backend-jars
           path: services/
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8.0.2
         with:
           name: web-dist
           path: apps/web/dist/
@@ -126,7 +126,7 @@ jobs:
             docker compose --env-file .env -f deployment/compose.yaml ps -a > ci-logs/containers.txt
             docker compose --env-file .env -f deployment/compose.yaml logs --no-color > ci-logs/compose.log 2>&1
           fi
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: integration-diagnostics
@@ -143,7 +143,7 @@ jobs:
     name: Deploy Lightsail staging
     needs: [backend, frontend, integration]
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     concurrency:
       group: lightsail-staging
@@ -152,7 +152,7 @@ jobs:
       name: staging
       url: https://swe5001.seventh720.com
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
       - name: Skip superseded main builds
         id: latest
         env:
@@ -164,12 +164,12 @@ jobs:
           else
             echo "This commit was superseded on main; skipping deployment."
           fi
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8.0.2
         if: steps.latest.outputs.deploy == 'true'
         with:
           name: backend-jars
           path: services/
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8.0.2
         if: steps.latest.outputs.deploy == 'true'
         with:
           name: web-dist
@@ -205,7 +205,7 @@ jobs:
     name: Telegram notification
     needs: [backend, frontend, integration]
     if: always() && !cancelled() && github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 2
     steps:
       - name: Send build result
