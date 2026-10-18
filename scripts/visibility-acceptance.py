@@ -18,7 +18,10 @@ for outsider in [None,attendee,b]:
  call('GET','/api/v1/events/'+event['id']+'/ticket-types',token=outsider,expected=404)
 call('POST','/api/v1/bookings',{**booking,'requestKey':str(uuid.uuid4())},attendee,404)
 call('PUT','/api/v1/pre-registrations/'+event['id'],{'ticketTypeId':booking['ticketTypeId'],'quantity':1},attendee,404)
-assert call('GET','/api/v1/bookings/'+booked['id'],token=attendee)==booked
+current_booking=call('GET','/api/v1/bookings/'+booked['id'],token=attendee)
+assert {k:v for k,v in current_booking.items() if k!='currentEvent'}=={k:v for k,v in booked.items() if k!='currentEvent'}
+assert current_booking['currentEvent']['title']==event['title']
+assert current_booking['eventTitle']==old['title']
 assert call('GET','/api/v1/events/'+event['id'],token=a)['visibility']=='ORGANIZATION_ONLY'
 event=call('PUT',path+'/revision',{**event,'visibility':'PUBLIC'},a)
 assert event['id'] in [e['id'] for e in call('GET','/api/v1/events?keyword='+suffix)['items']]
