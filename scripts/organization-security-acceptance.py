@@ -15,8 +15,10 @@ event=call('GET',path,token=a)
 inv=call('PUT',path+'/ticket-types',{'eventVersion':event['version'],'version':0,'ticketTypes':[{'name':'General','quota':10,'opensAt':(start-datetime.timedelta(days=8)).isoformat(),'closesAt':start.isoformat()}]},a)
 call('PUT',path+'/staff',{'userId':users[2]['id'],'active':True},a,204)
 # Assigned draft with zero bookings still has a meaningful current title.
-task=call('GET','/api/v1/me/staff-assignments',token=attendee)[0]
-assert task['title']==event['title'] and task['eventId']==event['id']
+tasks=call('GET','/api/v1/me/staff-assignments',token=attendee)
+matching=[t for t in tasks if t['eventId']==event['id']]
+assert len(matching)==1, f'Assigned draft must remain visible before publication: {tasks}'
+assert matching[0]['title']==event['title']
 event=call('GET',path,token=a)
 event=call('POST',path+'/publish',{'version':event['version'],'ticketVersion':inv['version']},a)
 call('PATCH',path+'/presentation',{'title':'Current staff task title','description':event['description'],'location':event['location'],'category':event['category'],'cardTheme':event['cardTheme'],'version':event['version']},a)
