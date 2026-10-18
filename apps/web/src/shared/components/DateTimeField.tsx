@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
+import {useOverlay} from "./useOverlay";
 import { Select } from "./Select";
 import { singaporeInput, validDateTime } from "./dateTime";
 const months = [
@@ -33,9 +34,12 @@ export function DateTimeField({
 }) {
   const id = useId();
   const root = useRef<HTMLDivElement>(null);
+  const panel = useRef<HTMLElement>(null);
+  const controls = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
+  useOverlay(open && !disabled, panel, controls, 380, Infinity);
   const [draft, setDraft] = useState("");
   const date = validDateTime(draft)
     ? draft
@@ -89,7 +93,7 @@ export function DateTimeField({
       }}
     >
       <label htmlFor={id}>{label}</label>
-      <div className="date-time-controls">
+      <div className="date-time-controls" ref={controls}>
         <input
           id={id}
           ref={input}
@@ -134,6 +138,7 @@ export function DateTimeField({
       {open && !disabled && (
         <section
           id={`${id}-calendar`}
+          ref={panel}
           className="english-calendar"
           aria-label={`${label} calendar`}
           lang="en"
@@ -217,7 +222,7 @@ export function DateTimeField({
             >
               Apply
             </button>
-            <button type="button" onClick={close}>
+            <button type="button" className="secondary-button" onClick={close}>
               Cancel
             </button>
           </div>

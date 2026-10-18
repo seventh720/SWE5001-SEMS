@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
+import {useOverlay} from "./useOverlay";
 export function Select({
   label,
   value,
@@ -15,7 +16,9 @@ export function Select({
   const id = useId();
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  useOverlay(open, panel, trigger);
   function focus(n: number) {
     root.current
       ?.querySelectorAll<HTMLButtonElement>('[role="option"]')
@@ -70,6 +73,7 @@ export function Select({
       {open && (
         <div
           id={`${id}-options`}
+          ref={panel}
           role="listbox"
           aria-labelledby={`${id}-label`}
           className="select-options"

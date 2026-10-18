@@ -89,3 +89,24 @@ it("supports keyboard navigation and selection without a native select", () => {
   expect(change).toHaveBeenCalledWith("B");
   expect(document.activeElement).toBe(trigger);
 });
+it("keeps the calendar open when dismissing a nested time selector and restores trigger focus", () => {
+ render(<DateTimeField label="Starts at" value="2026-10-24T14:00" onChange={vi.fn()}/>);
+ const trigger=screen.getByRole("button",{name:"Choose starts at"});
+ fireEvent.click(trigger);
+ fireEvent.click(screen.getByRole("combobox",{name:"Hour 14"}));
+ fireEvent.keyDown(document.activeElement!,{key:"Escape"});
+ expect(screen.queryByRole("listbox")).toBeNull();
+ expect(screen.getByLabelText("Starts at calendar")).toBeTruthy();
+ fireEvent.keyDown(document.activeElement!,{key:"Escape"});
+ expect(screen.queryByLabelText("Starts at calendar")).toBeNull();
+ expect(document.activeElement).toBe(trigger);
+});
+it("dismisses the calendar on an outside click without applying its draft", () => {
+ const change=vi.fn();
+ render(<DateTimeField label="Starts at" value="2026-10-24T14:00" onChange={change}/>);
+ fireEvent.click(screen.getByRole("button",{name:"Choose starts at"}));
+ fireEvent.click(screen.getByRole("button",{name:"October 25, 2026"}));
+ fireEvent.pointerDown(document.body);
+ expect(screen.queryByLabelText("Starts at calendar")).toBeNull();
+ expect(change).not.toHaveBeenCalled();
+});
