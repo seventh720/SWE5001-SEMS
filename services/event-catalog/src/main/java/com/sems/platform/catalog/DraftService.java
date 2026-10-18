@@ -27,10 +27,10 @@ public class DraftService {
   event.title=input.title().strip();event.description=input.description().strip();event.location=input.location().strip();event.category=input.category();event.cardTheme=input.cardTheme();event.updatedAt=java.time.Instant.now();events.flush();return event.view();
  }
  @Transactional(readOnly=true) public Event.View detail(UUID owner,UUID id){return owned(owner,id).view();}
- @Transactional(readOnly=true) public EventPage list(UUID owner,UUID organizationId,int page,int size){
+ @Transactional(readOnly=true) public EventPage list(UUID owner,UUID organizationId,int page,int size,String keyword){
   access.require(organizationId,owner,true);
-  if(page<0||size<1||size>50||(long)page*size>Integer.MAX_VALUE)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid pagination");
-  var result=events.findByOrganizationId(organizationId,PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"createdAt","id")));
+  if(page<0||size<1||size>50||(long)page*size>Integer.MAX_VALUE||keyword.length()>200)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid pagination");
+  var result=events.searchOrganization(organizationId,keyword.strip(),PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"createdAt","id")));
   return new EventPage(result.getContent().stream().map(Event::view).toList(),page,size,result.getTotalElements(),result.getTotalPages());
  }
  private Event owned(UUID owner,UUID id){var e=events.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found"));access.require(e.organizationId,owner,true);return e;}

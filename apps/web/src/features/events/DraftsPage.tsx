@@ -1,3 +1,4 @@
+import {EventSearch} from "./EventSearch";
 import type {Organization} from "../organizations/OrganizationsPage";
 import { HomeLink } from "../../shared/components/HomeLink";
 import { FeedbackNotice } from "../../shared/components/FeedbackNotice";
@@ -66,6 +67,8 @@ export function DraftsPage() {
     totalPages: 0,
     totalElements: 0,
   });
+  const [keyword,setKeyword]=useState("");
+  const [listError,setListError]=useState("");
   const [page, setPage] = useState(0);
   const [form, setForm] = useState(empty);
   const [editing, setEditing] = useState<Draft | null>(null);
@@ -79,15 +82,15 @@ export function DraftsPage() {
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(0);
   useEffect(() => {
-    if (!allowed || !token || !organizationId) {setLoading(false);return;}
+    if (!allowed || !token || !organizationId) {setLoading(false);setListError("");setData({items:[],totalPages:0,totalElements:0});return;}
     let active = true;
-    setLoading(true);
-    apiRequest<Page>(`/api/v1/organizer/events?organizationId=${organizationId}&page=${page}&size=10`, {}, token)
+    setLoading(true);setListError("");setData({items:[],totalPages:0,totalElements:0});
+    apiRequest<Page>(`/api/v1/organizer/events?organizationId=${organizationId}&page=${page}&size=10&keyword=${encodeURIComponent(keyword)}`, {}, token)
       .then((d) => {
-        if (active) setData(d);
+        if (active) {if(page>0&&page>=d.totalPages)setPage(Math.max(0,d.totalPages-1));else setData(d);}
       })
       .catch((e) => {
-        if (active) setError(e.message);
+        if (active) setListError(e.message);
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -95,7 +98,7 @@ export function DraftsPage() {
     return () => {
       active = false;
     };
-  }, [token, allowed, page, refresh,organizationId]);
+  }, [token, allowed, page, refresh,organizationId,keyword]);
   useEffect(() => {
     if (!data.items.some((e) => e.status === "UPDATING")) return;
     const timer = window.setInterval(() => setRefresh((v) => v + 1), 3000);
@@ -227,7 +230,7 @@ export function DraftsPage() {
           Create event
         </button>}
       </header>
-      <Select label="Organization" disabled={show||busy} value={organizationId} onChange={value=>{setOrganizationId(value);setSearchParams({organizationId:value});setData({items:[],totalPages:0,totalElements:0});setPage(0);setEditing(null);setMessage("");setError("")}} options={[{value:"",label:"Select an organization"},...organizations.map(o=>({value:o.id,label:o.name}))]} />
+      <Select label="Organization" disabled={show||busy} value={organizationId} onChange={value=>{setOrganizationId(value);setKeyword("");setSearchParams({organizationId:value});setData({items:[],totalPages:0,totalElements:0});setPage(0);setEditing(null);setMessage("");setError("")}} options={[{value:"",label:"Select an organization"},...organizations.map(o=>({value:o.id,label:o.name}))]} />
       <Link to="/organizations">Organization memberships →</Link>
       {error && (
         <p role="alert" className="error-message">
@@ -421,12 +424,14 @@ export function DraftsPage() {
         </section>
       )}
       {!show && <>
+      <EventSearch key={organizationId} disabled={!organizationId} onSearch={value=>{setKeyword(value);setPage(0);setRefresh(v=>v+1)}}/>
+      {listError&&<p role="alert">{listError} <button onClick={()=>setRefresh(v=>v+1)}>Retry events</button></p>}
       {loading ? (
         <p role="status">Loading drafts…</p>
       ) : (
         <section className="event-list">
           {data.items.length === 0 ? (
-            <p>No event drafts yet. Create your first event.</p>
+            <p>{listError?"Event list is unavailable.":!organizationId?"Select an organization to view its events.":keyword?"No events match your search.":"No events yet. Create your first event."}</p>
           ) : (
             data.items.map((d) => (
               <article className="card event-card" key={d.id}>
@@ -463,14 +468,14 @@ export function DraftsPage() {
         </section>
       )}
       <div className="actions">
-        <button disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
+        <button disabled={loading || page === 0} onClick={() => setPage((p) => p - 1)}>
           Previous
         </button>
         <span>
-          Page {page + 1} · {data.totalElements} events
+          Page {page + 1} of {Math.max(1,data.totalPages)} · {data.totalElements} events
         </span>
         <button
-          disabled={page + 1 >= data.totalPages}
+          disabled={loading || page + 1 >= data.totalPages}
           onClick={() => setPage((p) => p + 1)}
         >
           Next

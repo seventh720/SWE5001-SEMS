@@ -7,7 +7,7 @@ SEMS is a shared event and ticketing platform built with React/TypeScript, three
 Implemented: organizations and memberships, publication/editing/pause, free bookings, individual QR tickets, attendee and whole-event cancellation, assigned-staff check-in, basic summaries and in-app notifications. A [Lightsail HTTPS staging environment](docs/cloud-staging.md) is deployed. GitHub Actions has a main-only staging deployment job. Scaling/recovery experiments, image registry publication and security delivery gates remain outstanding. See the [proposal review and next steps](docs/implementation-plan.zh-CN.md) (Chinese).
 
 Platform-role revocation, recoverable organization closure and server-side member pagination are now implemented. Versioned image delivery, security gates and cloud measurements remain; see the [current review](docs/implementation-plan.zh-CN.md).
-本轮业务修复、云端版本与剩余工作见[发布复查](docs/release-review-2026-10-19.md)。JWT 为 1 小时；检票窗口为开始前 15 分钟至开始后 15 分钟（截止不含，若更早结束则提前关闭）。
+当前上线版本、本地完成项和待办见[项目进度](docs/progress.md)；测试范围见[覆盖情况](docs/test-coverage.md)。JWT 为 1 小时；检票窗口为开始前 15 分钟至开始后 15 分钟（截止不含，若更早结束则提前关闭）。
 
 ## 1. Architecture and permissions
 
@@ -20,8 +20,8 @@ Platform ADMIN manages platform accounts and organization provisioning. Organiza
 Requires Java 21, Maven 3.9+, Node.js 22, npm, OpenSSL, Python 3 and Docker Compose v2. Check `mvn -version` uses Java 21; a newer compiler with `--release 21` is not equivalent to the CI compiler.
 
 ```bash
-git clone git@github.com:seventh720/SWE5001-SMES.git
-cd SWE5001-SMES
+git clone git@github.com:seventh720/SWE5001-SEMS.git
+cd SWE5001-SEMS
 bash scripts/setup-local.sh
 mvn verify
 npm --prefix apps/web ci

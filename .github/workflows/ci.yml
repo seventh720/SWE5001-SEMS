@@ -113,6 +113,7 @@ jobs:
           python3 scripts/gateway-scaling-acceptance.py
           python3 scripts/organization-acceptance.py
           python3 scripts/organization-security-acceptance.py
+          python3 scripts/event-directory-acceptance.py
           python3 scripts/visibility-acceptance.py
           python3 scripts/notifications-acceptance.py
           python3 scripts/membership-notifications-acceptance.py

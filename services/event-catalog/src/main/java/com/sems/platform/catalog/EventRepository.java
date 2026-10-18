@@ -3,7 +3,8 @@ import java.util.*;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 public interface EventRepository extends JpaRepository<Event,UUID>{
- Page<Event> findByOrganizationId(UUID organizationId,Pageable page);
+ @org.springframework.data.jpa.repository.Query("select e from Event e where e.organizationId=:org and locate(lower(:keyword),lower(e.title))>0")
+ Page<Event> searchOrganization(@org.springframework.data.repository.query.Param("org") UUID organizationId,@org.springframework.data.repository.query.Param("keyword") String keyword,Pageable page);
  @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
  @org.springframework.data.jpa.repository.Query("select e from Event e where e.id=:id")
  Optional<Event> lockById(@org.springframework.data.repository.query.Param("id") UUID id);

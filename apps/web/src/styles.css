@@ -1518,7 +1518,7 @@ select,
 
 .check-in-page { max-width: 820px; }
 .ticket-camera { margin: 0 0 24px; padding: 20px; border: 1px solid var(--line); border-radius: 20px; background: #ffffffb8; }
-.ticket-camera video { display: block; width: 100%; max-height: 420px; aspect-ratio: 4 / 3; object-fit: contain; background: #211c2c; border-radius: 12px; }
+.ticket-camera video { display: block; margin-inline:auto; width: 100%; max-height: 420px; aspect-ratio: 4 / 3; object-fit: contain; background: #211c2c; border-radius: 12px; }
 .camera-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
 .check-in-result { padding: 16px; border: 1px solid #cddfd5; border-radius: 12px; background: #f5fff9; color: #254c38; }
 
@@ -1574,7 +1574,7 @@ select,
 .select-options { overscroll-behavior:contain; }
 .english-calendar .select-options:not([popover]) { top:auto; bottom:100%; }
 .date-time-field:has(.english-calendar), .custom-select:has(.select-options) { z-index:30; }
-button.danger-button { background:#fbe5e7; border-color:#e6a8af; color:#9b2434; }
+button.danger-button { font-weight:650; background:#fbe5e7; border-color:#e6a8af; color:#9b2434; }
 button.danger-button:hover:not(:disabled) { background:#f5cdd3; border-color:#bf5261; }
 .english-calendar .secondary-button { background:#eee8f5; border-color:#d9cce9; }
 .dashboard-panel > h2 { font-size:1.35rem; margin:0 0 16px; }

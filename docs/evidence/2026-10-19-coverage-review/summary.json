@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-19",
+  "baselineCommit": "32d9344c92380b1d0b442f4b4af258d9ae4b4e5b",
+  "scope": "PR changes based on baselineCommit; HTTP acceptance excluded from coverage percentages",
+  "frontendTests": 111,
+  "frontendFiles": 25,
+  "frontend": {
+    "lines": {
+      "total": 1168,
+      "covered": 1049,
+      "skipped": 0,
+      "pct": 89.81
+    },
+    "statements": {
+      "total": 1916,
+      "covered": 1568,
+      "skipped": 0,
+      "pct": 81.83
+    },
+    "functions": {
+      "total": 598,
+      "covered": 430,
+      "skipped": 0,
+      "pct": 71.9
+    },
+    "branches": {
+      "total": 1633,
+      "covered": 1269,
+      "skipped": 0,
+      "pct": 77.7
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "backend": {
+    "identity": {
+      "branch": {
+        "covered": 38,
+        "missed": 252
+      },
+      "line": {
+        "covered": 81,
+        "missed": 330
+      }
+    },
+    "event-catalog": {
+      "branch": {
+        "covered": 51,
+        "missed": 207
+      },
+      "line": {
+        "covered": 79,
+        "missed": 210
+      }
+    },
+    "admission": {
+      "branch": {
+        "covered": 64,
+        "missed": 348
+      },
+      "line": {
+        "covered": 49,
+        "missed": 394
+      }
+    }
+  },
+  "backendTests": 51
+}
