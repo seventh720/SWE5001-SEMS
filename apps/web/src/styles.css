@@ -711,13 +711,14 @@ textarea {
   overflow: hidden;
 }
 .brand-panel::after {
-  content: "✳";
+  content: "";
   position: absolute;
-  right: -28px;
-  bottom: -100px;
-  font-size: 300px;
-  color: #d1bee9;
-  line-height: 1;
+  width: 240px;
+  height: 240px;
+  right: -45px;
+  bottom: -65px;
+  background: #d1bee9;
+  clip-path: polygon(40% 0,60% 0,60% 26%,78% 8%,92% 22%,74% 40%,100% 40%,100% 60%,74% 60%,92% 78%,78% 92%,60% 74%,60% 100%,40% 100%,40% 74%,22% 92%,8% 78%,26% 60%,0 60%,0 40%,26% 40%,8% 22%,22% 8%,40% 26%);
   z-index: 0;
   pointer-events: none;
 }
@@ -1566,3 +1567,39 @@ select,
 .organization-request-history { padding-top: 20px; margin-top: 20px; border-top: 1px solid var(--line); }
 .organization-governance { margin: 32px 0; }
 .organization-governance-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,300px),1fr)); gap: 16px; }
+
+/* Shared overlays never take space from the form beneath them. */
+.date-time-field { position:relative; }
+.english-calendar { position:absolute; top:100%; left:0; z-index:30; max-width:380px; margin:6px 0 0; overflow:auto; overscroll-behavior:contain; }
+.select-options { overscroll-behavior:contain; }
+.english-calendar .select-options:not([popover]) { top:auto; bottom:100%; }
+.date-time-field:has(.english-calendar), .custom-select:has(.select-options) { z-index:30; }
+button.danger-button { background:#fbe5e7; border-color:#e6a8af; color:#9b2434; }
+button.danger-button:hover:not(:disabled) { background:#f5cdd3; border-color:#bf5261; }
+.english-calendar .secondary-button { background:#eee8f5; border-color:#d9cce9; }
+.dashboard-panel > h2 { font-size:1.35rem; margin:0 0 16px; }
+@media(max-width:700px) {
+  .topbar .motion-toggle { font-size:9px; padding:4px 0; }
+  .topbar .nav-actions { gap:8px; }
+  .topbar .menu-toggle { padding:8px 12px; }
+  .auth-shell { margin:20px auto 32px; padding:0 20px; gap:20px; }
+  .auth-shell .brand-panel { padding:22px; }
+  .auth-shell .brand-panel::after { display:none; }
+  .auth-shell .brand-panel h1 { font-size:28px; letter-spacing:-1px; margin:12px 0; }
+  .auth-shell .brand-panel p { margin:10px 0; }
+  .auth-shell .brand-panel ul { display:none; }
+  .auth-shell .form-panel { padding:22px; min-width:0; }
+  .dashboard-grid { gap:16px; }
+  .dashboard-panel { padding:20px; }
+  .dashboard-panel .section-heading { align-items:flex-start; flex-direction:column; gap:8px; }
+  .dashboard-panel > h2, .dashboard-panel .section-heading h2 { font-size:1.25rem; }
+  .dashboard-header { gap:16px; }
+  .camera-actions { flex-wrap:wrap; }
+  input, textarea, .custom-select > button { font-size:16px; }
+}
+@media(max-width:380px) {
+  .topbar { padding:12px; }
+  .nav-actions { gap:8px; }
+  .motion-toggle { display:none; }
+  .app { padding-inline:16px; }
+}

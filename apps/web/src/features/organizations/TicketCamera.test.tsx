@@ -73,3 +73,17 @@ it("releases the camera when the tab goes into the background",async()=>{
  vi.spyOn(document,"hidden","get").mockReturnValue(true);
  fireEvent(document,new Event("visibilitychange"));expect(stop).toHaveBeenCalled();expect(close).toHaveBeenCalledTimes(1);
 });
+it("lets mobile users start blocked playback without requesting camera permission again",async()=>{
+ vi.mocked(HTMLMediaElement.prototype.play).mockRejectedValueOnce(new DOMException("Gesture required","NotAllowedError"));
+ render(<TicketCamera onScan={vi.fn()} onClose={vi.fn()}/>);
+ fireEvent.click(await screen.findByRole("button",{name:"Start preview"}));
+ await screen.findByText(/Point the camera/);
+ expect(getUserMedia).toHaveBeenCalledTimes(1);
+ expect(screen.queryByRole("alert")).toBeNull();
+});
+it("distinguishes video playback failure from a camera permission failure",async()=>{
+ vi.mocked(HTMLMediaElement.prototype.play).mockRejectedValueOnce(new DOMException("Interrupted","AbortError"));
+ render(<TicketCamera onScan={vi.fn()} onClose={vi.fn()}/>);
+ expect((await screen.findByRole("alert")).textContent).toContain("video playback failed");
+ expect(stop).toHaveBeenCalled();
+});

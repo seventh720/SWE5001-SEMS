@@ -17,22 +17,29 @@ export function TicketCamera({onScan, onClose}: {onScan: (code: string) => void;
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [status, setStatus] = useState("Starting camera…");
   const [error, setError] = useState("");
+  const resume = useRef<(() => void) | null>(null);
+  const [playbackBlocked, setPlaybackBlocked] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
     let stream: MediaStream | undefined;
+    let releasePlayback: (() => void) | undefined;
+    let phase = "access";
     let timer: ReturnType<typeof setTimeout> | undefined;
     const preview = video.current!;
     function stop() {
       cancelled = true;
       clearTimeout(timer);
+      releasePlayback?.();
+      resume.current = null;
       stream?.getTracks().forEach(track => track.stop());
       if (preview.srcObject === stream) preview.srcObject = null;
     }
     function hidden() { if (document.hidden) { stop(); onClose(); } }
     document.addEventListener("visibilitychange", hidden);
     setError("");
+    setPlaybackBlocked(false);
     setStatus("Starting camera…");
     async function start() {
       try {
@@ -44,17 +51,40 @@ export function TicketCamera({onScan, onClose}: {onScan: (code: string) => void;
           setError("This browser cannot access a camera. Use another browser, a scanner or the ticket code below.");
           return;
         }
-        const {default: decode} = await import("jsqr");
-        if (cancelled) return;
         stream = await navigator.mediaDevices.getUserMedia({audio: false, video: device ? {deviceId: {exact: device}} : {facingMode: {ideal: "environment"}, width: {ideal: 1280}, height: {ideal: 720}}});
         if (cancelled) { stream.getTracks().forEach(track => track.stop()); return; }
+        phase = "playback";
+        // Set DOM properties as well as React attributes for mobile WebKit.
+        preview.muted = true;
+        preview.defaultMuted = true;
+        preview.playsInline = true;
         preview.srcObject = stream;
-        await preview.play();
+        try {
+          await preview.play();
+        } catch (error) {
+          if (cancelled) return;
+          if ((error as {name?: string}).name !== "NotAllowedError") throw error;
+          setPlaybackBlocked(true);
+          setStatus("Camera access is allowed. Tap Start preview to continue scanning.");
+          await new Promise<void>((resolve, reject) => {
+            releasePlayback = resolve;
+            resume.current = () => {
+              preview.play().then(() => {
+                setPlaybackBlocked(false);
+                resume.current = null;
+                resolve();
+              }, reject);
+            };
+          });
+        }
         if (cancelled) return;
         // Device enumeration is optional; a working default camera must still scan.
         navigator.mediaDevices.enumerateDevices?.().then(list => {
           if (!cancelled) setDevices(list.filter(item => item.kind === "videoinput" && item.deviceId));
         }).catch(() => {});
+        phase = "scanner";
+        const {default: decode} = await import("jsqr");
+        if (cancelled) return;
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d", {willReadFrequently: true});
         if (!context) throw new Error("Canvas unavailable");
@@ -87,7 +117,7 @@ export function TicketCamera({onScan, onClose}: {onScan: (code: string) => void;
         }
         frame();
       } catch (e) {
-        if (!cancelled) { stop(); setError(cameraError(e)); }
+        if (!cancelled) { stop(); setPlaybackBlocked(false); setError(phase === "access" ? cameraError(e) : phase === "playback" ? "Camera access was granted, but video playback failed. Open this page in Safari or Chrome and try again, or use the ticket code below." : "QR scanning could not load. Reload this page and try again, or use the ticket code below."); }
       }
     }
     void start();
@@ -99,6 +129,7 @@ export function TicketCamera({onScan, onClose}: {onScan: (code: string) => void;
     {error ? <p role="alert">{error}</p> : <p role="status">{status}</p>}
     {devices.length > 1 && <Select label="Camera" value={device} options={[{value: "", label: "Automatic (prefer rear camera)"}, ...devices.map((item, index) => ({value: item.deviceId, label: item.label || `Camera ${index + 1}`}))]} onChange={setDevice} />}
     <div className="camera-actions">
+      {playbackBlocked && <button type="button" className="primary-button" onClick={() => resume.current?.()}>Start preview</button>}
       {error && <button type="button" onClick={() => setAttempt(value => value + 1)}>Retry camera</button>}
       <button type="button" onClick={onClose}>Close camera</button>
     </div>
