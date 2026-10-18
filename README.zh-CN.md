@@ -17,7 +17,7 @@ Identity 管理账号、组织、成员及邀请；Event Catalog 管理活动、
 
 ## 2. 本地启动
 
-需要 Java 21、Maven 3.9+、Node.js 22、npm、OpenSSL、Python 3 和 Docker Compose v2。
+需要 Java 21、Maven 3.9+、Node.js 22、npm、OpenSSL、Python 3 和 Docker Compose v2。用 `mvn -version` 确认 Maven 实际使用 Java 21；高版本编译器的 `--release 21` 不等同于 CI 的 Java 21 编译器。
 
 ```bash
 git clone git@github.com:seventh720/SWE5001-SMES.git

@@ -16,7 +16,7 @@
 
 ## 已完成检查
 
-- Maven verify：40 个后端测试（Identity 12、Catalog 11、Admission 17），零失败。
+- Java 21 Maven clean verify：40 个后端测试（Identity 12、Catalog 11、Admission 17），零失败。
 - Vitest：92 个前端测试、21 个文件全部通过；TypeScript 检查与 Vite 生产构建通过。
 - nginx 配置检查通过；OpenAPI JSON、security scheme 引用和 git diff 空白检查通过。
 - `business-fixes-acceptance.py`：JWT 时长、并发管理员保护、分页边界/搜索、当前地点、所有权、结束检票、Catalog 停机降级及恢复、认证限流及恢复。详见 [business.txt](business.txt)。
@@ -24,7 +24,7 @@
 - `gateway-scaling-acceptance.py`：Admission 2→3 时观察到三个不同上游；3→2 后 30/30 路由成功；网关容器未重启、订单数不变。详见 [scaling.txt](scaling.txt)。
 - 治理审批及关闭恢复验收通过，包含 Identity/Catalog 重启与 Admission 故障、撤销权限、通知幂等、保留历史核销。详见 [governance.txt](governance.txt)、[closure.txt](closure.txt)。
 - 浏览器访问独立站点的登录页，页面正常加载。重登和到期交互主要由上述前端自动化用例验证，未实际等待一小时。
-- 新增业务与路由验收已接入 CI；远端 CI 尚未运行。
+- 新增业务与路由验收已接入 CI；远端 CI 通过草稿 PR #12 运行；首次发现的 Java 21 注解包名遮蔽问题已修复，最新结果见 PR。
 
 ## 使用与边界
 

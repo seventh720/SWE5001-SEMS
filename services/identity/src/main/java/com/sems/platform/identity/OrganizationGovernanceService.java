@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
@@ -30,9 +31,9 @@ public class OrganizationGovernanceService {
   var items=jdbc.query("SELECT r.*,o.name AS organization_name FROM organization_requests r JOIN organizations o ON o.id=r.organization_id"+filter+" ORDER BY CASE WHEN r.status='PENDING' THEN 0 ELSE 1 END,r.created_at DESC,r.id DESC LIMIT ? OFFSET ?",mapper,queryArgs.toArray());
   return new RequestPage(items,page,size,total,(total+size-1)/size,pending);
  }
- @Transactional(readOnly=true,isolation=org.springframework.transaction.annotation.Isolation.REPEATABLE_READ)
+ @Transactional(readOnly=true,isolation=Isolation.REPEATABLE_READ)
  public RequestPage requests(UUID org,UUID user,int page,int size){organizations.require(org,user,true);return page(org,page,size);}
- @Transactional(readOnly=true,isolation=org.springframework.transaction.annotation.Isolation.REPEATABLE_READ)
+ @Transactional(readOnly=true,isolation=Isolation.REPEATABLE_READ)
  public RequestPage reviewQueue(int page,int size){return page(null,page,size);}
  @Transactional public Request submit(UUID org,UUID user,String kind,String name,String slug,String reason,long baseVersion){
   var old=lock(org);organizations.require(org,user,true);version(old,baseVersion);

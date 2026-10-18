@@ -17,7 +17,7 @@ Platform ADMIN manages platform accounts and organization provisioning. Organiza
 
 ## 2. Local setup
 
-Requires Java 21, Maven 3.9+, Node.js 22, npm, OpenSSL, Python 3 and Docker Compose v2.
+Requires Java 21, Maven 3.9+, Node.js 22, npm, OpenSSL, Python 3 and Docker Compose v2. Check `mvn -version` uses Java 21; a newer compiler with `--release 21` is not equivalent to the CI compiler.
 
 ```bash
 git clone git@github.com:seventh720/SWE5001-SMES.git
