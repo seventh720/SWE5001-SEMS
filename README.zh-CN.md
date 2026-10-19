@@ -4,10 +4,11 @@
 
 SEMS 是 React + TypeScript、三个 Spring Boot 服务与 PostgreSQL 构成的共享活动票务平台。
 
-已实现组织与成员权限、活动发布/编辑/暂停、免费预订、独立二维码票券、参与者及整场活动取消、工作人员核销、基础统计及站内通知。[Lightsail HTTPS 测试环境](docs/cloud-staging.md)已部署，已配置 main 分支的 GitHub Actions 自动部署；扩容/故障实验、镜像仓库和安全门禁仍需完成。当前进度见 [Proposal 对照与下一步](docs/implementation-plan.zh-CN.md)。
+已实现多组织权限、活动发布/编辑/暂停/取消、免费预订、独立二维码票券、工作人员核销、预约、站内通知，以及组织管理员总览。活动和成员管理支持服务端检索、组合筛选与分页；已结束活动不能编辑后重开。
 
-超管降权即时失效、可恢复的组织注销和成员服务端分页已修复。版本化镜像交付、安全门禁与云端实测仍需完成，详见[本轮整体检查](docs/implementation-plan.zh-CN.md)。
-当前上线版本、本地完成项和待办见[项目进度](docs/progress.md)；测试范围见[覆盖情况](docs/test-coverage.md)。JWT 为 1 小时；检票窗口为开始前 15 分钟至开始后 15 分钟（截止不含，若更早结束则提前关闭）。
+PR #18 已合并；2026-10-20 最新 main 的 [CI 与 Lightsail 测试环境部署](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39302943078)成功，包含 lint、单元/组件测试、数据库/API 验收、安全扫描及 GHCR 镜像交付。本地扩容实验已完成；云端负载/故障实验、兼容回滚演练及手机完整扫码验收仍待补齐。
+
+[项目进度](docs/progress.md)维护当前版本和下一步；[业务规则](docs/functional-guide.md)说明权限与统计口径；[测试覆盖](docs/test-coverage.md)区分单元测试、API 验收和历史覆盖率。JWT 为 1 小时；检票窗口为开始前 15 分钟至开始后 15 分钟（截止不含，若更早结束则提前关闭）。
 
 ## 1. 架构与权限
 
@@ -43,31 +44,33 @@ docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.
 
 这是本地 HTTP 配置。[云端覆盖配置](docs/cloud-staging.md)已有 HTTPS 和自动部署；运行密钥目前存放于受限主机文件，尚未接入云托管密钥服务。
 
-## 3. 验收流程 / Acceptance walkthrough
+## 3. 验收流程
 
 1. 注册组织管理员、成员、参与者账号；平台管理员创建两个组织并指定管理员。
 2. 组织管理员邀请成员，成员在 Notifications 接受；创建 seminar 与 workshop，配置免费票种并发布。
 3. 参与者浏览、预订并查看二维码/手动票码；检查他人和其他组织无法访问管理数据。
 4. 为活动分配工作人员，核销票码两次，确认 attendance 仅增加一次；检查未分配人员被拒绝。
 5. 取消另一笔尚未签到且未开始的订单，检查库存仅释放一次；演示暂停/恢复与第三组织无代码入驻。
+6. 以组织管理员查看活动数、有效票数、签到数和签到率；组合活动状态/时间/可见性及成员角色/状态筛选，翻页后进入活动详情。验证普通组织者不能访问组织总览，已结束活动不能改期重开。
 
-## 4. Tests and CI
+## 4. 测试与 CI
 
 ```bash
 mvn verify
+npm --prefix apps/web run lint
 npm --prefix apps/web run test:coverage
 npm --prefix apps/web run build
 ```
 
 数据库/API 验收需要独立、可丢弃的 Compose 环境；部分脚本会停止服务、重启及制造故障。完整入口、隔离要求和现有流水线能力见 [CI operations](docs/ci.md)。历史证据见 [docs/evidence](docs/evidence/)。
 
-## 5. Layout and documentation
+## 5. 目录与文档
 
-- `services/` — backend services, migrations and tests.
-- `apps/web/` — frontend and UI tests.
-- `contracts/` — [OpenAPI contracts](contracts/README.md).
-- `deployment/` — local Compose, gateway and database setup.
-- `scripts/` — setup and reusable acceptance checks.
+- `services/` — 后端服务、迁移和测试。
+- `apps/web/` — 前端和界面测试。
+- `contracts/` — [OpenAPI 契约](contracts/README.md)。
+- `deployment/` — Compose、网关和数据库配置。
+- `scripts/` — 环境初始化和可重用验收脚本。
 - [文档索引 / Documentation index](docs/README.md)
 - [Proposal 对照与下一步](docs/implementation-plan.zh-CN.md)
 - [当前业务规则](docs/functional-guide.md)
@@ -105,6 +108,7 @@ npm --prefix apps/web run dev
 提交前执行：
 
 ```bash
+npm --prefix apps/web run lint
 npm --prefix apps/web run test:coverage
 npm --prefix apps/web run build
 ```
@@ -206,11 +210,14 @@ git push -u origin victor       # 其他组员填写自己的分支
 
 在 GitHub 创建 **base 为 `main`、compare 为自己的分支** 的 PR。按模板写清任务、最终行为、测试命令与结果、数据库或配置升级步骤；界面变更附截图。邀请 **1 名其他组员**担任 reviewer，留言或邀请不等于批准。未完成的工作使用 Draft PR。根据意见在原分支修改并 push，修改后请 reviewer 再次审查。
 
-CI 在面向 `main` 的 PR、推送至 `main` 或手动触发时运行。仅 push `victor` 而没有打开 PR，不会自动运行 CI。合并前以下三项必须通过：
+CI 在面向 `main` 的 PR、推送至 `main` 或手动触发时运行。仅 push `victor` 而没有打开 PR，不会自动运行 CI。合并前以下六项质量检查必须通过：
 
-- `Backend tests and build`
-- `Frontend tests and build`
-- `PostgreSQL and API acceptance`
+- `Lint`
+- `Backend · Unit Tests & Build`
+- `Frontend · Tests & Build`
+- `Backend · Integration Tests`
+- `Security · SAST, Dependencies & Secrets`
+- `Images · Scan, Smoke Test & Publish`
 
 同时需要 1 名其他组员批准、全部讨论解决且没有合并冲突。Telegram 通知用于告知结果，不作为合并质量门槛。
 
@@ -227,4 +234,4 @@ git push
 
 上一个 PR 合并后再开始下一个任务，避免同一 PR 累积无关改动。短期任务分支可以使用 **Squash and merge**，合并后删除，下个任务重新从最新 `origin/main` 创建。如果仓库仅允许 squash，则使用短期任务分支发 PR，不对长期个人分支反复 squash 合并。
 
-以上为团队约定，README 不会自动开启 GitHub 保护。仓库管理员应给 `main` 配置分支保护或 ruleset：必须通过 PR、至少 1 名其他组员批准、更新后重新批准、解决全部讨论、通过上述三项检查，并禁止强推和删除主分支。如果开启了合并后自动删除分支，应关闭该设置或保留／恢复 `victor` 等长期个人分支。
+以上为团队约定，README 不会自动开启 GitHub 保护。仓库管理员应给 `main` 配置分支保护或 ruleset：必须通过 PR、至少 1 名其他组员批准、更新后重新批准、解决全部讨论、通过上述六项质量检查，并禁止强推和删除主分支。如果开启了合并后自动删除分支，应关闭该设置或保留／恢复 `victor` 等长期个人分支。

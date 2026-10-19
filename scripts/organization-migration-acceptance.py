@@ -10,7 +10,7 @@ def call(method,path,body=None,token=None):
  req=urllib.request.Request(base+path,method=method,data=json.dumps(body).encode() if body is not None else None,headers={'Content-Type':'application/json',**({'Authorization':'Bearer '+token} if token else {})})
  with urllib.request.urlopen(req,timeout=15) as response:
   raw=response.read();return json.loads(raw) if raw else None
-suffix=uuid.uuid4().hex[:10];password='Migration-'+uuid.uuid4().hex;email='migration-'+suffix+'@example.com'
+suffix=uuid.uuid4().hex[:10];password=uuid.uuid4().hex[:16];email='migration-'+suffix+'@example.com'
 u=call('POST','/api/v1/auth/register',{'username':'migration'+suffix,'email':email,'password':password})
 admin=call('POST','/api/v1/auth/login',{'email':os.environ['SEMS_BOOTSTRAP_ADMIN_EMAIL'],'password':os.environ['SEMS_BOOTSTRAP_ADMIN_PASSWORD']})['accessToken']
 token=call('POST','/api/v1/auth/login',{'email':email,'password':password})['accessToken']

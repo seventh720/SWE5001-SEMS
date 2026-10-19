@@ -175,3 +175,50 @@ it("shows English validation without submitting invalid credentials", async () =
   expect((await screen.findByRole("alert")).textContent).toBe("Password must contain 8–72 characters.");
   expect(fetchMock).not.toHaveBeenCalled();
 });
+
+it.each(["Ab12345", "Ab123456789012345", "Passw0rd！", "Pass word", "密码Ab123456", "Ａb123456"])(
+  "rejects an invalid registration password before calling the API: %s", async (password) => {
+    mount();
+    fireEvent.click(screen.getByRole("button", {name: "Register"}));
+    credentials();
+    fireEvent.change(screen.getByLabelText("Username"), {target: {value: "Alice"}});
+    fireEvent.change(screen.getByLabelText("Password"), {target: {value: password}});
+    fireEvent.submit(screen.getByLabelText("Email").closest("form")!);
+    expect((await screen.findByRole("alert")).textContent).toBe(
+      "Password must contain 8–16 characters using English letters, numbers or symbols. Spaces are not allowed.",
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+  },
+);
+
+it.each(["abcdefgh", "12345678", "Ab123456", "Ab12345678901234", "Passw0rd!", "!@#$%^&*", "[]{}()\\\"", "<>;'`~?/", "Ab12!@#$%^&*()_+"])(
+  "registers with letters, numbers and printable ASCII symbols at the length boundaries: %s", async (password) => {
+    fetchMock.mockResolvedValueOnce(response(user, 201))
+      .mockResolvedValueOnce(response({accessToken: "token", user}));
+    mount();
+    fireEvent.click(screen.getByRole("button", {name: "Register"}));
+    credentials();
+    fireEvent.change(screen.getByLabelText("Username"), {target: {value: "Alice"}});
+    const input = screen.getByLabelText("Password") as HTMLInputElement;
+    expect(input.maxLength).toBe(16);
+    expect(input.getAttribute("aria-describedby")).toBe("password-help");
+    fireEvent.change(input, {target: {value: password}});
+    fireEvent.submit(input.closest("form")!);
+    await screen.findByText("Account: Alice");
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body)).password).toBe(password);
+  },
+);
+
+it("lets existing accounts log in with passwords outside the new registration policy", async () => {
+  fetchMock.mockResolvedValue(response({accessToken: "token", user}));
+  mount();
+  credentials();
+  const input = screen.getByLabelText("Password") as HTMLInputElement;
+  expect(input.maxLength).toBe(72);
+  expect(input.getAttribute("pattern")).toBeNull();
+  const password = "Existing-Password-2026!";
+  fireEvent.change(input, {target: {value: password}});
+  fireEvent.submit(input.closest("form")!);
+  await screen.findByText("Account: Alice");
+  expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body)).password).toBe(password);
+});

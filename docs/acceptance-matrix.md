@@ -1,9 +1,10 @@
 # Proposal 验收追踪
 
-截至 2026-10-19：业务实现包含工作人员分配、核销与基础统计；历史本地证据见 [组织验收](evidence/2026-10-15-organization-upgrade/verification.md)及[通知验收](evidence/2026-10-16-notifications/verification.md)。[整场活动取消](evidence/2026-10-17-event-cancellation/verification.md)已实现并完成本地双实例并发与故障恢复验收，平台复用计时、云实验及兼容回滚证据仍待补齐；安全门禁已在 PR #15 主分支流水线通过。取消验收覆盖 100 个并发报名请求与签到/退票/重复取消竞争、晚期事务失败回滚、Admission 停机、Catalog 重启和确认丢失恢复。已完成云端部署、HTTPS/健康检查和 JWT 有效期检查；云端负载、扩容收益及故障恢复目标实验尚未完成。当前版本进度和测试数字见[项目进度](progress.md)与[覆盖情况](test-coverage.md)。下面是目标清单，不是全部通过的结果。完整差距见[下一步计划](implementation-plan.zh-CN.md)。
+截至 2026-10-20：业务实现包含工作人员分配、核销与基础统计；历史本地证据见 [组织验收](evidence/2026-10-15-organization-upgrade/verification.md)及[通知验收](evidence/2026-10-16-notifications/verification.md)。[整场活动取消](evidence/2026-10-17-event-cancellation/verification.md)已实现并完成本地双实例并发与故障恢复验收，平台复用计时、云实验及兼容回滚证据仍待补齐；当前 `90d10d2` 的 [main 流水线](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39302943078)已通过 lint、测试、安全扫描、镜像发布及实际 Lightsail 部署。取消验收覆盖 100 个并发报名请求与签到/退票/重复取消竞争、晚期事务失败回滚、Admission 停机、Catalog 重启和确认丢失恢复。已完成云端部署、HTTPS/健康检查和 JWT 有效期检查；云端负载、扩容收益及故障恢复目标实验尚未完成。当前版本进度和测试数字见[项目进度](progress.md)与[覆盖情况](test-coverage.md)。下面是目标清单，不是全部通过的结果。完整差距见[下一步计划](implementation-plan.zh-CN.md)。
 
 | 目标 | 证据 |
 |---|---|
+| 组织总览与管理筛选 | PR #18：组织管理员总览、筛选前分页、已结束活动拒绝重开及 SVG 星号；本地 58 后端/119 前端测试和定向 HTTP/桌面/390px 浏览器验收通过。iPhone 真机和线上业务复验待补，见[覆盖范围](test-coverage.md) |
 | 业务修复与本地扩缩容 | [P1/P2 验收](evidence/2026-10-19-business-fixes/verification.md)：1 小时 JWT/重登、开始后 15 分钟截止检票、管理员保护、当前地点、分页、认证限流、Admission 2→3→2 动态路由；不替代下方云端负载目标 |
 | API/边界 | 三份OpenAPI、独立镜像/部署、无跨库访问验证 |
 | 完整流程 | 注册→授权组织者→发布→预订→出票→签到→统计 |

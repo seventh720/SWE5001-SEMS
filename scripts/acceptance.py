@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Real HTTP/PostgreSQL acceptance against the Compose stack; creates unique test accounts."""
-import concurrent.futures, datetime, json, os, urllib.request, urllib.error, uuid
+import concurrent.futures, datetime, json, os, urllib.request, urllib.error, uuid, time
 BASE=os.environ.get('SEMS_BASE_URL','http://localhost:18080')
 def call(method,path,body=None,token=None,expected=200):
     headers={'Content-Type':'application/json'}
@@ -23,14 +23,16 @@ def paged(path,token):
         if page+1>=data['totalPages']:return result
     raise AssertionError('Too many pages')
 suffix=uuid.uuid4().hex[:10]
-password='Test-'+uuid.uuid4().hex
+password=uuid.uuid4().hex[:16]
 users=[]
 for n in range(3):
     email=f'accept-{suffix}-{n}@example.com'
     user=call('POST','/api/v1/auth/register',{'username':f'u{suffix}{n}','email':email,'password':password},expected=201)
     assert user['roles']==['ATTENDEE']; users.append(user)
 call('POST','/api/v1/auth/register',{'username':users[0]['username'],'email':'other-'+suffix+'@example.com','password':password},expected=409)
-call('POST','/api/v1/auth/register',{'username':'unicode'+suffix,'email':'unicode'+suffix+'@example.com','password':'密'*30},expected=400)
+for invalid in ['Ab12345', 'Ab123456789012345', 'Passw0rd！', 'Pass word', '密码Ab123456', 'Ab123456\n']:
+    time.sleep(.25)  # Keep invalid-auth checks within the real gateway budget.
+    call('POST','/api/v1/auth/register',{'username':'invalid'+suffix,'email':'invalid-'+suffix+'@example.com','password':invalid},expected=400)
 call('POST','/api/v1/auth/login',{'email':users[0]['email'],'password':'wrong-password'},expected=401)
 def login(email,pw=password):return call('POST','/api/v1/auth/login',{'email':email,'password':pw})['accessToken']
 admin=login(os.environ['SEMS_BOOTSTRAP_ADMIN_EMAIL'],os.environ['SEMS_BOOTSTRAP_ADMIN_PASSWORD'])
