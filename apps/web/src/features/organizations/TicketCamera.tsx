@@ -1,10 +1,9 @@
 import {useEffect, useRef, useState} from "react";
-import {Select} from "../../shared/components/Select";
 
 function cameraError(error: unknown) {
   const name = (error as {name?: string})?.name;
   if (name === "NotAllowedError") return "Camera permission was denied. Allow camera access in your browser, or use the ticket code below.";
-  if (name === "NotFoundError" || name === "OverconstrainedError") return "No matching camera was found. Connect a webcam or use a scanner / ticket code below.";
+  if (name === "NotFoundError" || name === "OverconstrainedError") return "The selected camera is unavailable. Choose the other camera, or use the ticket code below.";
   if (name === "NotReadableError") return "The camera is unavailable or in use by another app. Close that app and try again.";
   return "Unable to start the camera. Try again, or use the ticket code below.";
 }
@@ -14,8 +13,7 @@ export function TicketCamera({onScan, onClose}: {onScan: (code: string) => void;
   const scan = useRef(onScan);
   scan.current = onScan;
   const [aspectRatio, setAspectRatio] = useState(4 / 3);
-  const [device, setDevice] = useState("");
-  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [camera, setCamera] = useState<{facing: "environment" | "user"; exact: boolean}>({facing: "environment", exact: false});
   const [status, setStatus] = useState("Starting camera…");
   const [error, setError] = useState("");
   const resume = useRef<(() => void) | null>(null);
@@ -52,7 +50,7 @@ export function TicketCamera({onScan, onClose}: {onScan: (code: string) => void;
           setError("This browser cannot access a camera. Use another browser, a scanner or the ticket code below.");
           return;
         }
-        stream = await navigator.mediaDevices.getUserMedia({audio: false, video: device ? {deviceId: {exact: device}} : {facingMode: {ideal: "environment"}, width: {ideal: 1280}, height: {ideal: 720}}});
+        stream = await navigator.mediaDevices.getUserMedia({audio: false, video: {facingMode: camera.exact ? {exact: camera.facing} : {ideal: camera.facing}, width: {ideal: 1280}, height: {ideal: 720}}});
         if (cancelled) { stream.getTracks().forEach(track => track.stop()); return; }
         phase = "playback";
         // Set DOM properties as well as React attributes for mobile WebKit.
@@ -79,10 +77,6 @@ export function TicketCamera({onScan, onClose}: {onScan: (code: string) => void;
           });
         }
         if (cancelled) return;
-        // Device enumeration is optional; a working default camera must still scan.
-        navigator.mediaDevices.enumerateDevices?.().then(list => {
-          if (!cancelled) setDevices(list.filter(item => item.kind === "videoinput" && item.deviceId));
-        }).catch(() => {});
         phase = "scanner";
         const {default: decode} = await import("jsqr");
         if (cancelled) return;
@@ -123,14 +117,17 @@ export function TicketCamera({onScan, onClose}: {onScan: (code: string) => void;
     }
     void start();
     return () => { stop(); document.removeEventListener("visibilitychange", hidden); };
-  }, [device, attempt, onClose]);
+  }, [camera, attempt, onClose]);
 
   return <section className="ticket-camera" aria-label="Ticket camera scanner">
     <video ref={video} autoPlay muted playsInline aria-label="Camera preview"
       style={{aspectRatio, width: `min(100%, ${420 * aspectRatio}px)`}}
       onResize={() => {const preview = video.current; if (preview?.videoWidth && preview.videoHeight) setAspectRatio(preview.videoWidth / preview.videoHeight);}} />
     {error ? <p role="alert">{error}</p> : <p role="status">{status}</p>}
-    {devices.length > 1 && <Select label="Camera" value={device} options={[{value: "", label: "Automatic (prefer rear camera)"}, ...devices.map((item, index) => ({value: item.deviceId, label: item.label || `Camera ${index + 1}`}))]} onChange={setDevice} />}
+    <div className="camera-actions" role="group" aria-label="Camera">
+      <button type="button" aria-pressed={camera.facing === "environment"} className={camera.facing === "environment" ? "primary-button" : "secondary-button"} onClick={() => {if (camera.facing !== "environment") setCamera({facing: "environment", exact: true});}}>Rear camera</button>
+      <button type="button" aria-pressed={camera.facing === "user"} className={camera.facing === "user" ? "primary-button" : "secondary-button"} onClick={() => {if (camera.facing !== "user") setCamera({facing: "user", exact: true});}}>Front camera</button>
+    </div>
     <div className="camera-actions">
       {playbackBlocked && <button type="button" className="primary-button" onClick={() => resume.current?.()}>Start preview</button>}
       {error && <button type="button" onClick={() => setAttempt(value => value + 1)}>Retry camera</button>}

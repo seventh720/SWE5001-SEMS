@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Print a credential-free local observation snapshot; this is not continuous monitoring."""
 import collections,datetime,json,math,os,subprocess,sys
-compose=['docker','compose','--env-file',os.environ.get('SEMS_ENV_FILE','.env'),'-f',os.environ.get('SEMS_COMPOSE_FILE','deployment/compose.yaml')]
+compose=['docker','compose','--env-file',os.environ.get('SEMS_ENV_FILE','.env')]
+for path in os.environ.get('SEMS_COMPOSE_FILE','deployment/compose.yaml').split(os.pathsep):
+ compose.extend(['-f',path])
 def output(args):return subprocess.check_output(args,text=True,stderr=subprocess.DEVNULL).strip()
 window=sys.argv[1] if len(sys.argv)>1 else '10m'
 rows=[]

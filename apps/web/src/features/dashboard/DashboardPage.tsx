@@ -1,5 +1,5 @@
 import { EventArtwork } from "../events/EventArtwork";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { apiRequest } from "../../shared/api/client";
@@ -48,8 +48,21 @@ function Feedback({
     </div>
   ) : null;
 }
-function OrganizerPanel() {
- return <section className="card dashboard-panel"><h2>Organizer workspace</h2><p>Select an organization to manage its events, or view events available to its members.</p><Link className="secondary-button" to="/organizations">My organizations →</Link></section>;
+function DashboardPanel({ title, to, action, children }: {
+  title: string;
+  to: string;
+  action: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="card dashboard-panel">
+      <h2>{title}</h2>
+      <div className="dashboard-panel-body">{children}</div>
+      <div className="dashboard-panel-footer">
+        <Link className="secondary-button" to={to}>{action}</Link>
+      </div>
+    </section>
+  );
 }
 export function DashboardPage() {
   const { user, token } = useAuth();
@@ -73,7 +86,6 @@ export function DashboardPage() {
     if(due.length){due.forEach(p=>checkedOpenings.current.add(`${p.eventId}:${p.opensAt}`));pre.retry();}
   }, [now, pre.items]);
   if (!user) return null;
-  const organizer = true;
   return (
     <main className="app-shell dashboard-shell" id="main-content">
       <header className="dashboard-header">
@@ -94,11 +106,7 @@ export function DashboardPage() {
         </Link>
       </header>
       <div className="dashboard-grid">
-        <section className="card dashboard-panel">
-          <div className="section-heading">
-            <h2>Your upcoming plans</h2>
-            <Link to="/bookings">All tickets →</Link>
-          </div>
+        <DashboardPanel title="Your upcoming plans" to="/bookings" action="All tickets →">
           <Feedback state={bookings} />
           {bookings.items.map((b) => (
             <Link className="dashboard-row" to={`/bookings/${b.id}`} key={b.id}>
@@ -119,12 +127,8 @@ export function DashboardPage() {
               to start your plans.
             </p>
           )}
-        </section>
-        <section className="card dashboard-panel">
-          <div className="section-heading">
-            <h2>Pre-registrations</h2>
-            <Link to="/pre-registrations">View all →</Link>
-          </div>
+        </DashboardPanel>
+        <DashboardPanel title="Pre-registrations" to="/pre-registrations" action="View all →">
           <Feedback state={pre} />
           {pre.items.map((p) => {
             const waiting = now < Date.parse(p.opensAt),
@@ -165,27 +169,18 @@ export function DashboardPage() {
               registration opens.
             </p>
           )}
-        </section>
-        {organizer && <OrganizerPanel />}
+        </DashboardPanel>
+        <DashboardPanel title="Organizer workspace" to="/organizations" action="My organizations →">
+          <p>Select an organization to manage its events, or view events available to its members.</p>
+        </DashboardPanel>
         {user.roles.includes("ADMIN") && (
-          <section className="card dashboard-panel">
-            <p className="eyebrow">PLATFORM ADMINISTRATION</p>
-            <h2>Users & access</h2>
+          <DashboardPanel title="Platform administration" to="/admin/organizations" action="Manage organizations">
             <p>Open organizations, appoint organization administrators and manage platform accounts.</p>
-            <Link className="secondary-button" to="/admin/organizations">
-              Manage organizations
-            </Link>
-          </section>
+          </DashboardPanel>
         )}
-        {true && (
-          <section className="card dashboard-panel">
-            <p className="eyebrow">STAFF WORKSPACE</p>
-            <h2>Event operations</h2><Link to="/staff">My check-in tasks →</Link>
-            <p>
-              Check tickets only for events assigned to you by an organization manager.
-            </p>
-          </section>
-        )}
+        <DashboardPanel title="Staff workspace" to="/staff" action="My check-in tasks →">
+          <p>Check tickets only for events assigned to you by an organization manager.</p>
+        </DashboardPanel>
       </div>
       <section className="dashboard-discover">
         <div className="section-heading">

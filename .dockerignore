@@ -3,3 +3,7 @@
 .secrets
 **/node_modules
 **/coverage
+
+.performance
+ci-logs
+release-images

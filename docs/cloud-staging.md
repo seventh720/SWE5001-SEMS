@@ -6,7 +6,9 @@ Host: `swe5001.seventh720.com`, DNS-only A record to the instance's attached sta
 
 ### Continuous deployment
 
-`Platform CI` deploys to the GitHub `staging` environment only for main pushes or a manual run on main, after backend, frontend and database/API acceptance pass. PRs never deploy. The JARs and web assets come from that same CI run. Superseded main commits are skipped; deployments are serialized and are not cancelled by newer pushes.
+`Platform CI` deploys to the GitHub `staging` environment only for main pushes or a manual run on main, after backend, frontend, database/API acceptance, source/dependency security and image security pass. PRs never deploy. The JARs and web assets come from that same CI run. CI builds all seven runtime images, scans them, verifies the application image set without rebuilding, then publishes the same images. Superseded main commits are skipped; deployments are serialized and are not cancelled by newer pushes.
+
+This digest delivery flow is newly implemented locally; its first successful GitHub/GHCR/cloud run remains pending. The previous deployment used host-side builds.
 
 Environment configuration:
 
@@ -14,16 +16,23 @@ Environment configuration:
 - Secret `STAGING_SSH_KEY`: dedicated staging deployment private key.
 - Secret `STAGING_KNOWN_HOSTS`: independently verified SSH host-key entry, with strict host verification.
 - Deployment branch policy: only main.
+- GHCR package permissions: this repository must be allowed to publish/read its packages. CI uses `GITHUB_TOKEN` with packages write for publication and read for deployment; private pulls use short-lived credentials through stdin, removed from the host on exit.
 
 The deployment key uses ubuntu with Docker sudo access. It is a privileged server credential, separate from the personal Lightsail key; its authorized-key entry disables forwarding and PTY allocation. Rotate it by installing a replacement public key, updating the environment secret, then removing the old public key.
 
-Releases live under `/home/ubuntu/swe5001/releases/<commit>` and link to the existing root `.env` and `.secrets`. The Compose project stays `swe5001`, preserving database/certificate volumes. Deployment builds images, backs up PostgreSQL under `backups/`, starts the release, restarts the gateway to load release configuration (Docker DNS refresh handles replica changes afterward), and checks internal health. Actions then checks the public HTTPS homepage and all three services. A brief interruption is possible on this single host.
+Releases live under `/home/ubuntu/swe5001/releases/<commit>-<run-id>-<attempt>` and link to the existing root `.env` and `.secrets`. The Compose project stays `swe5001`, preserving database/certificate volumes. The updated flow requires `deployment/compose.images.json` from the same commit, pulls immutable images, backs up PostgreSQL under `backups/`, starts the release with `--no-build --pull never`, restarts the gateway to load release configuration (Docker DNS refresh handles replica changes afterward), and checks internal health. Actions then checks the public HTTPS homepage and all three services. A brief interruption is possible on this single host.
 
-`deployed-sha`, `previous-deployed-sha`, and `current` record releases that passed host health checks; the Actions result additionally confirms public HTTPS. Failures retain the backup and release for inspection. Database migrations are not automatically reversed. Retry the failed deployment job for the current main commit, or manually run Platform CI on main. Before rollback, check migration compatibility; redeploy compatible binaries or explicitly restore the backup during maintenance. Never delete persistent volumes.
+`deployed-sha`, `previous-deployed-sha`, `current` and `previous` record releases that passed host health checks; the Actions result additionally confirms public HTTPS. Failures retain the backup and release for inspection. Database migrations are not automatically reversed. Retry the failed deployment job for the current main commit, or manually run Platform CI on main. Before rollback, check migration compatibility; redeploy compatible binaries or explicitly restore the backup during maintenance. Never delete persistent volumes.
 
 Backups and release directories remain on the server. Monitor disk usage and copy important backups off-host before removing old files.
 
-### Manual deployment
+### Rollback with image locks
+
+Retain the previous release directory and its `deployment/compose.images.json`; `previous` points to its exact directory, even when the same commit was rebuilt in another workflow run. Confirm schema compatibility before running that release's `scripts/cd/deploy.sh <full-commit> <registry-user>` from its release directory, with a read-packages credential supplied through stdin from a secure source. Do not put credentials in shell arguments or docs. The lock's commit must match; all seven services must use digest references. This rolls back the application image set only, not database migrations; restoration from backup is a separate maintenance action. Releases created before image locks existed need their legacy deployment procedure and separate compatibility review. A backup or digest file is not proof of a successful rollback drill.
+
+### Historical manual bootstrap
+
+The following build-on-host procedure describes the initial environment bootstrap. Routine updates use the CI digest flow above; do not use these commands to claim reproducible image delivery.
 
 Build the backend JARs with `mvn package` and the frontend with `npm --prefix apps/web run build` on the development/CI machine. Upload the service Dockerfiles and JARs, web Dockerfile/nginx.conf/dist, deployment directory and setup-local.sh while preserving relative paths. Never upload the development `.env`, `.secrets`, database, or SSH private key.
 
@@ -59,7 +68,7 @@ Download backups to a separate machine before deleting the instance. Preserve `.
 
 Database migrations run on service startup. Back up before updates, and check migration compatibility before rollback. Previous organization-lifecycle changes require compatible Catalog/Identity versions; do not blindly restore older binaries.
 
-Read-only inspection on 2026-10-19 confirmed all three readiness endpoints and HTTPS assets healthy. The deployed release was `c0f4600`, with 1 user and no organizations, events or bookings. Its JWT lifetime was still 1800 seconds; the new 3600-second/session-recovery changes require the next release. See [release review](release-review-2026-10-19.md).
+Read-only inspection on 2026-10-19 confirmed all three readiness endpoints and HTTPS assets healthy. The deployed release was `c0f4600`, with 1 user and no organizations, events or bookings. Its JWT lifetime was still 1800 seconds; the new 3600-second/session-recovery changes require the next release. See [release review](archive/2026-10-19/release-review-2026-10-19.md).
 
 Remaining work: security gates, off-host scheduled backups, real-device camera checks, and cloud load/recovery measurements. Existing fault-injection acceptance scripts are intended for disposable stacks, not this shared staging instance.
 

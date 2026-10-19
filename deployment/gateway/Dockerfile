@@ -1,0 +1,2 @@
+FROM nginx:stable-alpine
+RUN apk upgrade --no-cache

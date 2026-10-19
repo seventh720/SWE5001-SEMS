@@ -36,7 +36,8 @@ services:
     mem_limit: 96m
   caddy:
     <<: *runtime
-    image: caddy:2-alpine
+    build:
+      context: ./caddy
     mem_limit: 128m
     environment:
       SEMS_DOMAIN: ${SEMS_DOMAIN:?Set the public hostname}

@@ -3,7 +3,13 @@
   <parent><groupId>org.springframework.boot</groupId><artifactId>spring-boot-starter-parent</artifactId><version>3.5.16</version><relativePath/></parent>
   <groupId>com.sems.platform</groupId><artifactId>sems-platform</artifactId><version>0.1.0-SNAPSHOT</version><packaging>pom</packaging>
   <name>Smart Event Management and Ticketing Platform</name>
-  <properties><java.version>21</java.version></properties>
+  <properties>
+    <java.version>21</java.version>
+    <!-- Same-line security fixes beyond the Boot 3.5.16 managed baseline. -->
+    <jackson-bom.version>2.21.7</jackson-bom.version>
+    <tomcat.version>10.1.60</tomcat.version>
+    <postgresql.version>42.7.12</postgresql.version>
+  </properties>
   <modules><module>services/identity</module><module>services/event-catalog</module><module>services/admission</module></modules>
   <build><plugins><plugin>
     <groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>0.8.13</version>

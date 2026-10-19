@@ -44,7 +44,7 @@ export function OrganizationEvents({organization}:{organization:Organization}) {
       <div className="organization-event-meta"><span className="badge">{event.status??"PUBLISHED"}</span><span>{event.visibility==="ORGANIZATION_ONLY"?"Members only":"Public"}</span></div>
       <h4><Link to={manager?"/organizer/events/"+event.id+"/setup":"/events/"+event.id}>{event.title}</Link></h4>
       <p>{formatDateTime(event.startsAt)}</p><p>{event.location}</p>
-      <div className="organization-event-actions">{manager?<><Link to={"/organizer/events/"+event.id+"/setup"}>Manage event →</Link><Link to={"/organizer/events/"+event.id+"/staff"}>Staff & attendance</Link></>:<Link to={"/events/"+event.id}>View event →</Link>}</div>
+      <div className="organization-event-actions">{manager?<><Link to={"/organizer/events/"+event.id+"/setup"}>Manage event →</Link><Link to={"/organizer/events/"+event.id+"/staff"}>Staff &amp; attendance</Link></>:<Link to={"/events/"+event.id}>View event →</Link>}</div>
     </article>)}</div>
     {data&&data.totalPages>1&&<div className="actions"><button disabled={page===0} onClick={()=>setPage(p=>p-1)}>Previous</button><span>Page {page+1} of {data.totalPages}</span><button disabled={page+1>=data.totalPages} onClick={()=>setPage(p=>p+1)}>Next</button></div>}
   </section>;

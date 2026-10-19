@@ -124,7 +124,7 @@ export function PublicEventsPage() {
               <p className="event-excerpt">{e.description}</p>
               <div className="event-card-footer">
                 <span className="status-chip">Free admission</span>
-                <Link to={`/events/${e.id}`}>Details & registration ↗</Link>
+                <Link to={`/events/${e.id}`}>Details &amp; registration ↗</Link>
               </div>
             </article>
           ))}

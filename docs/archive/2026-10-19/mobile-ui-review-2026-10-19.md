@@ -1,6 +1,6 @@
 # Mobile UI review — 19 October 2026
 
-> 分阶段检查记录，保留当时的版本、测试数与发布状态。当前进度以[项目进度](progress.md)和[测试覆盖情况](test-coverage.md)为准。
+> 分阶段检查记录，保留当时的版本、测试数与发布状态。当前进度以[项目进度](../../progress.md)和[测试覆盖情况](../../test-coverage.md)为准。
 
 ## Cloud verification
 

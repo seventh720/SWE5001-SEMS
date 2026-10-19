@@ -60,13 +60,30 @@ it("ignores unrelated QR content without posting it",async()=>{
  const scan=vi.fn();render(<TicketCamera onScan={scan} onClose={vi.fn()}/>);
  await screen.findByText(/not a SEMS ticket/);expect(scan).not.toHaveBeenCalled();
 });
-it("stops the stream on camera switching and requests the selected PC webcam",async()=>{
- navigator.mediaDevices.enumerateDevices=vi.fn().mockResolvedValue([{kind:"videoinput",deviceId:"one",label:"Built-in"},{kind:"videoinput",deviceId:"two",label:"USB webcam"}]);
+it("defaults to rear and switches front/rear after releasing the previous stream",async()=>{
  render(<TicketCamera onScan={vi.fn()} onClose={vi.fn()}/>);
- fireEvent.click(await screen.findByRole("combobox",{name:/Camera/}));
- fireEvent.click(screen.getByRole("option",{name:"USB webcam"}));
- await waitFor(()=>expect(getUserMedia).toHaveBeenCalledWith({audio:false,video:{deviceId:{exact:"two"}}}));expect(stop).toHaveBeenCalled();
+ await screen.findByText(/Point the camera/);
+ expect(screen.getByRole("button",{name:"Rear camera"}).getAttribute("aria-pressed")).toBe("true");
+ expect(screen.queryByRole("combobox")).toBeNull();
+ fireEvent.click(screen.getByRole("button",{name:"Front camera"}));
+ await waitFor(()=>expect(getUserMedia).toHaveBeenCalledWith({audio:false,video:{facingMode:{exact:"user"},width:{ideal:1280},height:{ideal:720}}}));
+ expect(stop.mock.invocationCallOrder[0]).toBeLessThan(getUserMedia.mock.invocationCallOrder[1]);
+ expect(screen.getByRole("button",{name:"Front camera"}).getAttribute("aria-pressed")).toBe("true");
+ fireEvent.click(screen.getByRole("button",{name:"Rear camera"}));
+ await waitFor(()=>expect(getUserMedia).toHaveBeenCalledWith({audio:false,video:{facingMode:{exact:"environment"},width:{ideal:1280},height:{ideal:720}}}));
+ expect(screen.getByRole("button",{name:"Rear camera"}).getAttribute("aria-pressed")).toBe("true");
 });
+it("reports an unavailable selected camera instead of silently using the other direction",async()=>{
+ render(<TicketCamera onScan={vi.fn()} onClose={vi.fn()}/>);
+ await screen.findByText(/Point the camera/);
+ getUserMedia.mockRejectedValueOnce(new DOMException("No front camera","OverconstrainedError"));
+ fireEvent.click(screen.getByRole("button",{name:"Front camera"}));
+ expect((await screen.findByRole("alert")).textContent).toContain("selected camera is unavailable");
+ expect(getUserMedia).toHaveBeenCalledTimes(2);
+ fireEvent.click(screen.getByRole("button",{name:"Rear camera"}));
+ await screen.findByText(/Point the camera/);
+});
+
 it("releases the camera when the tab goes into the background",async()=>{
  const close=vi.fn();render(<TicketCamera onScan={vi.fn()} onClose={close}/>);
  await screen.findByText(/Point the camera/);
@@ -110,4 +127,18 @@ it("stops the stream and reports unreadable camera frames",async()=>{
  vi.spyOn(HTMLCanvasElement.prototype,"getContext").mockReturnValue({drawImage:()=>{throw new Error('Frame unavailable')},getImageData:vi.fn()} as unknown as CanvasRenderingContext2D);
  render(<TicketCamera onScan={vi.fn()} onClose={vi.fn()}/>);
  expect((await screen.findByRole('alert')).textContent).toContain('Unable to read camera frames');expect(stop).toHaveBeenCalled();
+});
+it("discards a late front-camera stream after switching back to rear",async()=>{
+ render(<TicketCamera onScan={vi.fn()} onClose={vi.fn()}/>);
+ await screen.findByText(/Point the camera/);
+ let resolveFront!:(stream:unknown)=>void;
+ getUserMedia.mockImplementationOnce(()=>new Promise(resolve=>{resolveFront=resolve}));
+ fireEvent.click(screen.getByRole('button',{name:'Front camera'}));
+ await waitFor(()=>expect(getUserMedia).toHaveBeenCalledTimes(2));
+ const rear={getTracks:()=>[{stop:vi.fn()}]};getUserMedia.mockResolvedValueOnce(rear);
+ fireEvent.click(screen.getByRole('button',{name:'Rear camera'}));
+ await screen.findByText(/Point the camera/);
+ const stopFront=vi.fn();await act(async()=>resolveFront({getTracks:()=>[{stop:stopFront}]}));
+ expect(stopFront).toHaveBeenCalledTimes(1);
+ expect((screen.getByLabelText('Camera preview') as HTMLVideoElement).srcObject).toBe(rear);
 });

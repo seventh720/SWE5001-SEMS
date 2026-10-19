@@ -74,7 +74,8 @@ services:
     build:
       context: ../apps/web
   gateway:
-    image: nginx:1.28-alpine
+    build:
+      context: ./gateway
     ports:
       - "127.0.0.1:18080:80"
     volumes:
