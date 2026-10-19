@@ -1,0 +1,88 @@
+{
+  "recordedAt": "2026-10-19T02:42:38.429521+00:00",
+  "baseCommit": "a6c7c2cd19ed7ada6c0a7579ac4224a6b092faa8",
+  "workingTreeChanges": true,
+  "scope": "Local Docker Desktop only; not cloud benchmark, HA evidence, registry publication or production deployment. Placeholder image tags were never pushed.",
+  "backendUnit": {
+    "tests": 51,
+    "failures": 0,
+    "errors": 0
+  },
+  "frontendTests": 113,
+  "frontendBuild": "passed",
+  "releaseToolTests": 1,
+  "comparisonToolTests": 3,
+  "workflowLint": "passed",
+  "shellcheck": "passed",
+  "apiRegression": [
+    "event-directory: shared organization access, pagination, live demotion",
+    "booking: publication recovery, idempotency, 100 requests/10 places, cancellation, owner isolation"
+  ],
+  "apiRegressionImageScope": "Upgraded JARs in isolated two-Admission Compose stack. Final runtime images separately passed fresh-DB startup and k6 API smoke.",
+  "runtimeImageScans": {
+    "caddy": {
+      "blockingFindings": 0,
+      "scopedSuppressions": 0
+    },
+    "event-catalog": {
+      "blockingFindings": 0,
+      "scopedSuppressions": 2
+    },
+    "web": {
+      "blockingFindings": 0,
+      "scopedSuppressions": 0
+    },
+    "identity": {
+      "blockingFindings": 0,
+      "scopedSuppressions": 2
+    },
+    "postgres": {
+      "blockingFindings": 0,
+      "scopedSuppressions": 0
+    },
+    "gateway": {
+      "blockingFindings": 0,
+      "scopedSuppressions": 0
+    },
+    "admission": {
+      "blockingFindings": 0,
+      "scopedSuppressions": 2
+    }
+  },
+  "springExceptionCves": [
+    "CVE-2026-47884",
+    "CVE-2026-47890"
+  ],
+  "springExceptionExpires": "2026-11-17",
+  "finalImageSmoke": {
+    "freshDatabase": true,
+    "threeServicesReady": true,
+    "caddyConfiguration": "passed",
+    "load": {
+      "catalog": {
+        "vus": 2,
+        "warmupSeconds": 2,
+        "measurementSeconds": 5,
+        "thresholdsPassed": true,
+        "successfulRequests": 84
+      },
+      "booking": {
+        "vus": 2,
+        "warmupSeconds": 2,
+        "measurementSeconds": 5,
+        "thresholdsPassed": true,
+        "successfulRequests": 148
+      }
+    },
+    "databaseAuditPassed": true
+  },
+  "faultToolSmoke": "Stopped one of two local Admission replicas for 1 second and restored it; no cloud recovery-time claim.",
+  "pending": [
+    "PR CI on Linux amd64",
+    "GHCR permissions and first publish/pull",
+    "cloud dataset and 25/50/100 VU repeated experiments",
+    "cloud failure/compatible rollback drills",
+    "long-running monitoring/alerts",
+    "multi-host/database failover architecture if claiming host-level HA"
+  ]
+}

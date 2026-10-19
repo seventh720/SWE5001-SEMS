@@ -1,0 +1,13 @@
+# Applicability review, not patched dependencies. See docs/security.md.
+# Any future server-rendered view/SSE use must remove these exceptions before release.
+vulnerabilities:
+  - id: CVE-2026-47884
+    purls:
+      - pkg:maven/org.springframework/spring-webmvc@6.2.19
+    expired_at: 2026-11-17
+    statement: REST-only APIs; no XsltView, view resolver or implicit MVC view rendering. check-spring-scope.py guards this assumption. Reviewed 2026-10-19; see Spring advisory and docs/security.md.
+  - id: CVE-2026-47890
+    purls:
+      - pkg:maven/org.springframework/spring-webmvc@6.2.19
+    expired_at: 2026-11-17
+    statement: No SSE or view fragments; notifications use JSON polling. check-spring-scope.py guards this assumption. Reviewed 2026-10-19; see Spring advisory and docs/security.md.

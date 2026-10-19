@@ -14,3 +14,8 @@ ci-logs/
 
 __pycache__/
 *.pyc
+
+# Benchmark credentials/results and generated release locks
+.performance/
+release-images/
+deployment/compose.images.json

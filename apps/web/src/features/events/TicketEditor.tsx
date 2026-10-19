@@ -6,7 +6,7 @@ export function initialTicket(capacity = 1, start = ""): TicketRow {return {name
 export function TicketEditor({tickets,onChange,capacity,startsAt,disabled}:{tickets:TicketRow[];onChange:(rows:TicketRow[])=>void;capacity:number;startsAt:string;disabled:boolean}) {
  const total=tickets.reduce((sum,t)=>sum+t.quota,0);
  function change(index:number,key:keyof TicketRow,value:string|number){onChange(tickets.map((t,n)=>n===index?{...t,[key]:value}:t));}
- return <section className="inline-ticket-setup"><h3>Tickets & registration window</h3><p className="muted">Times use Singapore time (UTC+08:00). Existing tickets remain valid when you save changes. Quotas must cover issued places.</p>
+ return <section className="inline-ticket-setup"><h3>Tickets &amp; registration window</h3><p className="muted">Times use Singapore time (UTC+08:00). Existing tickets remain valid when you save changes. Quotas must cover issued places.</p>
  <fieldset className="ticket-fields" disabled={disabled}>
  {tickets.map((t,n)=><div className="ticket-row" key={t.id ?? `new-${n}`}><div className="form-grid">
  <label>Ticket name {n+1}<input required maxLength={100} value={t.name} onChange={e=>change(n,"name",e.target.value)}/></label>

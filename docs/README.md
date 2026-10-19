@@ -1,17 +1,29 @@
-# 项目文档索引
+# 项目文档
 
-- [当前项目进度](progress.md)：已上线、本地完成、待验证与下一步；作为状态入口。
-- [测试覆盖情况](test-coverage.md)：实测覆盖率、业务验收范围、补测结果及剩余缺口。
-- [课程要求核对与展示行动清单](implementation-plan.zh-CN.md)：课程/proposal 对照、架构判断、已发现问题、presentation 讲法及 10 月 19–24 日安排。
-- [本次发布复查](release-review-2026-10-19.md)：PR #12 合并前的历史快照；当前状态见项目进度。
-- [当前业务规则](functional-guide.md)：组织、预订、票券、核销、资料和预约。
-- [验收矩阵](acceptance-matrix.md)：目标、证据和待补实验。
-- [架构决策](adr/0001-service-boundaries.md)：服务边界及一致性协议。
-- [发布管理](publication-management.md)、[改期规则](schedule-revision.md)：当前编辑协议与迁移兼容限制。
-- [组织升级](organization-upgrade.md)：权限模型、已有数据迁移及回滚边界。
-- [站内通知](in-app-notifications.md)：outbox、提醒和通知迁移。
-- [云端测试环境](cloud-staging.md)：Lightsail、HTTPS、部署命令与备份操作。
-- [CI](ci.md)：现有检查、独立验收环境与尚未配置的交付检查。
-- [原始验收证据](evidence/)：按日期保留，结果仅适用于记录中的版本/环境。
+当前状态只在[项目进度](progress.md)维护。以下说明按用途组织；历史检查和原始证据不替代当前发布状态。
 
-Proposal 及配图在本地相邻 `SWE5001/` 目录独立维护，未复制进仓库。运行和团队协作说明见根目录 README。
+## 当前系统与展示
+
+- [项目进度与下一步](progress.md)：上线版本、本地修改、仓库与云端待办。
+- [业务规则](functional-guide.md)：角色、活动、预订、票券、检票、预约和分页。
+- [架构决策](adr/0001-service-boundaries.md)：服务边界、一致性协议、扩容能力与部署限制。
+- [课程要求和展示行动清单](implementation-plan.zh-CN.md)：课程/proposal 对照、展示结构和时间安排。
+- [验收矩阵](acceptance-matrix.md)：目标与证据对应，未达到的目标保留为待办。
+
+## 测试与运维
+
+- [测试覆盖](test-coverage.md)：实测数字、回归范围、覆盖边界。
+- [CI](ci.md)：验收入口、独立测试环境和流水线。
+- [云端环境](cloud-staging.md)：部署、备份和回滚注意事项。
+- [发布管理](publication-management.md)、[改期协议](schedule-revision.md)：活动更新和跨服务同步。
+- [组织升级](organization-upgrade.md)、[站内通知](in-app-notifications.md)：已有环境迁移与兼容边界。
+
+- [扩容收益与可用性实验](performance-and-availability.md)：数据生成、负载、故障恢复、库存审计及 HA 声明边界。
+- [安全门禁与适用性](security.md)：扫描范围、依赖修复和有期限的 Spring 功能例外。
+
+## 历史记录
+
+- [阶段复查归档](archive/README.md)：保留当时版本、发现及结果，不作为当前待办清单。
+- [原始验收证据](evidence/)：按日期保留；结果仅适用于记录中的版本和环境。
+
+运行及团队协作见根目录 README。课程 PDF、proposal 和配图在仓库外维护，不复制进仓库。
