@@ -32,6 +32,10 @@ assert set(lock['services'])=={'identity','event-catalog','admission','web','pos
 assert all(re.fullmatch(r'[a-z0-9./:_-]+@sha256:[0-9a-f]{64}', s['image']) for s in lock['services'].values())
 CHECK
 compose=(sudo -n docker --config "$auth_dir" compose --env-file .env -p swe5001 -f deployment/compose.yaml -f deployment/compose.cloud.yaml -f deployment/compose.images.json)
+# Host-owned shared proxy settings survive replacement of release directories.
+if [ -f "$root/shared-proxy.compose.yaml" ]; then
+  compose+=(-f "$root/shared-proxy.compose.yaml")
+fi
 "${compose[@]}" config --quiet
 "${compose[@]}" pull
 backup="$root/backups/pre-deploy-$sha-$(date -u +%Y%m%dT%H%M%SZ).dump"
