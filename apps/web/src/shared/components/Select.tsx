@@ -20,9 +20,8 @@ export function Select({
   const [open, setOpen] = useState(false);
   useOverlay(open, panel, trigger);
   function focus(n: number) {
-    root.current
-      ?.querySelectorAll<HTMLButtonElement>('[role="option"]')
-      [n]?.focus();
+    const items = root.current?.querySelectorAll<HTMLButtonElement>('[role="option"]');
+    items?.[n]?.focus();
   }
   useEffect(() => {
     if (open)

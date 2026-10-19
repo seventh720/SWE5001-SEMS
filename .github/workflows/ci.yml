@@ -1,4 +1,4 @@
-name: Platform CI
+name: CI
 on:
   push:
     branches: [main]
@@ -11,8 +11,35 @@ concurrency:
   group: platform-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - uses: actions/setup-java@v6.1.0
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - run: npm ci
+        working-directory: apps/web
+      - name: Run lint and collect reports
+        run: bash scripts/ci/lint.sh
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: lint-report
+          path: lint-reports/
+          retention-days: 7
   backend:
-    name: Backend tests and build
+    name: Backend · Unit Tests & Build
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     outputs:
@@ -45,7 +72,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
   frontend:
-    name: Frontend tests and build
+    name: Frontend · Tests & Build
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
@@ -81,10 +108,10 @@ jobs:
           if-no-files-found: error
           retention-days: 7
   integration:
-    name: PostgreSQL and API acceptance
+    name: Backend · Integration Tests
     needs: [backend, frontend]
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/download-artifact@v8.0.2
@@ -101,6 +128,7 @@ jobs:
           bash -n scripts/cd/*.sh scripts/security/*.sh scripts/performance/*.sh
           python3 scripts/cd/test-release.py
           python3 scripts/performance/test-tools.py
+          python3 scripts/performance/test-local-experiment.py
           bash scripts/cd/package.sh "$RUNNER_TEMP/release.tar.gz"
       - run: docker compose --env-file .env -f deployment/compose.yaml config --quiet
       - run: docker compose --env-file .env -f deployment/compose.yaml up --build -d --scale admission=2
@@ -123,6 +151,7 @@ jobs:
           python3 scripts/event-cancellation-acceptance.py
           python3 scripts/predeployment-fixes-acceptance.py
           python3 scripts/organization-migration-acceptance.py
+          python3 scripts/catalog-recovery-acceptance.py
           bash scripts/performance/smoke.sh
       - name: Collect diagnostics
         if: always()
@@ -146,7 +175,7 @@ jobs:
           fi
 
   security:
-    name: Source and dependency security
+    name: Security · SAST, Dependencies & Secrets
     needs: [backend, frontend]
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -165,8 +194,8 @@ jobs:
           retention-days: 7
 
   images:
-    name: Scan and publish immutable images
-    needs: [backend, frontend, integration, security]
+    name: Images · Scan, Smoke Test & Publish
+    needs: [lint, backend, frontend, integration, security]
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -209,8 +238,8 @@ jobs:
           retention-days: 30
 
   deploy:
-    name: Deploy Lightsail staging
-    needs: [backend, frontend, integration, security, images]
+    name: Deploy · Lightsail Staging
+    needs: [lint, backend, frontend, integration, security, images]
     permissions:
       contents: read
       packages: read
@@ -285,8 +314,8 @@ jobs:
           echo "Deployed commit $GITHUB_SHA to https://swe5001.seventh720.com" >> "$GITHUB_STEP_SUMMARY"
 
   notify:
-    name: Telegram notification
-    needs: [backend, frontend, integration, security, images]
+    name: Notify · Telegram
+    needs: [lint, backend, frontend, integration, security, images]
     if: always() && !cancelled() && github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-24.04
     timeout-minutes: 2
@@ -296,6 +325,7 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+          LINT_RESULT: ${{ needs.lint.result }}
           BACKEND_RESULT: ${{ needs.backend.result }}
           FRONTEND_RESULT: ${{ needs.frontend.result }}
           INTEGRATION_RESULT: ${{ needs.integration.result }}
@@ -316,6 +346,7 @@ jobs:
               raise SystemExit(0)
           text = '\n'.join([
               'SEMS Platform CI',
+              'Lint: ' + os.environ['LINT_RESULT'],
               'Backend: ' + os.environ['BACKEND_RESULT'],
               'Backend unit coverage (line / branch): ' + os.environ['BACKEND_LINES'] + ' / ' + os.environ['BACKEND_BRANCHES'],
               'Frontend: ' + os.environ['FRONTEND_RESULT'],

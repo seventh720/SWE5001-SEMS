@@ -35,7 +35,7 @@ export async function apiRequest<T>(
     window.dispatchEvent(new CustomEvent("sems:unauthorized", { detail: token }));
   }
   if (!response.ok) {
-    let problem: ProblemResponse = {};
+    let problem: ProblemResponse;
     try {
       problem = (await response.json()) as ProblemResponse;
     } catch {
