@@ -782,6 +782,57 @@
               "maxLength": 200,
               "default": ""
             }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Optional filter, applied before pagination. Empty means all.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "",
+                "DRAFT",
+                "PUBLISHING",
+                "PUBLISHED",
+                "PAUSED",
+                "UPDATING",
+                "CANCELLING",
+                "CANCELLED"
+              ],
+              "default": ""
+            }
+          },
+          {
+            "name": "timeStatus",
+            "in": "query",
+            "required": false,
+            "description": "Optional filter, applied before pagination. Empty means all.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "",
+                "UPCOMING",
+                "ONGOING",
+                "ENDED"
+              ],
+              "default": ""
+            }
+          },
+          {
+            "name": "visibility",
+            "in": "query",
+            "required": false,
+            "description": "Optional filter, applied before pagination. Empty means all.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "",
+                "PUBLIC",
+                "ORGANIZATION_ONLY"
+              ],
+              "default": ""
+            }
           }
         ],
         "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context."
@@ -973,7 +1024,7 @@
             }
           }
         },
-        "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context."
+        "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context. Events whose saved endsAt is at or before server time cannot be edited or reopened; returns 409. Create a separate event from a template instead."
       }
     },
     "/api/v1/organizer/events/{id}/publish": {
@@ -1458,7 +1509,7 @@
             "description": "Version conflict or event not published"
           }
         },
-        "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context."
+        "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context. Events whose saved endsAt is at or before server time cannot be edited or reopened; returns 409. Create a separate event from a template instead."
       }
     },
     "/api/v1/organizer/events/{id}/revision": {
@@ -1475,7 +1526,7 @@
       ],
       "put": {
         "summary": "Save event details and tickets together, or pause/resume an already-published event",
-        "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context.",
+        "description": "Requires current active ORG_ADMIN or ORGANIZER membership in the event organization. Global ORGANIZER/STAFF/ADMIN roles do not bypass membership. Existing event-specific paths are retained; list/create have explicit organization context. Events whose saved endsAt is at or before server time cannot be edited or reopened; returns 409. Create a separate event from a template instead.",
         "requestBody": {
           "required": true,
           "content": {
@@ -1784,6 +1835,71 @@
           },
           "401": {
             "description": "Invalid internal token"
+          }
+        }
+      }
+    },
+    "/api/v1/organizer/organizations/{id}/overview": {
+      "get": {
+        "summary": "Organization administrator overview",
+        "description": "Organization-wide, all-time totals, independent of event-list filters and pagination. Total events includes drafts and cancellations. Valid tickets and checked-in counts exclude cancelled bookings and cancelled events; ended events remain included. Requires current ORG_ADMIN membership. Catalog and Admission totals are read separately.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Organization overview",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "totalEvents",
+                    "validTickets",
+                    "checkedIn",
+                    "updatedAt"
+                  ],
+                  "properties": {
+                    "totalEvents": {
+                      "type": "integer",
+                      "format": "int64",
+                      "minimum": 0
+                    },
+                    "validTickets": {
+                      "type": "integer",
+                      "format": "int64",
+                      "minimum": 0
+                    },
+                    "checkedIn": {
+                      "type": "integer",
+                      "format": "int64",
+                      "minimum": 0
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Current member is not an organization administrator"
+          },
+          "404": {
+            "description": "Organization is unavailable or inaccessible"
+          },
+          "503": {
+            "description": "Overview unavailable; no fabricated zero totals"
           }
         }
       }

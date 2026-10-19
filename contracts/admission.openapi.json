@@ -1956,6 +1956,50 @@
           }
         }
       }
+    },
+    "/internal/v1/organizations/{id}/attendance-summary": {
+      "get": {
+        "summary": "Internal organization ticket totals",
+        "description": "Requires the Catalog-to-Admission service token. Counts VALID and CHECKED_IN tickets on CONFIRMED bookings in non-cancelled events for the requested organization.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ticket totals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "validTickets": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "checkedIn": {
+                      "type": "integer",
+                      "format": "int64"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "serviceToken": []
+          }
+        ]
+      }
     }
   }
 }

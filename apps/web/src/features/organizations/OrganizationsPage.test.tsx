@@ -35,6 +35,7 @@ it("does not report empty memberships when the organization request fails", asyn
 it("defaults to scoped events and separates member management",async()=>{
  const fetch=vi.fn(async(input:RequestInfo|URL)=>{
   const p=String(input);
+  if(p.endsWith("/overview"))return json({totalEvents:1,validTickets:0,checkedIn:0,updatedAt:"2030-01-01T00:00:00Z"});
   if(p.includes("/me/organizations"))return json([{id:"a",name:"Society",role:"ORG_ADMIN"}]);
   if(p.includes("/organizer/events?"))return json({items:[{id:"e",title:"Society seminar",startsAt:"2030-01-01T00:00:00Z",location:"Campus",status:"DRAFT",visibility:"ORGANIZATION_ONLY"}],totalElements:1,totalPages:1});
   if(p.includes("/members?"))return memberPage([]);if(p.includes("/requests?"))return json({items:[],totalPages:0,hasPending:false});return json([]);

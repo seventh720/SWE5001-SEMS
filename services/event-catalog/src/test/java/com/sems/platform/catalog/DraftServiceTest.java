@@ -38,4 +38,16 @@ class DraftServiceTest {
   }
   verifyNoInteractions(repo);
  }
+ @Test void endedDraftCannotBeRescheduled(){
+  var event=new Event(UUID.randomUUID(),input);event.endsAt=Instant.now().minusSeconds(1);when(repo.findById(event.id)).thenReturn(Optional.of(event));
+  assertEquals(409,assertThrows(ResponseStatusException.class,()->service.update(event.organizerId,event.id,input)).getStatusCode().value());verify(repo,never()).flush();
+ }
+ @Test void appliesFiltersBeforePagination(){
+  var organization=UUID.randomUUID();when(repo.filterOrganization(eq(organization),eq("Seminar"),eq("PAUSED"),eq("PUBLIC"),eq("ENDED"),any(),any())).thenReturn(org.springframework.data.domain.Page.empty());
+  service.list(UUID.randomUUID(),organization,1,6," Seminar ","PAUSED","PUBLIC","ENDED");
+  verify(repo).filterOrganization(eq(organization),eq("Seminar"),eq("PAUSED"),eq("PUBLIC"),eq("ENDED"),any(),argThat(p->p.getPageNumber()==1&&p.getPageSize()==6));
+ }
+ @Test void rejectsUnknownFilters(){
+  assertEquals(400,assertThrows(ResponseStatusException.class,()->service.list(UUID.randomUUID(),UUID.randomUUID(),0,6,"","WRONG","","")).getStatusCode().value());verifyNoInteractions(repo);
+ }
 }

@@ -1,3 +1,4 @@
+import {Asterisk} from "../shared/components/Asterisk";
 import { SessionRecovery } from "../features/auth/SessionRecovery";
 import {OrganizationMembersPage} from "../features/organizations/OrganizationMembersPage";
 import {NotificationBell,NotificationsPage} from "../features/notifications/Notifications";
@@ -68,11 +69,11 @@ function Landing() {
         <div className="event-art" aria-hidden="true">
           <div className="art-orbit orbit-one" />
           <div className="art-orbit orbit-two" />
-          <div className="art-star">✳</div>
+          <div className="art-star"><Asterisk/></div>
           <div className="art-note note-top">MAKE SOME MEMORIES ↗</div>
           <div className="art-ticket ticket-back">
             <span>MEET / MAKE / CONNECT</span>
-            <div className="ticket-flower">✳</div>
+            <div className="ticket-flower"><Asterisk/></div>
           </div>
           <div className="art-ticket ticket-front">
             <div className="ticket-top">
@@ -140,7 +141,7 @@ function Landing() {
         <div className="discovery-grid">
           <Link className="discovery-card discovery-lilac" to="/events">
             <span className="discovery-symbol" aria-hidden="true">
-              ✳
+              <Asterisk/>
             </span>
             <span className="card-kicker">01 / DISCOVER</span>
             <h3>Follow your curiosity.</h3>

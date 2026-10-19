@@ -1,3 +1,4 @@
+import {EventFilters,emptyEventFilters,eventFilterQuery} from "./EventFilters";
 import {EventSearch} from "./EventSearch";
 import type {Organization} from "../organizations/OrganizationsPage";
 import { HomeLink } from "../../shared/components/HomeLink";
@@ -67,6 +68,7 @@ export function DraftsPage() {
     totalPages: 0,
     totalElements: 0,
   });
+  const [filters,setFilters]=useState(emptyEventFilters);
   const [keyword,setKeyword]=useState("");
   const [listError,setListError]=useState("");
   const [page, setPage] = useState(0);
@@ -85,7 +87,7 @@ export function DraftsPage() {
     if (!allowed || !token || !organizationId) {setLoading(false);setListError("");setData({items:[],totalPages:0,totalElements:0});return;}
     let active = true;
     setLoading(true);setListError("");setData({items:[],totalPages:0,totalElements:0});
-    apiRequest<Page>(`/api/v1/organizer/events?organizationId=${organizationId}&page=${page}&size=10&keyword=${encodeURIComponent(keyword)}`, {}, token)
+    apiRequest<Page>(`/api/v1/organizer/events?organizationId=${organizationId}&page=${page}&size=10&keyword=${encodeURIComponent(keyword)}${eventFilterQuery(filters)}`, {}, token)
       .then((d) => {
         if (active) {if(page>0&&page>=d.totalPages)setPage(Math.max(0,d.totalPages-1));else setData(d);}
       })
@@ -98,7 +100,7 @@ export function DraftsPage() {
     return () => {
       active = false;
     };
-  }, [token, allowed, page, refresh,organizationId,keyword]);
+  }, [token, allowed, page, refresh,organizationId,keyword,filters]);
   useEffect(() => {
     if (!data.items.some((e) => e.status === "UPDATING")) return;
     const timer = window.setInterval(() => setRefresh((v) => v + 1), 3000);
@@ -139,6 +141,7 @@ export function DraftsPage() {
         {},
         token!,
       );
+      if(!template&&Date.parse(d.endsAt)<=Date.now())throw new Error("Ended events cannot be edited or reopened. Use this event as a template instead.");
       if(!template&&["CANCELLING","CANCELLED"].includes(d.status))throw new Error("This event is cancelled or cancellation is pending. Open publication management to view its status.");
       const i = template ? {version:0,ticketTypes:[]} : await apiRequest<TicketInventory>(`/api/v1/organizer/events/${id}/ticket-types`,{},token!);
       if(d.organizationId)setOrganizationId(d.organizationId);
@@ -168,6 +171,7 @@ export function DraftsPage() {
   }
   async function save(e: FormEvent) {
     e.preventDefault();
+    if(editing&&Date.parse(editing.endsAt)<=Date.now()){setError("This event has ended and cannot be edited or reopened.");return;}
     setBusy(true);
     setError("");
     setMessage("");
@@ -425,13 +429,14 @@ export function DraftsPage() {
       )}
       {!show && <>
       <EventSearch key={organizationId} disabled={!organizationId} onSearch={value=>{setKeyword(value);setPage(0);setRefresh(v=>v+1)}}/>
+      <EventFilters value={filters} onChange={value=>{setFilters(value);setPage(0)}}/>
       {listError&&<p role="alert">{listError} <button onClick={()=>setRefresh(v=>v+1)}>Retry events</button></p>}
       {loading ? (
         <p role="status">Loading drafts…</p>
       ) : (
         <section className="event-list">
           {data.items.length === 0 ? (
-            <p>{listError?"Event list is unavailable.":!organizationId?"Select an organization to view its events.":keyword?"No events match your search.":"No events yet. Create your first event."}</p>
+            <p>{listError?"Event list is unavailable.":!organizationId?"Select an organization to view its events.":(keyword||eventFilterQuery(filters))?"No events match your search.":"No events yet. Create your first event."}</p>
           ) : (
             data.items.map((d) => (
               <article className="card event-card" key={d.id}>
