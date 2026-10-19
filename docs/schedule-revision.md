@@ -1,10 +1,12 @@
 # Editable schedule and capacity
 
+**Ended events:** once the current `endsAt` is at or before the server time, new detail, presentation and combined revision edits are rejected. Changing dates cannot reopen the event; create a new event, optionally from its template. UI controls follow the same rule. Existing durable operations retain their receipt-based recovery behavior.
+
 The event editor now permits date and capacity changes after ticket configuration and publication. Published registration requirements remain fixed. The editor now saves details and ticket configuration together through PUT /api/v1/organizer/events/{id}/revision, including unconfigured drafts; see [unified editing](publication-management.md). Legacy detail-only commands remain compatible.
 
 ## User-visible rules
 
-- Choose a future start and an end after it. An event with a checked-in ticket cannot be rescheduled.
+- A new start, when changed, must be in the future and the end must follow it. An unchanged start may remain in the past for a still-ongoing published or paused event. An event with a checked-in ticket cannot be rescheduled; an ended event cannot be edited at all.
 - Capacity must be at least the sum of allocated ticket-type quotas, which already bounds reserved places. An increase does not silently increase ticket quotas. The combined editor can reduce capacity and quotas together, as long as each quota covers its issued places.
 - For legacy detail-only revisions, moving the start shifts ticket windows by the same duration. The combined editor submits explicit ticket windows instead: review them alongside the new event time.
 - Confirmed booking start/end times follow the revised event schedule. Credentials, quantities, inventory counts and contact snapshots remain unchanged. Cancelled orders retain their historical dates. Venue/title snapshots on older orders remain historical; the public event link shows current details. No external change notifications are sent.

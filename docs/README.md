@@ -5,7 +5,7 @@
 ## 当前系统与展示
 
 - [项目进度与下一步](progress.md)：上线版本、本地修改、仓库与云端待办。
-- [业务规则](functional-guide.md)：角色、活动、预订、票券、检票、预约和分页。
+- [业务规则](functional-guide.md)：角色、活动生命周期、组织总览统计口径、预订/票券/检票、预约、筛选和分页。
 - [架构决策](adr/0001-service-boundaries.md)：服务边界、一致性协议、扩容能力与部署限制。
 - [课程要求和展示行动清单](implementation-plan.zh-CN.md)：课程/proposal 对照、展示结构和时间安排。
 - [验收矩阵](acceptance-matrix.md)：目标与证据对应，未达到的目标保留为待办。

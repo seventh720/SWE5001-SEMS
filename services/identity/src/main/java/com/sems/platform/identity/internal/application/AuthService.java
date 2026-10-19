@@ -26,9 +26,7 @@ public class AuthService {
 
     @Transactional
     public UserView register(String username, String email, String rawPassword) {
-        if (rawPassword.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {
-            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Password must be at most 72 UTF-8 bytes");
-        }
+        PasswordPolicy.validate(rawPassword);
         String normalizedUsername = UsernamePolicy.normalize(username);
         String normalizedEmail = normalizeEmail(email);
         if (users.existsByUsername(normalizedUsername)) {

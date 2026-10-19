@@ -4,6 +4,8 @@ import { Navigate, useLocation } from "react-router-dom";
 import { ApiError } from "../../shared/api/client";
 import { useAuth } from "./AuthContext";
 
+const passwordHelp = "Password must contain 8–16 characters using English letters, numbers or symbols. Spaces are not allowed.";
+
 export function AuthPage() {
   const { user, login, register, sessionExpired } = useAuth();
   const location = useLocation();
@@ -31,9 +33,11 @@ export function AuthPage() {
         ? "Choose a username with 3–50 letters, numbers, dots, underscores or hyphens."
         : !email.trim() || !/^[^\s@]+@[^\s@]+$/.test(email.trim())
           ? "Enter a valid email address, such as name@example.com."
-          : password.length < 8 || password.length > 72
-            ? "Password must contain 8–72 characters."
-            : "";
+          : mode === "register" && (password.length < 8 || password.length > 16 || /[^!-~]/.test(password))
+            ? passwordHelp
+            : password.length < 8 || password.length > 72
+              ? "Password must contain 8–72 characters."
+              : "";
     if (validationError) {
       setError(validationError);
       return;
@@ -138,12 +142,15 @@ export function AuthPage() {
                 mode === "login" ? "current-password" : "new-password"
               }
               minLength={8}
-              maxLength={72}
+              maxLength={mode === "register" ? 16 : 72}
+              pattern={mode === "register" ? "[!-~]{8,16}" : undefined}
+              aria-describedby={mode === "register" ? "password-help" : undefined}
               required
               value={password}
               onChange={(event) => setPassword(event.target.value)}
             />
           </label>
+          {mode === "register" && <p className="muted" id="password-help">{passwordHelp}</p>}
           {error && (
             <p className="error-message" role="alert">
               {error}

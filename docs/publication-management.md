@@ -1,5 +1,7 @@
 # Unified editing and publication management
 
+**Ended events:** once the current `endsAt` is at or before the server time, new detail, presentation and combined revision edits are rejected. Changing dates cannot reopen the event; create a new event, optionally from its template. UI controls follow the same rule. Existing durable operations retain their receipt-based recovery behavior.
+
 Entering an editor hides the event list and other-event actions. Details, artwork, schedule, capacity and ticket types share a form; Save/Close sit below ticket settings. Only Registration information is locked after first publication. Published ticket names, quotas and registration windows remain editable; new ticket types can be added. Tickets used by a booking (including a cancelled booking) or pre-registration cannot be deleted. Existing ticket IDs, issued credentials, quantities and contact snapshots are preserved; historical order ticket-name snapshots remain unchanged.
 
 Saving published changes automatically updates the public event once synchronization completes. There is no second publish step. Drafts stay private and paused events stay paused when edited. Initial publication still uses Publication preview with confirmation. Publication management contains Edit, public viewing (when published), Pause and Resume. Pausing hides public discovery and blocks new bookings/pre-registrations; it does not cancel or invalidate existing tickets. Resuming restores visibility subject to normal event and sales times.

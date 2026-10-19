@@ -1,5 +1,6 @@
 package com.sems.platform.identity.internal.web;
 
+import com.sems.platform.identity.internal.application.PasswordPolicy;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -16,7 +17,7 @@ public record RegisterRequest(
         @Size(max = 255)
         String email,
 
-        @NotBlank
-        @Size(min = 8, max = 72)
+        @NotBlank(message = PasswordPolicy.MESSAGE)
+        @Pattern(regexp = PasswordPolicy.PATTERN, message = PasswordPolicy.MESSAGE)
         String password) {
 }

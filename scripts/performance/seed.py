@@ -68,7 +68,7 @@ def main():
         'email': os.environ['SEMS_BOOTSTRAP_ADMIN_EMAIL'],
         'password': os.environ['SEMS_BOOTSTRAP_ADMIN_PASSWORD']})['accessToken']
     run = uuid.uuid4().hex[:12]
-    password = secrets.token_urlsafe(24)
+    password = secrets.token_hex(8)
     data = {'schemaVersion': 1, 'runId': run, 'baseUrl': base, 'password': password,
             'createdAt': dt.datetime.now(dt.timezone.utc).isoformat(), 'users': [], 'events': []}
     save(path, data)

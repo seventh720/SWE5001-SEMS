@@ -4,10 +4,11 @@
 
 SEMS is a shared event and ticketing platform built with React/TypeScript, three Spring Boot services and PostgreSQL.
 
-Implemented: organizations and memberships, publication/editing/pause, free bookings, individual QR tickets, attendee and whole-event cancellation, assigned-staff check-in, basic summaries and in-app notifications. A [Lightsail HTTPS staging environment](docs/cloud-staging.md) is deployed. GitHub Actions has a main-only staging deployment job. Scaling/recovery experiments, image registry publication and security delivery gates remain outstanding. See the [proposal review and next steps](docs/implementation-plan.zh-CN.md) (Chinese).
+Implemented: organization-scoped permissions, event publication/editing/pause/cancellation, free bookings, individual QR tickets, assigned-staff check-in, saved registrations, in-app notifications and an organization-admin overview. Event and member management support server-side search, combined filters and pagination. Ended events cannot be edited or reopened.
 
-Platform-role revocation, recoverable organization closure and server-side member pagination are now implemented. Versioned image delivery, security gates and cloud measurements remain; see the [current review](docs/implementation-plan.zh-CN.md).
-当前上线版本、本地完成项和待办见[项目进度](docs/progress.md)；测试范围见[覆盖情况](docs/test-coverage.md)。JWT 为 1 小时；检票窗口为开始前 15 分钟至开始后 15 分钟（截止不含，若更早结束则提前关闭）。
+PR #18 is merged. The latest main [CI and Lightsail staging deployment](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39302943078) succeeded on 2026-10-20, including lint, unit/component tests, database/API acceptance, security scans and GHCR image delivery. Local scaling experiments are complete; cloud load/failure experiments, a compatible rollback exercise and a complete phone check-in walkthrough remain outstanding.
+
+See [project status](docs/progress.md) for release evidence and next steps, [business rules](docs/functional-guide.md) for permissions and metric definitions, and [test coverage](docs/test-coverage.md) for verification limits. JWTs last one hour. Check-in opens 15 minutes before the event starts and closes 15 minutes after it starts (exclusive), or at the event end if earlier.
 
 ## 1. Architecture and permissions
 
@@ -43,23 +44,25 @@ For frontend development, run `npm --prefix apps/web run dev`; port 15173 proxie
 
 This is the local HTTP configuration. The [cloud overlay](docs/cloud-staging.md) provides HTTPS and deployment automation; runtime secrets currently use host files rather than a managed cloud secret service.
 
-## 3. 验收流程 / Acceptance walkthrough
+## 3. Acceptance walkthrough
 
-1. 注册组织管理员、成员、参与者账号；平台管理员创建两个组织并指定管理员。
-2. 组织管理员邀请成员，成员在 Notifications 接受；创建 seminar 与 workshop，配置免费票种并发布。
-3. 参与者浏览、预订并查看二维码/手动票码；检查他人和其他组织无法访问管理数据。
-4. 为活动分配工作人员，核销票码两次，确认 attendance 仅增加一次；检查未分配人员被拒绝。
-5. 取消另一笔尚未签到且未开始的订单，检查库存仅释放一次；演示暂停/恢复与第三组织无代码入驻。
+1. Register administrator, organizer, member and attendee accounts; have the platform administrator provision two organizations and their initial organization administrators.
+2. Invite members and accept through Notifications. Create seminar and workshop events, configure free ticket types and publish.
+3. Browse, book and view QR/manual ticket codes. Verify that other attendees and other organizations cannot access private management data.
+4. Assign event staff, check in a ticket twice and confirm attendance increases only once. Verify denial for unassigned staff.
+5. Cancel another unstarted booking with no check-ins and confirm inventory is released once. Demonstrate pause/resume and a third organization joining through configuration.
+6. Check organization-admin totals, combine event and member filters, and open event details across pages. Verify regular organizers cannot access the organization overview and ended events cannot be rescheduled to reopen.
 
 ## 4. Tests and CI
 
 ```bash
 mvn verify
+npm --prefix apps/web run lint
 npm --prefix apps/web run test:coverage
 npm --prefix apps/web run build
 ```
 
-数据库/API 验收需要独立、可丢弃的 Compose 环境；部分脚本会停止服务、重启及制造故障。完整入口、隔离要求和现有流水线能力见 [CI operations](docs/ci.md)。历史证据见 [docs/evidence](docs/evidence/)。
+Database/API acceptance requires a separate disposable Compose environment; some scripts stop/restart services and inject failures. See [CI operations](docs/ci.md) for entry points, isolation and pipeline behavior. Historical evidence is retained in [docs/evidence](docs/evidence/).
 
 ## 5. Layout and documentation
 
@@ -68,13 +71,13 @@ npm --prefix apps/web run build
 - `contracts/` — [OpenAPI contracts](contracts/README.md).
 - `deployment/` — local Compose, gateway and database setup.
 - `scripts/` — setup and reusable acceptance checks.
-- [文档索引 / Documentation index](docs/README.md)
-- [Proposal 对照与下一步](docs/implementation-plan.zh-CN.md)
-- [当前业务规则](docs/functional-guide.md)
-- [架构决策](docs/adr/0001-service-boundaries.md)
-- [验收矩阵](docs/acceptance-matrix.md)
+- [Documentation index](docs/README.md)
+- [Proposal review and next steps](docs/implementation-plan.zh-CN.md)
+- [Business rules](docs/functional-guide.md)
+- [Architecture decisions](docs/adr/0001-service-boundaries.md)
+- [Acceptance matrix](docs/acceptance-matrix.md)
 
-Proposal 与配图独立存放，不纳入代码仓库。
+The proposal and course illustrations are maintained separately from this repository.
 
 ## 6. Daily frontend and backend development
 
@@ -105,6 +108,7 @@ Open `http://localhost:15173`. Edit `apps/web/src/`; Vite reloads changes. It fa
 Before submitting frontend changes:
 
 ```bash
+npm --prefix apps/web run lint
 npm --prefix apps/web run test:coverage
 npm --prefix apps/web run build
 ```
@@ -206,11 +210,14 @@ Resolve merge conflicts in the affected files, stage them and run `git commit`; 
 
 On GitHub, create a PR with **base `main`**, **compare your branch**. Follow the PR template: explain the task, resulting behavior, test commands/results and any database/configuration upgrade steps; include screenshots for UI changes. Invite **one other teammate** as reviewer. A comment or reviewer invitation is not approval. Use Draft PRs for unfinished work. Address feedback on the same branch and push; ask for another review after changes.
 
-CI runs on PRs targeting `main`, pushes to `main`, or manual dispatch. Pushing `victor` alone without an open PR does not start automatic CI. Before merging, all three checks must pass:
+CI runs on PRs targeting `main`, pushes to `main`, or manual dispatch. Pushing `victor` alone without an open PR does not start automatic CI. Before merging, all six quality checks must pass:
 
-- `Backend tests and build`
-- `Frontend tests and build`
-- `PostgreSQL and API acceptance`
+- `Lint`
+- `Backend · Unit Tests & Build`
+- `Frontend · Tests & Build`
+- `Backend · Integration Tests`
+- `Security · SAST, Dependencies & Secrets`
+- `Images · Scan, Smoke Test & Publish`
 
 Require one other teammate's approval, resolve all discussions and remove merge conflicts. Telegram notification is informational, not a merge quality gate.
 
@@ -227,4 +234,4 @@ git push
 
 Start the next task only after the previous PR is merged, so unrelated changes do not accumulate in one PR. Short-lived task branches may use **Squash and merge** and be deleted afterward; start their next task from current `origin/main`. If repository settings permit only squash merges, use short-lived task branches for PRs instead of repeatedly squash-merging the persistent personal branch.
 
-These are team conventions; README changes do not enable GitHub protection. The repository administrator should configure `main` protection/rulesets to require PRs, one approval from another teammate, renewed approval after updates, resolved discussions and the three checks above, and prohibit force pushes/deletion. If automatic branch deletion is enabled, disable it or preserve/restore persistent personal branches such as `victor`.
+These are team conventions; README changes do not enable GitHub protection. The repository administrator should configure `main` protection/rulesets to require PRs, one approval from another teammate, renewed approval after updates, resolved discussions and the six quality checks above, and prohibit force pushes/deletion. If automatic branch deletion is enabled, disable it or preserve/restore persistent personal branches such as `victor`.
