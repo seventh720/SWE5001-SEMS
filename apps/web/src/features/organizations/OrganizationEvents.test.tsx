@@ -31,3 +31,15 @@ it("recovers when the last page shrinks and uses public discovery for members",a
  expect(fetch.mock.calls.at(-1)?.[0]).toBe("/api/v1/events?organizationId=org&page=0&size=6&keyword=");
  expect(screen.queryByRole("link",{name:"Create event"})).toBeNull();
 });
+
+it("combines server-side filters and resets pagination",async()=>{
+ const fetch=vi.fn(async()=>json({items:[],totalPages:2,totalElements:7}));vi.stubGlobal("fetch",fetch);
+ render(<MemoryRouter><OrganizationEvents organization={org}/></MemoryRouter>);
+ fireEvent.click(await screen.findByRole("button",{name:"Next"}));
+ await waitFor(()=>expect(fetch.mock.calls.length).toBe(2));
+ fireEvent.click(screen.getByRole("combobox",{name:/Event time/}));fireEvent.click(screen.getByRole("option",{name:"Ended"}));
+ await waitFor(()=>expect(vi.mocked(globalThis.fetch).mock.calls.at(-1)?.[0]).toContain("page=0&size=6&keyword=&timeStatus=ENDED"));
+ fireEvent.click(screen.getByRole("combobox",{name:/Publication status/}));fireEvent.click(screen.getByRole("option",{name:"Paused"}));
+ await waitFor(()=>expect(vi.mocked(globalThis.fetch).mock.calls.at(-1)?.[0]).toContain("status=PAUSED&timeStatus=ENDED"));
+ expect(screen.queryByText("Your next event starts here")).toBeNull();
+});

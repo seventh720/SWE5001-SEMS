@@ -1606,3 +1606,30 @@ button.danger-button:hover:not(:disabled) { background:#f5cdd3; border-color:#bf
   .motion-toggle { display:none; }
   .app { padding-inline:16px; }
 }
+
+.asterisk-icon { width: 1em; height: 1em; display: inline-block; vertical-align: -0.1em; }
+.management-filters { display: flex; flex-wrap: wrap; gap: 16px; margin: 20px 0; }
+.management-filters > * { flex: 1 1 180px; min-width: 0; }
+.organization-overview { margin: 28px 0 40px; padding: 24px; border: 1px solid #e3ddec; border-radius: 24px; background: #ffffffb8; }
+.organization-overview-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.organization-overview-heading h3 { margin: 0; }
+.organization-overview-heading .eyebrow { margin: 0 0 8px; }
+.organization-overview-heading > button { flex-shrink: 0; }
+.organization-overview-metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; margin: 24px 0 16px; }
+.organization-overview-metrics > div { padding: 20px; border-radius: 18px; background: #f3edf9; min-width: 0; }
+.organization-overview-metrics dt { color: #625872; font-size: .9rem; }
+.organization-overview-metrics dd { margin: 12px 0; font-size: clamp(1.8rem,3vw,2.6rem); font-weight: 700; line-height: 1.1; overflow-wrap: anywhere; }
+.organization-overview-metrics p,.organization-overview-note { color: #71657f; font-size: .82rem; line-height: 1.6; }
+.organization-overview-metrics p { margin: 0; }
+.organization-overview-note { margin: 8px 0 0; }
+@media(max-width: 900px) { .organization-overview-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width: 540px) {
+ .organization-overview { padding: 18px; }
+ .organization-overview-heading { align-items: flex-start; flex-direction: column; }
+ .organization-overview-metrics { gap: 10px; }
+ .organization-overview-metrics > div { padding: 14px; }
+ .organization-overview-heading > button { width: 100%; }
+}
+@media(max-width:700px) {
+ .topbar .nav-actions > button:not(.motion-toggle) { padding:8px 12px; white-space:nowrap; flex-shrink:0; }
+}

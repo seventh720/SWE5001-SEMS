@@ -41,14 +41,17 @@ public class OrganizationService {
  @Transactional public void platformUpdate(UUID org,String status,String adminEmail){lock(org);if(Boolean.TRUE.equals(jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM organization_closures WHERE organization_id=?)",Boolean.class,org)))throw new ResponseStatusException(HttpStatus.CONFLICT,"A closing or closed organization cannot be reactivated or reassigned");if(status!=null)jdbc.update("UPDATE organizations SET status=?,version=version+1 WHERE id=?",status,org);if(adminEmail!=null&&!adminEmail.isBlank())jdbc.update("INSERT INTO organization_memberships(organization_id,user_id,role,status) VALUES(?,?,'ORG_ADMIN','ACTIVE') ON CONFLICT(organization_id,user_id) DO UPDATE SET role='ORG_ADMIN',status='ACTIVE',version=organization_memberships.version+1",org,account(adminEmail));}
  public record MemberPage(List<Member> items,int page,int size,long totalElements,long totalMembers,long totalPages){}
  @Transactional(readOnly=true,isolation=Isolation.REPEATABLE_READ)
- public MemberPage members(UUID org,UUID actor,int page,int size,String search){
+ public MemberPage members(UUID org,UUID actor,int page,int size,String search){return members(org,actor,page,size,search,"","");}
+ @Transactional(readOnly=true,isolation=Isolation.REPEATABLE_READ)
+ public MemberPage members(UUID org,UUID actor,int page,int size,String search,String role,String status){
   require(org,actor,false);
   if(page<0||size<1||size>50||(long)page*size>Integer.MAX_VALUE||search.length()>200)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid member search or pagination");
+  if(!Set.of("","ORG_ADMIN","ORGANIZER","MEMBER").contains(role)||!Set.of("","ACTIVE","SUSPENDED","REMOVED").contains(status))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid member filter");
   String query=search.strip().toLowerCase(Locale.ROOT);
-  String filter=" FROM organization_memberships m JOIN users u ON u.id=m.user_id WHERE m.organization_id=? AND (strpos(lower(u.username),?)>0 OR strpos(lower(u.email),?)>0)";
-  long total=jdbc.queryForObject("SELECT count(*)"+filter,Long.class,org,query,query);
+  String filter=" FROM organization_memberships m JOIN users u ON u.id=m.user_id WHERE m.organization_id=? AND (strpos(lower(u.username),?)>0 OR strpos(lower(u.email),?)>0) AND (?='' OR m.role=?) AND (?='' OR m.status=?)";
+  long total=jdbc.queryForObject("SELECT count(*)"+filter,Long.class,org,query,query,role,role,status,status);
   long all=jdbc.queryForObject("SELECT count(*) FROM organization_memberships WHERE organization_id=?",Long.class,org);
-  var items=jdbc.query("SELECT m.*,u.username,u.email"+filter+" ORDER BY lower(u.username),m.user_id LIMIT ? OFFSET ?",(r,n)->new Member(r.getObject("user_id",UUID.class),r.getString("username"),r.getString("email"),r.getString("role"),r.getString("status"),r.getLong("version")),org,query,query,size,(long)page*size);
+  var items=jdbc.query("SELECT m.*,u.username,u.email"+filter+" ORDER BY lower(u.username),m.user_id LIMIT ? OFFSET ?",(r,n)->new Member(r.getObject("user_id",UUID.class),r.getString("username"),r.getString("email"),r.getString("role"),r.getString("status"),r.getLong("version")),org,query,query,role,role,status,status,size,(long)page*size);
   return new MemberPage(items,page,size,total,all,(total+size-1)/size);
  }
 

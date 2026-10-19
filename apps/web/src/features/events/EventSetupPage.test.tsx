@@ -50,3 +50,10 @@ it("shows durable cancellation status even when ticket inventory is unavailable"
  expect(screen.getByText("Cancellation reason: Venue unavailable")).toBeTruthy();
  await screen.findByRole("alert");expect(screen.queryByRole("button",{name:"Cancel entire event"})).toBeNull();
 });
+
+it.each(["PUBLISHED","PAUSED"])("prevents editing or reopening an ended %s event",async(status)=>{
+ fetchMock.mockResolvedValueOnce(response({...event,status,endsAt:"2020-01-01T00:00:00Z"})).mockResolvedValueOnce(response(inventory));mount();
+ const button=await screen.findByRole("button",{name:"Event ended"});expect((button as HTMLButtonElement).disabled).toBe(true);
+ expect(screen.queryByRole("link",{name:"Edit details & tickets"})).toBeNull();
+ expect(screen.getByText(/This event has ended and cannot/)).toBeTruthy();
+});

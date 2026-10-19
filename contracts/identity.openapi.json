@@ -1725,6 +1725,38 @@
               "maxLength": 200,
               "default": ""
             }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "description": "Optional filter, applied before pagination. Empty means all.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "",
+                "ORG_ADMIN",
+                "ORGANIZER",
+                "MEMBER"
+              ],
+              "default": ""
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Optional filter, applied before pagination. Empty means all.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "",
+                "ACTIVE",
+                "SUSPENDED",
+                "REMOVED"
+              ],
+              "default": ""
+            }
           }
         ],
         "description": "Live organization membership is required. Username/email search is case-insensitive and treats wildcard characters literally. Stable ordering by normalized username then user ID; totalElements is filtered and totalMembers is unfiltered."

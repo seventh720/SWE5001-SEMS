@@ -24,6 +24,7 @@ public class EventRevisionService {
   jdbc.query("SELECT pg_advisory_xact_lock(hashtextextended(?,0))",(org.springframework.jdbc.core.RowCallbackHandler)r->{},event.toString());
   var receipt=jdbc.queryForList("SELECT jsonb_strip_nulls(payload)=jsonb_strip_nulls(?::jsonb) AS matches FROM event_revision_receipts WHERE id=?",write(op),op.operationId());
   if(!receipt.isEmpty()){if(!Boolean.TRUE.equals(receipt.getFirst().get("matches")))conflict("Operation was reused with different input");return;}
+  if(!op.oldEndsAt().isAfter(Instant.now()))conflict("Ended events cannot be edited or reopened");
   var rows=jdbc.queryForList("SELECT * FROM sales WHERE event_id=? FOR UPDATE",event);
   var d=op.desired();if(((!d.startsAt().equals(op.oldStartsAt())||op.sourceStatus().equals("DRAFT"))&&!d.startsAt().isAfter(Instant.now()))||!d.endsAt().isAfter(d.startsAt()))conflict("Invalid event schedule");
   if(rows.isEmpty()){

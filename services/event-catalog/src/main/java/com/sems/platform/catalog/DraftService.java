@@ -12,6 +12,7 @@ public class DraftService {
  public Event.View create(UUID owner,Draft input){var membership=access.require(input.organizationId(),owner,true);validate(input);var event=new Event(owner,input);event.organizationName=membership==null?"Organization":membership.name();return events.saveAndFlush(event).view();}
  public Event.View update(UUID owner,UUID id,Draft input){
   Event event=owned(owner,id);
+  if(!event.endsAt.isAfter(java.time.Instant.now()))throw new ResponseStatusException(HttpStatus.CONFLICT,"Ended events cannot be edited or reopened. Create a new event using a template.");
   if(input.organizationId()!=null&&!input.organizationId().equals(event.organizationId))throw new ResponseStatusException(HttpStatus.CONFLICT,"Event organization cannot change");
   if(input.version()==null)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"version is required when updating");
   if(event.version!=input.version())throw new ResponseStatusException(HttpStatus.CONFLICT,"Event changed; reload before editing");
@@ -22,15 +23,19 @@ public class DraftService {
  }
  public Event.View presentation(UUID owner,UUID id,PresentationUpdate input){
   Event event=owned(owner,id);
+  if(!event.endsAt.isAfter(java.time.Instant.now()))throw new ResponseStatusException(HttpStatus.CONFLICT,"Ended events cannot be edited or reopened. Create a new event using a template.");
   if(!event.status.equals("PUBLISHED"))throw new ResponseStatusException(HttpStatus.CONFLICT,"Only published events use presentation editing");
   if(event.version!=input.version())throw new ResponseStatusException(HttpStatus.CONFLICT,"Event changed; reload before editing");
   event.title=input.title().strip();event.description=input.description().strip();event.location=input.location().strip();event.category=input.category();event.cardTheme=input.cardTheme();event.updatedAt=java.time.Instant.now();events.flush();return event.view();
  }
  @Transactional(readOnly=true) public Event.View detail(UUID owner,UUID id){return owned(owner,id).view();}
- @Transactional(readOnly=true) public EventPage list(UUID owner,UUID organizationId,int page,int size,String keyword){
+ @Transactional(readOnly=true) public EventPage list(UUID owner,UUID organizationId,int page,int size,String keyword){return list(owner,organizationId,page,size,keyword,"","","");}
+ @Transactional(readOnly=true) public EventPage list(UUID owner,UUID organizationId,int page,int size,String keyword,String status,String visibility,String timeStatus){
   access.require(organizationId,owner,true);
   if(page<0||size<1||size>50||(long)page*size>Integer.MAX_VALUE||keyword.length()>200)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid pagination");
-  var result=events.searchOrganization(organizationId,keyword.strip(),PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"createdAt","id")));
+  if(!Set.of("","DRAFT","PUBLISHING","PUBLISHED","PAUSED","UPDATING","CANCELLING","CANCELLED").contains(status)||!Set.of("","PUBLIC","ORGANIZATION_ONLY").contains(visibility)||!Set.of("","UPCOMING","ONGOING","ENDED").contains(timeStatus))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid event filter");
+  var paging=PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"createdAt","id"));
+  var result=status.isEmpty()&&visibility.isEmpty()&&timeStatus.isEmpty()?events.searchOrganization(organizationId,keyword.strip(),paging):events.filterOrganization(organizationId,keyword.strip(),status,visibility,timeStatus,java.time.Instant.now(),paging);
   return new EventPage(result.getContent().stream().map(Event::view).toList(),page,size,result.getTotalElements(),result.getTotalPages());
  }
  private Event owned(UUID owner,UUID id){var e=events.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found"));access.require(e.organizationId,owner,true);return e;}

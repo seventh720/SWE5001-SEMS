@@ -19,6 +19,7 @@ public class RevisionState {
   var e=events.lockById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found"));
   var pending=jdbc.query("SELECT payload FROM event_revisions WHERE event_id=? AND status='PENDING'",(rs,n)->read(rs.getString(1)),id);
   if(!pending.isEmpty()){if(pending.getFirst().desired().equals(input))return pending.getFirst();conflict("An event update is pending. Wait for it to complete, then reload.");}
+  if(!e.endsAt.isAfter(Instant.now()))conflict("Ended events cannot be edited or reopened. Create a new event using a template.");
   if(input.version()==null||e.version!=input.version())conflict("Event changed; reload before editing");
   if((!e.salesConfigured && input.ticketConfiguration()==null)||!(e.status.equals("DRAFT")||e.status.equals("PUBLISHED")||e.status.equals("PAUSED")))conflict("Event is not ready for this update");
   if(!input.endsAt().isAfter(input.startsAt())||((!input.startsAt().equals(e.startsAt)||e.status.equals("DRAFT"))&&!input.startsAt().isAfter(Instant.now())))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Choose a future start and an end after it");

@@ -33,7 +33,7 @@ it("preserves versioned role updates on the full directory",async()=>{
  expect(mutation[0]).toBe("/api/v1/organizations/o/members/0");expect(JSON.parse(mutation[1]!.body as string)).toMatchObject({role:"ORGANIZER",version:0});
 });
 it("allows ordinary members to browse but hides management controls",async()=>{
- page("MEMBER");await screen.findByText("Person 1");expect(screen.queryByRole("combobox")).toBeNull();expect(screen.getByRole("link",{name:"← Back to organization"}).getAttribute("href")).toContain("organizationId=o&section=members");
+ page("MEMBER");await screen.findByText("Person 1");expect(screen.queryByRole("combobox",{name:/Role for/})).toBeNull();expect(screen.queryByRole("combobox",{name:/Status for/})).toBeNull();expect(screen.getByRole("link",{name:"← Back to organization"}).getAttribute("href")).toContain("organizationId=o&section=members");
 });
 it("ignores an older search response that arrives after the current query",async()=>{
  let resolveSlow!:(value:Response)=>void;
@@ -48,4 +48,13 @@ it("ignores an older search response that arrives after the current query",async
  fireEvent.change(search,{target:{value:"slow"}});fireEvent.change(search,{target:{value:"fast"}});await screen.findByText("Latest result");
  resolveSlow(json({items:[{...members[0],username:"Stale result"}],page:0,size:12,totalElements:1,totalMembers:25,totalPages:1}));
  await waitFor(()=>expect(screen.queryByText("Stale result")).toBeNull());expect(screen.getByText("Latest result")).toBeTruthy();
+});
+
+it("resets pagination and combines member role and status filters",async()=>{
+ const fetch=page();await screen.findByText("Person 1");
+ fireEvent.click(screen.getByRole("button",{name:"Next"}));await screen.findByText("Person 13");
+ fireEvent.click(screen.getByRole("combobox",{name:/Filter by role/}));fireEvent.click(screen.getByRole("option",{name:"Event organizer"}));
+ await waitFor(()=>expect(String(fetch.mock.calls.at(-1)?.[0])).toContain("page=0&size=12&search=&role=ORGANIZER"));
+ fireEvent.click(screen.getByRole("combobox",{name:/Filter by member status/}));fireEvent.click(screen.getByRole("option",{name:"Suspended"}));
+ await waitFor(()=>expect(String(fetch.mock.calls.at(-1)?.[0])).toContain("role=ORGANIZER&status=SUSPENDED"));
 });

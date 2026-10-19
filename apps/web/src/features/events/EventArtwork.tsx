@@ -1,3 +1,4 @@
+import {Asterisk} from "../../shared/components/Asterisk";
 export const categories = [
   ["GENERAL", "General"],
   ["TECH", "Technology"],
@@ -34,7 +35,7 @@ export function EventArtwork({
       <div className="artwork-shapes" aria-hidden="true">
         <span className="artwork-ring" />
         <span className="artwork-glyph">
-          {["✳", "⌘", "◈", "♫", "↗", "✺", "◎"][index]}
+          {index === 0 ? <Asterisk/> : ["", "⌘", "◈", "♫", "↗", "✺", "◎"][index]}
         </span>
         <span className="artwork-disc" />
         <span className="artwork-word">
