@@ -238,6 +238,8 @@ jobs:
           retention-days: 30
 
   deploy:
+    outputs:
+      selected: ${{ steps.latest.outputs.deploy }}
     name: Deploy · Lightsail Staging
     needs: [lint, backend, frontend, integration, security, images]
     permissions:
@@ -315,7 +317,7 @@ jobs:
 
   notify:
     name: Notify · Telegram
-    needs: [lint, backend, frontend, integration, security, images]
+    needs: [lint, backend, frontend, integration, security, images, deploy]
     if: always() && !cancelled() && github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-24.04
     timeout-minutes: 2
@@ -325,6 +327,11 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+          DEPLOY_RESULT: ${{ needs.deploy.result }}
+          DEPLOY_SELECTED: ${{ needs.deploy.outputs.selected }}
+          SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
           LINT_RESULT: ${{ needs.lint.result }}
           BACKEND_RESULT: ${{ needs.backend.result }}
           FRONTEND_RESULT: ${{ needs.frontend.result }}
@@ -344,21 +351,32 @@ jobs:
           if not token or not chat:
               print('::notice::Telegram secrets are absent; notification skipped.')
               raise SystemExit(0)
-          text = '\n'.join([
-              'SEMS Platform CI',
-              'Lint: ' + os.environ['LINT_RESULT'],
-              'Backend: ' + os.environ['BACKEND_RESULT'],
-              'Backend unit coverage (line / branch): ' + os.environ['BACKEND_LINES'] + ' / ' + os.environ['BACKEND_BRANCHES'],
-              'Frontend: ' + os.environ['FRONTEND_RESULT'],
-              'Frontend coverage (line / branch): ' + os.environ['FRONTEND_LINES'] + ' / ' + os.environ['FRONTEND_BRANCHES'],
-              'PostgreSQL/API integration: ' + os.environ['INTEGRATION_RESULT'],
-              'Source/dependency security: ' + os.environ['SECURITY_RESULT'],
-              'Image security/publication: ' + os.environ['IMAGES_RESULT'],
-              os.environ['GITHUB_REPOSITORY'],
-              'Ref: ' + os.environ['GITHUB_REF_NAME'],
-              'Commit: ' + os.environ['GITHUB_SHA'][:12],
-              os.environ['RUN_URL'],
-          ])
+          icons = {'success': '✅', 'failure': '❌', 'cancelled': '🚫', 'skipped': '⏭️'}
+          checks = [('Lint', 'LINT_RESULT'), ('Backend · Unit Tests & Build', 'BACKEND_RESULT'),
+                    ('Frontend · Tests & Build', 'FRONTEND_RESULT'), ('Backend · Integration Tests', 'INTEGRATION_RESULT'),
+                    ('Security · SAST, Dependencies & Secrets', 'SECURITY_RESULT'),
+                    ('Images · Scan' + (' & Publish' if os.environ['GITHUB_EVENT_NAME'] != 'pull_request' else ''), 'IMAGES_RESULT')]
+          results = [os.environ[key] for _, key in checks]
+          deploy = os.environ['DEPLOY_RESULT']
+          overall = '❌ Failed' if 'failure' in results + [deploy] else (
+              '✅ Passed' if all(value == 'success' for value in results) else '⚠️ Incomplete')
+          context = ('PR #' + os.environ['PR_NUMBER']) if os.environ['PR_NUMBER'] else os.environ['GITHUB_EVENT_NAME']
+          lines = ['SEMS CI · ' + overall, os.environ['GITHUB_REPOSITORY'],
+                   context + ' · ' + os.environ['SOURCE_BRANCH'],
+                   'Commit: ' + os.environ['SOURCE_SHA'][:12] + ' · Actor: ' + os.environ['GITHUB_ACTOR'],
+                   'Run #' + os.environ['GITHUB_RUN_NUMBER'] + ' · Attempt ' + os.environ['GITHUB_RUN_ATTEMPT'], '']
+          lines += [icons.get(os.environ[key], '❔') + ' ' + label + ': ' + os.environ[key] for label, key in checks]
+          if deploy == 'success' and os.environ['DEPLOY_SELECTED'] != 'true':
+              lines.append('⏭️ Deploy: superseded commit; not deployed')
+          elif deploy == 'skipped':
+              lines.append('⏭️ Deploy: skipped (PR or unmet conditions)')
+          else:
+              lines.append(icons.get(deploy, '❔') + ' Deploy · Lightsail Staging: ' + deploy)
+          lines += ['', 'Coverage (line / branch; unit/component only)',
+                    'Backend: ' + (os.environ['BACKEND_LINES'] or 'N/A') + ' / ' + (os.environ['BACKEND_BRANCHES'] or 'N/A'),
+                    'Frontend: ' + (os.environ['FRONTEND_LINES'] or 'N/A') + ' / ' + (os.environ['FRONTEND_BRANCHES'] or 'N/A'),
+                    '', 'Checks, logs & reports: ' + os.environ['RUN_URL']]
+          text = '\n'.join(lines)
           request = urllib.request.Request(
               'https://api.telegram.org/bot' + token + '/sendMessage',
               data=json.dumps({'chat_id': chat, 'text': text}).encode(),
