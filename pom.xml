@@ -11,7 +11,21 @@
     <postgresql.version>42.7.12</postgresql.version>
   </properties>
   <modules><module>services/identity</module><module>services/event-catalog</module><module>services/admission</module></modules>
-  <build><plugins><plugin>
+  <build><plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId><artifactId>maven-checkstyle-plugin</artifactId><version>3.6.0</version>
+      <configuration>
+        <configLocation>${maven.multiModuleProjectDirectory}/config/checkstyle.xml</configLocation>
+        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+        <consoleOutput>true</consoleOutput><failOnViolation>true</failOnViolation>
+      </configuration>
+      <executions><execution>
+        <!-- IDE automatic builds skip this goal; Maven CLI and CI still run it in validate. -->
+        <?m2e ignore?>
+        <id>lint</id><phase>validate</phase><goals><goal>check</goal></goals>
+      </execution></executions>
+    </plugin>
+    <plugin>
     <groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>0.8.13</version>
     <executions><execution><goals><goal>prepare-agent</goal></goals></execution>
       <execution><id>report</id><phase>verify</phase><goals><goal>report</goal></goals></execution></executions>

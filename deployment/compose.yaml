@@ -58,6 +58,7 @@ services:
       context: ..
       dockerfile: services/admission/Dockerfile
     environment:
+      CATALOG_URL: http://gateway:8080
       DB_URL: jdbc:postgresql://postgres:5432/sems?currentSchema=admission
       CATALOG_TO_ADMISSION_TOKEN: ${CATALOG_TO_ADMISSION_TOKEN:?Required}
       ADMISSION_TO_CATALOG_TOKEN: ${ADMISSION_TO_CATALOG_TOKEN:?Required}

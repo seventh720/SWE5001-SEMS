@@ -19,3 +19,5 @@ __pycache__/
 .performance/
 release-images/
 deployment/compose.images.json
+
+lint-reports/

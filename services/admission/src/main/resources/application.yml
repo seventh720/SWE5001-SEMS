@@ -35,4 +35,4 @@ sems:
   internal:
     inbound-token: ${CATALOG_TO_ADMISSION_TOKEN}
     outbound-token: ${ADMISSION_TO_CATALOG_TOKEN}
-    remote-url: http://event-catalog:8082
+    remote-url: ${CATALOG_URL:http://event-catalog:8082}

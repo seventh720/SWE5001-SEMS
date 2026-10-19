@@ -1,5 +1,7 @@
 # 扩容收益与可用性验证
 
+已完成的本地正式实验与补测见[结果和图表](evidence/2026-10-19-local-architecture/README.md)。
+
 这份文档定义实验方法；实际完成状态见[当前进度](progress.md)。脚本位于 `scripts/performance/`。本地短时 smoke 只说明工具和业务路径能运行，不是云端性能结论。
 
 ## 可以证明什么
@@ -78,3 +80,20 @@ python3 scripts/performance/fault.py --service admission --seconds 60 --output f
 ## 本地工具验证口径
 
 2 VU、2 秒预热、5 秒测量只用于 smoke。CI 会运行数据生成、两个场景及数据库一致性审计；它不跑云端 100 VU 的十分钟实验。最终成绩必须附云端环境参数、镜像 digest、完整原始数据和重复实验汇总。
+
+## 本地完整实验执行器
+
+`local-experiment.py` 仅接受独立的 `sems-architecture` Compose JSON 环境和 `127.0.0.1:18087` 数据集，避免误恢复演示/云端数据库。运行前必须设置 Catalog、Admission 的 CPU/内存上限。每轮停止应用、恢复同一份私有数据库快照、等待所有副本就绪并刷新 JWT；故障实验先运行，之后按两种场景、25/50/100 VU、三次重复、交错 1/2 副本顺序运行。默认预热 60 秒、测量 600 秒，36 轮纯负载约 6.6 小时，数据库恢复和故障测试另计。
+
+```bash
+python3 scripts/performance/local-experiment.py \
+  --compose /private/path/compose.json \
+  --dataset /private/path/dataset.json \
+  --output /private/path/unique-results-directory
+```
+
+输出 `progress.json`、环境及镜像 ID、每轮 k6 summary/raw 压缩包、资源采样、网关 upstream、库存审计。故障实验额外记录同一 requestKey 重复提交的响应与最终数据库订单数，以及基于业务流量的连续 30 秒恢复窗口。恢复时间可能为零（剩余副本始终满足目标），也可能为空（观察期没有满足目标）；均不得用容器启动时间替代。
+
+本地执行需要电脑开机、Docker 运行且避免休眠；镜像已缓存后，运行请求走本地网络，不依赖持续互联网连接。负载发生器与服务共享 Docker 虚拟机，其他本地应用也可能竞争资源，必须作为实验限制记录。运行完成或捕获异常后停止专用实验容器；强制终止时仍需人工确认容器状态。原始 dataset、数据库快照和 Compose 中的凭据不能提交。状态为 `complete` 前不应把计划中的 36 轮写成已完成。
+
+补测使用 `--baseline 原始快照 --only-runs 具体轮次...`，必须保留原样本。`summarize-local.py` 会检查每轮真实请求时间连续性；参数写着 600 秒、k6 阈值通过，不足以证明连续测量已完成。用 `--replacement-source 补测目录` 合并经过环境和快照哈希核对的补测，旧结果保留在 `supersededRuns`。`plot-local.py` 从核验后的摘要生成 PNG/PDF 图表，依赖 Matplotlib。

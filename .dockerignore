@@ -7,3 +7,5 @@
 .performance
 ci-logs
 release-images
+
+lint-reports

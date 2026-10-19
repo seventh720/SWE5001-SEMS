@@ -202,11 +202,9 @@ function ExploreMenu({ onClose }: { onClose: () => void }) {
           <Link to="/profile" onClick={onClose}>
             My profile <span>Saved registration details</span>
           </Link>
-          {true && (
-            <Link to="/organizations" onClick={onClose}>
-              My organizations <span>Memberships and events</span>
-            </Link>
-          )}
+          <Link to="/organizations" onClick={onClose}>
+            My organizations <span>Memberships and events</span>
+          </Link>
           <Link to="/staff" onClick={onClose}>My check-in tasks <span>Assigned events</span></Link>
           {user.roles.includes("ADMIN") && (
             <Link to="/admin/users" onClick={onClose}>
