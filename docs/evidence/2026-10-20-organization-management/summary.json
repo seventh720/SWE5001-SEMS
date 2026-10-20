@@ -1,0 +1,69 @@
+{
+  "applicationCommit": "228633d6c2ae9ddeae4517f5294c5d94d4978fa2",
+  "deploymentRun": "https://github.com/seventh720/SWE5001-SEMS/actions/runs/39312012048",
+  "local": {
+    "runId": "qa693f52d10e78",
+    "baseUrl": "http://localhost:18080",
+    "mode": "disposable-compose",
+    "startedAt": "2026-10-20T08:45:01.740183+00:00",
+    "completedAt": "2026-10-20T08:45:17.905438+00:00",
+    "success": true,
+    "checks": [
+      "registration password boundaries and English error guidance",
+      "zero totals, administrator-only overview, organization isolation and internal route denial",
+      "member name/email, role and status filters; pagination and membership changes",
+      "book/replay/cancel/check-in loop; paused tickets included; cancelled event attendance excluded",
+      "combined event filters run before paging; all pages, empty and invalid queries",
+      "ended events remain in totals, reject edits/reopening and preserve version"
+    ],
+    "cleanup": {
+      "complete": true,
+      "failedFixtureIds": [],
+      "accountsRetained": 4,
+      "historyRetained": true
+    },
+    "fixtureCounts": {
+      "accounts": 4,
+      "organizations": 2,
+      "events": 8
+    }
+  },
+  "live": {
+    "runId": "qaad28db8d627e",
+    "baseUrl": "https://swe5001.seventh720.com",
+    "mode": "live-public-api",
+    "startedAt": "2026-10-20T08:41:34.737558+00:00",
+    "completedAt": "2026-10-20T08:45:52.383090+00:00",
+    "success": true,
+    "checks": [
+      "registration password boundaries and English error guidance",
+      "zero totals, administrator-only overview, organization isolation and internal route denial",
+      "member name/email, role and status filters; pagination and membership changes",
+      "book/replay/cancel/check-in loop; paused tickets included; cancelled event attendance excluded",
+      "combined event filters run before paging; all pages, empty and invalid queries",
+      "ended events remain in totals, reject edits/reopening and preserve version"
+    ],
+    "cleanup": {
+      "complete": true,
+      "failedFixtureIds": [],
+      "accountsRetained": 4,
+      "historyRetained": true
+    },
+    "fixtureCounts": {
+      "accounts": 4,
+      "organizations": 2,
+      "events": 8
+    }
+  },
+  "localBeforeLive": {
+    "startedAt": "2026-10-20T08:40:42.264078+00:00",
+    "completedAt": "2026-10-20T08:40:55.730937+00:00",
+    "success": true,
+    "cleanup": {
+      "complete": true,
+      "failedFixtureIds": [],
+      "accountsRetained": 4,
+      "historyRetained": true
+    }
+  }
+}

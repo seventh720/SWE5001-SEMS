@@ -27,7 +27,16 @@ Registration acceptance additionally checks requested field validation, category
 
 ## Current integration entry points
 
-The workflow runs organization-acceptance.py (including the earlier editor/booking regression chain), organization-security-acceptance.py, event-directory-acceptance.py, visibility-acceptance.py, notifications-acceptance.py, membership-notifications-acceptance.py, organization-governance-acceptance.py, event-cancellation-acceptance.py, predeployment-fixes-acceptance.py, organization-migration-acceptance.py and catalog-recovery-acceptance.py. Use the same entry points after builds, readiness and schema-isolation checks in a disposable stack with two Admission replicas. Load that stack’s environment and set SEMS_BASE_URL, SEMS_ENV_FILE and SEMS_COMPOSE_FILE as appropriate.
+The workflow runs organization-acceptance.py (including the earlier editor/booking regression chain), organization-security-acceptance.py, event-directory-acceptance.py, organization-management-acceptance.py, visibility-acceptance.py, notifications-acceptance.py, membership-notifications-acceptance.py, organization-governance-acceptance.py, event-cancellation-acceptance.py, predeployment-fixes-acceptance.py, organization-migration-acceptance.py and catalog-recovery-acceptance.py. Use the same entry points after builds, readiness and schema-isolation checks in a disposable stack with two Admission replicas. Load that stack’s environment and set SEMS_BASE_URL, SEMS_ENV_FILE and SEMS_COMPOSE_FILE as appropriate.
+
+`organization-management-acceptance.py` is a standalone real-API regression for organization-admin totals, member/event combined filters before paging, access isolation, registration guidance, the booking/check-in/cancellation loop and ended-event editing rejection. It creates four unique accounts, two organizations and eight events. Default mode is restricted to disposable localhost Compose and uses SQL only to move its own fixture timestamps; it never stops services. CI saves the credential-free fixture/cleanup report in `integration-diagnostics`.
+
+```bash
+# Load the disposable stack's admin environment first, as above.
+python3 scripts/organization-management-acceptance.py --report ci-logs/organization-management.json
+```
+
+The separate `--live --base-url https://swe5001.seventh720.com` mode uses public APIs only and waits for an event to end naturally. Use it only for an explicitly requested staging acceptance run with agreement on data retention. Both modes attempt cleanup in `finally`: cancel fixture offerings, soft-delete fixture organizations and verify organization access is revoked. Accounts, orders, notifications and check-in history remain; this is not a database purge, and the product has no account-delete/disable API. Check the report's `cleanup.complete` and `failedFixtureIds`; a process kill or service outage may require resuming cleanup manually using only those fixture IDs. Reports contain no passwords, tokens or ticket credentials. They do contain generated account emails and fixture IDs, so live reports stay in ignored `.secrets/acceptance/`.
 
 Give the test stack distinct project, network, volume and host-port names; changing COMPOSE_PROJECT_NAME alone does not override explicitly named Compose resources. Never inject failures into the shared working instance. Historical results are retained in [evidence](evidence/); configured workflow jobs are not proof of a successful current CI run.
 

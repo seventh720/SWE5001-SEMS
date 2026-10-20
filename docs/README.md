@@ -12,6 +12,7 @@
 
 ## 测试与运维
 
+- [组织管理及线上 API 验收](evidence/2026-10-20-organization-management/verification.md)：总览、筛选、生命周期、闭环与临时数据清理。
 - [测试覆盖](test-coverage.md)：实测数字、回归范围、覆盖边界。
 - [CI](ci.md)：验收入口、独立测试环境和流水线。
 - [云端环境](cloud-staging.md)：部署、备份和回滚注意事项。
