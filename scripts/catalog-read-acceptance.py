@@ -49,8 +49,12 @@ internal('/internal/v1/events/details', {'ids': [draft['id']] * 51}, expected=40
 internal('/internal/v1/events/details', {'ids': [None]}, expected=400)
 published = '/internal/v1/events/' + draft['id'] + '/published'
 snapshot = internal(published)
+snapshot_fields = {'id', 'organizerId', 'capacity', 'startsAt', 'endsAt', 'status',
+                   'title', 'location', 'registrationRequirements', 'organizationId', 'visibility'}
+assert set(snapshot) == snapshot_fields
 assert snapshot['registrationRequirements'] == current['registrationRequirements']
 assert snapshot['organizationId'] == org_a['id'] and snapshot['title'] == title
+internal('/internal/v1/events/' + str(uuid.uuid4()) + '/published', expected=404)
 assert call('GET', '/api/v1/events?keyword=' + suffix)['totalElements'] == 1
 
 # Full pages must count only matching, currently active organizations. These
@@ -87,6 +91,24 @@ def directory_event(token, organization, index, visibility='PUBLIC', category='T
     assert public['organizationName'] == organization['name']
     for key in ['startsAt', 'endsAt']:
         assert datetime.datetime.fromisoformat(public[key].replace('Z', '+00:00')) == datetime.datetime.fromisoformat(payload[key])
+    # These reads must retain every booking requirement without loading unrelated
+    # event fields, and return the same contract for management/staff access.
+    internal_route = '/internal/v1/events/' + event['id']
+    owned = internal(internal_route + '?owner=' + event['createdBy'])
+    member = internal(internal_route + '/member?user=' + event['createdBy'])
+    assert set(owned) == snapshot_fields and member == owned
+    assert owned['organizerId'] == event['createdBy'] and owned['id'] == event['id']
+    for key in ['title', 'location', 'capacity', 'registrationRequirements', 'organizationId', 'visibility']:
+        assert owned[key] == payload[key], key
+    assert owned['status'] == 'PUBLISHED'
+    for key in ['startsAt', 'endsAt']:
+        assert datetime.datetime.fromisoformat(owned[key].replace('Z', '+00:00')) == datetime.datetime.fromisoformat(payload[key])
+    if visibility == 'PUBLIC':
+        assert internal(internal_route + '/published') == owned
+    else:
+        internal(internal_route + '/published', expected=404)
+        internal(internal_route + '/published?user=' + users[2]['id'], expected=404)
+        assert internal(internal_route + '/published?user=' + event['createdBy']) == owned
     return event
 
 

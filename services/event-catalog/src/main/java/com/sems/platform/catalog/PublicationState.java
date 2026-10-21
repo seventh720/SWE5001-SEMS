@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 @Service
 public class PublicationState {
-    private final EventRepository events; private final OrganizationAccess access; private final CatalogTimings timings;
-    public PublicationState(EventRepository events,OrganizationAccess access,CatalogTimings timings) { this.events=events;this.access=access;this.timings=timings; }
+    private final EventRepository events; private final InternalEventReadRepository reads; private final OrganizationAccess access; private final CatalogTimings timings;
+    public PublicationState(EventRepository events,InternalEventReadRepository reads,OrganizationAccess access,CatalogTimings timings) { this.events=events;this.reads=reads;this.access=access;this.timings=timings; }
     public record Snapshot(UUID id,UUID organizerId,int capacity,Instant startsAt,Instant endsAt,String status,String title,String location,RegistrationRequirements registrationRequirements,UUID organizationId,String visibility) {}
     public record Operation(UUID eventId,UUID operationId,UUID organizerId,int capacity,Instant startsAt,Instant endsAt,long ticketVersion,String status,UUID organizationId) {}
     private Snapshot snapshot(Event e) { return new Snapshot(e.id,e.organizerId,e.capacity,e.startsAt,e.endsAt,e.status,e.title,e.location,e.registrationRequirements,e.organizationId,e.visibility); }
@@ -19,18 +19,18 @@ public class PublicationState {
         var e=events.lockById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found"));
         return e;
     }
-    // findById's repository transaction finishes before synchronous Identity access.
+    // Read only the snapshot fields, returning the JDBC connection before Identity access.
     public Snapshot inspect(UUID id,UUID owner,boolean published) {
-        var e=timings.read("publication-snapshot", () -> events.findById(id))
+        var e=timings.read("publication-snapshot", () -> reads.snapshot(id))
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found"));
-        if ((published&&(!e.status.equals("PUBLISHED")||!e.startsAt.isAfter(Instant.now()))))
+        if ((published&&(!e.status().equals("PUBLISHED")||!e.startsAt().isAfter(Instant.now()))))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found");
-        if(published)access.active(e.organizationId);
-        if(!published)access.require(e.organizationId,owner,true);
-        else if(e.visibility.equals("ORGANIZATION_ONLY"))access.require(e.organizationId,owner,false);
-        return snapshot(e);
+        if(published)access.active(e.organizationId());
+        if(!published)access.require(e.organizationId(),owner,true);
+        else if(e.visibility().equals("ORGANIZATION_ONLY"))access.require(e.organizationId(),owner,false);
+        return e;
     }
-    public Snapshot member(UUID id,UUID user) {var e=timings.read("member-snapshot", () -> events.findById(id)).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found"));access.require(e.organizationId,user,false);return snapshot(e);}
+    public Snapshot member(UUID id,UUID user) {var e=timings.read("member-snapshot", () -> reads.snapshot(id)).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Event not found"));access.require(e.organizationId(),user,false);return e;}
     @Transactional public Snapshot prepare(UUID owner,UUID id,long version) {
         var e=owned(owner,id);
         if (!e.status.equals("DRAFT") || e.version!=version) conflict("Event changed; reload");

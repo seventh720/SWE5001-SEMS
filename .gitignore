@@ -22,7 +22,3 @@ release-images/
 deployment/compose.images.json
 
 lint-reports/
-
-# Regenerable PDF copies of the published local experiment PNGs
-/docs/evidence/2026-10-19-local-architecture/scaling.pdf
-/docs/evidence/2026-10-19-local-architecture/resources.pdf

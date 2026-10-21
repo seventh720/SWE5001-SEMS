@@ -20,8 +20,7 @@
 - [组织升级](organization-upgrade.md)、[站内通知](in-app-notifications.md)：已有环境迁移与兼容边界。
 
 - [扩容收益与可用性实验](performance-and-availability.md)：数据生成、负载、故障恢复、库存审计及 HA 声明边界。
-- [本地架构实验结果](evidence/2026-10-19-local-architecture/README.md)：有效三次重复结果、扩容与资源图、故障恢复缺口及补测记录。
-- [云端容量实验](evidence/2026-10-21-cloud-capacity/README.md)：首轮连接额度瓶颈、修正后容量复测、Catalog 线程/CPU/SQL 定位、库存审计与数据清理。
+- [本版云端容量复测](evidence/2026-10-22-cloud-capacity/README.md)：`076f500`的分档读取/混合结果、库存审计与清理；旧性能实验记录已移除。
 - [安全门禁与适用性](security.md)：扫描范围、依赖修复和有期限的 Spring 功能例外。
 
 ## 历史记录

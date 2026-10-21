@@ -28,7 +28,7 @@
 
 ## 使用与边界
 
-在选定 Compose 环境设置 SEMS_ENV_FILE、SEMS_COMPOSE_FILE 后运行 `python3 scripts/observe-platform.py 10m`。本次 [observation.json](observation.json) 包含故意停机、非法请求和恢复探测，不能当作稳态性能结果；CPU/内存/数据库数据是瞬时快照，不是连续监控。
+在选定 Compose 环境设置 SEMS_ENV_FILE、SEMS_COMPOSE_FILE 后，可运行 `python3 scripts/observe-platform.py 10m`。2026-10-22按用户要求移除了旧性能/监控快照，业务及路由正确性验收继续保留；容量结果统一见[当前云端记录](../2026-10-22-cloud-capacity/README.md)。
 
 分页接口从数组变为 page 对象，且增加内部批量接口，需协调更新三个服务、Web 和网关。没有新增数据库迁移。登录限流是网关实例内共享预算，若将网关本身扩为多副本，预算会按副本增加；不是账号锁定或分布式限流。
 
