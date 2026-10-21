@@ -6,8 +6,6 @@ SEMS is a shared event and ticketing platform built with React/TypeScript, three
 
 Implemented: organization-scoped permissions, event publication/editing/pause/cancellation, free bookings, individual QR tickets, assigned-staff check-in, saved registrations, in-app notifications and an organization-admin overview. Event and member management support server-side search, combined filters and pagination. Ended events cannot be edited or reopened.
 
-PR #24 is deployed as `f69d49d`; [main CI and staging deployment](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39653776016) passed. Staging business acceptance and user-reported phone check-in passed. [Current cloud retest](docs/evidence/2026-10-22-cloud-capacity/README.md): with 50 ordinary events and 1000 accounts, read 250 VU passed; mixed 250 VU passed client thresholds but failed the server gate with four internal 504s; 500 VU targets were not run; 1000 VU targets were not run. The pool remains 10; this run's temporary fixtures were purged. Only this release's performance evidence is retained; business acceptance remains. Ten-minute steady load, independent replica scaling/recovery and compatible rollback remain outstanding.
-
 See [project status](docs/progress.md) for release evidence and next steps, [business rules](docs/functional-guide.md) for permissions and metric definitions, and [test coverage](docs/test-coverage.md) for verification limits. JWTs last one hour. Check-in opens 15 minutes before the event starts and closes 15 minutes after it starts (exclusive), or at the event end if earlier.
 
 ## 1. Architecture and permissions
