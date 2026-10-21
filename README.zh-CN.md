@@ -6,7 +6,7 @@ SEMS 是 React + TypeScript、三个 Spring Boot 服务与 PostgreSQL 构成的�
 
 已实现多组织权限、活动发布/编辑/暂停/取消、免费预订、独立二维码票券、工作人员核销、预约、站内通知，以及组织管理员总览。活动和成员管理支持服务端检索、组合筛选与分页；已结束活动不能编辑后重开。
 
-PR #20 已合并为 `2f169d6`；[main CI 与 Lightsail 测试环境部署](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39466717243/attempts/2)通过，线上 API 业务闭环及用户手机扫码实测也已通过。[云端容量基线](docs/evidence/2026-10-21-cloud-capacity/README.md)中，读取 250 VU、混合业务 100 VU 短时保持档通过，更高档命中网关连接额度。网关修正已通过本地回归，待部署复测；十分钟稳态、云端副本扩容/故障恢复及兼容回滚仍待完成。
+PR #21 已部署为 `054690b`；[main CI 与测试环境部署](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39572865890)通过。线上 API 闭环及用户手机扫码实测已通过。[云端复测](docs/evidence/2026-10-21-cloud-capacity/README.md)未再出现网关连接额度告警：读取 500 VU 完整保持三分钟、客户端零错误，但 p95 为 3.66 秒；混合 250 VU 有三次订票失败，两者严格验收均未通过。十分钟稳态、云端副本扩容/恢复及兼容回滚仍待完成。
 
 [项目进度](docs/progress.md)维护当前版本和下一步；[业务规则](docs/functional-guide.md)说明权限与统计口径；[测试覆盖](docs/test-coverage.md)区分单元测试、API 验收和历史覆盖率。JWT 为 1 小时；检票窗口为开始前 15 分钟至开始后 15 分钟（截止不含，若更早结束则提前关闭）。
 

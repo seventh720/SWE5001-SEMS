@@ -1134,5 +1134,1741 @@
         "oomKilled": false
       }
     ]
+  },
+  "latestApplicationCommit": "054690b08bf900eef93ac4c57de0c3c9a6a3f68e",
+  "postFix": {
+    "applicationCommit": "054690b08bf900eef93ac4c57de0c3c9a6a3f68e",
+    "deploymentRun": "https://github.com/seventh720/SWE5001-SEMS/actions/runs/39572865890",
+    "gatewayCorrectionDeployed": true,
+    "allThresholdsPassed": false,
+    "runs": {
+      "ladder": {
+        "runId": "4e87c7715be2",
+        "startedAt": "2026-10-21T09:26:54.610565+00:00",
+        "endedAt": "2026-10-21T09:35:52.887442+00:00",
+        "status": "STOPPED",
+        "reason": "read-500vu failed; higher stages were not scheduled",
+        "maxVUs": 1000,
+        "fixtureUsers": 1000,
+        "fixtureEvents": 101,
+        "scriptSha256": {
+          "cloud-capacity.py": "493a0e4ae06a22494c469165a08437c67d109c0faf9cf974b6bad7217d4431a5",
+          "cloud-capacity.js": "a7535f600586b910db8a3e8fe9af1bb63ecf51031e202326114870ee6f3ce8c7",
+          "cloud-guard.py": "d693364e58bfe478a0fecea1d2fd81aed91bde3c2c6750052eb5f099184649f1"
+        },
+        "resources": {
+          "samples": 96,
+          "minimumAvailableMemoryMiB": 1288.61,
+          "maxLoad1": 52.91,
+          "health": {
+            "swe5006-api": {
+              "samples": 96,
+              "failed": 0,
+              "overFiveSeconds": 0,
+              "maxSeconds": 2.173
+            },
+            "swe5006-web": {
+              "samples": 96,
+              "failed": 0,
+              "overFiveSeconds": 0,
+              "maxSeconds": 2.182
+            },
+            "swe5001-web": {
+              "samples": 96,
+              "failed": 0,
+              "overFiveSeconds": 0,
+              "maxSeconds": 1.902
+            },
+            "swe5001-identity": {
+              "samples": 96,
+              "failed": 0,
+              "overFiveSeconds": 0,
+              "maxSeconds": 2.183
+            },
+            "swe5001-event-catalog": {
+              "samples": 96,
+              "failed": 0,
+              "overFiveSeconds": 0,
+              "maxSeconds": 4.416
+            },
+            "swe5001-admission": {
+              "samples": 96,
+              "failed": 0,
+              "overFiveSeconds": 0,
+              "maxSeconds": 2.171
+            }
+          },
+          "containerIdentityChanged": false,
+          "guardReasons": [],
+          "maxDatabaseConnections": 31,
+          "maxLockWaiters": 0,
+          "maxSamplingGapSeconds": 8.666966,
+          "containers": {
+            "swe5001-caddy-1": {
+              "meanCpuPercent": 17.51,
+              "maxCpuPercent": 46.54,
+              "maxMemoryPercent": 43.14
+            },
+            "swe5001-gateway-1": {
+              "meanCpuPercent": 4.72,
+              "maxCpuPercent": 10.67,
+              "maxMemoryPercent": 16.35
+            },
+            "swe5001-identity-1": {
+              "meanCpuPercent": 26.32,
+              "maxCpuPercent": 121.88,
+              "maxMemoryPercent": 49.36
+            },
+            "swe5001-event-catalog-1": {
+              "meanCpuPercent": 43.69,
+              "maxCpuPercent": 160.72,
+              "maxMemoryPercent": 62.86
+            },
+            "swe5001-admission-1": {
+              "meanCpuPercent": 16.77,
+              "maxCpuPercent": 55.9,
+              "maxMemoryPercent": 39.33
+            },
+            "swe5001-postgres-1": {
+              "meanCpuPercent": 18.8,
+              "maxCpuPercent": 66.54,
+              "maxMemoryPercent": 18.44
+            },
+            "swe5001-web-1": {
+              "meanCpuPercent": 0.0,
+              "maxCpuPercent": 0.0,
+              "maxMemoryPercent": 3.55
+            },
+            "swe5006-frontend-1": {
+              "meanCpuPercent": 0.22,
+              "maxCpuPercent": 3.73,
+              "maxMemoryPercent": 8.42
+            },
+            "swe5006-backend-1": {
+              "meanCpuPercent": 0.27,
+              "maxCpuPercent": 4.86,
+              "maxMemoryPercent": 44.81
+            },
+            "swe5006-postgres-1": {
+              "meanCpuPercent": 1.18,
+              "maxCpuPercent": 5.56,
+              "maxMemoryPercent": 7.94
+            }
+          },
+          "generator": {
+            "samples": 109,
+            "maxCpuPercent": 55.47,
+            "maxMemoryPercent": 13.93
+          }
+        }
+      },
+      "mixed-ladder": {
+        "runId": "694217298691",
+        "startedAt": "2026-10-21T09:37:52.285251+00:00",
+        "endedAt": "2026-10-21T09:42:12.928339+00:00",
+        "status": "STOPPED",
+        "reason": "mixed-250vu failed; higher stages were not scheduled",
+        "maxVUs": 500,
+        "fixtureUsers": 1000,
+        "fixtureEvents": 101,
+        "scriptSha256": {
+          "cloud-capacity.py": "493a0e4ae06a22494c469165a08437c67d109c0faf9cf974b6bad7217d4431a5",
+          "cloud-capacity.js": "a7535f600586b910db8a3e8fe9af1bb63ecf51031e202326114870ee6f3ce8c7",
+          "cloud-guard.py": "d693364e58bfe478a0fecea1d2fd81aed91bde3c2c6750052eb5f099184649f1"
+        },
+        "resources": {
+          "samples": 49,
+          "minimumAvailableMemoryMiB": 1281.2,
+          "maxLoad1": 30.54,
+          "health": {
+            "swe5006-api": {
+              "samples": 49,
+              "failed": 0,
+              "overFiveSeconds": 0,
+              "maxSeconds": 1.869
+            },
+            "swe5006-web": {
+              "samples": 49,
+              "failed": 0,
+              "overFiveSeconds": 0,
+              "maxSeconds": 2.738
+            },
+            "swe5001-web": {
+              "samples": 49,
+              "failed": 0,
+              "overFiveSeconds": 0,
+              "maxSeconds": 2.008
+            },
+            "swe5001-identity": {
+              "samples": 49,
+              "failed": 0,
+              "overFiveSeconds": 0,
+              "maxSeconds": 2.02
+            },
+            "swe5001-event-catalog": {
+              "samples": 49,
+              "failed": 0,
+              "overFiveSeconds": 0,
+              "maxSeconds": 3.882
+            },
+            "swe5001-admission": {
+              "samples": 49,
+              "failed": 0,
+              "overFiveSeconds": 0,
+              "maxSeconds": 2.744
+            }
+          },
+          "containerIdentityChanged": false,
+          "guardReasons": [],
+          "maxDatabaseConnections": 32,
+          "maxLockWaiters": 0,
+          "maxSamplingGapSeconds": 8.081996,
+          "containers": {
+            "swe5001-caddy-1": {
+              "meanCpuPercent": 13.51,
+              "maxCpuPercent": 29.83,
+              "maxMemoryPercent": 41.52
+            },
+            "swe5001-gateway-1": {
+              "meanCpuPercent": 5.25,
+              "maxCpuPercent": 12.15,
+              "maxMemoryPercent": 13.28
+            },
+            "swe5001-identity-1": {
+              "meanCpuPercent": 11.61,
+              "maxCpuPercent": 25.17,
+              "maxMemoryPercent": 48.04
+            },
+            "swe5001-event-catalog-1": {
+              "meanCpuPercent": 29.06,
+              "maxCpuPercent": 61.11,
+              "maxMemoryPercent": 62.85
+            },
+            "swe5001-admission-1": {
+              "meanCpuPercent": 22.15,
+              "maxCpuPercent": 53.36,
+              "maxMemoryPercent": 45.58
+            },
+            "swe5001-postgres-1": {
+              "meanCpuPercent": 21.48,
+              "maxCpuPercent": 42.46,
+              "maxMemoryPercent": 20.4
+            },
+            "swe5001-web-1": {
+              "meanCpuPercent": 0.0,
+              "maxCpuPercent": 0.0,
+              "maxMemoryPercent": 3.55
+            },
+            "swe5006-frontend-1": {
+              "meanCpuPercent": 0.23,
+              "maxCpuPercent": 3.79,
+              "maxMemoryPercent": 6.23
+            },
+            "swe5006-backend-1": {
+              "meanCpuPercent": 1.24,
+              "maxCpuPercent": 5.35,
+              "maxMemoryPercent": 44.62
+            },
+            "swe5006-postgres-1": {
+              "meanCpuPercent": 0.56,
+              "maxCpuPercent": 4.93,
+              "maxMemoryPercent": 7.48
+            }
+          },
+          "generator": {
+            "samples": 50,
+            "maxCpuPercent": 44.04,
+            "maxMemoryPercent": 7.6
+          }
+        }
+      }
+    },
+    "stages": [
+      {
+        "name": "read-1vu",
+        "mode": "read",
+        "targetVUs": 1,
+        "plannedHold": "5s",
+        "startedAt": "2026-10-21T09:26:57.650442+00:00",
+        "exitCode": 0,
+        "endedAt": "2026-10-21T09:27:35.324815+00:00",
+        "requests": 20,
+        "unexpectedErrorRate": 0,
+        "p95Ms": 58.14366009999999,
+        "holdRequests": 20,
+        "overallP95Ms": 58.14366009999999,
+        "observedPeakVUs": 1,
+        "failedThresholds": [],
+        "suite": "ladder",
+        "passed": true,
+        "holdOperations": {
+          "events": {
+            "requests": 5,
+            "p95Ms": 42.7411082
+          },
+          "me": {
+            "requests": 5,
+            "p95Ms": 60.57851659999999
+          },
+          "event-detail": {
+            "requests": 5,
+            "p95Ms": 37.4412252
+          },
+          "orders": {
+            "requests": 5,
+            "p95Ms": 52.043057999999995
+          }
+        },
+        "checks": {
+          "passes": 20,
+          "fails": 0,
+          "value": 1
+        },
+        "holdUnexpectedErrorRate": 0,
+        "sourceSha256": "ed555a1b1d40213638ffcb4f2e973cb60b1a81a19756e8e044a9d96b01409ba4"
+      },
+      {
+        "name": "mixed-1vu",
+        "mode": "mixed",
+        "targetVUs": 1,
+        "plannedHold": "5s",
+        "startedAt": "2026-10-21T09:27:45.328929+00:00",
+        "exitCode": 0,
+        "endedAt": "2026-10-21T09:28:22.414057+00:00",
+        "requests": 19,
+        "unexpectedErrorRate": 0,
+        "p95Ms": 110.46400029999985,
+        "holdRequests": 19,
+        "overallP95Ms": 110.46400029999985,
+        "observedPeakVUs": 1,
+        "failedThresholds": [],
+        "bookings_created": 1,
+        "suite": "ladder",
+        "passed": true,
+        "holdOperations": {
+          "book": {
+            "requests": 1,
+            "p95Ms": 264.795625
+          },
+          "receipt": {
+            "requests": 1,
+            "p95Ms": 74.8515
+          },
+          "me": {
+            "requests": 4,
+            "p95Ms": 66.10297765
+          },
+          "cancel": {
+            "requests": 1,
+            "p95Ms": 93.316042
+          },
+          "event-detail": {
+            "requests": 4,
+            "p95Ms": 46.153933
+          },
+          "orders": {
+            "requests": 4,
+            "p95Ms": 61.49182765
+          },
+          "events": {
+            "requests": 4,
+            "p95Ms": 65.942925
+          }
+        },
+        "checks": {
+          "passes": 19,
+          "fails": 0,
+          "value": 1
+        },
+        "holdUnexpectedErrorRate": 0,
+        "sourceSha256": "de0a8cfe029e2caa99cbb0dafa969dcee42f93b797d70dafdda8c7c76ec1fc9a"
+      },
+      {
+        "name": "read-50vu",
+        "mode": "read",
+        "targetVUs": 50,
+        "plannedHold": "30s",
+        "startedAt": "2026-10-21T09:28:32.421232+00:00",
+        "exitCode": 0,
+        "endedAt": "2026-10-21T09:29:37.506374+00:00",
+        "requests": 7388,
+        "unexpectedErrorRate": 0,
+        "p95Ms": 147.05490649999984,
+        "holdRequests": 4886,
+        "overallP95Ms": 141.25359979999996,
+        "observedPeakVUs": 50,
+        "failedThresholds": [],
+        "suite": "ladder",
+        "passed": true,
+        "holdOperations": {
+          "event-detail": {
+            "requests": 1217,
+            "p95Ms": 150.4618673999999
+          },
+          "me": {
+            "requests": 1224,
+            "p95Ms": 59.348118649999996
+          },
+          "orders": {
+            "requests": 1227,
+            "p95Ms": 67.7021752
+          },
+          "events": {
+            "requests": 1218,
+            "p95Ms": 204.87368114999998
+          }
+        },
+        "checks": {
+          "passes": 7388,
+          "fails": 0,
+          "value": 1
+        },
+        "holdUnexpectedErrorRate": 0,
+        "sourceSha256": "b28868e450dfc0b1d34ec5a534eb75dc6d473726360e676faf8eaa929559913f"
+      },
+      {
+        "name": "read-100vu",
+        "mode": "read",
+        "targetVUs": 100,
+        "plannedHold": "30s",
+        "startedAt": "2026-10-21T09:29:47.512343+00:00",
+        "exitCode": 0,
+        "endedAt": "2026-10-21T09:30:50.523596+00:00",
+        "requests": 12456,
+        "unexpectedErrorRate": 0,
+        "p95Ms": 417.77657949999974,
+        "holdRequests": 7774,
+        "overallP95Ms": 387.66694824999956,
+        "observedPeakVUs": 100,
+        "failedThresholds": [],
+        "suite": "ladder",
+        "passed": true,
+        "holdOperations": {
+          "me": {
+            "requests": 1940,
+            "p95Ms": 94.85175094999997
+          },
+          "orders": {
+            "requests": 1939,
+            "p95Ms": 80.07327889999999
+          },
+          "event-detail": {
+            "requests": 1948,
+            "p95Ms": 392.2326748999999
+          },
+          "events": {
+            "requests": 1947,
+            "p95Ms": 568.8152000999997
+          }
+        },
+        "checks": {
+          "passes": 12456,
+          "fails": 0,
+          "value": 1
+        },
+        "holdUnexpectedErrorRate": 0,
+        "sourceSha256": "eb545a790748f7ff8d69c4f2082e0f677b3316376daa810fe8863289a465c6ac"
+      },
+      {
+        "name": "read-250vu",
+        "mode": "read",
+        "targetVUs": 250,
+        "plannedHold": "30s",
+        "startedAt": "2026-10-21T09:31:00.525841+00:00",
+        "exitCode": 0,
+        "endedAt": "2026-10-21T09:32:06.491721+00:00",
+        "requests": 16044,
+        "unexpectedErrorRate": 0,
+        "p95Ms": 2157.0378215499986,
+        "holdRequests": 8878,
+        "overallP95Ms": 1907.0655536499992,
+        "observedPeakVUs": 250,
+        "failedThresholds": [],
+        "suite": "ladder",
+        "passed": true,
+        "holdOperations": {
+          "me": {
+            "requests": 2220,
+            "p95Ms": 115.90578395
+          },
+          "events": {
+            "requests": 2221,
+            "p95Ms": 2945.847085
+          },
+          "event-detail": {
+            "requests": 2217,
+            "p95Ms": 1783.8631673999992
+          },
+          "orders": {
+            "requests": 2220,
+            "p95Ms": 83.20699965
+          }
+        },
+        "checks": {
+          "passes": 16044,
+          "fails": 0,
+          "value": 1
+        },
+        "holdUnexpectedErrorRate": 0,
+        "sourceSha256": "cc769f6cad9f15a610c9e03cff8727f7690ac7c1e0f0e4f99321d1f1903727de"
+      },
+      {
+        "name": "read-500vu",
+        "mode": "read",
+        "targetVUs": 500,
+        "plannedHold": "180s",
+        "startedAt": "2026-10-21T09:32:16.499125+00:00",
+        "exitCode": 99,
+        "endedAt": "2026-10-21T09:35:52.529099+00:00",
+        "requests": 73576,
+        "unexpectedErrorRate": 0,
+        "p95Ms": 3655.101064499999,
+        "holdRequests": 63602,
+        "overallP95Ms": 3582.2424395,
+        "observedPeakVUs": 500,
+        "failedThresholds": [
+          "http_req_duration{name:events,phase:hold}",
+          "http_req_duration{phase:hold}",
+          "http_req_duration",
+          "http_req_duration{name:event-detail,phase:hold}"
+        ],
+        "suite": "ladder",
+        "passed": false,
+        "holdOperations": {
+          "me": {
+            "requests": 15900,
+            "p95Ms": 92.4926021
+          },
+          "event-detail": {
+            "requests": 15914,
+            "p95Ms": 3235.5631202999994
+          },
+          "orders": {
+            "requests": 15901,
+            "p95Ms": 73.450625
+          },
+          "events": {
+            "requests": 15887,
+            "p95Ms": 4587.8487841999995
+          }
+        },
+        "checks": {
+          "passes": 73576,
+          "fails": 0,
+          "value": 1
+        },
+        "holdUnexpectedErrorRate": 0,
+        "sourceSha256": "0b3ca7274abc68298f6a53358a1579717e38b99dcced3ab68098996ea2587b0c"
+      },
+      {
+        "name": "mixed-1vu",
+        "mode": "mixed",
+        "targetVUs": 1,
+        "plannedHold": "5s",
+        "startedAt": "2026-10-21T09:37:55.360919+00:00",
+        "exitCode": 0,
+        "endedAt": "2026-10-21T09:38:32.463863+00:00",
+        "requests": 23,
+        "unexpectedErrorRate": 0,
+        "p95Ms": 31.3539539,
+        "holdRequests": 23,
+        "overallP95Ms": 31.3539539,
+        "observedPeakVUs": 1,
+        "failedThresholds": [],
+        "bookings_created": 1,
+        "suite": "mixed-ladder",
+        "passed": true,
+        "holdOperations": {
+          "events": {
+            "requests": 5,
+            "p95Ms": 28.360483
+          },
+          "cancel": {
+            "requests": 1,
+            "p95Ms": 30.626042
+          },
+          "book": {
+            "requests": 1,
+            "p95Ms": 55.643625
+          },
+          "me": {
+            "requests": 5,
+            "p95Ms": 16.997757999999997
+          },
+          "orders": {
+            "requests": 5,
+            "p95Ms": 29.736475
+          },
+          "event-detail": {
+            "requests": 5,
+            "p95Ms": 28.6648914
+          },
+          "receipt": {
+            "requests": 1,
+            "p95Ms": 29.722959
+          }
+        },
+        "checks": {
+          "passes": 23,
+          "fails": 0,
+          "value": 1
+        },
+        "holdUnexpectedErrorRate": 0,
+        "sourceSha256": "9318da9e11ce0f1f335879897cbd9938392624dea6b945ab9a165d51303e291f"
+      },
+      {
+        "name": "mixed-50vu",
+        "mode": "mixed",
+        "targetVUs": 50,
+        "plannedHold": "30s",
+        "startedAt": "2026-10-21T09:38:42.471422+00:00",
+        "exitCode": 0,
+        "endedAt": "2026-10-21T09:39:45.401563+00:00",
+        "requests": 8725,
+        "unexpectedErrorRate": 0,
+        "p95Ms": 103.45424979999987,
+        "holdRequests": 5749,
+        "overallP95Ms": 106.34015859999998,
+        "observedPeakVUs": 50,
+        "failedThresholds": [],
+        "bookings_created": 399,
+        "suite": "mixed-ladder",
+        "passed": true,
+        "holdOperations": {
+          "me": {
+            "requests": 1250,
+            "p95Ms": 41.6306106
+          },
+          "cancel": {
+            "requests": 251,
+            "p95Ms": 125.98279199999996
+          },
+          "orders": {
+            "requests": 1248,
+            "p95Ms": 115.6998587499999
+          },
+          "book": {
+            "requests": 250,
+            "p95Ms": 182.98734215
+          },
+          "event-detail": {
+            "requests": 1250,
+            "p95Ms": 79.95847309999999
+          },
+          "receipt": {
+            "requests": 251,
+            "p95Ms": 97.3965
+          },
+          "events": {
+            "requests": 1249,
+            "p95Ms": 98.91610839999998
+          }
+        },
+        "checks": {
+          "passes": 8725,
+          "fails": 0,
+          "value": 1
+        },
+        "holdUnexpectedErrorRate": 0,
+        "sourceSha256": "84230994a728b3deda9f603d9b163ab210c1c0da1ada4ab009ce54c680af2abd"
+      },
+      {
+        "name": "mixed-100vu",
+        "mode": "mixed",
+        "targetVUs": 100,
+        "plannedHold": "30s",
+        "startedAt": "2026-10-21T09:39:55.408769+00:00",
+        "exitCode": 0,
+        "endedAt": "2026-10-21T09:40:58.427018+00:00",
+        "requests": 12954,
+        "unexpectedErrorRate": 0,
+        "p95Ms": 390.1717499999999,
+        "holdRequests": 7649,
+        "overallP95Ms": 360.56636284999996,
+        "observedPeakVUs": 100,
+        "failedThresholds": [],
+        "bookings_created": 602,
+        "suite": "mixed-ladder",
+        "passed": true,
+        "holdOperations": {
+          "receipt": {
+            "requests": 334,
+            "p95Ms": 288.2146478
+          },
+          "cancel": {
+            "requests": 332,
+            "p95Ms": 336.54675845
+          },
+          "events": {
+            "requests": 1663,
+            "p95Ms": 460.76107499999995
+          },
+          "book": {
+            "requests": 333,
+            "p95Ms": 565.8710752000001
+          },
+          "event-detail": {
+            "requests": 1660,
+            "p95Ms": 312.1429047999998
+          },
+          "orders": {
+            "requests": 1662,
+            "p95Ms": 351.37761664999994
+          },
+          "me": {
+            "requests": 1665,
+            "p95Ms": 59.50338319999996
+          }
+        },
+        "checks": {
+          "passes": 12954,
+          "fails": 0,
+          "value": 1
+        },
+        "holdUnexpectedErrorRate": 0,
+        "sourceSha256": "9c146179a5deaa1c20d3b9f1962be55f8d7d8a4258e136b342e39868a9ad78c7"
+      },
+      {
+        "name": "mixed-250vu",
+        "mode": "mixed",
+        "targetVUs": 250,
+        "plannedHold": "30s",
+        "startedAt": "2026-10-21T09:41:08.430931+00:00",
+        "exitCode": 99,
+        "endedAt": "2026-10-21T09:42:12.499485+00:00",
+        "requests": 15806,
+        "unexpectedErrorRate": 0.0001898013412628116,
+        "p95Ms": 1958.2136592,
+        "holdRequests": 8085,
+        "overallP95Ms": 1719.4203234999998,
+        "observedPeakVUs": 250,
+        "failedThresholds": [
+          "checks"
+        ],
+        "bookings_created": 789,
+        "suite": "mixed-ladder",
+        "passed": false,
+        "holdOperations": {
+          "events": {
+            "requests": 1743,
+            "p95Ms": 2668.9891006999997
+          },
+          "event-detail": {
+            "requests": 1751,
+            "p95Ms": 1502.8890634999998
+          },
+          "orders": {
+            "requests": 1743,
+            "p95Ms": 1582.5149045999997
+          },
+          "me": {
+            "requests": 1741,
+            "p95Ms": 525.834542
+          },
+          "book": {
+            "requests": 366,
+            "p95Ms": 2594.2832099999996
+          },
+          "cancel": {
+            "requests": 369,
+            "p95Ms": 1683.1944754
+          },
+          "receipt": {
+            "requests": 372,
+            "p95Ms": 1640.40304215
+          }
+        },
+        "checks": {
+          "passes": 15803,
+          "fails": 3,
+          "value": 0.9998101986587372
+        },
+        "holdUnexpectedErrorRate": 0.00037105751391465676,
+        "sourceSha256": "bf4e074d17674f2f54209dbbf2b80d04258cbeceb8993b6e9027ba30e63cd33f"
+      }
+    ],
+    "unexecuted": [
+      "read-1000vu",
+      "mixed-500vu",
+      "mixed-1000vu",
+      "contention-1000vu"
+    ],
+    "datasetValidation": {
+      "ordinaryEvents": 100,
+      "pages": 10,
+      "pageSize": 10,
+      "returned": 100,
+      "unique": 100,
+      "exactFixtureIdsMatch": true,
+      "allTotalCountsMatch": true
+    },
+    "preparation": {
+      "users": 1000,
+      "ordinaryEvents": 100,
+      "hotEvents": 1,
+      "authenticationWorkers": 2,
+      "minimumAuthStartIntervalSeconds": 0.3,
+      "realAuthentication": true,
+      "notIncludedInPressureMetrics": true
+    },
+    "diagnostics": {
+      "read": {
+        "swe5001-gateway-1": {
+          "lines": 109769,
+          "messages": {
+            "worker_connections are not enough": 0,
+            "Too many open files": 0,
+            "upstream timed out": 12,
+            "no live upstreams": 0,
+            "connect() failed": 0,
+            "Connection refused": 0,
+            "Read timed out": 0,
+            "ERROR": 0,
+            "WARN": 0
+          },
+          "statusCounts": {
+            "200": 109745,
+            "504": 12
+          },
+          "errorPaths": [
+            {
+              "method": "POST",
+              "path": "/internal/v1/events/details",
+              "status": 504,
+              "count": 12
+            }
+          ]
+        },
+        "swe5001-caddy-1": {
+          "lines": 0,
+          "messages": {
+            "worker_connections are not enough": 0,
+            "Too many open files": 0,
+            "upstream timed out": 0,
+            "no live upstreams": 0,
+            "connect() failed": 0,
+            "Connection refused": 0,
+            "Read timed out": 0,
+            "ERROR": 0,
+            "WARN": 0
+          },
+          "statusCounts": {},
+          "errorPaths": []
+        },
+        "swe5001-identity-1": {
+          "lines": 0,
+          "messages": {
+            "worker_connections are not enough": 0,
+            "Too many open files": 0,
+            "upstream timed out": 0,
+            "no live upstreams": 0,
+            "connect() failed": 0,
+            "Connection refused": 0,
+            "Read timed out": 0,
+            "ERROR": 0,
+            "WARN": 0
+          },
+          "statusCounts": {},
+          "errorPaths": []
+        },
+        "swe5001-event-catalog-1": {
+          "lines": 0,
+          "messages": {
+            "worker_connections are not enough": 0,
+            "Too many open files": 0,
+            "upstream timed out": 0,
+            "no live upstreams": 0,
+            "connect() failed": 0,
+            "Connection refused": 0,
+            "Read timed out": 0,
+            "ERROR": 0,
+            "WARN": 0
+          },
+          "statusCounts": {},
+          "errorPaths": []
+        },
+        "swe5001-admission-1": {
+          "lines": 0,
+          "messages": {
+            "worker_connections are not enough": 0,
+            "Too many open files": 0,
+            "upstream timed out": 0,
+            "no live upstreams": 0,
+            "connect() failed": 0,
+            "Connection refused": 0,
+            "Read timed out": 0,
+            "ERROR": 0,
+            "WARN": 0
+          },
+          "statusCounts": {},
+          "errorPaths": []
+        }
+      },
+      "mixed": {
+        "swe5001-gateway-1": {
+          "lines": 52534,
+          "messages": {
+            "worker_connections are not enough": 0,
+            "Too many open files": 0,
+            "upstream timed out": 25,
+            "no live upstreams": 0,
+            "connect() failed": 0,
+            "Connection refused": 0,
+            "Read timed out": 0,
+            "ERROR": 0,
+            "WARN": 0
+          },
+          "statusCounts": {
+            "200": 52481,
+            "504": 25,
+            "503": 3
+          },
+          "errorPaths": [
+            {
+              "method": "POST",
+              "path": "/internal/v1/events/details",
+              "status": 504,
+              "count": 22
+            },
+            {
+              "method": "GET",
+              "path": "/internal/v1/events/{eventId}/published",
+              "status": 504,
+              "count": 3
+            },
+            {
+              "method": "POST",
+              "path": "/api/v1/bookings",
+              "status": 503,
+              "count": 3
+            }
+          ]
+        },
+        "swe5001-caddy-1": {
+          "lines": 0,
+          "messages": {
+            "worker_connections are not enough": 0,
+            "Too many open files": 0,
+            "upstream timed out": 0,
+            "no live upstreams": 0,
+            "connect() failed": 0,
+            "Connection refused": 0,
+            "Read timed out": 0,
+            "ERROR": 0,
+            "WARN": 0
+          },
+          "statusCounts": {},
+          "errorPaths": []
+        },
+        "swe5001-identity-1": {
+          "lines": 0,
+          "messages": {
+            "worker_connections are not enough": 0,
+            "Too many open files": 0,
+            "upstream timed out": 0,
+            "no live upstreams": 0,
+            "connect() failed": 0,
+            "Connection refused": 0,
+            "Read timed out": 0,
+            "ERROR": 0,
+            "WARN": 0
+          },
+          "statusCounts": {},
+          "errorPaths": []
+        },
+        "swe5001-event-catalog-1": {
+          "lines": 0,
+          "messages": {
+            "worker_connections are not enough": 0,
+            "Too many open files": 0,
+            "upstream timed out": 0,
+            "no live upstreams": 0,
+            "connect() failed": 0,
+            "Connection refused": 0,
+            "Read timed out": 0,
+            "ERROR": 0,
+            "WARN": 0
+          },
+          "statusCounts": {},
+          "errorPaths": []
+        },
+        "swe5001-admission-1": {
+          "lines": 0,
+          "messages": {
+            "worker_connections are not enough": 0,
+            "Too many open files": 0,
+            "upstream timed out": 0,
+            "no live upstreams": 0,
+            "connect() failed": 0,
+            "Connection refused": 0,
+            "Read timed out": 0,
+            "ERROR": 0,
+            "WARN": 0
+          },
+          "statusCounts": {},
+          "errorPaths": []
+        }
+      }
+    },
+    "inventory": {
+      "passed": true,
+      "events": 101,
+      "bookings": 1792,
+      "cancelled": 1792,
+      "activeTickets": 0,
+      "oversold": false,
+      "contentionExecuted": false
+    },
+    "cleanup": {
+      "deleted": {
+        "catalog.events": 101,
+        "identity.users": 1000,
+        "admission.sales": 101,
+        "admission.tickets": 1792,
+        "admission.bookings": 1792,
+        "identity.user_roles": 1000,
+        "admission.ticket_types": 101,
+        "identity.organizations": 1,
+        "admission.notifications": 3584,
+        "catalog.event_revisions": 0,
+        "identity.booking_profiles": 0,
+        "admission.pre_registrations": 0,
+        "catalog.event_cancellations": 101,
+        "catalog.organization_closures": 1,
+        "identity.organization_closures": 1,
+        "identity.organization_requests": 0,
+        "admission.event_revision_receipts": 0,
+        "admission.event_staff_assignments": 0,
+        "catalog.event_notification_outbox": 0,
+        "identity.membership_notifications": 4,
+        "identity.organization_invitations": 0,
+        "identity.organization_memberships": 1,
+        "admission.event_cancellation_receipts": 101
+      },
+      "untouched_data_unchanged": true,
+      "remaining_fixture_records": 0,
+      "original24TableFingerprintsUnchanged": true,
+      "serverBackupVerified": true,
+      "health": {
+        "swe5006-api": {
+          "ok": true,
+          "seconds": 0.2
+        },
+        "swe5006-web": {
+          "ok": true,
+          "seconds": 0.182
+        },
+        "swe5001-web": {
+          "ok": true,
+          "seconds": 0.181
+        },
+        "swe5001-identity": {
+          "ok": true,
+          "seconds": 0.2
+        },
+        "swe5001-event-catalog": {
+          "ok": true,
+          "seconds": 0.18
+        },
+        "swe5001-admission": {
+          "ok": true,
+          "seconds": 0.187
+        }
+      }
+    },
+    "deploymentMetadataSha256": "4057fe62efbdd4afdd75fa205df0793991d976503e09671e03286106d281e1aa"
+  },
+  "catalogDiagnosis": {
+    "applicationCommit": "054690b08bf900eef93ac4c57de0c3c9a6a3f68e",
+    "startedAt": "2026-10-21T10:26:33.500000+00:00",
+    "finishedAt": "2026-10-21T10:28:30.261419+00:00",
+    "exitCode": 99,
+    "guardStopped": false,
+    "fixtureUsers": 1,
+    "fixtureEvents": 100,
+    "maxVUs": 500,
+    "diagnosticOnly": true,
+    "distinctAccountsCapacityResult": false,
+    "rawDirectory": ".performance/cloud-20261021-catalog-profile",
+    "model": {
+      "readOnly": true,
+      "sharedAuthenticatedAccount": true,
+      "thinkSeconds": 1,
+      "stages": [
+        {
+          "targetVUs": 250,
+          "seconds": 30
+        },
+        {
+          "targetVUs": 500,
+          "seconds": 20
+        },
+        {
+          "targetVUs": 500,
+          "seconds": 30
+        },
+        {
+          "targetVUs": 0,
+          "seconds": 10
+        }
+      ],
+      "notComparableToDistinctAccountCapacity": true,
+      "threadDumpsMayPerturbTimings": true
+    },
+    "requests": 29413,
+    "checks": {
+      "passes": 29413,
+      "fails": 0
+    },
+    "fullDiagnosticP95Ms": {
+      "http_req_duration": 3009.2658347999995,
+      "http_req_duration{name:list}": 3961.3326992499988,
+      "http_req_duration{name:detail}": 2753.8898841999994
+    },
+    "threadDumps": {
+      "swe5001-event-catalog-1": [
+        {
+          "servletThreads": 200,
+          "stackCategories": {
+            "databasePoolWait": 153,
+            "other": 21,
+            "jackson": 2,
+            "jdbc": 8,
+            "identityHttp": 7,
+            "hibernate": 6,
+            "jwt": 3
+          },
+          "poolWaitCallers": {
+            "PublicEventController.list": 106,
+            "PublicEventController.detail": 47
+          }
+        },
+        {
+          "servletThreads": 200,
+          "stackCategories": {
+            "other": 9,
+            "databasePoolWait": 160,
+            "jdbc": 9,
+            "identityHttp": 18,
+            "jwt": 2,
+            "hibernate": 1,
+            "jackson": 1
+          },
+          "poolWaitCallers": {
+            "PublicEventController.detail": 52,
+            "PublicEventController.list": 108
+          }
+        },
+        {
+          "servletThreads": 200,
+          "stackCategories": {
+            "databasePoolWait": 170,
+            "jdbc": 10,
+            "identityHttp": 16,
+            "other": 4
+          },
+          "poolWaitCallers": {
+            "PublicEventController.list": 135,
+            "PublicEventController.detail": 35
+          }
+        }
+      ],
+      "swe5001-identity-1": [
+        {
+          "servletThreads": 60,
+          "stackCategories": {
+            "idle": 59,
+            "other": 1
+          },
+          "poolWaitCallers": {}
+        },
+        {
+          "servletThreads": 60,
+          "stackCategories": {
+            "idle": 60
+          },
+          "poolWaitCallers": {}
+        },
+        {
+          "servletThreads": 60,
+          "stackCategories": {
+            "idle": 48,
+            "jdbc": 6,
+            "hibernate": 1,
+            "jackson": 2,
+            "other": 3
+          },
+          "poolWaitCallers": {}
+        }
+      ]
+    },
+    "highLoadCpu": {
+      "sampleCount": 9,
+      "meanIdlePercent": 0.26,
+      "maxIoWaitPercent": 0.0,
+      "maxStealPercent": 0.0
+    },
+    "directInHostProbes": {
+      "details": {
+        "samples": 46,
+        "maxSeconds": 2.5989,
+        "non200OrErrors": 0
+      },
+      "published": {
+        "samples": 46,
+        "maxSeconds": 2.4846,
+        "non200OrErrors": 0
+      },
+      "identity": {
+        "samples": 46,
+        "maxSeconds": 0.3366,
+        "non200OrErrors": 0
+      }
+    },
+    "sql": {
+      "method": "Representative SQL reconstructed from repository predicates, EXPLAIN ANALYZE BUFFERS; one sample/query/window, not per-request tracing",
+      "before": [
+        {
+          "query": "discovery-organizations",
+          "executionMs": 0.392,
+          "planningMs": 1.899,
+          "sharedReadBlocks": 0
+        },
+        {
+          "query": "list",
+          "executionMs": 0.51,
+          "planningMs": 0.661,
+          "sharedReadBlocks": 0
+        },
+        {
+          "query": "count",
+          "executionMs": 0.21,
+          "planningMs": 0.155,
+          "sharedReadBlocks": 0
+        },
+        {
+          "query": "detail",
+          "executionMs": 0.04,
+          "planningMs": 0.246,
+          "sharedReadBlocks": 0
+        },
+        {
+          "query": "bulk-details",
+          "executionMs": 0.197,
+          "planningMs": 0.06,
+          "sharedReadBlocks": 0
+        },
+        {
+          "query": "identity-lookup",
+          "executionMs": 0.047,
+          "planningMs": 0.553,
+          "sharedReadBlocks": 0
+        }
+      ],
+      "during": [
+        {
+          "query": "discovery-organizations",
+          "executionMs": 2.387,
+          "planningMs": 27.867,
+          "sharedReadBlocks": 0
+        },
+        {
+          "query": "list",
+          "executionMs": 0.481,
+          "planningMs": 1.114,
+          "sharedReadBlocks": 0
+        },
+        {
+          "query": "count",
+          "executionMs": 0.184,
+          "planningMs": 0.206,
+          "sharedReadBlocks": 0
+        },
+        {
+          "query": "detail",
+          "executionMs": 0.039,
+          "planningMs": 0.087,
+          "sharedReadBlocks": 0
+        },
+        {
+          "query": "bulk-details",
+          "executionMs": 0.062,
+          "planningMs": 0.107,
+          "sharedReadBlocks": 0
+        },
+        {
+          "query": "identity-lookup",
+          "executionMs": 0.178,
+          "planningMs": 11.984,
+          "sharedReadBlocks": 0
+        }
+      ]
+    },
+    "database": {
+      "observedCatalogConnections": [
+        10
+      ],
+      "lockWaiterObservations": 0,
+      "maxObservedActiveQueryAgeSeconds": 0.075792,
+      "maxObservedTransactionAgeSeconds": 0.170782
+    },
+    "guard": {
+      "samples": 16,
+      "reasons": [],
+      "minimumAvailableMemoryMiB": 1232.73,
+      "containerIdentityChanged": false
+    },
+    "conclusions": [
+      "Dominant observed wait: Catalog JDBC connection acquisition; 153/160/170 of 200 servlet threads; list callers 106/108/135",
+      "Two shared CPUs saturated; high-load mean idle 0.26%, I/O wait and steal 0 in sampled windows; no Catalog cgroup CPU quota throttling",
+      "Representative SQL execution remained 0.039-2.387ms under load; this does not measure application queue or JDBC time",
+      "Identity synchronous lookups add work, but do not account for most observed wait; published lookup currently spans HTTP in a DB transaction",
+      "Direct Catalog details/published probes exceeded internal gateway 2s read budget; Catalog queueing explains how internal 504 can propagate as booking 503"
+    ],
+    "limitations": [
+      "Single shared account, diagnostic duration and signal-based thread sampling; not a new capacity pass",
+      "No JFR/flamegraph or pool lease-duration distribution collected; CPU hot methods and best pool size not established",
+      "Lightsail CPU burst credit metrics unavailable with current local AWS credentials; sampled steal=0 is not historical credit proof"
+    ],
+    "cleanup": {
+      "usersDeleted": 1,
+      "organizationsDeleted": 1,
+      "eventsDeleted": 100,
+      "bookingsOrTicketsCreated": 0,
+      "receipt": {
+        "deleted": {
+          "catalog.events": 100,
+          "identity.users": 1,
+          "admission.sales": 100,
+          "admission.tickets": 0,
+          "admission.bookings": 0,
+          "identity.user_roles": 1,
+          "admission.ticket_types": 100,
+          "identity.organizations": 1,
+          "admission.notifications": 0,
+          "catalog.event_revisions": 0,
+          "identity.booking_profiles": 0,
+          "admission.pre_registrations": 0,
+          "catalog.event_cancellations": 100,
+          "catalog.organization_closures": 1,
+          "identity.organization_closures": 1,
+          "identity.organization_requests": 0,
+          "admission.event_revision_receipts": 0,
+          "admission.event_staff_assignments": 0,
+          "catalog.event_notification_outbox": 0,
+          "identity.membership_notifications": 4,
+          "identity.organization_invitations": 0,
+          "identity.organization_memberships": 1,
+          "admission.event_cancellation_receipts": 100
+        },
+        "untouched_data_unchanged": true,
+        "remaining_fixture_records": 0
+      },
+      "originalTablesUnchanged": 24,
+      "serverBackupVerified": true,
+      "localCredentialsRemoved": true,
+      "postHealth": {
+        "swe5006-api": {
+          "ok": true,
+          "seconds": 0.202
+        },
+        "swe5006-web": {
+          "ok": true,
+          "seconds": 0.196
+        },
+        "swe5001-web": {
+          "ok": true,
+          "seconds": 0.197
+        },
+        "swe5001-identity": {
+          "ok": true,
+          "seconds": 0.16
+        },
+        "swe5001-event-catalog": {
+          "ok": true,
+          "seconds": 0.165
+        },
+        "swe5001-admission": {
+          "ok": true,
+          "seconds": 0.209
+        }
+      }
+    },
+    "sourceSha256": {
+      "profile.js": "3af084213090dbf74045d359576a363b3c88100a42363b0f40cda06d452c112a",
+      "remote-profile.py": "62a706d049109cb9938ff79bc1e8248a327a012731eaaac83cfddb143be9a86b",
+      "run-profile.py": "9a7cf845c847be6dbb3aab08f7662cb856a208dfa839bbc34a6ae305ebf19314",
+      "observer.jsonl": "444a53fccd95444a48755835f26e3207fe8b9327a34502bf7fc09bd9b36d58b8",
+      "swe5001-event-catalog-1-threads.log": "f2d957740d5a4f6b96204d0bb50b0b1e2ce0944f0cf88ab238213725b7a28b42",
+      "swe5001-identity-1-threads.log": "d99fd7d5399a4bcc0cf8d8fc8948be9ec9b91453ded8069a3e8f5e05dec85b91",
+      "explain-before.txt": "4b60b799cc9440e96ab1801d4cd823a800d9c097ade80be658669bceb3f29db2",
+      "explain-during.txt": "9c7b6d960ba9bfc4553775c89c5197ff4013df9b6900de0c11803b0955297295",
+      "purge-apply.out": "ba4fbc1869d4e39532c4befcbd1d44a1fbf3c6bea4b97d1108d33c2fe7203b29",
+      "health-after.json": "cc789a1f8da4d955a33cc4368da6baad663316b126e0b5835b1ed5ae719540b9"
+    }
+  },
+  "candidateReadFix": {
+    "applicationCommit": "fd925bd5850d9c8490ca062e2cef6b623b76c2ed",
+    "jarSha256": "185e6def1d234f94af13dea8ded5de526e216d7bb86f9c73414c03bbd8164b81",
+    "pullRequest": "https://github.com/seventh720/SWE5001-SEMS/pull/22",
+    "deployed": false,
+    "defaultPoolSize": 10,
+    "backendTests": 83,
+    "localApiAcceptance": [
+      {
+        "script": "catalog-read-acceptance.py",
+        "exitCode": 0,
+        "seconds": 5.87
+      },
+      {
+        "script": "organization-acceptance.py",
+        "exitCode": 0,
+        "seconds": 48.93
+      },
+      {
+        "script": "visibility-acceptance.py",
+        "exitCode": 0,
+        "seconds": 3.91
+      },
+      {
+        "script": "catalog-recovery-acceptance.py",
+        "exitCode": 0,
+        "seconds": 114.49
+      }
+    ],
+    "catalogRecoverySuccessfulBookings": 1619,
+    "changes": [
+      "Repository read transaction ends before remote Identity access for publication/member snapshots",
+      "Internal details use six-field constructor projection",
+      "Protected internal catalog.read/catalog.identity and Hikari acquire/usage/pool snapshots",
+      "CATALOG_DB_POOL_SIZE is configurable; baseline remains 10; new API acceptance added to CI"
+    ],
+    "poolComparison": {
+      "diagnosticOnly": true,
+      "rawDirectory": ".performance/catalog-read-tuning",
+      "fixtureUsers": 1,
+      "fixtureEvents": 100,
+      "vus": 50,
+      "rampSeconds": 15,
+      "warmupSeconds": 30,
+      "nominalMeasurementSeconds": 45,
+      "measurementIncludesGracefulIterationDrain": true,
+      "maxGracefulDrainSeconds": 10,
+      "thinkSeconds": 1,
+      "model": "authenticated list then detail; one account shared; excludes me/orders; no writes",
+      "cpuCaps": {
+        "event-catalog": 0.8,
+        "identity": 0.35,
+        "admission": 0.2,
+        "postgres": 0.4,
+        "gateway": 0.2,
+        "web": 0.05
+      },
+      "perJavaMemoryMiB": 768,
+      "generator": {
+        "cpus": 4,
+        "memoryGiB": 2
+      },
+      "plan": [
+        10,
+        16,
+        20,
+        20,
+        10,
+        16,
+        16,
+        20,
+        10
+      ],
+      "completedAt": "2026-10-21T11:08:03.362118+00:00",
+      "runs": [
+        {
+          "index": 1,
+          "poolSize": 10,
+          "requests": 6554,
+          "startedAt": "2026-10-21T10:53:27.788539+00:00",
+          "wholeRunAcquisition": {
+            "count": 13201,
+            "totalMs": 117.69366000000001,
+            "meanMs": 0.008915510946140445
+          },
+          "wholeRunUsage": {
+            "count": 13201,
+            "totalMs": 7738.0,
+            "meanMs": 0.5861677145670783
+          },
+          "unexpectedFailureRate": 0,
+          "taggedMeasurementP95Ms": {
+            "list": 81.14952024999997,
+            "detail": 89.29807299999999
+          },
+          "wholeRunRps": 86.29206113207036,
+          "checksPassed": 6554,
+          "overallP95Ms": 79.072375,
+          "k6SummarySha256": "f117d833d9da6036b9a0005686410896d6a39b1ca3ae6175545dcf0bbd77dcd3"
+        },
+        {
+          "index": 2,
+          "poolSize": 16,
+          "requests": 6518,
+          "startedAt": "2026-10-21T10:55:08.759358+00:00",
+          "wholeRunAcquisition": {
+            "count": 13129,
+            "totalMs": 2467.283677,
+            "meanMs": 0.18792624548708964
+          },
+          "wholeRunUsage": {
+            "count": 13129,
+            "totalMs": 20855.0,
+            "meanMs": 1.5884682763348312
+          },
+          "unexpectedFailureRate": 0,
+          "taggedMeasurementP95Ms": {
+            "list": 57.371520199999985,
+            "detail": 51.34147944999999
+          },
+          "wholeRunRps": 86.13907120088399,
+          "checksPassed": 6518,
+          "overallP95Ms": 85.88742495,
+          "k6SummarySha256": "16a8387a00cdf9abf6009c7f4de1ec488fe8a12ef1c1bf6a81001673e4a4007d"
+        },
+        {
+          "index": 3,
+          "poolSize": 20,
+          "requests": 6546,
+          "startedAt": "2026-10-21T10:56:48.127758+00:00",
+          "wholeRunAcquisition": {
+            "count": 13184,
+            "totalMs": 457.475458,
+            "meanMs": 0.03469929141383495
+          },
+          "wholeRunUsage": {
+            "count": 13184,
+            "totalMs": 16644.0,
+            "meanMs": 1.2624393203883495
+          },
+          "unexpectedFailureRate": 0,
+          "taggedMeasurementP95Ms": {
+            "list": 55.139151799999986,
+            "detail": 60.514407999999996
+          },
+          "wholeRunRps": 86.1070809548644,
+          "checksPassed": 6546,
+          "overallP95Ms": 77.79374024999998,
+          "k6SummarySha256": "df9c78be05a3fed89309c8e541ecc41091c2c99bdf66b92f42c0afbfe50efa3f"
+        },
+        {
+          "index": 4,
+          "poolSize": 20,
+          "requests": 6650,
+          "startedAt": "2026-10-21T10:58:27.039232+00:00",
+          "wholeRunAcquisition": {
+            "count": 13392,
+            "totalMs": 223.62774399999998,
+            "meanMs": 0.016698606929510154
+          },
+          "wholeRunUsage": {
+            "count": 13392,
+            "totalMs": 7158.0,
+            "meanMs": 0.5344982078853047
+          },
+          "unexpectedFailureRate": 0,
+          "taggedMeasurementP95Ms": {
+            "list": 36.90771874999998,
+            "detail": 41.74580449999999
+          },
+          "wholeRunRps": 87.55210421331567,
+          "checksPassed": 6650,
+          "overallP95Ms": 24.621241999999963,
+          "k6SummarySha256": "8014bcc50f3abac07ac78b24560023167b2e26e091ac2355e18ce160725e4fa3"
+        },
+        {
+          "index": 5,
+          "poolSize": 10,
+          "requests": 6666,
+          "startedAt": "2026-10-21T11:00:06.076178+00:00",
+          "wholeRunAcquisition": {
+            "count": 13425,
+            "totalMs": 29.471802999999998,
+            "meanMs": 0.002195292588454376
+          },
+          "wholeRunUsage": {
+            "count": 13425,
+            "totalMs": 4208.0,
+            "meanMs": 0.31344506517690873
+          },
+          "unexpectedFailureRate": 0,
+          "taggedMeasurementP95Ms": {
+            "list": 23.236999999999995,
+            "detail": 19.819233399999998
+          },
+          "wholeRunRps": 87.86087432601491,
+          "checksPassed": 6666,
+          "overallP95Ms": 20.933104499999995,
+          "k6SummarySha256": "cca2e39d148465159ce5dac3183c20c679208bd991505fb79a6115229af4ea4e"
+        },
+        {
+          "index": 6,
+          "poolSize": 16,
+          "requests": 6648,
+          "startedAt": "2026-10-21T11:01:44.987016+00:00",
+          "wholeRunAcquisition": {
+            "count": 13389,
+            "totalMs": 47.342028,
+            "meanMs": 0.003535889760250952
+          },
+          "wholeRunUsage": {
+            "count": 13389,
+            "totalMs": 7103.0,
+            "meanMs": 0.5305101202479647
+          },
+          "unexpectedFailureRate": 0,
+          "taggedMeasurementP95Ms": {
+            "list": 41.4491854,
+            "detail": 53.33514229999996
+          },
+          "wholeRunRps": 87.7712538231444,
+          "checksPassed": 6648,
+          "overallP95Ms": 38.01776029999982,
+          "k6SummarySha256": "d3d0d92cf91b6b3e1a8e531c3652823f3c3a4ed7978d1f2c96d84db3327f4845"
+        },
+        {
+          "index": 7,
+          "poolSize": 16,
+          "requests": 6666,
+          "startedAt": "2026-10-21T11:03:23.971544+00:00",
+          "wholeRunAcquisition": {
+            "count": 13425,
+            "totalMs": 456.377784,
+            "meanMs": 0.033994620782122904
+          },
+          "wholeRunUsage": {
+            "count": 13425,
+            "totalMs": 8996.0,
+            "meanMs": 0.6700931098696462
+          },
+          "unexpectedFailureRate": 0,
+          "taggedMeasurementP95Ms": {
+            "list": 74.40287114999998,
+            "detail": 62.98899585
+          },
+          "wholeRunRps": 87.71440355095308,
+          "checksPassed": 6666,
+          "overallP95Ms": 57.172760999999994,
+          "k6SummarySha256": "d2e215b429d7683ad2e948a7ff2e0e0342bc579f722c1cfdf89c0286986e810d"
+        },
+        {
+          "index": 8,
+          "poolSize": 20,
+          "requests": 6626,
+          "startedAt": "2026-10-21T11:05:03.205292+00:00",
+          "wholeRunAcquisition": {
+            "count": 13345,
+            "totalMs": 35.831697,
+            "meanMs": 0.002685027875608842
+          },
+          "wholeRunUsage": {
+            "count": 13345,
+            "totalMs": 6964.0,
+            "meanMs": 0.5218433870363433
+          },
+          "unexpectedFailureRate": 0,
+          "taggedMeasurementP95Ms": {
+            "list": 32.41786629999996,
+            "detail": 42.103737499999994
+          },
+          "wholeRunRps": 87.59660019926713,
+          "checksPassed": 6626,
+          "overallP95Ms": 26.416083249999982,
+          "k6SummarySha256": "c3f9287002560abccf2a12b58af71a4b90886c559ff73e1c1a0910286d3f84fe"
+        },
+        {
+          "index": 9,
+          "poolSize": 10,
+          "requests": 6654,
+          "startedAt": "2026-10-21T11:06:41.063051+00:00",
+          "wholeRunAcquisition": {
+            "count": 13400,
+            "totalMs": 516.075935,
+            "meanMs": 0.038513129477611936
+          },
+          "wholeRunUsage": {
+            "count": 13400,
+            "totalMs": 8569.0,
+            "meanMs": 0.6394776119402985
+          },
+          "unexpectedFailureRate": 0,
+          "taggedMeasurementP95Ms": {
+            "list": 54.83077855,
+            "detail": 67.43521339999998
+          },
+          "wholeRunRps": 87.58366783235036,
+          "checksPassed": 6654,
+          "overallP95Ms": 43.68193169999997,
+          "k6SummarySha256": "fc4ded8b9cd6059a1bd385264cdfa495baff40bc0cfbc78a5649dd051a77ce24"
+        }
+      ],
+      "medians": {
+        "10": {
+          "listP95Ms": 54.83077855,
+          "detailP95Ms": 67.43521339999998,
+          "wholeRunRps": 87.58366783235036,
+          "wholeRunAcquisitionMeanMs": 0.008915510946140445,
+          "wholeRunUsageMeanMs": 0.5861677145670783
+        },
+        "16": {
+          "listP95Ms": 57.371520199999985,
+          "detailP95Ms": 53.33514229999996,
+          "wholeRunRps": 87.71440355095308,
+          "wholeRunAcquisitionMeanMs": 0.033994620782122904,
+          "wholeRunUsageMeanMs": 0.6700931098696462
+        },
+        "20": {
+          "listP95Ms": 36.90771874999998,
+          "detailP95Ms": 42.103737499999994,
+          "wholeRunRps": 87.55210421331567,
+          "wholeRunAcquisitionMeanMs": 0.016698606929510154,
+          "wholeRunUsageMeanMs": 0.5344982078853047
+        }
+      },
+      "decision": "Retain 10. Stable local comparison has negligible acquisition waits and supplies no cloud high-load evidence for increasing the pool. Retest the deployed candidate with telemetry.",
+      "limitations": [
+        "Local per-container CPU quotas differ from shared cloud scheduling; no HTTPS/Caddy path",
+        "One account shared across 50 VUs, read-only list/detail only; not a capacity or scaling acceptance",
+        "Hikari means cover warmup/ramp/hold and same-process readiness/background work; request p95 is post-warmup tagged measurement including graceful iteration drain; RPS includes the full run",
+        "Interleaved three repetitions reduce ordering bias but do not establish a universally optimal pool size"
+      ],
+      "failedCalibration": {
+        "status": "STOPPED_DURING_WARMUP",
+        "vus": 250,
+        "poolSize": 10,
+        "coldStep": true,
+        "requests": 599,
+        "checkFailures": 343,
+        "unexpectedFailureRate": 0.5726210350584308,
+        "holdP95Ms": null,
+        "holdSamples": 0,
+        "remainingConfigurationsRun": false,
+        "k6SummarySha256": "336f2d13b0c0bd850c9e249ab04886607dae06fd0bb72d56b1f136e40f2b0829"
+      },
+      "sourceSha256": {
+        "pool.js": "8d3b61926b32b127efb0814ace3b49c91dbac5c099b1007030c3947ef22cd5f7",
+        "pool-matrix.py": "52ca6815cedda6193b29dd62493ef77d9631e52ce11b6b6ad5818c6d6cc739f5",
+        "pool-results.json": "cc4536d0df2ee79756860b3618fb2c652fae78a50882d720fc88ed52a8963a0f"
+      }
+    },
+    "cleanup": {
+      "at": "2026-10-21T11:09:05.274264+00:00",
+      "stackAndVolumeRemoved": true,
+      "credentialMaterialRemoved": true,
+      "disposableDatabaseCountsBeforeRemoval": {
+        "users": 13,
+        "organizations": 8,
+        "events": 119,
+        "bookings": 1643,
+        "tickets": 1649
+      },
+      "cloudChanges": false
+    }
   }
 }

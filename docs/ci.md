@@ -1,6 +1,6 @@
 # CI operations
 
-The workflow runs on main pushes and PRs targeting main. PR #20 is merged as `2f169d6`; [main run 39466717243, attempt 2](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39466717243/attempts/2) passed all checks, image publication and the executed Lightsail staging deployment. The first attempt failed during Caddy's Go checksum-service download; retrying the failed jobs succeeded with verification enabled. The six quality checks are:
+The workflow runs on main pushes and PRs targeting main. PR #21 is merged as `054690b`; [main run 39572865890](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39572865890) passed all checks, image publication and the executed Lightsail staging deployment. The six quality checks are:
 
 | Check | Work and evidence |
 |---|---|
@@ -19,9 +19,11 @@ Telegram uses repository Actions secrets `TELEGRAM_TOKEN` and `TELEGRAM_TO`. Mes
 
 Local commands: `mvn verify`, `npm --prefix apps/web run test:coverage`, `npm --prefix apps/web run build`, then run Compose and `bash scripts/check-db-isolation.sh`. Load `.env` into the shell before `python3 scripts/organization-acceptance.py`. The latter creates unique test data and intentionally stops Admission and restarts Catalog/gateway; run it only against a disposable local/CI Compose environment. Use `COMPOSE_PROJECT_NAME` to select a dedicated test project.
 
-Main-only delivery builds/scans tested artifacts in CI, publishes GHCR digests, then backs up staging, pulls the locked images and checks HTTPS. It does not rebuild images on the deployment host. The successful run above deployed `2f169d6`; staging API business acceptance and the later cloud capacity baseline are recorded separately in [project status](progress.md). Follow the [deployment procedures](cloud-staging.md), including the existing shared-proxy override. OpenAPI contract conformance and the final cloud scaling/recovery experiments remain outstanding. The main branch protection API reported no traditional branch protection on 2026-10-20; this PR does not change repository protection settings.
+Main-only delivery builds/scans tested artifacts in CI, publishes GHCR digests, then backs up staging, pulls the locked images and checks HTTPS. It does not rebuild images on the deployment host. The successful run above deployed `054690b`; staging API business acceptance and the later cloud capacity baseline are recorded separately in [project status](progress.md). Follow the [deployment procedures](cloud-staging.md), including the existing shared-proxy override. OpenAPI contract conformance and the final cloud scaling/recovery experiments remain outstanding. The main branch protection API reported no traditional branch protection on 2026-10-20; this PR does not change repository protection settings.
 
 Integration now starts two Admission replicas and runs booking acceptance, including publication regression, 100 competing requests for 10 places, same-key races, per-attendee isolation and repeated cancellation. This is a local correctness check, not a cloud throughput or recovery-target measurement.
+
+PR #22 adds `scripts/catalog-read-acceptance.py` to the same integration job. It checks the six-field read projection, input limits, immediate organization suspension and internal service-token diagnostics. The candidate's local backend suite has 83 tests; staging remains the deployed version recorded above until a main deployment succeeds.
 
 Registration acceptance additionally checks requested field validation, category/theme persistence, combined search/filtering, information-aware retries and cross-organizer denial. Existing booking/publication tests still run.
 

@@ -1,6 +1,17 @@
+[Gateway regression before PR #21]
 Nginx syntax: PASS
 Three local readiness probes: PASS
 Organization management API acceptance: PASS
 PASS: reserved = confirmed quantities = active tickets, within quota
 PASS: 1635 bookings plus same-key replays and live receipts survived Catalog stop/cold restart without failure
 PASS: public internal paths denied; internal listener authenticated; all-replicas-down fails boundedly and same-key recovery succeeds
+
+[Catalog read candidate fd925bd; local, not deployed]
+Maven verify: PASS (83 tests, 5 new cases)
+Catalog read/projection/protected diagnostics API acceptance: PASS
+Organization and visibility API regression: PASS
+Catalog recovery: PASS (1619 bookings plus same-key replays and live receipts)
+Fixed-resource pool 10/16/20: PASS (three interleaved repetitions each at calibrated 50 VU)
+Initial cold-step 250 VU calibration: STOPPED during warmup (343/599 checks failed; no measurement samples)
+Default pool retained: 10
+Dedicated local stack/database volume removed; temporary credential material redacted
