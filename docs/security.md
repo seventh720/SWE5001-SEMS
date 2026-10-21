@@ -1,6 +1,6 @@
 # 安全门禁与依赖适用性
 
-PR #18 合并提交 `90d10d2` 的 [main 流水线](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39302943078)已通过源码/依赖/secret 和运行镜像扫描，并完成镜像发布与测试环境部署。扫描结果对应当次漏洞数据库与规则版本；有期限的适用性例外和后续复核要求见下文。最终状态统一见[当前进度](progress.md)。
+PR #20 合并提交 `2f169d6` 的 [main 流水线](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39466717243/attempts/2)已通过源码/依赖/secret 和运行镜像扫描，并完成镜像发布与测试环境部署。扫描结果对应当次漏洞数据库与规则版本；有期限的适用性例外和后续复核要求见下文。最终状态统一见[当前进度](progress.md)。
 
 ## 注册密码规则
 
@@ -17,6 +17,8 @@ PR #18 合并提交 `90d10d2` 的 [main 流水线](https://github.com/seventh720
 本地应在不含 `.env`、`.secrets` 和私有 dataset 的干净副本运行 `bash scripts/security/scan.sh source`；其中须有本轮构建的 JAR。源码扫描不覆盖 Git 历史，也不是完整渗透测试或业务权限证明。
 
 ## 2026-10-19 依赖处置
+
+2026-10-21 补充：PR #21 的镜像扫描发现 Caddy 二进制使用的 Go 1.26.9 命中 HIGH `CVE-2026-111943`（`crypto/x509` 对不可信中间证书的处置）。构建工具链升级至同系列 1.26.10，Caddy 2.11.7、x/net 0.60.0 及现有扫描阈值保持原配置，没有新增豁免。修复依据见 [Go 公告](https://github.com/golang/go/issues/82345)与 [1.26.10 发布记录](https://go.dev/doc/devel/release#go1.26.10)；历史扫描通过仅对应当时漏洞库。
 
 初次扫描在已打包的 Java 依赖中发现 Jackson、Tomcat、pgJDBC 以及 Spring MVC 相关记录。同系列修复版本集中在根 pom 中管理：Jackson BOM 2.21.7、Tomcat 10.1.60、pgJDBC 42.7.12。版本改动必须经过单元、真实 API/数据库和镜像扫描，不能只看依赖下载成功。Java 镜像明确采用 Temurin 21 / Ubuntu 24.04（noble）；Web/网关采用维护中的 nginx stable Alpine，PostgreSQL/Caddy 也在构建时安装 Alpine 安全更新，最终所有镜像以 digest 锁定。PostgreSQL 的入口权限切换改用 Alpine su-exec，替代附带旧 Go 运行库的 gosu；须验证全新数据库初始化。Caddy 保持 2.11.7，按官方方式重编译标准模块，更新 Go 至 1.26.9、x/net 至 0.60.0，并验证现有 Caddyfile；参考 [Caddy 官方构建说明](https://caddyserver.com/docs/build)。源码依赖扫描通过不代表基础镜像通过，必须分别检查。
 

@@ -1,4 +1,4 @@
-FROM golang:1.26.9-alpine AS builder
+FROM golang:1.26.10-alpine AS builder
 WORKDIR /src
 COPY main.go .
 # Preserve Caddy's version/modules; update the affected Go runtime and x/net only.

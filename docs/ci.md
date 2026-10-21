@@ -1,6 +1,6 @@
 # CI operations
 
-The workflow runs on main pushes and PRs targeting main. PR #18 is merged as `90d10d2`; [main run 39302943078](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39302943078) passed all checks, image publication and the executed Lightsail staging deployment on 2026-10-20 (SGT). The six quality checks are:
+The workflow runs on main pushes and PRs targeting main. PR #20 is merged as `2f169d6`; [main run 39466717243, attempt 2](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39466717243/attempts/2) passed all checks, image publication and the executed Lightsail staging deployment. The first attempt failed during Caddy's Go checksum-service download; retrying the failed jobs succeeded with verification enabled. The six quality checks are:
 
 | Check | Work and evidence |
 |---|---|
@@ -19,13 +19,15 @@ Telegram uses repository Actions secrets `TELEGRAM_TOKEN` and `TELEGRAM_TO`. Mes
 
 Local commands: `mvn verify`, `npm --prefix apps/web run test:coverage`, `npm --prefix apps/web run build`, then run Compose and `bash scripts/check-db-isolation.sh`. Load `.env` into the shell before `python3 scripts/organization-acceptance.py`. The latter creates unique test data and intentionally stops Admission and restarts Catalog/gateway; run it only against a disposable local/CI Compose environment. Use `COMPOSE_PROJECT_NAME` to select a dedicated test project.
 
-The first [cloud staging deployment](cloud-staging.md) is live. The updated main-only delivery flow builds/scans tested artifacts in CI, publishes GHCR digests, then backs up staging, pulls the locked images and checks HTTPS. It no longer rebuilds images on the deployment host. See [deployment procedures](cloud-staging.md). The current [main pipeline](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39302943078), including the `Deploy tested artifacts` step, succeeded for `90d10d2`. This is deployment-job evidence, not a fresh manual check of all cloud business flows or the current live version. The main branch protection API reported no traditional branch protection on 2026-10-20; repository protection settings were not changed. OpenAPI contract conformance is not implemented. Booking consistency, staff check-in and summaries have local acceptance coverage. Container restart recovery includes publication and whole-event cancellation recovery, not evidence that the final cloud recovery/scaling targets have been achieved.
+Main-only delivery builds/scans tested artifacts in CI, publishes GHCR digests, then backs up staging, pulls the locked images and checks HTTPS. It does not rebuild images on the deployment host. The successful run above deployed `2f169d6`; staging API business acceptance and the later cloud capacity baseline are recorded separately in [project status](progress.md). Follow the [deployment procedures](cloud-staging.md), including the existing shared-proxy override. OpenAPI contract conformance and the final cloud scaling/recovery experiments remain outstanding. The main branch protection API reported no traditional branch protection on 2026-10-20; this PR does not change repository protection settings.
 
 Integration now starts two Admission replicas and runs booking acceptance, including publication regression, 100 competing requests for 10 places, same-key races, per-attendee isolation and repeated cancellation. This is a local correctness check, not a cloud throughput or recovery-target measurement.
 
 Registration acceptance additionally checks requested field validation, category/theme persistence, combined search/filtering, information-aware retries and cross-organizer denial. Existing booking/publication tests still run.
 
 ## Current integration entry points
+
+Deployment-bundle validation also runs offline Python checks for release locks, result comparison, local experiment execution and the cloud capacity ladder. CI does not run the cloud load generator or use staging credentials.
 
 The workflow runs organization-acceptance.py (including the earlier editor/booking regression chain), organization-security-acceptance.py, event-directory-acceptance.py, organization-management-acceptance.py, visibility-acceptance.py, notifications-acceptance.py, membership-notifications-acceptance.py, organization-governance-acceptance.py, event-cancellation-acceptance.py, predeployment-fixes-acceptance.py, organization-migration-acceptance.py and catalog-recovery-acceptance.py. Use the same entry points after builds, readiness and schema-isolation checks in a disposable stack with two Admission replicas. Load that stack’s environment and set SEMS_BASE_URL, SEMS_ENV_FILE and SEMS_COMPOSE_FILE as appropriate.
 

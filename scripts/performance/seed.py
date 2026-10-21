@@ -86,6 +86,7 @@ def main():
     org = call(base, 'POST', '/api/v1/admin/organizations',
         {'name': f'Benchmark {run}', 'slug': f'benchmark-{run}', 'adminEmail': organizer['email']}, admin)
     data['organizationId'] = org['id']
+    save(path, data)
     token = call(base, 'POST', '/api/v1/auth/login',
         {'email': organizer['email'], 'password': password})['accessToken']
     start = dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=7)

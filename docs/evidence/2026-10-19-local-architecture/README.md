@@ -73,9 +73,9 @@
 ## 证据与复现
 
 - [完整结构化结果](summary.json)、[逐轮 HTTP 成绩](measurements.csv)、[逐操作成绩](operation-measurements.csv)、[原始文件哈希](raw-manifest.json)。
-- [扩容图 PDF](scaling.pdf)、[资源图 PDF](resources.pdf)，可直接用于演示和报告。
+- 页面保留 PNG 图；需要矢量 PDF 时运行 `plot-local.py` 重新导出，生成副本由 Git 忽略。
 - 本地压缩原始日志保存在仓库忽略目录 `.performance/`，不上传凭据、数据库快照或大体积压测记录。
-- 工具：`scripts/performance/local-experiment.py`、`summarize-local.py`、`plot-local.py`。绘图需要 Matplotlib。当前报告和工具修改尚未提交/推送。
+- 工具：`scripts/performance/local-experiment.py`、`summarize-local.py`、`plot-local.py`。绘图需要 Matplotlib。本报告已随历史 PR 合并；后续代码修复不改写原实验结果。
 
 ## 后续代码修复（2026-10-20）
 

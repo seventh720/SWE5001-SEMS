@@ -1,0 +1,1138 @@
+{
+  "applicationCommit": "2f169d685545bdb2f2ab051b78bfdd889f1c94c8",
+  "allThresholdsPassed": false,
+  "stages": [
+    {
+      "name": "read-1vu",
+      "mode": "read",
+      "targetVUs": 1,
+      "plannedHold": "5s",
+      "startedAt": "2026-10-21T07:15:13.498068+00:00",
+      "exitCode": 0,
+      "endedAt": "2026-10-21T07:15:50.434979+00:00",
+      "requests": 20,
+      "unexpectedErrorRate": 0,
+      "p95Ms": 50.2414375,
+      "observedPeakVUs": 1,
+      "failedThresholds": [],
+      "holdRequests": 20,
+      "overallP95Ms": 50.2414375,
+      "suite": "baseline",
+      "passed": true,
+      "steadySamplesPresent": true,
+      "checks": {
+        "passes": 20,
+        "fails": 0,
+        "value": 1
+      },
+      "holdOperations": {
+        "orders": {
+          "requests": 5,
+          "p95Ms": 50.4419918
+        },
+        "events": {
+          "requests": 5,
+          "p95Ms": 49.1135416
+        },
+        "event-detail": {
+          "requests": 5,
+          "p95Ms": 34.729633400000004
+        },
+        "me": {
+          "requests": 5,
+          "p95Ms": 27.1281998
+        }
+      },
+      "sourceSha256": "eb47f8671b7e5e16a0213d466b0b1f19f524e96dea12d3c7f0016dbcdd757e17"
+    },
+    {
+      "name": "mixed-1vu",
+      "mode": "mixed",
+      "targetVUs": 1,
+      "plannedHold": "5s",
+      "startedAt": "2026-10-21T07:16:00.447020+00:00",
+      "exitCode": 0,
+      "endedAt": "2026-10-21T07:16:37.487045+00:00",
+      "requests": 23,
+      "unexpectedErrorRate": 0,
+      "p95Ms": 49.929337499999995,
+      "observedPeakVUs": 1,
+      "failedThresholds": [],
+      "bookings_created": 1,
+      "holdRequests": 23,
+      "overallP95Ms": 49.929337499999995,
+      "suite": "baseline",
+      "passed": true,
+      "steadySamplesPresent": true,
+      "checks": {
+        "passes": 23,
+        "fails": 0,
+        "value": 1
+      },
+      "holdOperations": {
+        "receipt": {
+          "requests": 1,
+          "p95Ms": 25.710666
+        },
+        "event-detail": {
+          "requests": 5,
+          "p95Ms": 43.4680744
+        },
+        "orders": {
+          "requests": 5,
+          "p95Ms": 44.0312082
+        },
+        "me": {
+          "requests": 5,
+          "p95Ms": 36.375416599999994
+        },
+        "cancel": {
+          "requests": 1,
+          "p95Ms": 34.205459
+        },
+        "events": {
+          "requests": 5,
+          "p95Ms": 49.47655
+        },
+        "book": {
+          "requests": 1,
+          "p95Ms": 52.136375
+        }
+      },
+      "sourceSha256": "8aca9209c578e7e44e581e364a57db7e6480c7e1cdffb4cd61f872a205a6fb57"
+    },
+    {
+      "name": "read-50vu",
+      "mode": "read",
+      "targetVUs": 50,
+      "plannedHold": "30s",
+      "startedAt": "2026-10-21T07:16:47.493222+00:00",
+      "exitCode": 0,
+      "endedAt": "2026-10-21T07:17:50.426385+00:00",
+      "requests": 7620,
+      "unexpectedErrorRate": 0,
+      "p95Ms": 97.4447271,
+      "observedPeakVUs": 50,
+      "failedThresholds": [],
+      "holdRequests": 5042,
+      "overallP95Ms": 97.36532325,
+      "suite": "baseline",
+      "passed": true,
+      "steadySamplesPresent": true,
+      "checks": {
+        "passes": 7620,
+        "fails": 0,
+        "value": 1
+      },
+      "holdOperations": {
+        "event-detail": {
+          "requests": 1261,
+          "p95Ms": 101.717125
+        },
+        "events": {
+          "requests": 1263,
+          "p95Ms": 126.6612878
+        },
+        "me": {
+          "requests": 1259,
+          "p95Ms": 57.04182529999999
+        },
+        "orders": {
+          "requests": 1259,
+          "p95Ms": 67.1123753
+        }
+      },
+      "sourceSha256": "40a9cfc57af9d72f5e3ae4b7811e96b267708e5b5171692cb555eb49792aaa07"
+    },
+    {
+      "name": "read-100vu",
+      "mode": "read",
+      "targetVUs": 100,
+      "plannedHold": "30s",
+      "startedAt": "2026-10-21T07:18:00.433371+00:00",
+      "exitCode": 0,
+      "endedAt": "2026-10-21T07:19:03.476944+00:00",
+      "requests": 13460,
+      "unexpectedErrorRate": 0,
+      "p95Ms": 276.05054584999993,
+      "observedPeakVUs": 100,
+      "failedThresholds": [],
+      "holdRequests": 8482,
+      "overallP95Ms": 256.11619169999983,
+      "suite": "baseline",
+      "passed": true,
+      "steadySamplesPresent": true,
+      "checks": {
+        "passes": 13460,
+        "fails": 0,
+        "value": 1
+      },
+      "holdOperations": {
+        "events": {
+          "requests": 2115,
+          "p95Ms": 372.5142838
+        },
+        "orders": {
+          "requests": 2130,
+          "p95Ms": 91.62981874999996
+        },
+        "event-detail": {
+          "requests": 2117,
+          "p95Ms": 264.01355039999993
+        },
+        "me": {
+          "requests": 2120,
+          "p95Ms": 83.26453544999998
+        }
+      },
+      "sourceSha256": "981239e26a00977e90c3fddccf6a098c9149dec94b3f34f5e9a634c37356a5e6"
+    },
+    {
+      "name": "read-250vu",
+      "mode": "read",
+      "targetVUs": 250,
+      "plannedHold": "30s",
+      "startedAt": "2026-10-21T07:19:13.484994+00:00",
+      "exitCode": 0,
+      "endedAt": "2026-10-21T07:20:19.440546+00:00",
+      "requests": 17376,
+      "unexpectedErrorRate": 0,
+      "p95Ms": 2036.0118157,
+      "observedPeakVUs": 250,
+      "failedThresholds": [],
+      "holdRequests": 9568,
+      "overallP95Ms": 1764.6430527499997,
+      "suite": "baseline",
+      "passed": true,
+      "steadySamplesPresent": true,
+      "checks": {
+        "passes": 17376,
+        "fails": 0,
+        "value": 1
+      },
+      "holdOperations": {
+        "event-detail": {
+          "requests": 2392,
+          "p95Ms": 1573.4810053499998
+        },
+        "me": {
+          "requests": 2405,
+          "p95Ms": 107.04501699999994
+        },
+        "orders": {
+          "requests": 2405,
+          "p95Ms": 96.45586619999999
+        },
+        "events": {
+          "requests": 2366,
+          "p95Ms": 2749.572834749999
+        }
+      },
+      "sourceSha256": "77f0820da97bad706395152bb6f64f436068cd0bac29c51fa9d0f23be7b0ad2c"
+    },
+    {
+      "name": "read-500vu",
+      "mode": "read",
+      "targetVUs": 500,
+      "plannedHold": "180s",
+      "startedAt": "2026-10-21T07:20:29.452914+00:00",
+      "exitCode": 99,
+      "endedAt": "2026-10-21T07:20:50.453915+00:00",
+      "requests": 5904,
+      "unexpectedErrorRate": 0.024051490514905148,
+      "p95Ms": null,
+      "observedPeakVUs": 332,
+      "failedThresholds": [
+        "http_reqs{name:events,phase:hold}",
+        "checks",
+        "http_reqs{name:orders,phase:hold}",
+        "http_reqs{name:me,phase:hold}",
+        "unexpected_failure",
+        "http_reqs{name:event-detail,phase:hold}"
+      ],
+      "holdRequests": 0,
+      "overallP95Ms": 1236.1932571999992,
+      "suite": "baseline",
+      "passed": false,
+      "steadySamplesPresent": false,
+      "checks": {
+        "passes": 5762,
+        "fails": 142,
+        "value": 0.9759485094850948
+      },
+      "holdOperations": {
+        "events": {
+          "requests": 0,
+          "p95Ms": null
+        },
+        "orders": {
+          "requests": 0,
+          "p95Ms": null
+        },
+        "me": {
+          "requests": 0,
+          "p95Ms": null
+        },
+        "event-detail": {
+          "requests": 0,
+          "p95Ms": null
+        }
+      },
+      "sourceSha256": "879a6505968bb935b79f201804664bc99e058c91fa8d6c8aed4570074d6b63ac"
+    },
+    {
+      "name": "mixed-1vu",
+      "mode": "mixed",
+      "targetVUs": 1,
+      "plannedHold": "5s",
+      "startedAt": "2026-10-21T07:59:32.124885+00:00",
+      "exitCode": 0,
+      "endedAt": "2026-10-21T08:00:09.372683+00:00",
+      "requests": 23,
+      "unexpectedErrorRate": 0,
+      "p95Ms": 86.398,
+      "holdRequests": 21,
+      "overallP95Ms": 83.03324999999997,
+      "observedPeakVUs": 1,
+      "failedThresholds": [],
+      "bookings_created": 1,
+      "suite": "mixed-baseline",
+      "passed": true,
+      "steadySamplesPresent": true,
+      "checks": {
+        "passes": 23,
+        "fails": 0,
+        "value": 1
+      },
+      "holdOperations": {
+        "me": {
+          "requests": 4,
+          "p95Ms": 141.70194814999996
+        },
+        "orders": {
+          "requests": 4,
+          "p95Ms": 26.9822669
+        },
+        "receipt": {
+          "requests": 1,
+          "p95Ms": 22.265208
+        },
+        "event-detail": {
+          "requests": 5,
+          "p95Ms": 49.8401334
+        },
+        "book": {
+          "requests": 1,
+          "p95Ms": 86.398
+        },
+        "events": {
+          "requests": 5,
+          "p95Ms": 36.9154164
+        },
+        "cancel": {
+          "requests": 1,
+          "p95Ms": 32.02
+        }
+      },
+      "sourceSha256": "2996adb3115319fa3c2430fa11030021047801b4fb4b2df01d12c481dc29d2b6"
+    },
+    {
+      "name": "mixed-50vu",
+      "mode": "mixed",
+      "targetVUs": 50,
+      "plannedHold": "30s",
+      "startedAt": "2026-10-21T08:00:19.380113+00:00",
+      "exitCode": 0,
+      "endedAt": "2026-10-21T08:01:24.496842+00:00",
+      "requests": 8446,
+      "unexpectedErrorRate": 0,
+      "p95Ms": 132.00283269999994,
+      "holdRequests": 5543,
+      "overallP95Ms": 135.26639624999999,
+      "observedPeakVUs": 50,
+      "failedThresholds": [],
+      "bookings_created": 386,
+      "suite": "mixed-baseline",
+      "passed": true,
+      "steadySamplesPresent": true,
+      "checks": {
+        "passes": 8446,
+        "fails": 0,
+        "value": 1
+      },
+      "holdOperations": {
+        "orders": {
+          "requests": 1206,
+          "p95Ms": 137.2069995
+        },
+        "book": {
+          "requests": 243,
+          "p95Ms": 205.80744639999995
+        },
+        "me": {
+          "requests": 1203,
+          "p95Ms": 91.20897519999933
+        },
+        "event-detail": {
+          "requests": 1204,
+          "p95Ms": 116.98182504999998
+        },
+        "cancel": {
+          "requests": 241,
+          "p95Ms": 142.719459
+        },
+        "events": {
+          "requests": 1204,
+          "p95Ms": 141.83093749999995
+        },
+        "receipt": {
+          "requests": 242,
+          "p95Ms": 123.71624345
+        }
+      },
+      "sourceSha256": "740de51fdfb11c5d2272557bc0e1a03bb08fca52fa55f26831a43ee9bb61d893"
+    },
+    {
+      "name": "mixed-100vu",
+      "mode": "mixed",
+      "targetVUs": 100,
+      "plannedHold": "30s",
+      "startedAt": "2026-10-21T08:01:34.502499+00:00",
+      "exitCode": 0,
+      "endedAt": "2026-10-21T08:02:37.225368+00:00",
+      "requests": 12319,
+      "unexpectedErrorRate": 0,
+      "p95Ms": 397.62829999999997,
+      "holdRequests": 7803,
+      "overallP95Ms": 367.4891425999999,
+      "observedPeakVUs": 100,
+      "failedThresholds": [],
+      "bookings_created": 569,
+      "suite": "mixed-baseline",
+      "passed": true,
+      "steadySamplesPresent": true,
+      "checks": {
+        "passes": 12319,
+        "fails": 0,
+        "value": 1
+      },
+      "holdOperations": {
+        "event-detail": {
+          "requests": 1701,
+          "p95Ms": 321.349667
+        },
+        "book": {
+          "requests": 334,
+          "p95Ms": 535.6351544999997
+        },
+        "me": {
+          "requests": 1691,
+          "p95Ms": 53.303396
+        },
+        "receipt": {
+          "requests": 337,
+          "p95Ms": 310.1645335999999
+        },
+        "orders": {
+          "requests": 1691,
+          "p95Ms": 356.32845899999984
+        },
+        "cancel": {
+          "requests": 338,
+          "p95Ms": 334.83388125
+        },
+        "events": {
+          "requests": 1711,
+          "p95Ms": 472.25825
+        }
+      },
+      "sourceSha256": "ecee1f12fcbe4db4954a0e764826eafcf34b9deae8aa4a24b29989c7cb12efcb"
+    },
+    {
+      "name": "mixed-250vu",
+      "mode": "mixed",
+      "targetVUs": 250,
+      "plannedHold": "30s",
+      "startedAt": "2026-10-21T08:02:47.233031+00:00",
+      "exitCode": 99,
+      "endedAt": "2026-10-21T08:03:20.840744+00:00",
+      "requests": 6646,
+      "unexpectedErrorRate": 0.02994282275052663,
+      "p95Ms": null,
+      "holdRequests": 0,
+      "overallP95Ms": 1322.7803549999996,
+      "observedPeakVUs": 249,
+      "failedThresholds": [
+        "http_reqs{name:orders,phase:hold}",
+        "http_reqs{name:event-detail,phase:hold}",
+        "http_reqs{name:events,phase:hold}",
+        "http_reqs{name:cancel,phase:hold}",
+        "checks",
+        "http_reqs{name:receipt,phase:hold}",
+        "http_reqs{name:book,phase:hold}",
+        "unexpected_failure",
+        "http_reqs{name:me,phase:hold}"
+      ],
+      "bookings_created": 352,
+      "suite": "mixed-baseline",
+      "passed": false,
+      "steadySamplesPresent": false,
+      "checks": {
+        "passes": 6447,
+        "fails": 199,
+        "value": 0.9700571772494734
+      },
+      "holdOperations": {
+        "orders": {
+          "requests": 0,
+          "p95Ms": null
+        },
+        "event-detail": {
+          "requests": 0,
+          "p95Ms": null
+        },
+        "events": {
+          "requests": 0,
+          "p95Ms": null
+        },
+        "cancel": {
+          "requests": 0,
+          "p95Ms": null
+        },
+        "receipt": {
+          "requests": 0,
+          "p95Ms": null
+        },
+        "book": {
+          "requests": 0,
+          "p95Ms": null
+        },
+        "me": {
+          "requests": 0,
+          "p95Ms": null
+        }
+      },
+      "sourceSha256": "75e5e953cd61757792150f49fafe7debcc98f2b7b927cb8b69365bec66e66992"
+    }
+  ],
+  "unexecuted": [
+    "read-1000vu",
+    "mixed-500vu",
+    "mixed-1000vu",
+    "contention-1000vu"
+  ],
+  "read500ReachedTarget": false,
+  "read500ObservedPeakVUs": 332,
+  "mixed250ObservedPeakVUs": 249,
+  "inventory": {
+    "passed": true,
+    "events": 101,
+    "bookings": 1318,
+    "cancelled": 1291,
+    "activeTickets": 27,
+    "oversold": false,
+    "contentionExecuted": false
+  },
+  "cleanup": {
+    "deleted": {
+      "catalog.events": 101,
+      "identity.users": 1000,
+      "admission.sales": 101,
+      "admission.tickets": 1318,
+      "admission.bookings": 1318,
+      "identity.user_roles": 1000,
+      "admission.ticket_types": 101,
+      "identity.organizations": 1,
+      "admission.notifications": 2636,
+      "catalog.event_revisions": 0,
+      "identity.booking_profiles": 0,
+      "admission.pre_registrations": 0,
+      "catalog.event_cancellations": 101,
+      "catalog.organization_closures": 1,
+      "identity.organization_closures": 1,
+      "identity.organization_requests": 0,
+      "admission.event_revision_receipts": 0,
+      "admission.event_staff_assignments": 0,
+      "catalog.event_notification_outbox": 0,
+      "identity.membership_notifications": 4,
+      "identity.organization_invitations": 0,
+      "identity.organization_memberships": 1,
+      "admission.event_cancellation_receipts": 101
+    },
+    "untouched_data_unchanged": true,
+    "remaining_fixture_records": 0,
+    "original24TableFingerprintsUnchanged": true,
+    "serverBackupVerified": true,
+    "health": {
+      "swe5006-api": {
+        "ok": true,
+        "seconds": 0.263
+      },
+      "swe5006-web": {
+        "ok": true,
+        "seconds": 0.257
+      },
+      "swe5001-web": {
+        "ok": true,
+        "seconds": 0.256
+      },
+      "swe5001-identity": {
+        "ok": true,
+        "seconds": 0.264
+      },
+      "swe5001-event-catalog": {
+        "ok": true,
+        "seconds": 0.263
+      },
+      "swe5001-admission": {
+        "ok": true,
+        "seconds": 0.262
+      }
+    }
+  },
+  "candidateGateway": {
+    "deployedToCloud": false,
+    "workerProcesses": "auto",
+    "workerConnections": 4096,
+    "workerOpenFiles": 8192,
+    "upstreamIdleKeepalivePerWorkerPerPool": 32,
+    "nginxConfigTestPassed": true,
+    "localOrganizationManagementAcceptancePassed": true,
+    "cloudRetestRequired": true,
+    "localCatalogFailoverAcceptancePassed": true,
+    "localCatalogFailoverBookings": 1635
+  },
+  "schemaVersion": 1,
+  "recordedDate": "2026-10-21",
+  "criteria": {
+    "overallAndPerOperationP95MsLessThan": 3000,
+    "unexpectedErrorRateLessThan": 0.01,
+    "allStatusAndContentChecksPass": true,
+    "stopOnFailedStage": true,
+    "holdExcludesRampAndDrain": true
+  },
+  "datasetValidation": {
+    "ordinaryEvents": 100,
+    "pages": 10,
+    "pageSize": 10,
+    "returned": 100,
+    "unique": 100,
+    "exactFixtureIdsMatch": true,
+    "allTotalCountsMatch": true
+  },
+  "runs": {
+    "baseline": {
+      "runId": "b2c9e3eaee7a",
+      "startedAt": "2026-10-21T07:15:10.318302+00:00",
+      "endedAt": "2026-10-21T07:20:50.745795+00:00",
+      "status": "STOPPED",
+      "reason": "read-500vu failed; higher stages were not scheduled",
+      "maxVUs": 1000,
+      "fixtureUsers": 1000,
+      "fixtureEvents": 101,
+      "scriptSha256": {
+        "cloud-capacity.py": "bc53f50e141c507dbebca8a331b49cf2fd3b21a893f082a85cd63cf325d27468",
+        "cloud-capacity.js": "a7535f600586b910db8a3e8fe9af1bb63ecf51031e202326114870ee6f3ce8c7",
+        "cloud-guard.py": "d693364e58bfe478a0fecea1d2fd81aed91bde3c2c6750052eb5f099184649f1"
+      },
+      "resources": {
+        "samples": 66,
+        "minimumAvailableMemoryMiB": 1360.83,
+        "maxLoad1": 34.89,
+        "containers": {
+          "swe5006-frontend-1": {
+            "maxCpuPercent": 3.83,
+            "maxMemoryPercent": 6.78
+          },
+          "swe5006-backend-1": {
+            "maxCpuPercent": 4.93,
+            "maxMemoryPercent": 47.92
+          },
+          "swe5006-postgres-1": {
+            "maxCpuPercent": 5.45,
+            "maxMemoryPercent": 8.22
+          },
+          "swe5001-caddy-1": {
+            "maxCpuPercent": 30.59,
+            "maxMemoryPercent": 27.98
+          },
+          "swe5001-gateway-1": {
+            "maxCpuPercent": 7.63,
+            "maxMemoryPercent": 8.41
+          },
+          "swe5001-identity-1": {
+            "maxCpuPercent": 60.97,
+            "maxMemoryPercent": 47.66
+          },
+          "swe5001-admission-1": {
+            "maxCpuPercent": 74.76,
+            "maxMemoryPercent": 41.31
+          },
+          "swe5001-event-catalog-1": {
+            "maxCpuPercent": 76.08,
+            "maxMemoryPercent": 57.99
+          },
+          "swe5001-postgres-1": {
+            "maxCpuPercent": 35.77,
+            "maxMemoryPercent": 19.12
+          },
+          "swe5001-web-1": {
+            "maxCpuPercent": 0,
+            "maxMemoryPercent": 4.01
+          }
+        },
+        "health": {
+          "swe5006-api": {
+            "samples": 66,
+            "failed": 0,
+            "overFiveSeconds": 0,
+            "maxSeconds": 0.983
+          },
+          "swe5006-web": {
+            "samples": 66,
+            "failed": 0,
+            "overFiveSeconds": 0,
+            "maxSeconds": 1.107
+          },
+          "swe5001-web": {
+            "samples": 66,
+            "failed": 0,
+            "overFiveSeconds": 0,
+            "maxSeconds": 1.137
+          },
+          "swe5001-identity": {
+            "samples": 66,
+            "failed": 1,
+            "overFiveSeconds": 0,
+            "maxSeconds": 1.356
+          },
+          "swe5001-event-catalog": {
+            "samples": 66,
+            "failed": 1,
+            "overFiveSeconds": 0,
+            "maxSeconds": 1.938
+          },
+          "swe5001-admission": {
+            "samples": 66,
+            "failed": 1,
+            "overFiveSeconds": 0,
+            "maxSeconds": 1.115
+          }
+        },
+        "maxDatabaseConnections": 31,
+        "maxLockWaiters": 0,
+        "containerIdentityChanged": false,
+        "guardReasons": [],
+        "maxSamplingGapSeconds": 8.583246,
+        "generator": {
+          "samples": 63,
+          "maxCpuPercent": 48.9,
+          "maxMemoryPercent": 9.03
+        }
+      }
+    },
+    "mixed-baseline": {
+      "runId": "2bca7a354a7d",
+      "startedAt": "2026-10-21T07:59:29.021672+00:00",
+      "endedAt": "2026-10-21T08:03:21.149331+00:00",
+      "status": "STOPPED",
+      "reason": "mixed-250vu failed; higher stages were not scheduled",
+      "maxVUs": 250,
+      "fixtureUsers": 250,
+      "fixtureEvents": 101,
+      "scriptSha256": {
+        "cloud-capacity.py": "493a0e4ae06a22494c469165a08437c67d109c0faf9cf974b6bad7217d4431a5",
+        "cloud-capacity.js": "a7535f600586b910db8a3e8fe9af1bb63ecf51031e202326114870ee6f3ce8c7",
+        "cloud-guard.py": "d693364e58bfe478a0fecea1d2fd81aed91bde3c2c6750052eb5f099184649f1"
+      },
+      "resources": {
+        "samples": 45,
+        "minimumAvailableMemoryMiB": 1340.01,
+        "maxLoad1": 23.54,
+        "containers": {
+          "swe5006-frontend-1": {
+            "maxCpuPercent": 6.5,
+            "maxMemoryPercent": 7.36
+          },
+          "swe5006-backend-1": {
+            "maxCpuPercent": 5.93,
+            "maxMemoryPercent": 47.93
+          },
+          "swe5006-postgres-1": {
+            "maxCpuPercent": 4.22,
+            "maxMemoryPercent": 7.86
+          },
+          "swe5001-caddy-1": {
+            "maxCpuPercent": 28.09,
+            "maxMemoryPercent": 24.95
+          },
+          "swe5001-gateway-1": {
+            "maxCpuPercent": 9.56,
+            "maxMemoryPercent": 9.46
+          },
+          "swe5001-identity-1": {
+            "maxCpuPercent": 36.73,
+            "maxMemoryPercent": 47.32
+          },
+          "swe5001-admission-1": {
+            "maxCpuPercent": 60.92,
+            "maxMemoryPercent": 41.46
+          },
+          "swe5001-event-catalog-1": {
+            "maxCpuPercent": 80.61,
+            "maxMemoryPercent": 60.52
+          },
+          "swe5001-postgres-1": {
+            "maxCpuPercent": 49.06,
+            "maxMemoryPercent": 20.6
+          },
+          "swe5001-web-1": {
+            "maxCpuPercent": 0,
+            "maxMemoryPercent": 4.01
+          }
+        },
+        "health": {
+          "swe5006-api": {
+            "samples": 45,
+            "failed": 0,
+            "overFiveSeconds": 0,
+            "maxSeconds": 1.071
+          },
+          "swe5006-web": {
+            "samples": 45,
+            "failed": 0,
+            "overFiveSeconds": 0,
+            "maxSeconds": 1.056
+          },
+          "swe5001-web": {
+            "samples": 45,
+            "failed": 0,
+            "overFiveSeconds": 0,
+            "maxSeconds": 1.062
+          },
+          "swe5001-identity": {
+            "samples": 45,
+            "failed": 0,
+            "overFiveSeconds": 0,
+            "maxSeconds": 1.59
+          },
+          "swe5001-event-catalog": {
+            "samples": 45,
+            "failed": 0,
+            "overFiveSeconds": 0,
+            "maxSeconds": 1.916
+          },
+          "swe5001-admission": {
+            "samples": 45,
+            "failed": 0,
+            "overFiveSeconds": 0,
+            "maxSeconds": 1.586
+          }
+        },
+        "maxDatabaseConnections": 32,
+        "maxLockWaiters": 0,
+        "containerIdentityChanged": false,
+        "guardReasons": [],
+        "maxSamplingGapSeconds": 6.949007,
+        "generator": {
+          "samples": 42,
+          "maxCpuPercent": 45.05,
+          "maxMemoryPercent": 6.62
+        }
+      }
+    }
+  },
+  "cloud": {
+    "cpus": 2,
+    "memoryMiB": 3832,
+    "sharedWith": "SWE5006",
+    "replicasPerJavaService": 1
+  },
+  "model": {
+    "thinkSeconds": 1,
+    "rampSeconds": 30,
+    "readRequestsPerIteration": 4,
+    "mixedWriteEveryIterations": 5,
+    "maxWritesPerVU": 60
+  },
+  "generator": {
+    "k6": "1.3.0",
+    "cpuLimit": 4,
+    "memoryGiB": 2
+  },
+  "guard": {
+    "healthSeconds": 5,
+    "probeTimeoutSeconds": 6,
+    "badSamples": 3,
+    "availableMemoryMiB": 384,
+    "containerMemoryPercent": 95,
+    "latencyGoalMs": 3000,
+    "stopAfterAnyFailedStage": true
+  },
+  "diagnostics": {
+    "read": {
+      "swe5001-gateway-1": {
+        "lines": 44773,
+        "messages": {
+          "worker_connections are not enough": 65,
+          "Too many open files": 0,
+          "upstream timed out": 0,
+          "no live upstreams": 0,
+          "connect() failed": 0,
+          "Connection refused": 0,
+          "Read timed out": 0,
+          "ERROR": 0,
+          "WARN": 0
+        },
+        "statusCounts": {
+          "200": 44499,
+          "201": 1,
+          "500": 5,
+          "499": 203
+        }
+      },
+      "swe5001-caddy-1": {
+        "lines": 141,
+        "messages": {
+          "worker_connections are not enough": 0,
+          "Too many open files": 0,
+          "upstream timed out": 0,
+          "no live upstreams": 0,
+          "connect() failed": 0,
+          "Connection refused": 0,
+          "Read timed out": 0,
+          "ERROR": 0,
+          "WARN": 0
+        },
+        "statusCounts": {
+          "502": 140
+        }
+      },
+      "swe5001-identity-1": {
+        "lines": 0,
+        "messages": {
+          "worker_connections are not enough": 0,
+          "Too many open files": 0,
+          "upstream timed out": 0,
+          "no live upstreams": 0,
+          "connect() failed": 0,
+          "Connection refused": 0,
+          "Read timed out": 0,
+          "ERROR": 0,
+          "WARN": 0
+        },
+        "statusCounts": {}
+      },
+      "swe5001-event-catalog-1": {
+        "lines": 0,
+        "messages": {
+          "worker_connections are not enough": 0,
+          "Too many open files": 0,
+          "upstream timed out": 0,
+          "no live upstreams": 0,
+          "connect() failed": 0,
+          "Connection refused": 0,
+          "Read timed out": 0,
+          "ERROR": 0,
+          "WARN": 0
+        },
+        "statusCounts": {}
+      },
+      "swe5001-admission-1": {
+        "lines": 0,
+        "messages": {
+          "worker_connections are not enough": 0,
+          "Too many open files": 0,
+          "upstream timed out": 0,
+          "no live upstreams": 0,
+          "connect() failed": 0,
+          "Connection refused": 0,
+          "Read timed out": 0,
+          "ERROR": 0,
+          "WARN": 0
+        },
+        "statusCounts": {}
+      }
+    },
+    "mixed": {
+      "swe5001-gateway-1": {
+        "lines": 38416,
+        "messages": {
+          "worker_connections are not enough": 60,
+          "Too many open files": 0,
+          "upstream timed out": 14,
+          "no live upstreams": 0,
+          "connect() failed": 0,
+          "Connection refused": 0,
+          "Read timed out": 0,
+          "ERROR": 0,
+          "WARN": 0
+        },
+        "statusCounts": {
+          "200": 38149,
+          "504": 14,
+          "500": 6,
+          "503": 9,
+          "499": 164
+        }
+      },
+      "swe5001-caddy-1": {
+        "lines": 187,
+        "messages": {
+          "worker_connections are not enough": 0,
+          "Too many open files": 0,
+          "upstream timed out": 0,
+          "no live upstreams": 0,
+          "connect() failed": 0,
+          "Connection refused": 0,
+          "Read timed out": 0,
+          "ERROR": 0,
+          "WARN": 0
+        },
+        "statusCounts": {
+          "502": 185
+        }
+      },
+      "swe5001-identity-1": {
+        "lines": 0,
+        "messages": {
+          "worker_connections are not enough": 0,
+          "Too many open files": 0,
+          "upstream timed out": 0,
+          "no live upstreams": 0,
+          "connect() failed": 0,
+          "Connection refused": 0,
+          "Read timed out": 0,
+          "ERROR": 0,
+          "WARN": 0
+        },
+        "statusCounts": {}
+      },
+      "swe5001-event-catalog-1": {
+        "lines": 0,
+        "messages": {
+          "worker_connections are not enough": 0,
+          "Too many open files": 0,
+          "upstream timed out": 0,
+          "no live upstreams": 0,
+          "connect() failed": 0,
+          "Connection refused": 0,
+          "Read timed out": 0,
+          "ERROR": 0,
+          "WARN": 0
+        },
+        "statusCounts": {}
+      },
+      "swe5001-admission-1": {
+        "lines": 0,
+        "messages": {
+          "worker_connections are not enough": 0,
+          "Too many open files": 0,
+          "upstream timed out": 0,
+          "no live upstreams": 0,
+          "connect() failed": 0,
+          "Connection refused": 0,
+          "Read timed out": 0,
+          "ERROR": 0,
+          "WARN": 0
+        },
+        "statusCounts": {}
+      }
+    }
+  },
+  "deployment": {
+    "cpus": 2,
+    "containers": [
+      {
+        "name": "swe5001-caddy-1",
+        "image": "ghcr.io/seventh720/swe5001-sems/caddy@sha256:de2150615e45544dffc86eaeacacab298d5526cb40ce5f06cf0af5408d0f6fc0",
+        "memoryBytes": 268435456,
+        "nanoCpus": 0,
+        "startedAt": "2026-10-20T18:03:26.960659434Z",
+        "restartCount": 0,
+        "oomKilled": false
+      },
+      {
+        "name": "swe5001-gateway-1",
+        "image": "ghcr.io/seventh720/swe5001-sems/gateway@sha256:b8549f0401e26adc9c9a87fe2b3bb95ccfd92b0da2a73c5a722661a0382e2cd4",
+        "memoryBytes": 100663296,
+        "nanoCpus": 0,
+        "startedAt": "2026-10-20T18:03:28.542194754Z",
+        "restartCount": 0,
+        "oomKilled": false
+      },
+      {
+        "name": "swe5001-identity-1",
+        "image": "ghcr.io/seventh720/swe5001-sems/identity@sha256:2575dd94d50f3cd6d91888bc945cb4465194853b7a6c73fb7f635c536b07f3d6",
+        "memoryBytes": 805306368,
+        "nanoCpus": 0,
+        "startedAt": "2026-10-20T18:03:26.059387534Z",
+        "restartCount": 0,
+        "oomKilled": false
+      },
+      {
+        "name": "swe5001-event-catalog-1",
+        "image": "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:05f7bd7557ff8b1d9d33dae5c68d490778eef499065da768c738dce85ac55d03",
+        "memoryBytes": 805306368,
+        "nanoCpus": 0,
+        "startedAt": "2026-10-20T18:03:26.057236696Z",
+        "restartCount": 0,
+        "oomKilled": false
+      },
+      {
+        "name": "swe5001-admission-1",
+        "image": "ghcr.io/seventh720/swe5001-sems/admission@sha256:6716d50229011cc43b839c072ba8c8e5d47450d83d61d127839e8d6ef53bc5c3",
+        "memoryBytes": 805306368,
+        "nanoCpus": 0,
+        "startedAt": "2026-10-20T18:03:26.053646586Z",
+        "restartCount": 0,
+        "oomKilled": false
+      },
+      {
+        "name": "swe5001-postgres-1",
+        "image": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:e8d5905caff2a3b05be228fa9a93cd9a8e5feed8daacbdd7510e580d23afa790",
+        "memoryBytes": 536870912,
+        "nanoCpus": 0,
+        "startedAt": "2026-10-20T18:03:23.272961471Z",
+        "restartCount": 0,
+        "oomKilled": false
+      },
+      {
+        "name": "swe5001-web-1",
+        "image": "ghcr.io/seventh720/swe5001-sems/web@sha256:133117b9229de37b0eed9ba3b8e4b067a4c6f50d4eb48ccc242ad1db91cd8028",
+        "memoryBytes": 100663296,
+        "nanoCpus": 0,
+        "startedAt": "2026-10-20T18:03:23.285610326Z",
+        "restartCount": 0,
+        "oomKilled": false
+      },
+      {
+        "name": "swe5006-backend-1",
+        "image": "ghcr.io/seventh720/swe5006-sems/backend@sha256:2852e8ef7c0c117b510ee73284d7ceb58b8d92711bf677d2a0a42ac3e01329f0",
+        "memoryBytes": 805306368,
+        "nanoCpus": 0,
+        "startedAt": "2026-10-20T19:38:25.629827681Z",
+        "restartCount": 0,
+        "oomKilled": false
+      },
+      {
+        "name": "swe5006-frontend-1",
+        "image": "ghcr.io/seventh720/swe5006-sems/frontend@sha256:f2c5060660b799c7679d772abb56398f4281f4e1a0ef9c5dc38e8aaf955007c2",
+        "memoryBytes": 100663296,
+        "nanoCpus": 0,
+        "startedAt": "2026-10-20T19:38:57.823367228Z",
+        "restartCount": 0,
+        "oomKilled": false
+      },
+      {
+        "name": "swe5006-postgres-1",
+        "image": "ghcr.io/seventh720/swe5006-sems/postgres@sha256:a3bf6218d963db938f92745c6b6d8a909f2b63a816e74f6c474ace5ecec27aa5",
+        "memoryBytes": 536870912,
+        "nanoCpus": 0,
+        "startedAt": "2026-10-20T19:38:19.934062336Z",
+        "restartCount": 0,
+        "oomKilled": false
+      }
+    ]
+  }
+}

@@ -65,5 +65,39 @@
       "accountsRetained": 4,
       "historyRetained": true
     }
+  },
+  "followUpPurge": {
+    "runId": "qaad28db8d627e",
+    "completedAt": "2026-10-21T06:38:23.185457+00:00",
+    "deleted": {
+      "catalog.events": 8,
+      "identity.users": 4,
+      "admission.sales": 4,
+      "admission.tickets": 10,
+      "admission.bookings": 5,
+      "identity.user_roles": 4,
+      "admission.ticket_types": 4,
+      "identity.organizations": 2,
+      "admission.notifications": 11,
+      "catalog.event_revisions": 1,
+      "identity.booking_profiles": 0,
+      "admission.pre_registrations": 0,
+      "catalog.event_cancellations": 4,
+      "catalog.organization_closures": 2,
+      "identity.organization_closures": 2,
+      "identity.organization_requests": 0,
+      "admission.event_revision_receipts": 1,
+      "admission.event_staff_assignments": 3,
+      "catalog.event_notification_outbox": 1,
+      "identity.membership_notifications": 19,
+      "identity.organization_invitations": 2,
+      "identity.organization_memberships": 4,
+      "admission.event_cancellation_receipts": 4
+    },
+    "remaining_fixture_records": 0,
+    "untouched_data_unchanged": true,
+    "backupLocation": "server-only",
+    "apiSearchVerifiedEmpty": true,
+    "healthEndpoints": "UP"
   }
 }

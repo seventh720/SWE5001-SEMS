@@ -23,3 +23,13 @@ The user explicitly accepted retained accounts/history and cleanup using product
 Four staging accounts and the related orders, notifications, tickets and check-in audit history remain by design. The product has no account deletion/disable API; this was not a database purge. Raw staging fixture IDs/generated emails are retained in ignored `.secrets/acceptance/` reports. Passwords, authentication tokens and ticket credentials are absent from reports and evidence.
 
 The live run completed at **2026-10-20 16:45:52 SGT**. All three HTTPS readiness endpoints returned `UP` after cleanup. See the [credential-free summary](summary.json) for exact timestamps, fixture counts, checks and cleanup results.
+
+## Follow-up purge — 2026-10-21
+
+At the user's subsequent request, the four retained fixture accounts and their related test data were deleted from staging. The original acceptance/soft-cleanup results above describe the state on 2026-10-20; this follow-up supersedes their data-retention status.
+
+An exact-ID inventory confirmed four accounts, two DELETED organizations, eight events, five CANCELLED bookings and ten tickets, with no account memberships/events/bookings outside the fixture and no privileged platform roles. A private server-side custom-format PostgreSQL backup was created and its archive directory validated. A transaction rehearsal ended in ROLLBACK. The committed transaction checked row counts and content digests of non-fixture data across the business tables; these were unchanged. Fresh database and platform-admin API reads confirmed no target accounts, organizations, events, bookings or tickets remained. All three HTTPS readiness endpoints returned UP.
+
+The verified backup remains on the staging server; no full-database export was performed. Private scope and cleanup receipts remain in ignored `.secrets/acceptance/`; no production credentials or personal data are included in this evidence.
+
+The user also confirmed physical phone camera check-in works. This is user-reported device acceptance; the HTTP run above did not operate a camera or measure recognition rates.
