@@ -4,24 +4,24 @@
   "applicationCommit": "f69d49d92f72d0ca3882598215ed4b4c9e59b52e",
   "deploymentRun": "https://github.com/seventh720/SWE5001-SEMS/actions/runs/39653776016",
   "status": "STOPPED",
-  "startedAt": "2026-10-21T19:13:15.586984+00:00",
-  "endedAt": "2026-10-21T19:23:40.381278+00:00",
+  "startedAt": "2026-10-21T19:57:00.801558+00:00",
+  "endedAt": "2026-10-21T20:07:24.907304+00:00",
   "reason": "250 VU pair did not pass; no higher VU scheduled",
   "catalogPool": 10,
   "policy": "Both modes at250, then both at500, then both at1000. Never escalate after either mode fails. Same-level independent mode may run only if shared health guard and runtime identity are healthy. Original k6 thresholds retained, plus zero internal/public5xx, upstream timeouts and connection-limit messages.",
   "datasetValidation": {
-    "ordinaryEvents": 100,
-    "hotEvents": 1,
-    "pages": 11,
+    "ordinaryEvents": 50,
+    "hotEvents": 0,
+    "pages": 5,
     "pageSize": 10,
-    "returned": 101,
-    "unique": 101,
+    "returned": 50,
+    "unique": 50,
     "exactFixtureIdsMatch": true,
     "allTotalCountsMatch": true
   },
   "fixtureUsers": 1000,
-  "fixtureOrdinaryEvents": 100,
-  "fixtureUnusedContentionEvents": 1,
+  "fixtureOrdinaryEvents": 50,
+  "fixtureUnusedContentionEvents": 0,
   "model": {
     "readRequestsPerIteration": 4,
     "thinkSeconds": 1,
@@ -39,13 +39,13 @@
   },
   "runs": {
     "read-250": {
-      "runId": "ed48824bc769",
+      "runId": "388599fcea62",
       "status": "PASSED",
-      "startedAt": "2026-10-21T19:13:21.002967+00:00",
-      "endedAt": "2026-10-21T19:18:29.496325+00:00",
+      "startedAt": "2026-10-21T19:57:05.743765+00:00",
+      "endedAt": "2026-10-21T20:02:13.952101+00:00",
       "maxVUs": 250,
       "scriptSha256": {
-        "run-suite.py": "b899d12181037b2645c2d6079f641610928813ea4028e9b12cd71e518d0279e0",
+        "run-suite.py": "1304f7322517b1c54aeb0d542775723ccb0e4cfc2e72b361ff3caec09fdbb41d",
         "cloud-capacity.js": "a7535f600586b910db8a3e8fe9af1bb63ecf51031e202326114870ee6f3ce8c7",
         "cloud-guard.py": "d693364e58bfe478a0fecea1d2fd81aed91bde3c2c6750052eb5f099184649f1"
       },
@@ -72,7 +72,7 @@
         ]
       ],
       "inventoryAfter": {
-        "events": 101,
+        "events": 50,
         "bookings": 0,
         "cancelled": 0,
         "reserved": 0,
@@ -80,119 +80,119 @@
         "consistent": true
       },
       "resources": {
-        "samples": 59,
-        "minimumAvailableMemoryMiB": 1375.11,
-        "maxLoad1": 49.48,
+        "samples": 61,
+        "minimumAvailableMemoryMiB": 1230.92,
+        "maxLoad1": 42.06,
         "health": {
           "swe5006-api": {
-            "samples": 59,
+            "samples": 61,
             "failed": 0,
             "overFiveSeconds": 0,
-            "maxSeconds": 2.905
+            "maxSeconds": 1.644
           },
           "swe5006-web": {
-            "samples": 59,
+            "samples": 61,
             "failed": 0,
             "overFiveSeconds": 0,
-            "maxSeconds": 3.611
+            "maxSeconds": 2.063
           },
           "swe5001-web": {
-            "samples": 59,
+            "samples": 61,
             "failed": 0,
             "overFiveSeconds": 0,
-            "maxSeconds": 2.538
+            "maxSeconds": 1.672
           },
           "swe5001-identity": {
-            "samples": 59,
+            "samples": 61,
             "failed": 0,
             "overFiveSeconds": 0,
-            "maxSeconds": 3.618
+            "maxSeconds": 1.812
           },
           "swe5001-event-catalog": {
-            "samples": 59,
+            "samples": 61,
             "failed": 0,
             "overFiveSeconds": 0,
-            "maxSeconds": 3.608
+            "maxSeconds": 2.217
           },
           "swe5001-admission": {
-            "samples": 59,
+            "samples": 61,
             "failed": 0,
             "overFiveSeconds": 0,
-            "maxSeconds": 3.215
+            "maxSeconds": 2.052
           }
         },
         "containerIdentityChanged": false,
         "guardReasons": [],
         "maxDatabaseConnections": 31,
         "maxLockWaiters": 0,
-        "maxSamplingGapSeconds": 7.988087,
+        "maxSamplingGapSeconds": 6.096273,
         "containers": {
           "swe5001-caddy-1": {
-            "meanCpuPercent": 14.69,
-            "maxCpuPercent": 35.2,
-            "maxMemoryPercent": 24.15
+            "meanCpuPercent": 17.06,
+            "maxCpuPercent": 41.44,
+            "maxMemoryPercent": 24.74
           },
           "swe5001-gateway-1": {
-            "meanCpuPercent": 4.17,
-            "maxCpuPercent": 9.09,
-            "maxMemoryPercent": 11.35
+            "meanCpuPercent": 5.09,
+            "maxCpuPercent": 10.9,
+            "maxMemoryPercent": 10.88
           },
           "swe5001-identity-1": {
-            "meanCpuPercent": 26.77,
-            "maxCpuPercent": 64.35,
-            "maxMemoryPercent": 50.09
+            "meanCpuPercent": 17.64,
+            "maxCpuPercent": 46.69,
+            "maxMemoryPercent": 50.88
           },
           "swe5001-admission-1": {
-            "meanCpuPercent": 18.41,
-            "maxCpuPercent": 41.71,
-            "maxMemoryPercent": 38.29
+            "meanCpuPercent": 8.46,
+            "maxCpuPercent": 22.35,
+            "maxMemoryPercent": 48.1
           },
           "swe5001-event-catalog-1": {
-            "meanCpuPercent": 33.1,
-            "maxCpuPercent": 68.9,
-            "maxMemoryPercent": 55.3
+            "meanCpuPercent": 20.89,
+            "maxCpuPercent": 51.9,
+            "maxMemoryPercent": 57.14
           },
           "swe5001-postgres-1": {
-            "meanCpuPercent": 15.13,
-            "maxCpuPercent": 34.93,
-            "maxMemoryPercent": 18.25
+            "meanCpuPercent": 14.76,
+            "maxCpuPercent": 34.58,
+            "maxMemoryPercent": 21.03
           },
           "swe5001-web-1": {
             "meanCpuPercent": 0.0,
             "maxCpuPercent": 0.0,
-            "maxMemoryPercent": 4.67
+            "maxMemoryPercent": 3.73
           },
           "swe5006-frontend-1": {
-            "meanCpuPercent": 0.16,
-            "maxCpuPercent": 3.58,
-            "maxMemoryPercent": 7.13
+            "meanCpuPercent": 0.64,
+            "maxCpuPercent": 4.19,
+            "maxMemoryPercent": 6.73
           },
           "swe5006-backend-1": {
-            "meanCpuPercent": 0.74,
-            "maxCpuPercent": 5.11,
-            "maxMemoryPercent": 46.49
+            "meanCpuPercent": 0.64,
+            "maxCpuPercent": 5.02,
+            "maxMemoryPercent": 46.71
           },
           "swe5006-postgres-1": {
-            "meanCpuPercent": 0.75,
-            "maxCpuPercent": 5.21,
-            "maxMemoryPercent": 7.72
+            "meanCpuPercent": 0.82,
+            "maxCpuPercent": 4.97,
+            "maxMemoryPercent": 7.35
           }
         },
         "generator": {
           "samples": 60,
-          "maxCpuPercent": 63.89,
-          "maxMemoryPercent": 7.27
+          "maxCpuPercent": 61.24,
+          "maxMemoryPercent": 7.36
         }
       }
     },
     "mixed-250": {
-      "runId": "e572262a3095",
+      "runId": "d7f3d0073c9c",
       "status": "STOPPED",
-      "startedAt": "2026-10-21T19:18:36.739043+00:00",
-      "endedAt": "2026-10-21T19:23:36.453722+00:00",
+      "startedAt": "2026-10-21T20:02:21.685390+00:00",
+      "endedAt": "2026-10-21T20:07:20.715242+00:00",
       "maxVUs": 250,
       "scriptSha256": {
-        "run-suite.py": "b899d12181037b2645c2d6079f641610928813ea4028e9b12cd71e518d0279e0",
+        "run-suite.py": "1304f7322517b1c54aeb0d542775723ccb0e4cfc2e72b361ff3caec09fdbb41d",
         "cloud-capacity.js": "a7535f600586b910db8a3e8fe9af1bb63ecf51031e202326114870ee6f3ce8c7",
         "cloud-guard.py": "d693364e58bfe478a0fecea1d2fd81aed91bde3c2c6750052eb5f099184649f1"
       },
@@ -220,116 +220,116 @@
       ],
       "reason": "mixed-250vu failed; higher stages were not scheduled",
       "inventoryAfter": {
-        "events": 101,
-        "bookings": 2284,
-        "cancelled": 2284,
+        "events": 50,
+        "bookings": 2388,
+        "cancelled": 2388,
         "reserved": 0,
         "activeTickets": 0,
         "consistent": true
       },
       "resources": {
-        "samples": 52,
-        "minimumAvailableMemoryMiB": 1195.21,
-        "maxLoad1": 38.62,
+        "samples": 55,
+        "minimumAvailableMemoryMiB": 1233.81,
+        "maxLoad1": 47.5,
         "health": {
           "swe5006-api": {
-            "samples": 52,
+            "samples": 55,
             "failed": 0,
             "overFiveSeconds": 0,
-            "maxSeconds": 3.376
+            "maxSeconds": 3.24
           },
           "swe5006-web": {
-            "samples": 52,
+            "samples": 55,
             "failed": 0,
             "overFiveSeconds": 0,
-            "maxSeconds": 3.392
+            "maxSeconds": 3.721
           },
           "swe5001-web": {
-            "samples": 52,
+            "samples": 55,
             "failed": 0,
             "overFiveSeconds": 0,
-            "maxSeconds": 3.427
+            "maxSeconds": 3.66
           },
           "swe5001-identity": {
-            "samples": 52,
+            "samples": 55,
             "failed": 0,
             "overFiveSeconds": 0,
-            "maxSeconds": 3.387
+            "maxSeconds": 3.287
           },
           "swe5001-event-catalog": {
-            "samples": 52,
+            "samples": 55,
             "failed": 0,
             "overFiveSeconds": 0,
-            "maxSeconds": 4.084
+            "maxSeconds": 4.487
           },
           "swe5001-admission": {
-            "samples": 52,
+            "samples": 55,
             "failed": 0,
             "overFiveSeconds": 0,
-            "maxSeconds": 4.965
+            "maxSeconds": 2.868
           }
         },
         "containerIdentityChanged": false,
         "guardReasons": [],
-        "maxDatabaseConnections": 31,
-        "maxLockWaiters": 1,
-        "maxSamplingGapSeconds": 11.082494,
+        "maxDatabaseConnections": 32,
+        "maxLockWaiters": 0,
+        "maxSamplingGapSeconds": 9.427221,
         "containers": {
           "swe5001-caddy-1": {
-            "meanCpuPercent": 14.32,
-            "maxCpuPercent": 31.86,
-            "maxMemoryPercent": 25.63
+            "meanCpuPercent": 14.77,
+            "maxCpuPercent": 31.6,
+            "maxMemoryPercent": 27.31
           },
           "swe5001-gateway-1": {
-            "meanCpuPercent": 5.29,
-            "maxCpuPercent": 10.75,
-            "maxMemoryPercent": 13.66
+            "meanCpuPercent": 5.89,
+            "maxCpuPercent": 11.29,
+            "maxMemoryPercent": 13.82
           },
           "swe5001-identity-1": {
-            "meanCpuPercent": 12.42,
-            "maxCpuPercent": 40.22,
-            "maxMemoryPercent": 49.41
+            "meanCpuPercent": 13.32,
+            "maxCpuPercent": 29.07,
+            "maxMemoryPercent": 50.86
           },
           "swe5001-admission-1": {
-            "meanCpuPercent": 25.93,
-            "maxCpuPercent": 62.92,
-            "maxMemoryPercent": 50.98
+            "meanCpuPercent": 17.87,
+            "maxCpuPercent": 43.85,
+            "maxMemoryPercent": 52.62
           },
           "swe5001-event-catalog-1": {
-            "meanCpuPercent": 23.53,
-            "maxCpuPercent": 52.91,
-            "maxMemoryPercent": 55.34
+            "meanCpuPercent": 22.33,
+            "maxCpuPercent": 59.44,
+            "maxMemoryPercent": 57.55
           },
           "swe5001-postgres-1": {
-            "meanCpuPercent": 20.62,
-            "maxCpuPercent": 45.71,
-            "maxMemoryPercent": 20.12
+            "meanCpuPercent": 21.56,
+            "maxCpuPercent": 45.07,
+            "maxMemoryPercent": 21.29
           },
           "swe5001-web-1": {
             "meanCpuPercent": 0.0,
             "maxCpuPercent": 0.0,
-            "maxMemoryPercent": 4.67
+            "maxMemoryPercent": 3.73
           },
           "swe5006-frontend-1": {
-            "meanCpuPercent": 0.14,
-            "maxCpuPercent": 3.86,
+            "meanCpuPercent": 0.13,
+            "maxCpuPercent": 3.73,
             "maxMemoryPercent": 6.18
           },
           "swe5006-backend-1": {
-            "meanCpuPercent": 0.35,
-            "maxCpuPercent": 3.53,
-            "maxMemoryPercent": 46.44
+            "meanCpuPercent": 0.5,
+            "maxCpuPercent": 4.99,
+            "maxMemoryPercent": 46.55
           },
           "swe5006-postgres-1": {
-            "meanCpuPercent": 0.66,
-            "maxCpuPercent": 6.1,
-            "maxMemoryPercent": 7.56
+            "meanCpuPercent": 0.37,
+            "maxCpuPercent": 5.29,
+            "maxMemoryPercent": 7.36
           }
         },
         "generator": {
-          "samples": 61,
-          "maxCpuPercent": 96.94,
-          "maxMemoryPercent": 7.89
+          "samples": 60,
+          "maxCpuPercent": 51.49,
+          "maxMemoryPercent": 7.78
         }
       }
     }
@@ -340,15 +340,15 @@
       "mode": "read",
       "targetVUs": 1,
       "plannedHold": "5s",
-      "startedAt": "2026-10-21T19:13:24.019786+00:00",
+      "startedAt": "2026-10-21T19:57:08.783783+00:00",
       "exitCode": 0,
-      "endedAt": "2026-10-21T19:14:03.280078+00:00",
+      "endedAt": "2026-10-21T19:57:47.744452+00:00",
       "summaryPresent": true,
       "requests": 20,
       "unexpectedErrorRate": 0,
-      "p95Ms": 57.89246904999999,
+      "p95Ms": 25.11451315,
       "holdRequests": 20,
-      "overallP95Ms": 57.89246904999999,
+      "overallP95Ms": 25.11451315,
       "observedPeakVUs": 1,
       "failedThresholds": [],
       "serverDiagnostics": {
@@ -370,49 +370,49 @@
         "value": 1
       },
       "operations": {
-        "event-detail": {
-          "holdRequests": 5,
-          "p95Ms": 33.627717
-        },
-        "orders": {
-          "holdRequests": 5,
-          "p95Ms": 60.30636639999999
-        },
         "events": {
           "holdRequests": 5,
-          "p95Ms": 53.346100199999995
+          "p95Ms": 26.206575400000002
+        },
+        "event-detail": {
+          "holdRequests": 5,
+          "p95Ms": 16.6776334
         },
         "me": {
           "holdRequests": 5,
-          "p95Ms": 23.694417199999997
+          "p95Ms": 14.6292328
+        },
+        "orders": {
+          "holdRequests": 5,
+          "p95Ms": 15.0120244
         }
       },
-      "k6SummarySha256": "8928d08c9637482f00403191aad5bd328ee981dc85e2f81c72a5f567ee4f6d06",
+      "k6SummarySha256": "e7f78814b7175614eed8e819cf1edec91a5c4dfcc9afb73dc9a3da427865bd63",
       "isTargetStage": false,
       "clientThresholdsPassed": true,
       "passed": true,
-      "elapsedIncludingRampAndDrainSeconds": 39.260292
+      "elapsedIncludingRampAndDrainSeconds": 38.960669
     },
     {
       "name": "read-50vu",
       "mode": "read",
       "targetVUs": 50,
       "plannedHold": "30s",
-      "startedAt": "2026-10-21T19:14:13.589073+00:00",
+      "startedAt": "2026-10-21T19:57:58.117464+00:00",
       "exitCode": 0,
-      "endedAt": "2026-10-21T19:15:17.486982+00:00",
+      "endedAt": "2026-10-21T19:59:01.954092+00:00",
       "summaryPresent": true,
-      "requests": 7828,
+      "requests": 8464,
       "unexpectedErrorRate": 0,
-      "p95Ms": 91.76256699999999,
-      "holdRequests": 5205,
-      "overallP95Ms": 89.80546074999995,
+      "p95Ms": 27.49677745,
+      "holdRequests": 5590,
+      "overallP95Ms": 26.2701098,
       "observedPeakVUs": 50,
       "failedThresholds": [],
       "serverDiagnostics": {
-        "accessRows": 7841,
+        "accessRows": 8477,
         "statusCounts": {
-          "200": 7841
+          "200": 8477
         },
         "internal5xx": 0,
         "public5xx": 0,
@@ -423,54 +423,54 @@
       "serverGatePassed": true,
       "suite": "read-250",
       "checks": {
-        "passes": 7828,
+        "passes": 8464,
         "fails": 0,
         "value": 1
       },
       "operations": {
-        "events": {
-          "holdRequests": 1303,
-          "p95Ms": 123.66349169999998
-        },
-        "orders": {
-          "holdRequests": 1299,
-          "p95Ms": 55.79186659999999
-        },
         "event-detail": {
-          "holdRequests": 1302,
-          "p95Ms": 96.10412229999993
+          "holdRequests": 1398,
+          "p95Ms": 28.3266964
         },
         "me": {
-          "holdRequests": 1301,
-          "p95Ms": 53.941583
+          "holdRequests": 1396,
+          "p95Ms": 22.19460375
+        },
+        "orders": {
+          "holdRequests": 1395,
+          "p95Ms": 22.386000199999998
+        },
+        "events": {
+          "holdRequests": 1401,
+          "p95Ms": 34.562208
         }
       },
-      "k6SummarySha256": "4b35921c924e1a650bd42de2c082532fa1fe836f9d2061caadb1f28481202540",
+      "k6SummarySha256": "53cdf7b66aba9f8268173b4758e1169e4260b3168eee19283a062bd45ee73e78",
       "isTargetStage": false,
       "clientThresholdsPassed": true,
       "passed": true,
-      "elapsedIncludingRampAndDrainSeconds": 63.897909
+      "elapsedIncludingRampAndDrainSeconds": 63.836628
     },
     {
       "name": "read-100vu",
       "mode": "read",
       "targetVUs": 100,
       "plannedHold": "30s",
-      "startedAt": "2026-10-21T19:15:27.903686+00:00",
+      "startedAt": "2026-10-21T19:59:12.554520+00:00",
       "exitCode": 0,
-      "endedAt": "2026-10-21T19:16:31.817943+00:00",
+      "endedAt": "2026-10-21T20:00:16.431354+00:00",
       "summaryPresent": true,
-      "requests": 14380,
+      "requests": 16376,
       "unexpectedErrorRate": 0,
-      "p95Ms": 211.2452705999999,
-      "holdRequests": 9107,
-      "overallP95Ms": 185.75186044999984,
+      "p95Ms": 76.02164159999997,
+      "holdRequests": 10637,
+      "overallP95Ms": 63.372103999999986,
       "observedPeakVUs": 100,
       "failedThresholds": [],
       "serverDiagnostics": {
-        "accessRows": 14393,
+        "accessRows": 16389,
         "statusCounts": {
-          "200": 14393
+          "200": 16389
         },
         "internal5xx": 0,
         "public5xx": 0,
@@ -481,54 +481,54 @@
       "serverGatePassed": true,
       "suite": "read-250",
       "checks": {
-        "passes": 14380,
+        "passes": 16376,
         "fails": 0,
         "value": 1
       },
       "operations": {
-        "me": {
-          "holdRequests": 2280,
-          "p95Ms": 93.33072289999998
-        },
         "events": {
-          "holdRequests": 2273,
-          "p95Ms": 299.37829179999983
-        },
-        "event-detail": {
-          "holdRequests": 2273,
-          "p95Ms": 214.62622519999994
+          "holdRequests": 2663,
+          "p95Ms": 118.1748835999999
         },
         "orders": {
-          "holdRequests": 2281,
-          "p95Ms": 74.697084
+          "holdRequests": 2657,
+          "p95Ms": 45.8095588
+        },
+        "event-detail": {
+          "holdRequests": 2660,
+          "p95Ms": 99.11313509999981
+        },
+        "me": {
+          "holdRequests": 2657,
+          "p95Ms": 43.4908418
         }
       },
-      "k6SummarySha256": "30ba75d23e98dbc0585603e1eb971d613b38d5228f75d63ecb5423368b9a60b3",
+      "k6SummarySha256": "1c19f35aca0401401f2c18f2d259c9c14fd330ae8af80f477e45a155a0dc1868",
       "isTargetStage": false,
       "clientThresholdsPassed": true,
       "passed": true,
-      "elapsedIncludingRampAndDrainSeconds": 63.914257
+      "elapsedIncludingRampAndDrainSeconds": 63.876834
     },
     {
       "name": "read-250vu",
       "mode": "read",
       "targetVUs": 250,
       "plannedHold": "60s",
-      "startedAt": "2026-10-21T19:16:42.443165+00:00",
+      "startedAt": "2026-10-21T20:00:27.103157+00:00",
       "exitCode": 0,
-      "endedAt": "2026-10-21T19:18:18.265946+00:00",
+      "endedAt": "2026-10-21T20:02:02.678792+00:00",
       "summaryPresent": true,
-      "requests": 30384,
+      "requests": 37152,
       "unexpectedErrorRate": 0,
-      "p95Ms": 1342.9920339999999,
-      "holdRequests": 21689,
-      "overallP95Ms": 1256.959944649999,
+      "p95Ms": 932.578001,
+      "holdRequests": 26501,
+      "overallP95Ms": 868.0156966499998,
       "observedPeakVUs": 250,
       "failedThresholds": [],
       "serverDiagnostics": {
-        "accessRows": 30401,
+        "accessRows": 37171,
         "statusCounts": {
-          "200": 30401
+          "200": 37171
         },
         "internal5xx": 0,
         "public5xx": 0,
@@ -539,48 +539,48 @@
       "serverGatePassed": true,
       "suite": "read-250",
       "checks": {
-        "passes": 30384,
+        "passes": 37152,
         "fails": 0,
         "value": 1
       },
       "operations": {
+        "events": {
+          "holdRequests": 6634,
+          "p95Ms": 1236.51644265
+        },
         "orders": {
-          "holdRequests": 5424,
-          "p95Ms": 160.27104819999994
+          "holdRequests": 6625,
+          "p95Ms": 154.14496719999997
         },
         "me": {
-          "holdRequests": 5431,
-          "p95Ms": 399.43135399999977
-        },
-        "events": {
-          "holdRequests": 5418,
-          "p95Ms": 1805.8864251999998
+          "holdRequests": 6625,
+          "p95Ms": 277.5626085999999
         },
         "event-detail": {
-          "holdRequests": 5416,
-          "p95Ms": 1241.8848342499998
+          "holdRequests": 6617,
+          "p95Ms": 881.1513669999996
         }
       },
-      "k6SummarySha256": "99e2f75fe6981370696078173afb3baa2ba0da23df9476a0264accfd1795717b",
+      "k6SummarySha256": "ff1074054d34d4399ef019203efefbe7c0a868530916b5f09a87bcb11c9e0957",
       "isTargetStage": true,
       "clientThresholdsPassed": true,
       "passed": true,
-      "elapsedIncludingRampAndDrainSeconds": 95.822781
+      "elapsedIncludingRampAndDrainSeconds": 95.575635
     },
     {
       "name": "mixed-1vu",
       "mode": "mixed",
       "targetVUs": 1,
       "plannedHold": "5s",
-      "startedAt": "2026-10-21T19:18:39.723652+00:00",
+      "startedAt": "2026-10-21T20:02:24.793193+00:00",
       "exitCode": 0,
-      "endedAt": "2026-10-21T19:19:18.951069+00:00",
+      "endedAt": "2026-10-21T20:03:03.868078+00:00",
       "summaryPresent": true,
       "requests": 23,
       "unexpectedErrorRate": 0,
-      "p95Ms": 30.7132756,
+      "p95Ms": 29.187203899999993,
       "holdRequests": 23,
-      "overallP95Ms": 30.7132756,
+      "overallP95Ms": 29.187203899999993,
       "observedPeakVUs": 1,
       "failedThresholds": [],
       "bookings_created": 1,
@@ -605,60 +605,60 @@
       "operations": {
         "orders": {
           "holdRequests": 5,
-          "p95Ms": 29.3230754
-        },
-        "book": {
-          "holdRequests": 1,
-          "p95Ms": 215.722083
-        },
-        "event-detail": {
-          "holdRequests": 5,
-          "p95Ms": 15.7550836
+          "p95Ms": 19.2315252
         },
         "receipt": {
           "holdRequests": 1,
-          "p95Ms": 22.235292
-        },
-        "cancel": {
-          "holdRequests": 1,
-          "p95Ms": 25.987208
-        },
-        "me": {
-          "holdRequests": 5,
-          "p95Ms": 12.369841
+          "p95Ms": 15.278958
         },
         "events": {
           "holdRequests": 5,
-          "p95Ms": 27.286408199999997
+          "p95Ms": 28.1539914
+        },
+        "cancel": {
+          "holdRequests": 1,
+          "p95Ms": 15.647459
+        },
+        "book": {
+          "holdRequests": 1,
+          "p95Ms": 36.9335
+        },
+        "me": {
+          "holdRequests": 5,
+          "p95Ms": 20.421691799999998
+        },
+        "event-detail": {
+          "holdRequests": 5,
+          "p95Ms": 18.4309418
         }
       },
-      "k6SummarySha256": "a9a4c39d319107ebced8582c53877c93046949692a14c9586ce89d37a5ee1b98",
+      "k6SummarySha256": "647022f68809a7fdcc7c504defb2a2dba53e8829edc7743713cbe78d39ec36e0",
       "isTargetStage": false,
       "clientThresholdsPassed": true,
       "passed": true,
-      "elapsedIncludingRampAndDrainSeconds": 39.227417
+      "elapsedIncludingRampAndDrainSeconds": 39.074885
     },
     {
       "name": "mixed-50vu",
       "mode": "mixed",
       "targetVUs": 50,
       "plannedHold": "30s",
-      "startedAt": "2026-10-21T19:19:29.308438+00:00",
+      "startedAt": "2026-10-21T20:03:14.213176+00:00",
       "exitCode": 0,
-      "endedAt": "2026-10-21T19:20:33.151704+00:00",
+      "endedAt": "2026-10-21T20:04:18.086568+00:00",
       "summaryPresent": true,
-      "requests": 9128,
+      "requests": 9290,
       "unexpectedErrorRate": 0,
-      "p95Ms": 92.56765649999997,
-      "holdRequests": 5926,
-      "overallP95Ms": 81.49630864999999,
+      "p95Ms": 75.37606489999996,
+      "holdRequests": 6040,
+      "overallP95Ms": 66.01514765,
       "observedPeakVUs": 50,
       "failedThresholds": [],
-      "bookings_created": 416,
+      "bookings_created": 422,
       "serverDiagnostics": {
-        "accessRows": 12726,
+        "accessRows": 12948,
         "statusCounts": {
-          "200": 12726
+          "200": 12948
         },
         "internal5xx": 0,
         "public5xx": 0,
@@ -669,67 +669,67 @@
       "serverGatePassed": true,
       "suite": "mixed-250",
       "checks": {
-        "passes": 9128,
+        "passes": 9290,
         "fails": 0,
         "value": 1
       },
       "operations": {
-        "book": {
-          "holdRequests": 258,
-          "p95Ms": 174.91242055
-        },
-        "me": {
-          "holdRequests": 1288,
-          "p95Ms": 31.374920949999986
-        },
-        "orders": {
-          "holdRequests": 1289,
-          "p95Ms": 108.86793299999998
-        },
-        "cancel": {
-          "holdRequests": 258,
-          "p95Ms": 116.08481519999994
-        },
         "event-detail": {
-          "holdRequests": 1288,
-          "p95Ms": 67.56248564999994
-        },
-        "receipt": {
-          "holdRequests": 258,
-          "p95Ms": 84.89155434999996
+          "holdRequests": 1315,
+          "p95Ms": 68.28591259999999
         },
         "events": {
-          "holdRequests": 1287,
-          "p95Ms": 87.13384619999997
+          "holdRequests": 1314,
+          "p95Ms": 82.24631064999993
+        },
+        "book": {
+          "holdRequests": 262,
+          "p95Ms": 134.27560655
+        },
+        "me": {
+          "holdRequests": 1313,
+          "p95Ms": 34.077841799999995
+        },
+        "receipt": {
+          "holdRequests": 262,
+          "p95Ms": 55.12879614999999
+        },
+        "orders": {
+          "holdRequests": 1312,
+          "p95Ms": 88.22554724999999
+        },
+        "cancel": {
+          "holdRequests": 262,
+          "p95Ms": 83.53358479999994
         }
       },
-      "k6SummarySha256": "dccec53512faaac3b0145e1fbe1e226913946d074d70dbe0b137352cc67a1ebc",
+      "k6SummarySha256": "b77011440494826c7521b7745cec2eef65fe00fc8426819ccf5f0ceb15b77c3f",
       "isTargetStage": false,
       "clientThresholdsPassed": true,
       "passed": true,
-      "elapsedIncludingRampAndDrainSeconds": 63.843266
+      "elapsedIncludingRampAndDrainSeconds": 63.873392
     },
     {
       "name": "mixed-100vu",
       "mode": "mixed",
       "targetVUs": 100,
       "plannedHold": "30s",
-      "startedAt": "2026-10-21T19:20:43.812601+00:00",
+      "startedAt": "2026-10-21T20:04:28.673449+00:00",
       "exitCode": 0,
-      "endedAt": "2026-10-21T19:21:48.034026+00:00",
+      "endedAt": "2026-10-21T20:05:32.541466+00:00",
       "summaryPresent": true,
-      "requests": 14186,
+      "requests": 15008,
       "unexpectedErrorRate": 0,
-      "p95Ms": 364.36928359999996,
-      "holdRequests": 8363,
-      "overallP95Ms": 318.993469,
+      "p95Ms": 289.5416045,
+      "holdRequests": 8903,
+      "overallP95Ms": 250.29704779999986,
       "observedPeakVUs": 100,
       "failedThresholds": [],
-      "bookings_created": 650,
+      "bookings_created": 688,
       "serverDiagnostics": {
-        "accessRows": 19807,
+        "accessRows": 20959,
         "statusCounts": {
-          "200": 19807
+          "200": 20959
         },
         "internal5xx": 0,
         "public5xx": 0,
@@ -740,140 +740,124 @@
       "serverGatePassed": true,
       "suite": "mixed-250",
       "checks": {
-        "passes": 14186,
+        "passes": 15008,
         "fails": 0,
         "value": 1
       },
       "operations": {
-        "orders": {
-          "holdRequests": 1831,
-          "p95Ms": 427.4735764999999
+        "events": {
+          "holdRequests": 1941,
+          "p95Ms": 313.614708
         },
         "cancel": {
-          "holdRequests": 355,
-          "p95Ms": 392.9505589
+          "holdRequests": 389,
+          "p95Ms": 288.5543334
         },
         "receipt": {
-          "holdRequests": 356,
-          "p95Ms": 321.50904175
-        },
-        "event-detail": {
-          "holdRequests": 1819,
-          "p95Ms": 226.86715889999988
-        },
-        "events": {
-          "holdRequests": 1815,
-          "p95Ms": 315.2797462
+          "holdRequests": 390,
+          "p95Ms": 220.00099824999998
         },
         "me": {
-          "holdRequests": 1827,
-          "p95Ms": 71.66087869999997
+          "holdRequests": 1931,
+          "p95Ms": 71.79116699999999
+        },
+        "orders": {
+          "holdRequests": 1932,
+          "p95Ms": 296.47082555
         },
         "book": {
-          "holdRequests": 360,
-          "p95Ms": 593.3572419999999
+          "holdRequests": 390,
+          "p95Ms": 461.9828157
+        },
+        "event-detail": {
+          "holdRequests": 1930,
+          "p95Ms": 207.78086059999995
         }
       },
-      "k6SummarySha256": "f6406aaf44c397090c371b56799e82c0ff274b9a4305eecc6901b98eedb6c409",
+      "k6SummarySha256": "2b79503c74c3c285a1491c7b5dc93713d1900ef625e10c51d7026c225d3f0a26",
       "isTargetStage": false,
       "clientThresholdsPassed": true,
       "passed": true,
-      "elapsedIncludingRampAndDrainSeconds": 64.221425
+      "elapsedIncludingRampAndDrainSeconds": 63.868017
     },
     {
       "name": "mixed-250vu",
       "mode": "mixed",
       "targetVUs": 250,
       "plannedHold": "60s",
-      "startedAt": "2026-10-21T19:21:58.785201+00:00",
-      "exitCode": 99,
-      "endedAt": "2026-10-21T19:23:34.973477+00:00",
+      "startedAt": "2026-10-21T20:05:43.424703+00:00",
+      "exitCode": 0,
+      "endedAt": "2026-10-21T20:07:19.125474+00:00",
       "summaryPresent": true,
-      "requests": 25648,
-      "unexpectedErrorRate": 3.898939488459139e-05,
-      "p95Ms": 2342.176999249999,
-      "holdRequests": 17530,
-      "overallP95Ms": 2030.1309111999992,
+      "requests": 26999,
+      "unexpectedErrorRate": 0,
+      "p95Ms": 1544.5560592999998,
+      "holdRequests": 18643,
+      "overallP95Ms": 1426.9857422999996,
       "observedPeakVUs": 250,
-      "failedThresholds": [
-        "checks",
-        "http_req_duration{name:book,phase:hold}"
-      ],
-      "bookings_created": 1217,
+      "failedThresholds": [],
+      "bookings_created": 1277,
       "serverDiagnostics": {
-        "accessRows": 35879,
+        "accessRows": 37763,
         "statusCounts": {
-          "200": 35876,
-          "504": 2,
-          "503": 1
+          "200": 37759,
+          "504": 4
         },
-        "internal5xx": 2,
-        "public5xx": 1,
-        "upstreamTimeoutMessages": 2,
+        "internal5xx": 4,
+        "public5xx": 0,
+        "upstreamTimeoutMessages": 4,
         "connectionLimitMessages": 0,
         "errorPaths": [
-          {
-            "method": "GET",
-            "path": "/internal/v1/events/{eventId}/published",
-            "status": 504,
-            "count": 1
-          },
-          {
-            "method": "POST",
-            "path": "/api/v1/bookings",
-            "status": 503,
-            "count": 1
-          },
           {
             "method": "POST",
             "path": "/internal/v1/events/details",
             "status": 504,
-            "count": 1
+            "count": 4
           }
         ]
       },
       "serverGatePassed": false,
       "suite": "mixed-250",
       "checks": {
-        "passes": 25647,
-        "fails": 1,
-        "value": 0.9999610106051154
+        "passes": 26999,
+        "fails": 0,
+        "value": 1
       },
       "operations": {
-        "receipt": {
-          "holdRequests": 752,
-          "p95Ms": 2453.8427885
-        },
-        "orders": {
-          "holdRequests": 3839,
-          "p95Ms": 2691.7514469
-        },
         "event-detail": {
-          "holdRequests": 3818,
-          "p95Ms": 861.3561374999991
+          "holdRequests": 4056,
+          "p95Ms": 1120.03083325
         },
         "events": {
-          "holdRequests": 3787,
-          "p95Ms": 1441.5697802999996
+          "holdRequests": 3999,
+          "p95Ms": 1739.5804088
+        },
+        "orders": {
+          "holdRequests": 4079,
+          "p95Ms": 1530.5037442999999
         },
         "book": {
-          "holdRequests": 737,
-          "p95Ms": 4518.9406692
-        },
-        "cancel": {
-          "holdRequests": 758,
-          "p95Ms": 2482.9004893999995
+          "holdRequests": 813,
+          "p95Ms": 2517.5930759999997
         },
         "me": {
-          "holdRequests": 3839,
-          "p95Ms": 104.99827079999996
+          "holdRequests": 4079,
+          "p95Ms": 172.24308779999998
+        },
+        "cancel": {
+          "holdRequests": 807,
+          "p95Ms": 1539.4619922000002
+        },
+        "receipt": {
+          "holdRequests": 810,
+          "p95Ms": 1478.3722966499997
         }
       },
-      "k6SummarySha256": "32b717192f20d5ebbd2386bd22eb86a9668dd0e1ca06dfbd0855df4840e71d5b",
+      "k6SummarySha256": "5f07ad56612278b603910b2b4a175e47336a221ad321ffafec2783aafd50f59c",
       "isTargetStage": true,
-      "clientThresholdsPassed": false,
+      "clientThresholdsPassed": true,
       "passed": false,
-      "elapsedIncludingRampAndDrainSeconds": 96.188276
+      "elapsedIncludingRampAndDrainSeconds": 95.700771
     }
   ],
   "targetCases": [
@@ -887,21 +871,21 @@
         "mode": "read",
         "targetVUs": 250,
         "plannedHold": "60s",
-        "startedAt": "2026-10-21T19:16:42.443165+00:00",
+        "startedAt": "2026-10-21T20:00:27.103157+00:00",
         "exitCode": 0,
-        "endedAt": "2026-10-21T19:18:18.265946+00:00",
+        "endedAt": "2026-10-21T20:02:02.678792+00:00",
         "summaryPresent": true,
-        "requests": 30384,
+        "requests": 37152,
         "unexpectedErrorRate": 0,
-        "p95Ms": 1342.9920339999999,
-        "holdRequests": 21689,
-        "overallP95Ms": 1256.959944649999,
+        "p95Ms": 932.578001,
+        "holdRequests": 26501,
+        "overallP95Ms": 868.0156966499998,
         "observedPeakVUs": 250,
         "failedThresholds": [],
         "serverDiagnostics": {
-          "accessRows": 30401,
+          "accessRows": 37171,
           "statusCounts": {
-            "200": 30401
+            "200": 37171
           },
           "internal5xx": 0,
           "public5xx": 0,
@@ -911,6 +895,894 @@
         },
         "serverGatePassed": true,
         "suite": "read-250",
+        "checks": {
+          "passes": 37152,
+          "fails": 0,
+          "value": 1
+        },
+        "operations": {
+          "events": {
+            "holdRequests": 6634,
+            "p95Ms": 1236.51644265
+          },
+          "orders": {
+            "holdRequests": 6625,
+            "p95Ms": 154.14496719999997
+          },
+          "me": {
+            "holdRequests": 6625,
+            "p95Ms": 277.5626085999999
+          },
+          "event-detail": {
+            "holdRequests": 6617,
+            "p95Ms": 881.1513669999996
+          }
+        },
+        "k6SummarySha256": "ff1074054d34d4399ef019203efefbe7c0a868530916b5f09a87bcb11c9e0957",
+        "isTargetStage": true,
+        "clientThresholdsPassed": true,
+        "passed": true,
+        "elapsedIncludingRampAndDrainSeconds": 95.575635
+      }
+    },
+    {
+      "vus": 250,
+      "mode": "mixed",
+      "passed": false,
+      "suiteStatus": "STOPPED",
+      "stage": {
+        "name": "mixed-250vu",
+        "mode": "mixed",
+        "targetVUs": 250,
+        "plannedHold": "60s",
+        "startedAt": "2026-10-21T20:05:43.424703+00:00",
+        "exitCode": 0,
+        "endedAt": "2026-10-21T20:07:19.125474+00:00",
+        "summaryPresent": true,
+        "requests": 26999,
+        "unexpectedErrorRate": 0,
+        "p95Ms": 1544.5560592999998,
+        "holdRequests": 18643,
+        "overallP95Ms": 1426.9857422999996,
+        "observedPeakVUs": 250,
+        "failedThresholds": [],
+        "bookings_created": 1277,
+        "serverDiagnostics": {
+          "accessRows": 37763,
+          "statusCounts": {
+            "200": 37759,
+            "504": 4
+          },
+          "internal5xx": 4,
+          "public5xx": 0,
+          "upstreamTimeoutMessages": 4,
+          "connectionLimitMessages": 0,
+          "errorPaths": [
+            {
+              "method": "POST",
+              "path": "/internal/v1/events/details",
+              "status": 504,
+              "count": 4
+            }
+          ]
+        },
+        "serverGatePassed": false,
+        "suite": "mixed-250",
+        "checks": {
+          "passes": 26999,
+          "fails": 0,
+          "value": 1
+        },
+        "operations": {
+          "event-detail": {
+            "holdRequests": 4056,
+            "p95Ms": 1120.03083325
+          },
+          "events": {
+            "holdRequests": 3999,
+            "p95Ms": 1739.5804088
+          },
+          "orders": {
+            "holdRequests": 4079,
+            "p95Ms": 1530.5037442999999
+          },
+          "book": {
+            "holdRequests": 813,
+            "p95Ms": 2517.5930759999997
+          },
+          "me": {
+            "holdRequests": 4079,
+            "p95Ms": 172.24308779999998
+          },
+          "cancel": {
+            "holdRequests": 807,
+            "p95Ms": 1539.4619922000002
+          },
+          "receipt": {
+            "holdRequests": 810,
+            "p95Ms": 1478.3722966499997
+          }
+        },
+        "k6SummarySha256": "5f07ad56612278b603910b2b4a175e47336a221ad321ffafec2783aafd50f59c",
+        "isTargetStage": true,
+        "clientThresholdsPassed": true,
+        "passed": false,
+        "elapsedIncludingRampAndDrainSeconds": 95.700771
+      }
+    }
+  ],
+  "unexecuted": [
+    "read-500vu",
+    "mixed-500vu",
+    "read-1000vu",
+    "mixed-1000vu"
+  ],
+  "inventoryBefore": {
+    "events": 50,
+    "bookings": 0,
+    "cancelled": 0,
+    "reserved": 0,
+    "activeTickets": 0,
+    "consistent": true
+  },
+  "inventoryAfterProductCleanup": [
+    {
+      "id": "07406872-9afb-4626-8533-a5852b0a8ccf",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 46,
+      "event_id": "f1a2d064-7da6-4363-8e09-6cebcfc27eff",
+      "reserved": 0,
+      "cancelled": 46,
+      "confirmed": 0,
+      "all_tickets": 46
+    },
+    {
+      "id": "15bf12c0-9bd7-43bb-9fad-93829432da9f",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 49,
+      "event_id": "50d97486-8d4a-4b84-8d9d-edea27a98009",
+      "reserved": 0,
+      "cancelled": 49,
+      "confirmed": 0,
+      "all_tickets": 49
+    },
+    {
+      "id": "19765016-48aa-43b9-a9c1-7b4c2c9d11b6",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 40,
+      "event_id": "d1fa59b9-c544-4e23-be59-557d2f043177",
+      "reserved": 0,
+      "cancelled": 40,
+      "confirmed": 0,
+      "all_tickets": 40
+    },
+    {
+      "id": "1b4a26bd-cf22-4673-9040-82ddb7119013",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 45,
+      "event_id": "3a7d7bc4-86fe-4c11-84b0-41a63623faba",
+      "reserved": 0,
+      "cancelled": 45,
+      "confirmed": 0,
+      "all_tickets": 45
+    },
+    {
+      "id": "234b5e90-123d-42f9-adb5-dd9a855b5698",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 43,
+      "event_id": "c3c02499-c325-4402-8072-d4a07cf1a345",
+      "reserved": 0,
+      "cancelled": 43,
+      "confirmed": 0,
+      "all_tickets": 43
+    },
+    {
+      "id": "24e56920-1c81-46ab-bcce-83d93d299ccf",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 46,
+      "event_id": "cbe6de65-114b-4786-b5d2-87fa6b8ddc07",
+      "reserved": 0,
+      "cancelled": 46,
+      "confirmed": 0,
+      "all_tickets": 46
+    },
+    {
+      "id": "2be55008-6444-4791-a5c4-893b90f72f7b",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 50,
+      "event_id": "750cbcb9-f5ce-4edd-80b2-18b8bbc0b67d",
+      "reserved": 0,
+      "cancelled": 50,
+      "confirmed": 0,
+      "all_tickets": 50
+    },
+    {
+      "id": "2c0c0e6f-8dac-49fe-8f46-0c5b97394cb5",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 44,
+      "event_id": "db5d0076-4672-4d27-ad4f-3660a2edf91c",
+      "reserved": 0,
+      "cancelled": 44,
+      "confirmed": 0,
+      "all_tickets": 44
+    },
+    {
+      "id": "2e2d368a-2370-448f-b3b3-175beb1c0c18",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 47,
+      "event_id": "f12ae09e-a49d-4d8f-a51a-ec4a1dc343d4",
+      "reserved": 0,
+      "cancelled": 47,
+      "confirmed": 0,
+      "all_tickets": 47
+    },
+    {
+      "id": "30142006-b8a9-465a-8e97-53e43705d15c",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 50,
+      "event_id": "a3dbf6f7-d411-4ffe-9ea4-294489fbbb7a",
+      "reserved": 0,
+      "cancelled": 50,
+      "confirmed": 0,
+      "all_tickets": 50
+    },
+    {
+      "id": "33823337-57bf-4ea8-ad81-39a1bbec0efe",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 45,
+      "event_id": "7409073f-fd1d-4dd7-8a27-d528bccc31d8",
+      "reserved": 0,
+      "cancelled": 45,
+      "confirmed": 0,
+      "all_tickets": 45
+    },
+    {
+      "id": "408a7d91-c608-4225-8056-714368061aa0",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 46,
+      "event_id": "7daefbda-06b2-4834-b583-f52a6c8cd0c2",
+      "reserved": 0,
+      "cancelled": 46,
+      "confirmed": 0,
+      "all_tickets": 46
+    },
+    {
+      "id": "459a5e6e-2323-4275-9e43-71e176f56823",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 53,
+      "event_id": "8e1f90f9-db3a-4237-ac3f-9c21e96573da",
+      "reserved": 0,
+      "cancelled": 53,
+      "confirmed": 0,
+      "all_tickets": 53
+    },
+    {
+      "id": "4b93cff1-c0b6-4170-83aa-32877fd81b11",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 43,
+      "event_id": "2a3a642e-a3a2-4503-b849-8832d3a3f3b2",
+      "reserved": 0,
+      "cancelled": 43,
+      "confirmed": 0,
+      "all_tickets": 43
+    },
+    {
+      "id": "4c8323af-a042-4227-aa9a-6aa756fc2efb",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 55,
+      "event_id": "c465fdb1-a5c0-426f-b931-5debe3317b38",
+      "reserved": 0,
+      "cancelled": 55,
+      "confirmed": 0,
+      "all_tickets": 55
+    },
+    {
+      "id": "4e7b6a40-20f3-4065-a17f-409dd6e447d8",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 54,
+      "event_id": "8abc9d6a-df83-4ce6-808c-c5ae494c66c3",
+      "reserved": 0,
+      "cancelled": 54,
+      "confirmed": 0,
+      "all_tickets": 54
+    },
+    {
+      "id": "524543fd-35a0-4c71-8c8b-7c107fecc311",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 51,
+      "event_id": "45f79d02-4810-4b4d-bbe8-ddce211f6311",
+      "reserved": 0,
+      "cancelled": 51,
+      "confirmed": 0,
+      "all_tickets": 51
+    },
+    {
+      "id": "53e663e4-ccb3-4f1b-bad8-4e38ee7de276",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 54,
+      "event_id": "7201349b-56ec-4877-afc9-35db9f97f6a3",
+      "reserved": 0,
+      "cancelled": 54,
+      "confirmed": 0,
+      "all_tickets": 54
+    },
+    {
+      "id": "5c0a08a8-b052-4a8c-8a2f-811b95c0eba2",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 45,
+      "event_id": "b5997950-87d5-4392-93e6-0d19c5331588",
+      "reserved": 0,
+      "cancelled": 45,
+      "confirmed": 0,
+      "all_tickets": 45
+    },
+    {
+      "id": "5d43d631-3172-4bd4-aa55-5bf32bbfa869",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 48,
+      "event_id": "eb07de5b-7d76-4d39-a801-f661b154f967",
+      "reserved": 0,
+      "cancelled": 48,
+      "confirmed": 0,
+      "all_tickets": 48
+    },
+    {
+      "id": "5df93ed2-2cc1-469a-88c1-0378ccca5c15",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 51,
+      "event_id": "a317795d-cdb7-4443-a26a-c61451b46bb7",
+      "reserved": 0,
+      "cancelled": 51,
+      "confirmed": 0,
+      "all_tickets": 51
+    },
+    {
+      "id": "630442d0-84a6-4c06-8cb8-d6bb4d9f8179",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 49,
+      "event_id": "2e79c144-99e7-4aa2-9922-4269584f3e44",
+      "reserved": 0,
+      "cancelled": 49,
+      "confirmed": 0,
+      "all_tickets": 49
+    },
+    {
+      "id": "67039d95-e15a-4da5-abd5-5a1c3a1f1ea0",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 49,
+      "event_id": "75a1ee00-5bcd-400a-84fd-4953d94538bb",
+      "reserved": 0,
+      "cancelled": 49,
+      "confirmed": 0,
+      "all_tickets": 49
+    },
+    {
+      "id": "71126feb-dd26-4096-b302-a11bc01a60ed",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 43,
+      "event_id": "4ffbd7d4-c451-401b-937c-d194534f7b3b",
+      "reserved": 0,
+      "cancelled": 43,
+      "confirmed": 0,
+      "all_tickets": 43
+    },
+    {
+      "id": "71a966a8-c6f8-4e88-830d-556859ae74a3",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 52,
+      "event_id": "0ceccf85-893a-470f-8dea-58f659fa361d",
+      "reserved": 0,
+      "cancelled": 52,
+      "confirmed": 0,
+      "all_tickets": 52
+    },
+    {
+      "id": "7aedfb58-eddf-48fe-9f80-119b8947fdb8",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 44,
+      "event_id": "d24d19be-446b-4769-aebb-1f27bf8f8ccd",
+      "reserved": 0,
+      "cancelled": 44,
+      "confirmed": 0,
+      "all_tickets": 44
+    },
+    {
+      "id": "7b4a308a-60ae-4841-bae2-1d6d30bcc8a0",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 46,
+      "event_id": "e544d3e2-4aa7-4686-8157-91da6abc9f16",
+      "reserved": 0,
+      "cancelled": 46,
+      "confirmed": 0,
+      "all_tickets": 46
+    },
+    {
+      "id": "8284f7d8-ed11-4eb0-b0f6-2436d6cc25e9",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 41,
+      "event_id": "dc03a941-7d5a-47c0-875f-352def841f20",
+      "reserved": 0,
+      "cancelled": 41,
+      "confirmed": 0,
+      "all_tickets": 41
+    },
+    {
+      "id": "8621edac-51d7-4b82-8daa-5a4290a7b8f3",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 48,
+      "event_id": "0c35ea0f-e0f7-4e21-b867-770fdd95ec2f",
+      "reserved": 0,
+      "cancelled": 48,
+      "confirmed": 0,
+      "all_tickets": 48
+    },
+    {
+      "id": "8bfa9d9b-bc57-48ab-8b9f-e7f90ed03278",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 47,
+      "event_id": "24e8006f-401c-449c-ae41-b5f320bcd1f5",
+      "reserved": 0,
+      "cancelled": 47,
+      "confirmed": 0,
+      "all_tickets": 47
+    },
+    {
+      "id": "8c2a502c-29d1-4e46-b046-3d457e089910",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 50,
+      "event_id": "d2283306-21e9-47f0-8880-dfa82ef5d10d",
+      "reserved": 0,
+      "cancelled": 50,
+      "confirmed": 0,
+      "all_tickets": 50
+    },
+    {
+      "id": "8f4a2153-63e7-4d1b-956d-c98e7fcb493d",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 51,
+      "event_id": "15d7a36b-98be-462b-9175-da732ecf902d",
+      "reserved": 0,
+      "cancelled": 51,
+      "confirmed": 0,
+      "all_tickets": 51
+    },
+    {
+      "id": "90ce44cf-07e5-40db-b4af-8b9cb519453e",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 43,
+      "event_id": "42fbc042-ca62-4537-8566-88ba1eaceb5c",
+      "reserved": 0,
+      "cancelled": 43,
+      "confirmed": 0,
+      "all_tickets": 43
+    },
+    {
+      "id": "a38378b3-b243-439a-bc21-f910a019e2c2",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 52,
+      "event_id": "4f2971f6-b9ff-4b0d-a981-dacaa5cfad12",
+      "reserved": 0,
+      "cancelled": 52,
+      "confirmed": 0,
+      "all_tickets": 52
+    },
+    {
+      "id": "a396eecd-2ed3-4183-9865-255136559625",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 43,
+      "event_id": "f707c769-faec-4a63-9a72-edb631bbd6fb",
+      "reserved": 0,
+      "cancelled": 43,
+      "confirmed": 0,
+      "all_tickets": 43
+    },
+    {
+      "id": "ac8a74f8-c231-4103-963f-d7031290142b",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 49,
+      "event_id": "5aa2263b-b58c-4f94-bcb8-5097e6553839",
+      "reserved": 0,
+      "cancelled": 49,
+      "confirmed": 0,
+      "all_tickets": 49
+    },
+    {
+      "id": "c7f81d56-0be0-44d3-abcf-75495a7b5452",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 41,
+      "event_id": "f002d065-bac9-4a3b-803b-5f7afee9bacb",
+      "reserved": 0,
+      "cancelled": 41,
+      "confirmed": 0,
+      "all_tickets": 41
+    },
+    {
+      "id": "cf1e18b6-0080-409e-a3a2-d31fb57e0d7a",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 48,
+      "event_id": "c0b02e85-7c68-439b-a30f-527765a3c308",
+      "reserved": 0,
+      "cancelled": 48,
+      "confirmed": 0,
+      "all_tickets": 48
+    },
+    {
+      "id": "d3ee6a99-3cc3-45c4-ab35-6af9d2848098",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 46,
+      "event_id": "58dc0471-7ffc-48cc-831a-4b0df93ae298",
+      "reserved": 0,
+      "cancelled": 46,
+      "confirmed": 0,
+      "all_tickets": 46
+    },
+    {
+      "id": "d83e0fa8-02fb-43c8-85a2-c32407f77e65",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 48,
+      "event_id": "a3867891-14f4-4607-bcd2-f0b74d7a58be",
+      "reserved": 0,
+      "cancelled": 48,
+      "confirmed": 0,
+      "all_tickets": 48
+    },
+    {
+      "id": "d870b85f-e9d7-4744-9d33-b610e09b7800",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 51,
+      "event_id": "41ed4f0f-0cfb-4879-bc0a-77b34dabc58a",
+      "reserved": 0,
+      "cancelled": 51,
+      "confirmed": 0,
+      "all_tickets": 51
+    },
+    {
+      "id": "dbe1d217-d03a-44ed-a93e-c5a4e3f347e0",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 50,
+      "event_id": "5eff18b1-575e-4072-aa55-b4282c7524e3",
+      "reserved": 0,
+      "cancelled": 50,
+      "confirmed": 0,
+      "all_tickets": 50
+    },
+    {
+      "id": "dc3bea8b-85cd-400a-adec-3fadbea2ea33",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 56,
+      "event_id": "3635afb7-4b7a-410a-9bff-d59d44ebf2b1",
+      "reserved": 0,
+      "cancelled": 56,
+      "confirmed": 0,
+      "all_tickets": 56
+    },
+    {
+      "id": "e383bdc2-57fc-465a-90a1-9e7e5b9f4083",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 46,
+      "event_id": "f2675cb1-825b-40cc-af1b-c5ad782d0d43",
+      "reserved": 0,
+      "cancelled": 46,
+      "confirmed": 0,
+      "all_tickets": 46
+    },
+    {
+      "id": "ea8af5b5-ef5d-4a83-8e74-797fffb99c9f",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 44,
+      "event_id": "005684c4-3517-4fcc-92b7-d7f406a190a3",
+      "reserved": 0,
+      "cancelled": 44,
+      "confirmed": 0,
+      "all_tickets": 44
+    },
+    {
+      "id": "f3538c9e-0b19-46c5-84af-b7c2745b8592",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 52,
+      "event_id": "5e20a9f1-899f-47bc-a3a4-852fcc16bb68",
+      "reserved": 0,
+      "cancelled": 52,
+      "confirmed": 0,
+      "all_tickets": 52
+    },
+    {
+      "id": "f3df4fdb-a6cd-453b-a080-4f3c3c59f22d",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 45,
+      "event_id": "96f9ad12-d832-4dc0-81b8-460b7ea611f5",
+      "reserved": 0,
+      "cancelled": 45,
+      "confirmed": 0,
+      "all_tickets": 45
+    },
+    {
+      "id": "f58c6d7e-7fbf-4c3b-bd09-d70cd1147e9b",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 53,
+      "event_id": "f17d9be8-3334-4b71-b33c-b24eba5a9d77",
+      "reserved": 0,
+      "cancelled": 53,
+      "confirmed": 0,
+      "all_tickets": 53
+    },
+    {
+      "id": "f632f70e-f741-488d-9d69-256532d52067",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 44,
+      "event_id": "84e46243-b7ab-4354-9aa5-49a75d508f34",
+      "reserved": 0,
+      "cancelled": 44,
+      "confirmed": 0,
+      "all_tickets": 44
+    },
+    {
+      "id": "f91a9cf5-6656-4c86-8f4a-e04c8fcfed4d",
+      "quota": 100000,
+      "tickets": 0,
+      "bookings": 52,
+      "event_id": "bb3c081d-217f-4fd3-80e8-3f00faacf850",
+      "reserved": 0,
+      "cancelled": 52,
+      "confirmed": 0,
+      "all_tickets": 52
+    }
+  ],
+  "serverBackup": {
+    "bytes": 931077,
+    "sha256": "21f3508f65c4f3d14ad299f7e8f9a46da77775991aea0ba743318d11142df9bc",
+    "archiveListVerified": true,
+    "downloaded": false
+  },
+  "healthAfter": {
+    "at": "2026-10-21T20:09:59.409610+00:00",
+    "availableMemoryMiB": 1338.58,
+    "load1": 3.07,
+    "containers": [
+      {
+        "Name": "swe5001-caddy-1",
+        "CPUPerc": "0.00%",
+        "MemUsage": "35.49MiB / 256MiB",
+        "MemPerc": "13.86%",
+        "PIDs": "11"
+      },
+      {
+        "Name": "swe5001-gateway-1",
+        "CPUPerc": "0.00%",
+        "MemUsage": "6.582MiB / 96MiB",
+        "MemPerc": "6.86%",
+        "PIDs": "3"
+      },
+      {
+        "Name": "swe5001-identity-1",
+        "CPUPerc": "0.19%",
+        "MemUsage": "377.1MiB / 768MiB",
+        "MemPerc": "49.11%",
+        "PIDs": "33"
+      },
+      {
+        "Name": "swe5001-admission-1",
+        "CPUPerc": "0.11%",
+        "MemUsage": "380.2MiB / 768MiB",
+        "MemPerc": "49.51%",
+        "PIDs": "32"
+      },
+      {
+        "Name": "swe5001-event-catalog-1",
+        "CPUPerc": "0.19%",
+        "MemUsage": "418.9MiB / 768MiB",
+        "MemPerc": "54.54%",
+        "PIDs": "33"
+      },
+      {
+        "Name": "swe5001-postgres-1",
+        "CPUPerc": "3.66%",
+        "MemUsage": "108.4MiB / 512MiB",
+        "MemPerc": "21.16%",
+        "PIDs": "36"
+      },
+      {
+        "Name": "swe5001-web-1",
+        "CPUPerc": "0.00%",
+        "MemUsage": "3.57MiB / 96MiB",
+        "MemPerc": "3.72%",
+        "PIDs": "3"
+      },
+      {
+        "Name": "swe5006-frontend-1",
+        "CPUPerc": "0.00%",
+        "MemUsage": "5.918MiB / 96MiB",
+        "MemPerc": "6.16%",
+        "PIDs": "3"
+      },
+      {
+        "Name": "swe5006-backend-1",
+        "CPUPerc": "0.16%",
+        "MemUsage": "356.5MiB / 768MiB",
+        "MemPerc": "46.42%",
+        "PIDs": "32"
+      },
+      {
+        "Name": "swe5006-postgres-1",
+        "CPUPerc": "0.00%",
+        "MemUsage": "37.38MiB / 512MiB",
+        "MemPerc": "7.30%",
+        "PIDs": "16"
+      }
+    ],
+    "states": [
+      "/swe5001-caddy-1|true|false|0",
+      "/swe5001-gateway-1|true|false|0",
+      "/swe5001-identity-1|true|false|0",
+      "/swe5001-admission-1|true|false|0",
+      "/swe5001-event-catalog-1|true|false|0",
+      "/swe5001-postgres-1|true|false|0",
+      "/swe5001-web-1|true|false|0",
+      "/swe5006-frontend-1|true|false|0",
+      "/swe5006-backend-1|true|false|0",
+      "/swe5006-postgres-1|true|false|0"
+    ],
+    "identityChanged": false,
+    "database": "{\"connections\" : 31, \"active\" : 1, \"lockWaiters\" : 0, \"longestActiveSeconds\" : 0.000000}",
+    "health": {
+      "swe5006-api": {
+        "ok": true,
+        "seconds": 0.353
+      },
+      "swe5006-web": {
+        "ok": true,
+        "seconds": 0.356
+      },
+      "swe5001-web": {
+        "ok": true,
+        "seconds": 0.356
+      },
+      "swe5001-identity": {
+        "ok": true,
+        "seconds": 0.26
+      },
+      "swe5001-event-catalog": {
+        "ok": true,
+        "seconds": 0.318
+      },
+      "swe5001-admission": {
+        "ok": true,
+        "seconds": 0.268
+      }
+    },
+    "stopReasons": []
+  },
+  "runtimeAfter": {
+    "applicationCommit": "f69d49d92f72d0ca3882598215ed4b4c9e59b52e",
+    "catalogPool": 10,
+    "remainingLoadMonitors": 0,
+    "publicDiagnosticsStatus": 404,
+    "deploymentMetadata": [
+      "/swe5001-caddy-1 sha256:9791546afda3a014cb3dffb65422fc9ab38a76d83456a1e0a1aaa3edce9d4024 2026-10-21T18:49:25.14848549Z restart=0 oom=false memory=268435456",
+      "/swe5001-gateway-1 sha256:654173989f2a5114c97b72a2d80bcf5664bdca2b81837aed5267758c72280a4f 2026-10-21T18:49:26.675790245Z restart=0 oom=false memory=100663296",
+      "/swe5001-identity-1 sha256:05410e67f5247fee164dd4828d5d71281a8b61332932f018650c7374ee6d1a39 2026-10-21T18:49:24.468634747Z restart=0 oom=false memory=805306368",
+      "/swe5001-event-catalog-1 sha256:53a31e278fa95c741acf01e23536714daec699f91585290205c2a09a6deb7d35 2026-10-21T18:49:24.466410769Z restart=0 oom=false memory=805306368",
+      "/swe5001-admission-1 sha256:74fef66b783302eb88d75f4132a138ab3e1d241ee800391e7bec2516931446f0 2026-10-21T18:49:24.471877871Z restart=0 oom=false memory=805306368",
+      "/swe5001-postgres-1 sha256:d164cf4067f39ba9cdbce50b2feef82aa16434051f4ddf2d23a8e90b10b7b7b3 2026-10-21T18:49:21.690743133Z restart=0 oom=false memory=536870912",
+      "/swe5001-web-1 sha256:a97506f6395911f22d7142512c7df22deb029a548978696dd122ff1ed0d6aff8 2026-10-21T18:49:21.688787874Z restart=0 oom=false memory=100663296",
+      "/swe5006-frontend-1 sha256:9c2018040bad10561d4e3a0df081498219ff59d72fe6a944fca45848efa2bf21 2026-10-21T14:09:33.275950143Z restart=0 oom=false memory=100663296",
+      "/swe5006-backend-1 sha256:1015a7b9f85f0dfa214ce812079711d532b6e966baf4d84d21ede8d75a3142dc 2026-10-21T14:09:01.015186911Z restart=0 oom=false memory=805306368",
+      "/swe5006-postgres-1 sha256:b462b52fb7f34c0451a8bf2da5f7c8722740d3fa4cb41370c1f04958e685ea88 2026-10-21T14:08:55.316674479Z restart=0 oom=false memory=536870912"
+    ]
+  },
+  "cleanup": {
+    "deleted": {
+      "catalog.events": 50,
+      "identity.users": 1000,
+      "admission.sales": 50,
+      "admission.tickets": 2388,
+      "admission.bookings": 2388,
+      "identity.user_roles": 1000,
+      "admission.ticket_types": 50,
+      "identity.organizations": 1,
+      "admission.notifications": 4776,
+      "catalog.event_revisions": 0,
+      "identity.booking_profiles": 0,
+      "admission.pre_registrations": 0,
+      "catalog.event_cancellations": 50,
+      "catalog.organization_closures": 1,
+      "identity.organization_closures": 1,
+      "identity.organization_requests": 0,
+      "admission.event_revision_receipts": 0,
+      "admission.event_staff_assignments": 0,
+      "catalog.event_notification_outbox": 0,
+      "identity.membership_notifications": 4,
+      "identity.organization_invitations": 0,
+      "identity.organization_memberships": 1,
+      "admission.event_cancellation_receipts": 50
+    },
+    "untouched_data_unchanged": true,
+    "remaining_fixture_records": 0,
+    "freshOriginal24TablesUnchanged": true,
+    "totalTemporaryOrdersRemovedIncludingPreflight": 3076,
+    "totalTemporaryTicketsRemovedIncludingPreflight": 3076
+  },
+  "experimentIntent": "Final pre-presentation run:50 ordinary events and1000 users; same release/resources, original business model, holds, thresholds and paired escalation.",
+  "sameRelease100EventBaseline": {
+    "applicationCommit": "f69d49d92f72d0ca3882598215ed4b4c9e59b52e",
+    "deploymentRun": "https://github.com/seventh720/SWE5001-SEMS/actions/runs/39653776016",
+    "startedAt": "2026-10-21T19:13:15.586984+00:00",
+    "endedAt": "2026-10-21T19:23:40.381278+00:00",
+    "catalogPool": 10,
+    "fixtureUsers": 1000,
+    "fixtureOrdinaryEvents": 100,
+    "fixtureUnusedContentionEvents": 1,
+    "model": {
+      "readRequestsPerIteration": 4,
+      "thinkSeconds": 1,
+      "mixedBookingEveryIterations": 5,
+      "maxWritesPerVu": 60,
+      "rampSeconds": 30,
+      "hold250Seconds": 60,
+      "hold500And1000Seconds": 180,
+      "warmup": "At250,each mode starts with1-VU preflight,50 and100VU holds30s. Higher suites directly ramp to their target.",
+      "history": "Read250 starts with no orders. Mixed suites grow cancelled-order history; subsequent read suites inherit it. No data reset between levels.",
+      "thresholds": "Overall and each operation p95<3000ms,unexpected failure<1%,all status/content checks pass. Additional server gate requires zero internal/public5xx,upstream timeouts and connection-limit messages.",
+      "jwtValidity": "Real issued JWTs; require actual expiry at least20 minutes after each suite starts.",
+      "generator": "Separate local Docker k6:1.3.0,4CPU/2GiB over HTTPS",
+      "cloud": "Singapore shared Lightsail,2vCPU/3832MiB; one replica per Java service,768MiB each; PostgreSQL512MiB,gateway/web96MiB,Caddy256MiB;SWE5006 remains running."
+    },
+    "cases": [
+      {
+        "vus": 250,
+        "mode": "read",
+        "passed": true,
+        "requests": 30384,
+        "p95Ms": 1342.9920339999999,
         "checks": {
           "passes": 30384,
           "fails": 0,
@@ -934,72 +1806,25 @@
             "p95Ms": 1241.8848342499998
           }
         },
-        "k6SummarySha256": "99e2f75fe6981370696078173afb3baa2ba0da23df9476a0264accfd1795717b",
-        "isTargetStage": true,
-        "clientThresholdsPassed": true,
-        "passed": true,
-        "elapsedIncludingRampAndDrainSeconds": 95.822781
-      }
-    },
-    {
-      "vus": 250,
-      "mode": "mixed",
-      "passed": false,
-      "suiteStatus": "STOPPED",
-      "stage": {
-        "name": "mixed-250vu",
-        "mode": "mixed",
-        "targetVUs": 250,
-        "plannedHold": "60s",
-        "startedAt": "2026-10-21T19:21:58.785201+00:00",
-        "exitCode": 99,
-        "endedAt": "2026-10-21T19:23:34.973477+00:00",
-        "summaryPresent": true,
-        "requests": 25648,
-        "unexpectedErrorRate": 3.898939488459139e-05,
-        "p95Ms": 2342.176999249999,
-        "holdRequests": 17530,
-        "overallP95Ms": 2030.1309111999992,
-        "observedPeakVUs": 250,
-        "failedThresholds": [
-          "checks",
-          "http_req_duration{name:book,phase:hold}"
-        ],
-        "bookings_created": 1217,
         "serverDiagnostics": {
-          "accessRows": 35879,
+          "accessRows": 30401,
           "statusCounts": {
-            "200": 35876,
-            "504": 2,
-            "503": 1
+            "200": 30401
           },
-          "internal5xx": 2,
-          "public5xx": 1,
-          "upstreamTimeoutMessages": 2,
+          "internal5xx": 0,
+          "public5xx": 0,
+          "upstreamTimeoutMessages": 0,
           "connectionLimitMessages": 0,
-          "errorPaths": [
-            {
-              "method": "GET",
-              "path": "/internal/v1/events/{eventId}/published",
-              "status": 504,
-              "count": 1
-            },
-            {
-              "method": "POST",
-              "path": "/api/v1/bookings",
-              "status": 503,
-              "count": 1
-            },
-            {
-              "method": "POST",
-              "path": "/internal/v1/events/details",
-              "status": 504,
-              "count": 1
-            }
-          ]
+          "errorPaths": []
         },
-        "serverGatePassed": false,
-        "suite": "mixed-250",
+        "failedThresholds": []
+      },
+      {
+        "vus": 250,
+        "mode": "mixed",
+        "passed": false,
+        "requests": 25648,
+        "p95Ms": 2342.176999249999,
         "checks": {
           "passes": 25647,
           "fails": 1,
@@ -1035,1319 +1860,213 @@
             "p95Ms": 104.99827079999996
           }
         },
-        "k6SummarySha256": "32b717192f20d5ebbd2386bd22eb86a9668dd0e1ca06dfbd0855df4840e71d5b",
-        "isTargetStage": true,
-        "clientThresholdsPassed": false,
-        "passed": false,
-        "elapsedIncludingRampAndDrainSeconds": 96.188276
-      }
-    }
-  ],
-  "unexecuted": [
-    "read-500vu",
-    "mixed-500vu",
-    "read-1000vu",
-    "mixed-1000vu"
-  ],
-  "inventoryBefore": {
-    "events": 101,
-    "bookings": 0,
-    "cancelled": 0,
-    "reserved": 0,
-    "activeTickets": 0,
-    "consistent": true
-  },
-  "inventoryAfterProductCleanup": [
-    {
-      "id": "00b5ef44-190b-4b17-afe5-a402dfb82af6",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 17,
-      "event_id": "eb05740a-fb5a-430a-bb9f-735c68e5b233",
-      "reserved": 0,
-      "cancelled": 17,
-      "confirmed": 0,
-      "all_tickets": 17
-    },
-    {
-      "id": "0255abe2-1a4c-4e39-94af-b7f637afff09",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 26,
-      "event_id": "46ea23a8-9d52-493b-819c-27f189a41d9c",
-      "reserved": 0,
-      "cancelled": 26,
-      "confirmed": 0,
-      "all_tickets": 26
-    },
-    {
-      "id": "04b3d970-c6d4-4d2c-ab1c-7eaf5fa429e0",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 16,
-      "event_id": "6978dfd8-44ca-49c4-82d6-79d7f39975b5",
-      "reserved": 0,
-      "cancelled": 16,
-      "confirmed": 0,
-      "all_tickets": 16
-    },
-    {
-      "id": "04bc466d-0614-4147-821e-5a65087b17f0",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "753b8e6a-1632-426e-a6d9-a2032bc84c78",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "074c47a9-ba85-4894-9d5a-f98ae11bd824",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 31,
-      "event_id": "09f7a7c6-8627-4a67-b265-4791c3184f0a",
-      "reserved": 0,
-      "cancelled": 31,
-      "confirmed": 0,
-      "all_tickets": 31
-    },
-    {
-      "id": "07fbc38f-9639-4ab2-85bd-c7bcace1fa5b",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 29,
-      "event_id": "9d081c3b-4146-4a56-afcd-4a80ac4197b9",
-      "reserved": 0,
-      "cancelled": 29,
-      "confirmed": 0,
-      "all_tickets": 29
-    },
-    {
-      "id": "0a79d4db-66ef-413c-a8d6-f07357da9ae3",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 13,
-      "event_id": "0b7c303f-8c8d-45aa-84d1-4b2b26c9bfe7",
-      "reserved": 0,
-      "cancelled": 13,
-      "confirmed": 0,
-      "all_tickets": 13
-    },
-    {
-      "id": "0ed5e843-c378-40f3-9bb5-dbee3ec1e687",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 34,
-      "event_id": "7889d40b-2869-4b21-81fb-74c364a708ef",
-      "reserved": 0,
-      "cancelled": 34,
-      "confirmed": 0,
-      "all_tickets": 34
-    },
-    {
-      "id": "0ffa5fc0-a032-4707-a6c6-6675613e5d4e",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "89fdedba-8a20-47f2-b3fe-701310ed5b37",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "101702aa-d602-4171-8537-f2d2db10f6a4",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 35,
-      "event_id": "a6cd4f30-758a-4a4b-a5e2-2a0b29e546bc",
-      "reserved": 0,
-      "cancelled": 35,
-      "confirmed": 0,
-      "all_tickets": 35
-    },
-    {
-      "id": "123e601b-60db-4904-abb1-14ce4ab3be3f",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 16,
-      "event_id": "4f691224-bd8a-4176-9665-0c71b4ba8b67",
-      "reserved": 0,
-      "cancelled": 16,
-      "confirmed": 0,
-      "all_tickets": 16
-    },
-    {
-      "id": "1564482c-449b-4bf2-a970-5cc09f323cd6",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 34,
-      "event_id": "937f1ad2-ee81-4af2-af0c-a2b4faa6f687",
-      "reserved": 0,
-      "cancelled": 34,
-      "confirmed": 0,
-      "all_tickets": 34
-    },
-    {
-      "id": "17f55f29-37a4-4ee1-affa-a830a8b9f54a",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "0efb1d0d-6e93-43c0-a041-2e876b69dc2f",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "18744479-ba82-4cb4-beab-94a23d6a3c81",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 30,
-      "event_id": "736e4e25-0e55-4e84-8fb3-7d6588a0a1c6",
-      "reserved": 0,
-      "cancelled": 30,
-      "confirmed": 0,
-      "all_tickets": 30
-    },
-    {
-      "id": "1b448a81-949b-412f-ba08-4bb75c75b7b3",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "3d942e37-f843-4bcb-8549-b39da8d2f0d9",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "1ddc3e3d-e7ba-4270-8ddb-cf2a79b41e4d",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 31,
-      "event_id": "6db0e3ac-ec4a-4507-b6cc-4aa12d59eb51",
-      "reserved": 0,
-      "cancelled": 31,
-      "confirmed": 0,
-      "all_tickets": 31
-    },
-    {
-      "id": "1f2fcb1c-78d8-45a8-84cd-21cc1cde035d",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 16,
-      "event_id": "8431efd8-3b2f-4983-8a43-f9b6bd7429e9",
-      "reserved": 0,
-      "cancelled": 16,
-      "confirmed": 0,
-      "all_tickets": 16
-    },
-    {
-      "id": "292e30e0-c857-4e20-9de5-f22d9d9159be",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "2ccdf578-3263-43ac-8254-7e10d3227e8d",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "2e1ea6e3-1b91-4702-b20f-1a363b42bc72",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 30,
-      "event_id": "4a779411-bd13-4766-b135-917ff80deaea",
-      "reserved": 0,
-      "cancelled": 30,
-      "confirmed": 0,
-      "all_tickets": 30
-    },
-    {
-      "id": "323362ef-8d61-4972-8585-25d5b11f6332",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "3e02bd29-bc35-45b3-8159-f9dc94bc96ca",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "35149434-9a1c-4a43-bb2a-738f1577176e",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 28,
-      "event_id": "1acc80c4-9633-4ed6-ae3c-aaff2bdd4741",
-      "reserved": 0,
-      "cancelled": 28,
-      "confirmed": 0,
-      "all_tickets": 28
-    },
-    {
-      "id": "3f21e5a1-3d49-4e56-a429-5cb947c8a0af",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 31,
-      "event_id": "3def8083-12d2-4276-802f-90360a7a09c4",
-      "reserved": 0,
-      "cancelled": 31,
-      "confirmed": 0,
-      "all_tickets": 31
-    },
-    {
-      "id": "469f5025-b018-4be0-8139-4b38b1f030c0",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 13,
-      "event_id": "e75157fc-d6f6-4628-8424-90cd67eb415f",
-      "reserved": 0,
-      "cancelled": 13,
-      "confirmed": 0,
-      "all_tickets": 13
-    },
-    {
-      "id": "48551af9-f871-4448-a35c-61723413eac4",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 30,
-      "event_id": "8ac3a9b6-5636-4223-94b4-c2f376b3aa94",
-      "reserved": 0,
-      "cancelled": 30,
-      "confirmed": 0,
-      "all_tickets": 30
-    },
-    {
-      "id": "48a736c8-8363-4de4-8969-ba33f52719e8",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 16,
-      "event_id": "57281e3e-f99b-49c6-a6e5-ba5a6fcd4472",
-      "reserved": 0,
-      "cancelled": 16,
-      "confirmed": 0,
-      "all_tickets": 16
-    },
-    {
-      "id": "4bb3138e-d1e7-487c-8630-8dfa41b6b8d0",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 29,
-      "event_id": "10fda2db-7587-4cfb-82b6-b24b6c454f26",
-      "reserved": 0,
-      "cancelled": 29,
-      "confirmed": 0,
-      "all_tickets": 29
-    },
-    {
-      "id": "4d7cf6d4-f213-4fd5-aafc-57a0f1615715",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 35,
-      "event_id": "3e40ed53-1175-481d-b9ae-c43f438f5c0d",
-      "reserved": 0,
-      "cancelled": 35,
-      "confirmed": 0,
-      "all_tickets": 35
-    },
-    {
-      "id": "50b8127a-6691-440a-9b7d-8a3b6c35f4dd",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 17,
-      "event_id": "decf7540-b802-4360-b3f0-d2e2ac1999f2",
-      "reserved": 0,
-      "cancelled": 17,
-      "confirmed": 0,
-      "all_tickets": 17
-    },
-    {
-      "id": "536d1573-41df-47dd-bf43-f0eb04103a05",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 13,
-      "event_id": "eb944955-556f-468d-a98a-db4cdfa944ff",
-      "reserved": 0,
-      "cancelled": 13,
-      "confirmed": 0,
-      "all_tickets": 13
-    },
-    {
-      "id": "557e2774-6f4e-4896-b3ac-7877a39e46af",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 33,
-      "event_id": "cdcaaaef-0967-4f34-a922-a608b225a805",
-      "reserved": 0,
-      "cancelled": 33,
-      "confirmed": 0,
-      "all_tickets": 33
-    },
-    {
-      "id": "58db6227-f2c7-41b5-8498-94edd2bfe6c4",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 34,
-      "event_id": "64f98fba-6a51-484f-bb38-f24964a5fa75",
-      "reserved": 0,
-      "cancelled": 34,
-      "confirmed": 0,
-      "all_tickets": 34
-    },
-    {
-      "id": "59dc319c-0141-4b3c-93d6-0eebd1e2888c",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 17,
-      "event_id": "2583b339-cb59-476a-87db-b23fc712c8be",
-      "reserved": 0,
-      "cancelled": 17,
-      "confirmed": 0,
-      "all_tickets": 17
-    },
-    {
-      "id": "5e112397-5e02-4dab-919b-88d463dbb42e",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "299c6731-65c6-4ebe-80ed-5b21663c1cf0",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "5e4a9f3e-2069-4cd6-b251-58a8b36d376e",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "25e424b3-c0f0-45fd-9cf7-e0f34cc68d2a",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "5f94af03-bf4a-49e0-b55f-5aecc6c7060f",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 13,
-      "event_id": "4de90369-d824-466e-adb7-c97b0a7cd3a7",
-      "reserved": 0,
-      "cancelled": 13,
-      "confirmed": 0,
-      "all_tickets": 13
-    },
-    {
-      "id": "60ca1b1c-fab9-4a90-a2e4-b3ab1e996820",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 30,
-      "event_id": "42a758ec-d7f4-4e21-98a5-2e51d512154b",
-      "reserved": 0,
-      "cancelled": 30,
-      "confirmed": 0,
-      "all_tickets": 30
-    },
-    {
-      "id": "649abdf1-6fb2-48d3-a51b-b671693520b9",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 25,
-      "event_id": "28361812-2906-435b-97af-e99d6168eed9",
-      "reserved": 0,
-      "cancelled": 25,
-      "confirmed": 0,
-      "all_tickets": 25
-    },
-    {
-      "id": "657a8755-8051-44a5-ac8d-91028506fa33",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 13,
-      "event_id": "1aa51d24-eb1c-48e3-9b28-6a81a937e3db",
-      "reserved": 0,
-      "cancelled": 13,
-      "confirmed": 0,
-      "all_tickets": 13
-    },
-    {
-      "id": "6886e376-4e09-4bd3-a6ad-cb970a030104",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 13,
-      "event_id": "d71690be-0acb-4331-ac7b-2246608b80ef",
-      "reserved": 0,
-      "cancelled": 13,
-      "confirmed": 0,
-      "all_tickets": 13
-    },
-    {
-      "id": "6931fa1b-3cb5-4561-b826-6bd55a217a87",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 15,
-      "event_id": "f889e8eb-5517-4da4-b83e-10f41ac9a555",
-      "reserved": 0,
-      "cancelled": 15,
-      "confirmed": 0,
-      "all_tickets": 15
-    },
-    {
-      "id": "6997a061-782f-4841-a5a6-0758d03f6ff4",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 28,
-      "event_id": "affc3c57-0e62-4f5b-bd3b-053533e2bdd0",
-      "reserved": 0,
-      "cancelled": 28,
-      "confirmed": 0,
-      "all_tickets": 28
-    },
-    {
-      "id": "6c9eaafb-3114-4d3d-a886-03a35ffe98bd",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 13,
-      "event_id": "8eb9b356-f306-4d7e-9126-0a1918583411",
-      "reserved": 0,
-      "cancelled": 13,
-      "confirmed": 0,
-      "all_tickets": 13
-    },
-    {
-      "id": "73305d94-45f8-4c2c-bfd9-0eded47d0d2d",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 35,
-      "event_id": "fbb23521-fb9a-42d9-abb3-1119b3b1ee3e",
-      "reserved": 0,
-      "cancelled": 35,
-      "confirmed": 0,
-      "all_tickets": 35
-    },
-    {
-      "id": "7475556d-ad83-488e-a55e-f0cd6d9fb972",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 28,
-      "event_id": "0bdb6d4b-02b2-4788-a592-f75905c9f519",
-      "reserved": 0,
-      "cancelled": 28,
-      "confirmed": 0,
-      "all_tickets": 28
-    },
-    {
-      "id": "75ce6a2e-2de1-4b16-a78a-efee1ef571d2",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 32,
-      "event_id": "8b160240-23ec-46b2-99de-6ac2d9d7c761",
-      "reserved": 0,
-      "cancelled": 32,
-      "confirmed": 0,
-      "all_tickets": 32
-    },
-    {
-      "id": "7632cbd6-9bb6-435b-a96f-d6564b58df3b",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 15,
-      "event_id": "6b90d3b1-8382-4d1f-a9b0-96a5da03e3d0",
-      "reserved": 0,
-      "cancelled": 15,
-      "confirmed": 0,
-      "all_tickets": 15
-    },
-    {
-      "id": "786ae85b-0754-486a-b1e1-318e2723750e",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 13,
-      "event_id": "29dfa03d-fb36-4793-a9f0-8f4c200e9573",
-      "reserved": 0,
-      "cancelled": 13,
-      "confirmed": 0,
-      "all_tickets": 13
-    },
-    {
-      "id": "78c7dc62-e164-4dc0-bc3b-98abcc8ecf09",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 13,
-      "event_id": "1f384167-8c61-4434-aef7-4f56a6515f32",
-      "reserved": 0,
-      "cancelled": 13,
-      "confirmed": 0,
-      "all_tickets": 13
-    },
-    {
-      "id": "7ad6e40e-35f4-484d-9383-cc81c4202c9c",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 15,
-      "event_id": "f28331c8-3d20-4255-8a0f-18bfe1b232e4",
-      "reserved": 0,
-      "cancelled": 15,
-      "confirmed": 0,
-      "all_tickets": 15
-    },
-    {
-      "id": "7c602933-539b-4ef1-a484-cb51a9276221",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "a58e62c7-e8b7-4b8f-8608-2ddee1f14f0c",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "7cad5611-bc9e-4eba-932c-9fb2769c6b90",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 32,
-      "event_id": "7909207b-930e-4f8e-9612-77fd9c9ad914",
-      "reserved": 0,
-      "cancelled": 32,
-      "confirmed": 0,
-      "all_tickets": 32
-    },
-    {
-      "id": "7d93c61d-d709-4d3c-884c-6fd4f168bdf8",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 16,
-      "event_id": "06def99b-d2d2-4bf7-89ed-7b6afe46f0ea",
-      "reserved": 0,
-      "cancelled": 16,
-      "confirmed": 0,
-      "all_tickets": 16
-    },
-    {
-      "id": "802b033b-7d09-438a-84fe-563961d6787a",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 31,
-      "event_id": "7b375dbf-9e3c-4dd2-b7f7-97f85e1cc791",
-      "reserved": 0,
-      "cancelled": 31,
-      "confirmed": 0,
-      "all_tickets": 31
-    },
-    {
-      "id": "81923098-7d52-4dbd-8214-ad7303fada24",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 28,
-      "event_id": "8c0166b3-5e70-4d63-a27b-fced151423e3",
-      "reserved": 0,
-      "cancelled": 28,
-      "confirmed": 0,
-      "all_tickets": 28
-    },
-    {
-      "id": "850e8c7d-54ff-4281-af60-365051f37982",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 27,
-      "event_id": "d9c5f27f-a6bc-4253-be51-64a84c84baa7",
-      "reserved": 0,
-      "cancelled": 27,
-      "confirmed": 0,
-      "all_tickets": 27
-    },
-    {
-      "id": "883566bc-e3db-446f-ac7e-4d125a69b45e",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "ff99c4a4-5cfa-462f-9ea2-0a04ec2db2d0",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "88cb777d-a414-426c-942d-5e07ba268167",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "58c63c49-3d8a-490e-98a7-4ca98dd8ef6f",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "8af104e1-9b4d-4920-a1cc-7b98fbd8b611",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 16,
-      "event_id": "13eeccba-d2bf-4cd4-a802-514916ccac4c",
-      "reserved": 0,
-      "cancelled": 16,
-      "confirmed": 0,
-      "all_tickets": 16
-    },
-    {
-      "id": "8b063379-1795-4a05-9432-e92d5b8841c6",
-      "quota": 100,
-      "tickets": 0,
-      "bookings": 0,
-      "event_id": "9ba0a057-cf7f-4bb9-be2a-7be56e6a5e38",
-      "reserved": 0,
-      "cancelled": 0,
-      "confirmed": 0,
-      "all_tickets": 0
-    },
-    {
-      "id": "8e1e8974-c9f8-4d28-ac08-cb72143af6db",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 33,
-      "event_id": "f3652186-1dad-4ffc-a8b3-3837ad928f69",
-      "reserved": 0,
-      "cancelled": 33,
-      "confirmed": 0,
-      "all_tickets": 33
-    },
-    {
-      "id": "94483e4c-3b67-49af-88e6-470c23cce56b",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 37,
-      "event_id": "10e44095-0638-408c-92bc-2d16e6b86ba1",
-      "reserved": 0,
-      "cancelled": 37,
-      "confirmed": 0,
-      "all_tickets": 37
-    },
-    {
-      "id": "964c4b95-c67a-4f2e-86e4-522ee49db6ea",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 13,
-      "event_id": "c9500f75-5e6e-4afc-9732-b01b7a9602e2",
-      "reserved": 0,
-      "cancelled": 13,
-      "confirmed": 0,
-      "all_tickets": 13
-    },
-    {
-      "id": "9b5307b7-e52a-45db-8f92-fcc8aa529829",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 33,
-      "event_id": "ffc58114-0505-47e1-8329-2faa76592c39",
-      "reserved": 0,
-      "cancelled": 33,
-      "confirmed": 0,
-      "all_tickets": 33
-    },
-    {
-      "id": "9e6eff17-e200-4b89-a793-a29327000262",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 32,
-      "event_id": "2f27b8e3-191b-4c1a-8013-d1d08b2503ae",
-      "reserved": 0,
-      "cancelled": 32,
-      "confirmed": 0,
-      "all_tickets": 32
-    },
-    {
-      "id": "a144ca79-e1c8-4fbd-a398-d1afc7475e29",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 17,
-      "event_id": "2f8ca0a0-f299-43be-941b-e2d6cb7813d0",
-      "reserved": 0,
-      "cancelled": 17,
-      "confirmed": 0,
-      "all_tickets": 17
-    },
-    {
-      "id": "a2f751e2-4ef8-41e4-be63-32aa395a081a",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 28,
-      "event_id": "626a2091-7fde-4b25-98b5-533e09d937d5",
-      "reserved": 0,
-      "cancelled": 28,
-      "confirmed": 0,
-      "all_tickets": 28
-    },
-    {
-      "id": "a76382cb-5117-4b89-8ee9-54773699f2b3",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 13,
-      "event_id": "5d18c5ec-5290-47fb-90d3-ce254051181a",
-      "reserved": 0,
-      "cancelled": 13,
-      "confirmed": 0,
-      "all_tickets": 13
-    },
-    {
-      "id": "a81511e7-d55f-470d-99ff-667949a9990e",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 31,
-      "event_id": "30fb79b2-b850-4e3d-968f-88073b9e9010",
-      "reserved": 0,
-      "cancelled": 31,
-      "confirmed": 0,
-      "all_tickets": 31
-    },
-    {
-      "id": "a8c47f62-1d62-424a-866d-5a855f82bd2b",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 33,
-      "event_id": "e1fdbad8-209c-46b8-94ea-2412c0a70170",
-      "reserved": 0,
-      "cancelled": 33,
-      "confirmed": 0,
-      "all_tickets": 33
-    },
-    {
-      "id": "aab8dcfc-63e4-410b-aa4c-2c01dd3bb0b5",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 15,
-      "event_id": "20479ff2-bf78-4ab5-b611-2407091375b6",
-      "reserved": 0,
-      "cancelled": 15,
-      "confirmed": 0,
-      "all_tickets": 15
-    },
-    {
-      "id": "ad7033eb-89a3-4d0e-bf5c-06283e8529b0",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 30,
-      "event_id": "b88afb5b-fbee-4abc-a0b3-7352dc8f73bb",
-      "reserved": 0,
-      "cancelled": 30,
-      "confirmed": 0,
-      "all_tickets": 30
-    },
-    {
-      "id": "b318c081-d3f0-4b83-9d36-f68650649057",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 31,
-      "event_id": "932e0f07-ab93-4a25-ab24-d218ca8322a3",
-      "reserved": 0,
-      "cancelled": 31,
-      "confirmed": 0,
-      "all_tickets": 31
-    },
-    {
-      "id": "b6672358-de74-4f04-a0d9-86ba50047ae9",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 34,
-      "event_id": "0bfc15fd-a2ed-4099-9c3c-c31dd6b204e6",
-      "reserved": 0,
-      "cancelled": 34,
-      "confirmed": 0,
-      "all_tickets": 34
-    },
-    {
-      "id": "bc00b5e7-e705-4899-825e-01e6aef4ae71",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "e2e0e15d-cd33-46c6-a8f3-4a11f8636dab",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "bda35604-9a41-4e9e-9f81-4d4463ebf6c9",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "7574a2bc-11f7-4167-9175-b6746b4a411b",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "c00bd5be-5dc1-442c-b913-c3192894b5a6",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 28,
-      "event_id": "3d45c609-3ee3-4617-a9b5-358ed79829cd",
-      "reserved": 0,
-      "cancelled": 28,
-      "confirmed": 0,
-      "all_tickets": 28
-    },
-    {
-      "id": "c6ebde13-38ec-41de-86ef-e3e19a7e26bb",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 30,
-      "event_id": "d57b69d8-c608-4fea-a8cc-7d698341f282",
-      "reserved": 0,
-      "cancelled": 30,
-      "confirmed": 0,
-      "all_tickets": 30
-    },
-    {
-      "id": "c924ae5b-1572-4903-a701-bc58334e6678",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 15,
-      "event_id": "3ad8ed11-0903-44a7-b7af-2662450ac01b",
-      "reserved": 0,
-      "cancelled": 15,
-      "confirmed": 0,
-      "all_tickets": 15
-    },
-    {
-      "id": "caab2479-7b61-4f35-8704-1a72275f3cd1",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 27,
-      "event_id": "cf771e54-1537-4284-870e-e5ab4b749cab",
-      "reserved": 0,
-      "cancelled": 27,
-      "confirmed": 0,
-      "all_tickets": 27
-    },
-    {
-      "id": "d2682f96-91d1-42ca-a053-2adcde902af4",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 14,
-      "event_id": "63421b7c-e724-4801-8e13-d1bda36ec682",
-      "reserved": 0,
-      "cancelled": 14,
-      "confirmed": 0,
-      "all_tickets": 14
-    },
-    {
-      "id": "d3802bfb-38bd-4e3c-888a-436741270f86",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 28,
-      "event_id": "ecb422d8-9fd1-40ee-9eff-34109520a8ab",
-      "reserved": 0,
-      "cancelled": 28,
-      "confirmed": 0,
-      "all_tickets": 28
-    },
-    {
-      "id": "d605672f-9601-47e2-b700-0a4e11319caf",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 34,
-      "event_id": "3006dffc-2707-4ce9-bd1d-a96d739cbea8",
-      "reserved": 0,
-      "cancelled": 34,
-      "confirmed": 0,
-      "all_tickets": 34
-    },
-    {
-      "id": "d6ee6b91-063e-4beb-8f1a-c87318ba5303",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 16,
-      "event_id": "7e70bacd-51b1-4935-8528-57441c6e77af",
-      "reserved": 0,
-      "cancelled": 16,
-      "confirmed": 0,
-      "all_tickets": 16
-    },
-    {
-      "id": "d774b960-9195-4cbd-84e2-dc4ccb54b222",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 26,
-      "event_id": "ada0dccc-5fa8-4d53-8155-2ffc06e52ba5",
-      "reserved": 0,
-      "cancelled": 26,
-      "confirmed": 0,
-      "all_tickets": 26
-    },
-    {
-      "id": "d7a57f6d-5f99-4420-849d-edbcd79eabea",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 32,
-      "event_id": "fca225bb-bb29-40ab-a58c-c4202256848c",
-      "reserved": 0,
-      "cancelled": 32,
-      "confirmed": 0,
-      "all_tickets": 32
-    },
-    {
-      "id": "da6aebbe-4ea3-46ef-a822-d3fc1beecfde",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 36,
-      "event_id": "0e3e770c-cf75-410c-866f-fcc804c8189f",
-      "reserved": 0,
-      "cancelled": 36,
-      "confirmed": 0,
-      "all_tickets": 36
-    },
-    {
-      "id": "e3ffd1c9-6c86-404e-b7c7-da03e1b85583",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 29,
-      "event_id": "489f49ac-0073-482c-9d72-ab6469cdf546",
-      "reserved": 0,
-      "cancelled": 29,
-      "confirmed": 0,
-      "all_tickets": 29
-    },
-    {
-      "id": "e75d058e-4b74-44f7-bdeb-a88ee225e1a5",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 17,
-      "event_id": "9185d9f4-0247-4c74-a7e5-292ec3d2ced6",
-      "reserved": 0,
-      "cancelled": 17,
-      "confirmed": 0,
-      "all_tickets": 17
-    },
-    {
-      "id": "e972e197-d88e-43b4-a732-4dd635fdc5d5",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 15,
-      "event_id": "5cbd88ca-942e-4af4-a83e-715d46d9c1a3",
-      "reserved": 0,
-      "cancelled": 15,
-      "confirmed": 0,
-      "all_tickets": 15
-    },
-    {
-      "id": "eae0e929-5640-4938-b71e-aaf5c938b77d",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 16,
-      "event_id": "164760c3-a996-40fd-aa9f-e651f2eefc2a",
-      "reserved": 0,
-      "cancelled": 16,
-      "confirmed": 0,
-      "all_tickets": 16
-    },
-    {
-      "id": "ebe22925-d4e8-4032-bd01-723b08251899",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 13,
-      "event_id": "8352c1dd-82ea-4ac7-9ff5-61a91d242f51",
-      "reserved": 0,
-      "cancelled": 13,
-      "confirmed": 0,
-      "all_tickets": 13
-    },
-    {
-      "id": "ed04b68a-567f-4d96-afe2-9a74c4ef2d60",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 36,
-      "event_id": "33daef60-4e4c-46c2-a0e7-023a653470a2",
-      "reserved": 0,
-      "cancelled": 36,
-      "confirmed": 0,
-      "all_tickets": 36
-    },
-    {
-      "id": "ed0edd49-9638-4760-ae76-9ad1786231e1",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 13,
-      "event_id": "2ecdc712-16a9-4ddc-bb2e-926f40fce395",
-      "reserved": 0,
-      "cancelled": 13,
-      "confirmed": 0,
-      "all_tickets": 13
-    },
-    {
-      "id": "ee7b0eaa-b047-4d7c-979c-5d89865b6203",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 28,
-      "event_id": "5db4bc9f-4b0e-46ad-8359-0f81d7bb2690",
-      "reserved": 0,
-      "cancelled": 28,
-      "confirmed": 0,
-      "all_tickets": 28
-    },
-    {
-      "id": "eefaf5ad-ae47-4eeb-bf12-bbefc311ef57",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 35,
-      "event_id": "0447b10e-52eb-46ff-9f88-07b0b47d208d",
-      "reserved": 0,
-      "cancelled": 35,
-      "confirmed": 0,
-      "all_tickets": 35
-    },
-    {
-      "id": "f1d06fc6-e677-48e9-bd78-88603ee8543c",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 17,
-      "event_id": "e648ed82-2082-4735-8b56-df005595552b",
-      "reserved": 0,
-      "cancelled": 17,
-      "confirmed": 0,
-      "all_tickets": 17
-    },
-    {
-      "id": "f680c131-7a6e-4951-8fa8-627301c1cab3",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 15,
-      "event_id": "29efdba2-e011-490b-a16f-94296e3bec49",
-      "reserved": 0,
-      "cancelled": 15,
-      "confirmed": 0,
-      "all_tickets": 15
-    },
-    {
-      "id": "f891e842-5579-406a-b26b-49b6063c46bb",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 32,
-      "event_id": "0d77af2d-4c1e-48d7-a609-8131fcb72e85",
-      "reserved": 0,
-      "cancelled": 32,
-      "confirmed": 0,
-      "all_tickets": 32
-    },
-    {
-      "id": "f98c0797-40cd-42d0-9202-ad72be96894b",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 16,
-      "event_id": "b4e1947c-b662-4e12-9dbe-0eeba8adb096",
-      "reserved": 0,
-      "cancelled": 16,
-      "confirmed": 0,
-      "all_tickets": 16
-    },
-    {
-      "id": "f9fdb59e-c0c4-4d99-bd91-6c6336fc058c",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 33,
-      "event_id": "603f7d2e-3e36-4209-91ba-88e81e8a0bad",
-      "reserved": 0,
-      "cancelled": 33,
-      "confirmed": 0,
-      "all_tickets": 33
-    },
-    {
-      "id": "fdfc11cf-d1a9-45b9-9fd2-ae967c585f6d",
-      "quota": 100000,
-      "tickets": 0,
-      "bookings": 16,
-      "event_id": "5b975624-3826-47c5-96c9-2d56023c5d95",
-      "reserved": 0,
-      "cancelled": 16,
-      "confirmed": 0,
-      "all_tickets": 16
-    }
-  ],
-  "serverBackup": {
-    "bytes": 940449,
-    "sha256": "616cadd04bb603af1db9943bcda6cd43b20947cfe755257845620cc58af0b437",
-    "archiveListVerified": true,
-    "downloaded": false
-  },
-  "healthAfter": {
-    "at": "2026-10-21T19:25:40.623256+00:00",
-    "availableMemoryMiB": 1405.13,
-    "load1": 5.04,
-    "containers": [
-      {
-        "Name": "swe5001-caddy-1",
-        "CPUPerc": "0.00%",
-        "MemUsage": "23.8MiB / 256MiB",
-        "MemPerc": "9.30%",
-        "PIDs": "11"
-      },
-      {
-        "Name": "swe5001-gateway-1",
-        "CPUPerc": "0.00%",
-        "MemUsage": "6.586MiB / 96MiB",
-        "MemPerc": "6.86%",
-        "PIDs": "3"
-      },
-      {
-        "Name": "swe5001-identity-1",
-        "CPUPerc": "0.12%",
-        "MemUsage": "366.3MiB / 768MiB",
-        "MemPerc": "47.69%",
-        "PIDs": "46"
-      },
-      {
-        "Name": "swe5001-admission-1",
-        "CPUPerc": "0.15%",
-        "MemUsage": "373.5MiB / 768MiB",
-        "MemPerc": "48.63%",
-        "PIDs": "84"
-      },
-      {
-        "Name": "swe5001-event-catalog-1",
-        "CPUPerc": "0.11%",
-        "MemUsage": "403.5MiB / 768MiB",
-        "MemPerc": "52.54%",
-        "PIDs": "75"
-      },
-      {
-        "Name": "swe5001-postgres-1",
-        "CPUPerc": "0.02%",
-        "MemUsage": "111.9MiB / 512MiB",
-        "MemPerc": "21.85%",
-        "PIDs": "36"
-      },
-      {
-        "Name": "swe5001-web-1",
-        "CPUPerc": "0.00%",
-        "MemUsage": "3.57MiB / 96MiB",
-        "MemPerc": "3.72%",
-        "PIDs": "3"
-      },
-      {
-        "Name": "swe5006-frontend-1",
-        "CPUPerc": "0.00%",
-        "MemUsage": "5.918MiB / 96MiB",
-        "MemPerc": "6.16%",
-        "PIDs": "3"
-      },
-      {
-        "Name": "swe5006-backend-1",
-        "CPUPerc": "0.10%",
-        "MemUsage": "355.5MiB / 768MiB",
-        "MemPerc": "46.29%",
-        "PIDs": "32"
-      },
-      {
-        "Name": "swe5006-postgres-1",
-        "CPUPerc": "0.00%",
-        "MemUsage": "37.38MiB / 512MiB",
-        "MemPerc": "7.30%",
-        "PIDs": "16"
+        "serverDiagnostics": {
+          "accessRows": 35879,
+          "statusCounts": {
+            "200": 35876,
+            "504": 2,
+            "503": 1
+          },
+          "internal5xx": 2,
+          "public5xx": 1,
+          "upstreamTimeoutMessages": 2,
+          "connectionLimitMessages": 0,
+          "errorPaths": [
+            {
+              "method": "GET",
+              "path": "/internal/v1/events/{eventId}/published",
+              "status": 504,
+              "count": 1
+            },
+            {
+              "method": "POST",
+              "path": "/api/v1/bookings",
+              "status": 503,
+              "count": 1
+            },
+            {
+              "method": "POST",
+              "path": "/internal/v1/events/details",
+              "status": 504,
+              "count": 1
+            }
+          ]
+        },
+        "failedThresholds": [
+          "checks",
+          "http_req_duration{name:book,phase:hold}"
+        ]
       }
     ],
-    "states": [
-      "/swe5001-caddy-1|true|false|0",
-      "/swe5001-gateway-1|true|false|0",
-      "/swe5001-identity-1|true|false|0",
-      "/swe5001-admission-1|true|false|0",
-      "/swe5001-event-catalog-1|true|false|0",
-      "/swe5001-postgres-1|true|false|0",
-      "/swe5001-web-1|true|false|0",
-      "/swe5006-frontend-1|true|false|0",
-      "/swe5006-backend-1|true|false|0",
-      "/swe5006-postgres-1|true|false|0"
+    "runtimeMetadataUnchangedBetweenRuns": true,
+    "k6BusinessScriptSha256": "a7535f600586b910db8a3e8fe9af1bb63ecf51031e202326114870ee6f3ce8c7"
+  },
+  "sameBusinessScriptAsBaseline": true,
+  "comparisonLimitations": [
+    "One sequential run per dataset,not interleaved repeats.",
+    "Previous directory had100 ordinary events plus1 unused contention event; final directory has exactly50 ordinary events.",
+    "Reducing event count changes pagination and per-event concurrency as well as data volume; it does not isolate a single causal factor."
+  ],
+  "measurementSetupAttempt": {
+    "status": "INVALID_PREFLIGHT_THEN_OPERATOR_STOP",
+    "reason": "read1VU had zero hold samples despite20 successful requests; mixed prewarm stopped before250 target; no capacity target executed.",
+    "readPreflight": {
+      "name": "read-1vu",
+      "mode": "read",
+      "targetVUs": 1,
+      "plannedHold": "5s",
+      "startedAt": "2026-10-21T19:47:01.231332+00:00",
+      "exitCode": 99,
+      "endedAt": "2026-10-21T19:47:47.095130+00:00",
+      "summaryPresent": true,
+      "requests": 20,
+      "unexpectedErrorRate": 0,
+      "p95Ms": null,
+      "holdRequests": 0,
+      "overallP95Ms": 21.747587499999998,
+      "observedPeakVUs": 1,
+      "failedThresholds": [
+        "http_reqs{name:me,phase:hold}",
+        "http_reqs{name:orders,phase:hold}",
+        "http_reqs{name:events,phase:hold}",
+        "http_reqs{name:event-detail,phase:hold}"
+      ],
+      "serverDiagnostics": {
+        "accessRows": 29,
+        "statusCounts": {
+          "200": 29
+        },
+        "internal5xx": 0,
+        "public5xx": 0,
+        "upstreamTimeoutMessages": 0,
+        "connectionLimitMessages": 0,
+        "errorPaths": []
+      },
+      "serverGatePassed": true
+    },
+    "mixedCompletedPrewarm": [
+      {
+        "name": "mixed-1vu",
+        "mode": "mixed",
+        "targetVUs": 1,
+        "plannedHold": "5s",
+        "startedAt": "2026-10-21T19:47:58.771860+00:00",
+        "exitCode": 0,
+        "endedAt": "2026-10-21T19:49:31.178719+00:00",
+        "summaryPresent": true,
+        "requests": 23,
+        "unexpectedErrorRate": 0,
+        "p95Ms": 21.953841099999998,
+        "holdRequests": 23,
+        "overallP95Ms": 21.953841099999998,
+        "observedPeakVUs": 1,
+        "failedThresholds": [],
+        "bookings_created": 1,
+        "serverDiagnostics": {
+          "accessRows": 49,
+          "statusCounts": {
+            "200": 49
+          },
+          "internal5xx": 0,
+          "public5xx": 0,
+          "upstreamTimeoutMessages": 0,
+          "connectionLimitMessages": 0,
+          "errorPaths": []
+        },
+        "serverGatePassed": true
+      },
+      {
+        "name": "mixed-50vu",
+        "mode": "mixed",
+        "targetVUs": 50,
+        "plannedHold": "30s",
+        "startedAt": "2026-10-21T19:49:41.978703+00:00",
+        "exitCode": 0,
+        "endedAt": "2026-10-21T19:50:46.333810+00:00",
+        "summaryPresent": true,
+        "requests": 8697,
+        "unexpectedErrorRate": 0,
+        "p95Ms": 171.16865019999997,
+        "holdRequests": 5529,
+        "overallP95Ms": 155.07513359999996,
+        "observedPeakVUs": 50,
+        "failedThresholds": [],
+        "bookings_created": 395,
+        "serverDiagnostics": {
+          "accessRows": 12119,
+          "statusCounts": {
+            "200": 12119
+          },
+          "internal5xx": 0,
+          "public5xx": 0,
+          "upstreamTimeoutMessages": 0,
+          "connectionLimitMessages": 0,
+          "errorPaths": []
+        },
+        "serverGatePassed": true
+      }
     ],
-    "identityChanged": false,
-    "database": "{\"connections\" : 32, \"active\" : 2, \"lockWaiters\" : 0, \"longestActiveSeconds\" : 0.002070}",
-    "health": {
-      "swe5006-api": {
-        "ok": true,
-        "seconds": 0.225
+    "interruptedMixed100Metrics": {
+      "http_reqs": {
+        "count": 5912,
+        "rate": 70.60070994165596
       },
-      "swe5006-web": {
-        "ok": true,
-        "seconds": 0.211
+      "checks": {
+        "passes": 5912,
+        "fails": 0,
+        "thresholds": {
+          "rate==1": false
+        },
+        "value": 1
       },
-      "swe5001-web": {
-        "ok": true,
-        "seconds": 0.193
+      "unexpected_failure": {
+        "passes": 0,
+        "fails": 5912,
+        "thresholds": {
+          "rate<0.01": false
+        },
+        "value": 0
       },
-      "swe5001-identity": {
-        "ok": true,
-        "seconds": 0.217
-      },
-      "swe5001-event-catalog": {
-        "ok": true,
-        "seconds": 0.225
-      },
-      "swe5001-admission": {
-        "ok": true,
-        "seconds": 0.196
+      "http_req_duration": {
+        "avg": 83.3238620191139,
+        "min": 7.170084,
+        "med": 38.497375,
+        "max": 51894.12182,
+        "p(90)": 177.9439045,
+        "p(95)": 229.50533969999995,
+        "thresholds": {
+          "p(95)<3000": false
+        }
       }
     },
-    "stopReasons": []
-  },
-  "runtimeAfter": {
-    "applicationCommit": "f69d49d92f72d0ca3882598215ed4b4c9e59b52e",
-    "catalogPool": 10,
-    "remainingLoadMonitors": 0,
-    "publicDiagnosticsStatus": 404,
-    "deploymentMetadata": [
-      "/swe5001-caddy-1 sha256:9791546afda3a014cb3dffb65422fc9ab38a76d83456a1e0a1aaa3edce9d4024 2026-10-21T18:49:25.14848549Z restart=0 oom=false memory=268435456",
-      "/swe5001-gateway-1 sha256:654173989f2a5114c97b72a2d80bcf5664bdca2b81837aed5267758c72280a4f 2026-10-21T18:49:26.675790245Z restart=0 oom=false memory=100663296",
-      "/swe5001-identity-1 sha256:05410e67f5247fee164dd4828d5d71281a8b61332932f018650c7374ee6d1a39 2026-10-21T18:49:24.468634747Z restart=0 oom=false memory=805306368",
-      "/swe5001-event-catalog-1 sha256:53a31e278fa95c741acf01e23536714daec699f91585290205c2a09a6deb7d35 2026-10-21T18:49:24.466410769Z restart=0 oom=false memory=805306368",
-      "/swe5001-admission-1 sha256:74fef66b783302eb88d75f4132a138ab3e1d241ee800391e7bec2516931446f0 2026-10-21T18:49:24.471877871Z restart=0 oom=false memory=805306368",
-      "/swe5001-postgres-1 sha256:d164cf4067f39ba9cdbce50b2feef82aa16434051f4ddf2d23a8e90b10b7b7b3 2026-10-21T18:49:21.690743133Z restart=0 oom=false memory=536870912",
-      "/swe5001-web-1 sha256:a97506f6395911f22d7142512c7df22deb029a548978696dd122ff1ed0d6aff8 2026-10-21T18:49:21.688787874Z restart=0 oom=false memory=100663296",
-      "/swe5006-frontend-1 sha256:9c2018040bad10561d4e3a0df081498219ff59d72fe6a944fca45848efa2bf21 2026-10-21T14:09:33.275950143Z restart=0 oom=false memory=100663296",
-      "/swe5006-backend-1 sha256:1015a7b9f85f0dfa214ce812079711d532b6e966baf4d84d21ede8d75a3142dc 2026-10-21T14:09:01.015186911Z restart=0 oom=false memory=805306368",
-      "/swe5006-postgres-1 sha256:b462b52fb7f34c0451a8bf2da5f7c8722740d3fa4cb41370c1f04958e685ea88 2026-10-21T14:08:55.316674479Z restart=0 oom=false memory=536870912"
-    ]
-  },
-  "cleanup": {
-    "deleted": {
-      "catalog.events": 101,
-      "identity.users": 1000,
-      "admission.sales": 101,
-      "admission.tickets": 2284,
-      "admission.bookings": 2284,
-      "identity.user_roles": 1000,
-      "admission.ticket_types": 101,
-      "identity.organizations": 1,
-      "admission.notifications": 4568,
-      "catalog.event_revisions": 0,
-      "identity.booking_profiles": 0,
-      "admission.pre_registrations": 0,
-      "catalog.event_cancellations": 101,
-      "catalog.organization_closures": 1,
-      "identity.organization_closures": 1,
-      "identity.organization_requests": 0,
-      "admission.event_revision_receipts": 0,
-      "admission.event_staff_assignments": 0,
-      "catalog.event_notification_outbox": 0,
-      "identity.membership_notifications": 4,
-      "identity.organization_invitations": 0,
-      "identity.organization_memberships": 1,
-      "admission.event_cancellation_receipts": 101
+    "orderHistoryReset": {
+      "deleted": {
+        "admission.tickets": 688,
+        "admission.bookings": 688,
+        "admission.notifications": 1371
+      },
+      "ordersReset": 688,
+      "ticketsReset": 688,
+      "usersRetained": 1000,
+      "eventsRetained": 50,
+      "remainingBookings": 0,
+      "originalDataUnchanged": true,
+      "serverBackupVerified": true,
+      "freshOriginal24TablesUnchanged": true,
+      "completedAt": "2026-10-21T19:55:42.593849+00:00"
     },
-    "untouched_data_unchanged": true,
-    "remaining_fixture_records": 0,
-    "freshOriginal24TablesUnchanged": true
+    "generatorCorrection": "caffeinate -i prevents local idle sleep; local no-HTTP probe observed five iterations at wall/run elapsed30–34s; original business script and scoring unchanged.",
+    "rootCauseConfirmed": false,
+    "archivedAt": "2026-10-21T19:57:00.768186+00:00"
   },
+  "generatorIdleSleepPrevented": true,
   "recordCleanup": {
     "supersededPrivatePerformanceEntriesRemoved": [
-      "cloud-20261022-jdbc-release"
+      "cloud-20261022-internal-reads"
     ],
     "publicCapacityReportReplaced": "docs/evidence/2026-10-22-cloud-capacity/",
-    "currentPrivateRootRetained": ".performance/cloud-20261022-internal-reads",
+    "currentPrivateRootRetained": ".performance/cloud-20261022-final-50-events",
+    "sameRelease100EventBaselineRetainedAsComparisonOnly": true,
     "businessAcceptanceRetained": true
   }
 }
