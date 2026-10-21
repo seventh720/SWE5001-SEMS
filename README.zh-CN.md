@@ -6,7 +6,7 @@ SEMS 是 React + TypeScript、三个 Spring Boot 服务与 PostgreSQL 构成的�
 
 已实现多组织权限、活动发布/编辑/暂停/取消、免费预订、独立二维码票券、工作人员核销、预约、站内通知，以及组织管理员总览。活动和成员管理支持服务端检索、组合筛选与分页；已结束活动不能编辑后重开。
 
-PR #22 已部署为 `1413622`；[main CI 与测试环境部署](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39600755101)通过。线上 API 闭环及用户手机扫码已通过。[云端实验](docs/evidence/2026-10-21-cloud-capacity/README.md)完成池10/16各三次250 VU读取对照：客户端检查通过，但16无吞吐收益、内部超时更多，混合250仍有14次订票503；默认保留10，未继续500/1000。此前JPA查询候选无整体收益已撤回；新的[JDBC读取候选](docs/evidence/2026-10-22-public-catalog/README.md)完成单组本地对照，p95约498→407 ms、RPS约563→591，尚未部署或证明云端收益。十分钟稳态、云端副本扩容/恢复及兼容回滚仍待完成。
+PR #23 已部署为 `076f500`；[main CI与实际部署](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39638785624)通过。线上业务闭环及用户手机扫码已确认。[本版云端复测](docs/evidence/2026-10-22-cloud-capacity/README.md)：250 VU读取通过、混合未通过；500 VU未执行；1000 VU未执行。默认池10，测试临时数据已清理。旧性能实验记录已移除，业务验收保留。十分钟稳态、独立副本扩容/故障恢复及兼容回滚仍待完成。
 
 [项目进度](docs/progress.md)维护当前版本和下一步；[业务规则](docs/functional-guide.md)说明权限与统计口径；[测试覆盖](docs/test-coverage.md)区分单元测试、API 验收和历史覆盖率。JWT 为 1 小时；检票窗口为开始前 15 分钟至开始后 15 分钟（截止不含，若更早结束则提前关闭）。
 

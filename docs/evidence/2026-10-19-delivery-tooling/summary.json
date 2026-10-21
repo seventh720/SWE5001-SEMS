@@ -18,7 +18,7 @@
     "event-directory: shared organization access, pagination, live demotion",
     "booking: publication recovery, idempotency, 100 requests/10 places, cancellation, owner isolation"
   ],
-  "apiRegressionImageScope": "Upgraded JARs in isolated two-Admission Compose stack. Final runtime images separately passed fresh-DB startup and k6 API smoke.",
+  "apiRegressionImageScope": "Upgraded JARs in isolated two-Admission Compose stack. Final runtime images separately passed fresh-DB startup.",
   "runtimeImageScans": {
     "caddy": {
       "blockingFindings": 0,
@@ -58,25 +58,8 @@
     "freshDatabase": true,
     "threeServicesReady": true,
     "caddyConfiguration": "passed",
-    "load": {
-      "catalog": {
-        "vus": 2,
-        "warmupSeconds": 2,
-        "measurementSeconds": 5,
-        "thresholdsPassed": true,
-        "successfulRequests": 84
-      },
-      "booking": {
-        "vus": 2,
-        "warmupSeconds": 2,
-        "measurementSeconds": 5,
-        "thresholdsPassed": true,
-        "successfulRequests": 148
-      }
-    },
     "databaseAuditPassed": true
   },
-  "faultToolSmoke": "Stopped one of two local Admission replicas for 1 second and restored it; no cloud recovery-time claim.",
   "pending": [
     "PR CI on Linux amd64",
     "GHCR permissions and first publish/pull",
@@ -84,5 +67,6 @@
     "cloud failure/compatible rollback drills",
     "long-running monitoring/alerts",
     "multi-host/database failover architecture if claiming host-level HA"
-  ]
+  ],
+  "recordCleanup": "2026-10-22: older load/fault smoke samples removed at user request; build,security,API and database correctness checks retained."
 }
