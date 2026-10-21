@@ -129,6 +129,7 @@ jobs:
           python3 scripts/cd/test-release.py
           python3 scripts/performance/test-tools.py
           python3 scripts/performance/test-local-experiment.py
+          python3 scripts/performance/test-cloud-capacity.py
           bash scripts/cd/package.sh "$RUNNER_TEMP/release.tar.gz"
       - run: docker compose --env-file .env -f deployment/compose.yaml config --quiet
       - run: docker compose --env-file .env -f deployment/compose.yaml up --build -d --scale admission=2
