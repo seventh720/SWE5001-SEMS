@@ -63,7 +63,7 @@ requirements = {'realName': True, 'email': True, 'phone': False, 'studentId': Tr
 def directory_event(token, organization, index, visibility='PUBLIC', category='TECH'):
     begins = start + datetime.timedelta(minutes=index + 1)
     payload = {'organizationId': organization['id'], 'visibility': visibility,
-        'title': directory_keyword + ' ' + str(index), 'description': 'Projected public description',
+        'title': directory_keyword + (r' \literal_' if index == 0 else ' ') + str(index), 'description': 'Projected public description',
         'location': 'Projection venue', 'startsAt': begins.isoformat(),
         'endsAt': (begins + datetime.timedelta(hours=2)).isoformat(), 'capacity': 30,
         'category': category, 'cardTheme': 'SKY', 'registrationRequirements': requirements}
@@ -103,6 +103,8 @@ def directory(page=0, size=2, token=None, **filters):
 
 first = directory()
 assert first['totalElements'] == 3 and first['totalPages'] == 2
+backslash = directory(keyword=directory_keyword + r' \literal_0')
+assert backslash['totalElements'] == 1 and backslash['items'][0]['id'] == directory_a['id']
 assert [x['id'] for x in first['items']] == [directory_a['id'], directory_a2['id']]
 assert all(x['registrationRequirements'] == requirements and x['cardTheme'] == 'SKY' for x in first['items'])
 assert [x['id'] for x in directory(page=1)['items']] == [directory_b['id']]
