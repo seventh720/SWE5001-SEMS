@@ -3,6 +3,8 @@ import java.util.*;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 public interface EventRepository extends JpaRepository<Event,UUID>{
+ @org.springframework.data.jpa.repository.Query("select new com.sems.platform.catalog.EventDetails(e.id,e.title,e.location,e.startsAt,e.endsAt,e.status) from Event e where e.id in :ids")
+ List<EventDetails> detailsByIds(@org.springframework.data.repository.query.Param("ids") Collection<UUID> ids);
  @org.springframework.data.jpa.repository.Query("select e from Event e where e.organizationId=:org and locate(lower(:keyword),lower(e.title))>0")
  Page<Event> searchOrganization(@org.springframework.data.repository.query.Param("org") UUID organizationId,@org.springframework.data.repository.query.Param("keyword") String keyword,Pageable page);
  @org.springframework.data.jpa.repository.Query("select e from Event e where e.organizationId=:org and locate(lower(:keyword),lower(e.title))>0 and (:status='' or e.status=:status) and (:visibility='' or e.visibility=:visibility) and (:timeStatus='' or (:timeStatus='UPCOMING' and e.startsAt>:now) or (:timeStatus='ONGOING' and e.startsAt<=:now and e.endsAt>:now) or (:timeStatus='ENDED' and e.endsAt<=:now))")
