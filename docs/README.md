@@ -20,7 +20,7 @@
 - [组织升级](organization-upgrade.md)、[站内通知](in-app-notifications.md)：已有环境迁移与兼容边界。
 
 - [扩容收益与可用性实验](performance-and-availability.md)：数据生成、负载、故障恢复、库存审计及 HA 声明边界。
-- [pre前最终50活动复测](evidence/2026-10-22-cloud-capacity/README.md)：`f69d49d`在50场活动下的分档读取/混合结果、同版本100场活动简要对照、库存审计与清理。
+- [pre前最终50活动复测](evidence/2026-10-22-cloud-capacity/README.md)：`f69d49d`在50场活动下的分档读取/混合结果、剩余504与冻结决定、库存审计与清理。
 - [安全门禁与适用性](security.md)：扫描范围、依赖修复和有期限的 Spring 功能例外。
 
 ## 历史记录
