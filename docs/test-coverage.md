@@ -13,6 +13,14 @@
 
 线上验收与临时数据清理见[业务验证记录](evidence/2026-10-20-organization-management/verification.md)。API/数据库验收不计入 JaCoCo；下方覆盖率是 2026-10-19 的历史快照，未套用到当前版本。原始分子/分母见[覆盖汇总](evidence/2026-10-19-coverage-review/summary.json)。
 
+## 本轮内部读取优化（待部署）
+
+2026-10-22，本地 Java 21 `mvn verify` 通过84项，0失败/错误/跳过，Checkstyle及三个服务构建通过。连接释放回归使用真实NamedParameterJdbcTemplate与替身JDBC连接，检查远程Identity校验前连接已关闭、没有额外显式事务；同时覆盖11字段映射、私有活动即时撤权、组织停用、下游失败、不可发布/已开始/缺失活动拒绝。
+
+独立本地Compose项目使用全新PostgreSQL卷和本轮重建的Catalog镜像，其余服务复用本地已有镜像；执行 `catalog-read-acceptance.py`、`visibility-acceptance.py`、`organization-acceptance.py` 和 `catalog-recovery-acceptance.py`。新增HTTP断言检查完整11字段快照、报名要求JSON、组织/创建者/时刻映射，公开/私有活动和管理/成员路径一致性。四项均通过，数据库隔离检查通过；临时测试容器、网络、独立数据库卷及专用镜像已清理。真实API/数据库验收不计入上述单元测试数。
+
+本次没有修改前端、部署资源、连接池、超时或压测评分。当前云端报告仍对应 `076f500`；本轮修复尚未部署，503/504是否消除及容量收益需合并部署后复测确认。
+
 ## 2026-10-19 本地覆盖率快照
 
 | 范围 | 测试 | 行覆盖率 | 分支覆盖率 |
