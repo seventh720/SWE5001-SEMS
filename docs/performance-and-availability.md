@@ -2,6 +2,8 @@
 
 已完成的本地正式实验与补测见[结果和图表](evidence/2026-10-19-local-architecture/README.md)。
 
+2026-10-21 云端已完成[容量基线](evidence/2026-10-21-cloud-capacity/README.md)：读取 250 VU、混合 100 VU 短时阶梯通过，更高档因网关连接额度错误停测；候选修正本地验证通过，部署后的复测与扩容/故障实验仍待完成。
+
 这份文档定义实验方法；实际完成状态见[当前进度](progress.md)。脚本位于 `scripts/performance/`。本地短时 smoke 只说明工具和业务路径能运行，不是云端性能结论。
 
 ## 可以证明什么
@@ -18,7 +20,7 @@
 
 ## 准备独立实验环境
 
-使用与发布版相同的镜像 digest、数据库配置和网关配置。负载发生器放在另一台机器，避免抢占被测服务 CPU。先记录机器规格、CPU/内存限制、镜像、commit、数据库连接池、网络条件和副本数。当前云配置的容器内存上限合计约 3136 MiB，新增一个 Java 副本还需 768 MiB 上限；这不是实际预留值，但不能在未核对主机余量时直接加副本。
+使用与发布版相同的镜像 digest、数据库配置和网关配置。负载发生器放在另一台机器，避免抢占被测服务 CPU。先记录机器规格、CPU/内存限制、镜像、commit、数据库连接池、网络条件和副本数。仓库默认云配置的容器内存上限合计约 3136 MiB；本次共享 Caddy 实际为 256 MiB，SWE5001 合计约 3264 MiB，另有 SWE5006。新增一个 Java 副本还需 768 MiB 上限；这不是实际预留值，但不能在未核对主机余量时直接加副本。
 
 只在专门的实验组织/数据库中造数和注入故障，不对正在演示的数据运行验收链。用环境变量提供管理员登录资料，不把 token、密码、`.env` 或完整 dataset 放进证据、PR 或 CI artifact。
 
@@ -33,6 +35,30 @@ python3 scripts/performance/seed.py --base-url "$SEMS_BASE_URL" \
 生成器通过真实 API 建立独立组织、100 个已发布活动和 1000 个账号，保持真实认证限流，完成后统一登录。密码和 token 文件权限为 0600，目录被 Git 忽略。重复执行不会覆盖旧数据；失败时保留已生成记录，另建实验或人工清理该实验组织，不自动删除数据。JWT 仍为一小时；每轮前需要时执行同一命令并加 `--refresh`。压测 setup 会验证账号有效性；完整一轮应在 token 到期前完成。
 
 ## 扩容实验矩阵
+
+### 云端容量阶梯（独立于扩容对照）
+
+`cloud-capacity.js` 和 `cloud-capacity.py` 借鉴 SWE5006 的容量验证方法，使用独立负载机访问已部署的 HTTPS 入口，保持真实鉴权与限流。先运行 1 VU 读取/混合预检，再分别执行 50→100→250→500→1000 VU；每档爬升 30 秒，低档保持 30 秒，500/1000 档各保持 180 秒，档间恢复 10 秒。500 VU 也有独立的三分钟成绩，不把爬升或收尾阶段计入保持阶段。最后使用独立的 100 票活动做一次库存竞争。
+
+读取迭代依次请求活动分页、活动详情、本人资料、本人订单，然后等待 1 秒。混合场景每五轮增加订票→读取回执→取消，每 VU 最多 60 次。1000 个账号、100 场普通活动和 1 场库存竞争活动均属于本轮独立组织；注册/登录准备不计入压测成绩。与下面原有 0.1 秒思考时间的扩容负载不同，不能仅凭相同 VU 数比较吞吐。
+
+```bash
+python3 scripts/performance/cloud-fixture.py prepare-hot --dataset .performance/dataset.json
+caffeinate -i python3 scripts/performance/cloud-capacity.py \
+  --dataset .performance/dataset.json --reports .performance/cloud-capacity-run \
+  --identity-file .secrets/cd/staging_ed25519 --known-hosts /path/to/trusted-known-hosts \
+  --commit <actual-deployed-sha> --max-vus 1000
+```
+
+`cloud-guard.py` 在主机采样两套系统的六项健康检查、容器 CPU/内存、重启/OOM、主机可用内存与数据库连接/锁等待。健康失败或超过 5 秒、可用内存低于 384 MiB、任一容器内存超过 95% 连续三次即停测；容器退出、重启、OOM 或监控断线也停测。负载生成器限制 4 CPU/2 GiB，并记录资源。任何一档未通过即停止后续档位，保留失败结果，不放宽阈值继续评分。
+
+整体与逐接口 p95＜3 秒、意外错误率＜1%，同时要求所有状态和内容检查通过。混合场景的 409 为失败；库存竞争只允许明确的余票不足 409，并另外记录成功数、售罄数及数据库库存审计。JWT、密码和完整原始记录留在 `.performance/`；对外证据仅提交脱敏指标。实验后通过 `cloud-fixture.py cleanup` 取消本轮活动、关闭本轮组织并撤销组织者角色；账号及审计历史的物理清理由受控的精确 ID 事务另行执行，工具不会批量删除其他数据。
+
+可参考 SWE5006 的 Nginx 每 worker 4096 连接、8192 文件额度及上游连接复用配置，但先记录当前版本基线，再根据日志验证瓶颈。Nginx 的连接额度同时覆盖客户端和上游连接，仍受文件额度约束；连接复用池只限制空闲连接，不限制全部上游连接。参见 [Nginx 连接额度](https://nginx.org/en/docs/ngx_core_module.html#worker_connections)和[上游 keepalive](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#keepalive)。
+
+这组实验回答当前部署在指定业务模型下能否达标，不能代替下述 1→2 副本收益、十分钟稳态重复测量和故障恢复实验，也不证明主机级高可用。
+
+### 副本扩容对照
 
 分别运行两类场景，其他参数不变：
 

@@ -1,0 +1,6 @@
+Nginx syntax: PASS
+Three local readiness probes: PASS
+Organization management API acceptance: PASS
+PASS: reserved = confirmed quantities = active tickets, within quota
+PASS: 1635 bookings plus same-key replays and live receipts survived Catalog stop/cold restart without failure
+PASS: public internal paths denied; internal listener authenticated; all-replicas-down fails boundedly and same-key recovery succeeds

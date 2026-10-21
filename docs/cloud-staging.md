@@ -8,7 +8,7 @@ Host: `swe5001.seventh720.com`, DNS-only A record to the instance's attached sta
 
 `CI` deploys to the GitHub `staging` environment only for main pushes or a manual run on main, after lint, backend, frontend, database/API acceptance, source/dependency security and image security pass. PRs never deploy. The JARs and web assets come from that same CI run. CI builds all seven runtime images, scans them, verifies the application image set without rebuilding, then publishes the same images. Superseded main commits are skipped; deployments are serialized and are not cancelled by newer pushes.
 
-The digest delivery flow passed in [main run 39302943078](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39302943078) for `90d10d2` (PR #18). Image publication and the actual `Deploy tested artifacts` step succeeded; deployment completed on 2026-10-20 at 02:44 SGT. This records that run, not a fresh inspection of the current host or business data. See [current status](progress.md).
+The digest delivery flow passed in [main run 39466717243, attempt 2](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39466717243/attempts/2) for `2f169d6` (PR #20). Image publication and the actual `Deploy tested artifacts` step succeeded; the 2026-10-21 capacity experiment verified that deployed SHA and recorded image digests. The gateway connection-limit correction is a local candidate until its PR is merged and deployed. See [current status](progress.md).
 
 Environment configuration:
 
@@ -70,7 +70,7 @@ Database migrations run on service startup. Back up before updates, and check mi
 
 The initial read-only inspection on 2026-10-19 confirmed readiness and HTTPS for release `c0f4600`, with 1 user and no organizations, events or bookings. That is a historical snapshot, not a current data count. JWTs now use a 3600-second lifetime; the current release evidence is linked above. See [release review](archive/2026-10-19/release-review-2026-10-19.md).
 
-Remaining work: off-host scheduled backups, real-device rendering and camera checks, cloud business acceptance, load/recovery measurements and a compatible rollback drill. Security and image delivery gates have passed the current main pipeline. Existing fault-injection acceptance scripts are intended for disposable stacks, not this shared staging instance.
+Staging API acceptance and user-reported phone camera checks have passed. The [cloud capacity baseline](evidence/2026-10-21-cloud-capacity/README.md) passed short holds at 250 read VU and 100 mixed VU; higher stages stopped on gateway connection errors. Both the earlier four-account acceptance fixtures and this run's 1000 accounts/101 events were purged after verified server-side backups; original business data remained unchanged. Next: deploy the gateway correction and retest, then measure ten-minute steady load, replica scaling/recovery and compatible rollback. Off-host scheduled backups also remain outstanding. Existing fault-injection acceptance scripts are intended for disposable stacks, not this shared staging instance.
 
 ## Navicat access
 
