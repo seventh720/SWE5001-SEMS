@@ -2,7 +2,7 @@
 
 已完成的本地正式实验与补测见[结果和图表](evidence/2026-10-19-local-architecture/README.md)。
 
-2026-10-21 已完成[网关修正后的云端复测](evidence/2026-10-21-cloud-capacity/README.md)：读取500 VU完整保持三分钟、客户端零错误，但p95约3.66秒；混合250 VU的p95/错误率SLO达标，有三次503导致严格状态检查失败。网关连接额度告警已消失；读取修正已在候选PR #22，尚待云端验收，十分钟稳态及独立扩容/故障实验仍待完成。
+2026-10-21 [最新云端实验](evidence/2026-10-21-cloud-capacity/README.md)运行已部署 PR #22 / `1413622`：池10/16各三次固定历史的250 VU读取客户端检查通过，16无吞吐收益且内部超时更多；16下混合250出现14次订票503，严格验收失败。默认保留10，未继续500/1000。CPU完整采样后，复用分组总数与公开字段投影的本地候选未证明整体收益，已撤回，未部署。十分钟稳态及独立扩容/故障实验仍待完成。
 
 这份文档定义实验方法；实际完成状态见[当前进度](progress.md)。脚本位于 `scripts/performance/`。本地短时 smoke 只说明工具和业务路径能运行，不是云端性能结论。
 
@@ -38,11 +38,11 @@ python3 scripts/performance/seed.py --base-url "$SEMS_BASE_URL" \
 
 ### Catalog 读取计时与连接池对照
 
-候选读取修正结束仓库只读事务后再调用 Identity，内部详情采用六字段投影。`catalog.read` 按组织发现、公开列表/详情、发布/成员快照和内部详情分别计时；`catalog.identity` 区分批量组织状态与成员查询。Hikari 自带 `connections.acquire` / `connections.usage` 分别记录连接获取和占用时间，包含在 `hikaricp` 指标中。
+已部署的读取修正结束仓库只读事务后再调用 Identity，内部详情采用六字段投影。`catalog.read` 按组织发现、公开列表/详情、发布/成员快照和内部详情分别计时；`catalog.identity` 区分批量组织状态与成员查询。Hikari 自带 `connections.acquire` / `connections.usage` 分别记录连接获取和占用时间，包含在 `hikaricp` 指标中。
 
 `GET /internal/v1/diagnostics/catalog` 返回上述计时的累计次数、总毫秒和滚动最大值，以及连接池 active/idle/pending/total/max 瞬时值。必须使用现有 `ADMISSION_TO_CATALOG_TOKEN` 服务凭据；公开网关仍返回404，不额外暴露 Actuator metrics。累计计时应以同一进程前后快照求差计算均值；最大值为 Micrometer 时间窗口值，不能当成某一档的 p95，也不能跨服务重建直接相减。读取总计时包含连接等待、JDBC和映射，与Hikari计时重叠，不能直接相加。请求保持期 p95 仍由负载机测量。
 
-Catalog 的 `CATALOG_DB_POOL_SIZE` 可从部署 `.env` 传入，默认保持10。隔离环境对照10/16/20时，其他服务池、CPU/内存、数据与负载必须固定；更改该值后仅重建 Catalog，等待 readiness 和网关 DNS 刷新。至少三次交错重复，同时保留获取/占用、吞吐、状态检查及逐接口延迟。双核 CPU 已饱和时，扩大连接池不能预先视为优化；应按测量结果选择，线上配置另行通过部署流程生效。最新诊断、候选验证和适用范围见[容量实验记录](evidence/2026-10-21-cloud-capacity/README.md)。
+Catalog 的 `CATALOG_DB_POOL_SIZE` 可从部署 `.env` 传入，默认保持10。隔离环境对照10/16/20时，其他服务池、CPU/内存、数据与负载必须固定；更改该值后仅重建 Catalog，等待 readiness 和网关 DNS 刷新。至少三次交错重复，同时保留获取/占用、吞吐、状态检查及逐接口延迟。双核 CPU 已饱和时，扩大连接池不能预先视为优化；应按测量结果选择，线上配置另行通过部署流程生效。最新诊断、读取验证和适用范围见[容量实验记录](evidence/2026-10-21-cloud-capacity/README.md)。
 
 ### 云端容量阶梯（独立于扩容对照）
 
