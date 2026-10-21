@@ -1,6 +1,6 @@
 # CI operations
 
-The workflow runs on main pushes and PRs targeting main. PR #21 is merged as `054690b`; [main run 39572865890](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39572865890) passed all checks, image publication and the executed Lightsail staging deployment. The six quality checks are:
+The workflow runs on main pushes and PRs targeting main. PR #22 is merged as `1413622`; [main run 39600755101](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39600755101) passed all checks, image publication and the executed Lightsail staging deployment. The six quality checks are:
 
 | Check | Work and evidence |
 |---|---|
@@ -19,11 +19,11 @@ Telegram uses repository Actions secrets `TELEGRAM_TOKEN` and `TELEGRAM_TO`. Mes
 
 Local commands: `mvn verify`, `npm --prefix apps/web run test:coverage`, `npm --prefix apps/web run build`, then run Compose and `bash scripts/check-db-isolation.sh`. Load `.env` into the shell before `python3 scripts/organization-acceptance.py`. The latter creates unique test data and intentionally stops Admission and restarts Catalog/gateway; run it only against a disposable local/CI Compose environment. Use `COMPOSE_PROJECT_NAME` to select a dedicated test project.
 
-Main-only delivery builds/scans tested artifacts in CI, publishes GHCR digests, then backs up staging, pulls the locked images and checks HTTPS. It does not rebuild images on the deployment host. The successful run above deployed `054690b`; staging API business acceptance and the later cloud capacity baseline are recorded separately in [project status](progress.md). Follow the [deployment procedures](cloud-staging.md), including the existing shared-proxy override. OpenAPI contract conformance and the final cloud scaling/recovery experiments remain outstanding. The main branch protection API reported no traditional branch protection on 2026-10-20; this PR does not change repository protection settings.
+Main-only delivery builds/scans tested artifacts in CI, publishes GHCR digests, then backs up staging, pulls the locked images and checks HTTPS. It does not rebuild images on the deployment host. The successful run above deployed `1413622`; staging API business acceptance and the later cloud capacity baseline are recorded separately in [project status](progress.md). Follow the [deployment procedures](cloud-staging.md), including the existing shared-proxy override. OpenAPI contract conformance and the final cloud scaling/recovery experiments remain outstanding. The main branch protection API reported no traditional branch protection on 2026-10-20; this PR does not change repository protection settings.
 
 Integration now starts two Admission replicas and runs booking acceptance, including publication regression, 100 competing requests for 10 places, same-key races, per-attendee isolation and repeated cancellation. This is a local correctness check, not a cloud throughput or recovery-target measurement.
 
-PR #22 adds `scripts/catalog-read-acceptance.py` to the same integration job. It checks the six-field read projection, input limits, immediate organization suspension and internal service-token diagnostics. The candidate's local backend suite has 83 tests; staging remains the deployed version recorded above until a main deployment succeeds.
+PR #22 adds `scripts/catalog-read-acceptance.py` to the same integration job. It checks the six-field read projection, input limits, immediate organization suspension and internal service-token diagnostics. The PR #22 backend suite had 83 tests and passed in the merged main run. This change extends the script with full-page totals, category/private filters and immediate suspension; local PostgreSQL/API acceptance passed. A query candidate passed 88 tests but showed no overall local performance benefit, so its application changes and five tests were reverted without deployment. The final baseline suite was rerun with 83 tests; remote checks for the added API assertions must pass before merge.
 
 Registration acceptance additionally checks requested field validation, category/theme persistence, combined search/filtering, information-aware retries and cross-organizer denial. Existing booking/publication tests still run.
 
