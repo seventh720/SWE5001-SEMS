@@ -30,7 +30,7 @@ export function EventSetupPage() {
  const draft=event?.status==="DRAFT";const pending=["PUBLISHING","UPDATING","CANCELLING"].includes(event?.status??"");
  return <main className="app-shell event-setup-workspace"><div className="page-breadcrumbs"><HomeLink /><Link className="back-link" to={event?.organizationId?`/organizer/events?organizationId=${event.organizationId}`:"/organizations"}>← Back to organization</Link></div>
  <p className="eyebrow">{draft?"PUBLICATION PREVIEW":"PUBLICATION MANAGEMENT"}</p><h1>{event?.title??(error?"Event unavailable":"Loading event…")}</h1>{event&&<p>{event.organizationName} · {event.visibility==="ORGANIZATION_ONLY"?"Organization members only":"Public event"}</p>}
- {error&&<div role="alert" className="error-message">{error}<button disabled={busy} onClick={()=>{setConfirm(null);load().then(()=>setError("")).catch(loadError);}}>Reload event</button></div>}
+ {error&&<div role="alert" className="error-message event-load-error"><span>{error}</span><button disabled={busy} onClick={()=>{setConfirm(null);load().then(()=>setError("")).catch(loadError);}}>Reload event</button></div>}
  <FeedbackNotice message={message} tone={message.startsWith("Publication update failed")?"error":pending?"info":"success"}/>
  {event&&<><p><span className="badge">{event.status}</span> · Capacity {event.capacity}</p>{event.cancellationReason&&<p>Cancellation reason: {event.cancellationReason}</p>}{event.publicationError&&<p role="alert">{event.publicationError}</p>}{pending&&<p role="status">Syncing event status…</p>}</>}
  {event&&inventory&&<>

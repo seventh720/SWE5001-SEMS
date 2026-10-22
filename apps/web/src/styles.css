@@ -177,6 +177,14 @@ textarea {
   border-radius: 7px;
   color: #9b2920;
 }
+.event-load-error {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+.event-load-error > span { flex: 1 1 320px; }
+.event-load-error > button { flex: 0 0 auto; }
 .auth-shell {
   max-width: 1100px;
   margin: 60px auto;
