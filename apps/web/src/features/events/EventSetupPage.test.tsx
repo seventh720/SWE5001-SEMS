@@ -10,6 +10,24 @@ const inventory={version:2,ticketTypes:[{id:"t1",name:"General",quota:30,opensAt
 const response=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status});
 function mount(){sessionStorage.setItem("sems-auth",JSON.stringify({token:"token",user:{roles:["ORGANIZER"]}}));render(<AuthProvider><MemoryRouter initialEntries={["/organizer/events/e1/setup"]}><Routes><Route path="/organizer/events/:id/setup" element={<EventSetupPage/>}/></Routes></MemoryRouter></AuthProvider>);}
 beforeEach(()=>{fetchMock.mockReset();vi.stubGlobal("fetch",fetchMock);});afterEach(()=>{cleanup();vi.unstubAllGlobals();sessionStorage.clear();});
+it.each([403,404])("explains unavailable management access for HTTP %s without showing unloaded event details",async(status)=>{
+ fetchMock.mockResolvedValueOnce(response({detail:"Organization or event not found"},status));mount();
+ await screen.findByRole("heading",{name:"Event unavailable"});
+ expect(screen.getByRole("alert").textContent).toContain("You don't have access to manage this event, or it is no longer available.");
+ expect(screen.queryByText("Loading event…")).toBeNull();
+ expect(screen.queryByText(/Public event/)).toBeNull();
+ expect(screen.queryByRole("button",{name:"Publish event"})).toBeNull();
+ expect(fetchMock).toHaveBeenCalledTimes(1);
+});
+it("preserves service failure details and allows reloading the event",async()=>{
+ fetchMock.mockResolvedValueOnce(response({detail:"Catalog unavailable; retry later"},503)).mockResolvedValueOnce(response(event)).mockResolvedValueOnce(response(inventory));mount();
+ await screen.findByRole("heading",{name:"Event unavailable"});
+ expect(screen.getByRole("alert").textContent).toContain("Catalog unavailable; retry later");
+ fireEvent.click(screen.getByRole("button",{name:"Reload event"}));
+ await screen.findByRole("button",{name:"Publish event"});
+ expect(screen.queryByRole("alert")).toBeNull();
+ expect(screen.getByRole("heading",{level:1,name:"Seminar"})).toBeTruthy();
+});
 it("previews saved details and requires confirmation for initial publication",async()=>{
  fetchMock.mockResolvedValueOnce(response(event)).mockResolvedValueOnce(response(inventory)).mockResolvedValueOnce(response({...event,status:"PUBLISHED"}));mount();
  fireEvent.click(await screen.findByRole("button",{name:"Publish event"}));expect(fetchMock).toHaveBeenCalledTimes(2);

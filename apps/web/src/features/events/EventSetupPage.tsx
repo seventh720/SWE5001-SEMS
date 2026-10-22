@@ -3,7 +3,7 @@ import { FeedbackNotice } from "../../shared/components/FeedbackNotice";
 import { useEffect, useState, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
-import { apiRequest } from "../../shared/api/client";
+import { ApiError, apiRequest } from "../../shared/api/client";
 import { formatDateTime } from "../../shared/components/dateTime";
 import { registrationFields, type Requirements } from "../bookings/registration";
 import { EventArtwork } from "./EventArtwork";
@@ -14,9 +14,10 @@ export function EventSetupPage() {
  const [event,setEvent]=useState<Event|null>(null);const [inventory,setInventory]=useState<TicketInventory|null>(null);
  const [reason,setReason]=useState("");
  const [error,setError]=useState("");const [message,setMessage]=useState("");const [busy,setBusy]=useState(false);const [confirm,setConfirm]=useState<string|null>(null);
+ function loadError(e:unknown){setError(e instanceof ApiError&&[403,404].includes(e.status)?"You don't have access to manage this event, or it is no longer available.":(e as Error).message);}
  async function load(){const e=await apiRequest<Event>(`/api/v1/organizer/events/${id}`,{},token!);setEvent(e);const i=await apiRequest<TicketInventory>(`/api/v1/organizer/events/${id}/ticket-types`,{},token!);setInventory(i);setError("");}
- useEffect(()=>{void load().catch(e=>setError(e.message));},[id,token]);
- useEffect(()=>{if(!["PUBLISHING","UPDATING","CANCELLING"].includes(event?.status??""))return;const timer=setInterval(()=>void load().catch(e=>setError(e.message)),3000);return()=>clearInterval(timer);},[event?.status,id,token]);
+ useEffect(()=>{void load().catch(loadError);},[id,token]);
+ useEffect(()=>{if(!["PUBLISHING","UPDATING","CANCELLING"].includes(event?.status??""))return;const timer=setInterval(()=>void load().catch(loadError),3000);return()=>clearInterval(timer);},[event?.status,id,token]);
  async function act(){if(!event||!inventory||!confirm)return;setBusy(true);setError("");setMessage("");try{
  const first=confirm==="PUBLISH";const cancelling=confirm==="CANCEL";
  const saved=await apiRequest<Event>(`/api/v1/organizer/events/${id}/${cancelling?"cancel":first?"publish":"revision"}`,{method:first||cancelling?"POST":"PUT",body:JSON.stringify(cancelling?{version:event.version,reason:reason.trim()}:first?{version:event.version,ticketVersion:inventory.version}:{...event,publicationStatus:confirm})},token!);
@@ -28,8 +29,8 @@ export function EventSetupPage() {
  const cancelled=event?.status==="CANCELLED";
  const draft=event?.status==="DRAFT";const pending=["PUBLISHING","UPDATING","CANCELLING"].includes(event?.status??"");
  return <main className="app-shell event-setup-workspace"><div className="page-breadcrumbs"><HomeLink /><Link className="back-link" to={event?.organizationId?`/organizer/events?organizationId=${event.organizationId}`:"/organizations"}>← Back to organization</Link></div>
- <p className="eyebrow">{draft?"PUBLICATION PREVIEW":"PUBLICATION MANAGEMENT"}</p><h1>{event?.title??"Loading event…"}</h1><p>{event?.organizationName} · {event?.visibility==="ORGANIZATION_ONLY"?"Organization members only":"Public event"}</p>
- {error&&<div role="alert" className="error-message">{error}<button disabled={busy} onClick={()=>{setConfirm(null);load().then(()=>setError("")).catch(e=>setError(e.message));}}>Reload event</button></div>}
+ <p className="eyebrow">{draft?"PUBLICATION PREVIEW":"PUBLICATION MANAGEMENT"}</p><h1>{event?.title??(error?"Event unavailable":"Loading event…")}</h1>{event&&<p>{event.organizationName} · {event.visibility==="ORGANIZATION_ONLY"?"Organization members only":"Public event"}</p>}
+ {error&&<div role="alert" className="error-message">{error}<button disabled={busy} onClick={()=>{setConfirm(null);load().then(()=>setError("")).catch(loadError);}}>Reload event</button></div>}
  <FeedbackNotice message={message} tone={message.startsWith("Publication update failed")?"error":pending?"info":"success"}/>
  {event&&<><p><span className="badge">{event.status}</span> · Capacity {event.capacity}</p>{event.cancellationReason&&<p>Cancellation reason: {event.cancellationReason}</p>}{event.publicationError&&<p role="alert">{event.publicationError}</p>}{pending&&<p role="status">Syncing event status…</p>}</>}
  {event&&inventory&&<>
