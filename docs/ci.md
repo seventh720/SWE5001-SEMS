@@ -1,6 +1,6 @@
 # CI operations
 
-The workflow runs on main pushes and PRs targeting main. PR #24 is merged as `f69d49d`; [main run 39653776016](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39653776016) passed all checks, image publication and the executed Lightsail staging deployment. The six quality checks are:
+The workflow runs on main pushes, PRs targeting main and manual dispatch. The latest recorded release is PR #27 / `fb27bbf`; [main run 39751659240](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39751659240) passed all checks, image publication and the Lightsail staging deployment. The six quality checks are:
 
 | Check | Work and evidence |
 |---|---|
@@ -19,7 +19,7 @@ Telegram uses repository Actions secrets `TELEGRAM_TOKEN` and `TELEGRAM_TO`. Mes
 
 Local commands: `mvn verify`, `npm --prefix apps/web run test:coverage`, `npm --prefix apps/web run build`, then run Compose and `bash scripts/check-db-isolation.sh`. Load `.env` into the shell before `python3 scripts/organization-acceptance.py`. The latter creates unique test data and intentionally stops Admission and restarts Catalog/gateway; run it only against a disposable local/CI Compose environment. Use `COMPOSE_PROJECT_NAME` to select a dedicated test project.
 
-Main-only delivery builds/scans tested artifacts in CI, publishes GHCR digests, then backs up staging, pulls the locked images and checks HTTPS. It does not rebuild images on the deployment host. The successful run above deployed `f69d49d`; staging API business acceptance and the later cloud capacity baseline are recorded separately in [project status](progress.md). Follow the [deployment procedures](cloud-staging.md), including the existing shared-proxy override. OpenAPI contract conformance and the final cloud scaling/recovery experiments remain outstanding. The main branch protection API reported no traditional branch protection on 2026-10-20; this PR does not change repository protection settings.
+Main-only delivery builds/scans tested artifacts in CI, publishes GHCR digests, then backs up staging, pulls the locked images and checks HTTPS. It does not rebuild images on the deployment host. The latest recorded run above deployed `fb27bbf`; API business acceptance and the capacity baseline on `f69d49d` are recorded separately in [release status](progress.md). Follow the [deployment procedures](cloud-staging.md), including the existing shared-proxy override. OpenAPI contract conformance and the final cloud scaling/recovery experiments remain outstanding. The main branch protection API reported no traditional branch protection on 2026-10-20; this PR does not change repository protection settings.
 
 Integration now starts two Admission replicas and runs booking acceptance, including publication regression, 100 competing requests for 10 places, same-key races, per-attendee isolation and repeated cancellation. This is a local correctness check, not a cloud throughput or recovery-target measurement.
 
@@ -52,7 +52,7 @@ See [security policy and scoped exceptions](security.md) and [performance/availa
 
 ## Lint and check naming (2026-10-20)
 
-The workflow is named `CI`, following SWE5006's `Area · Purpose` check naming. `Lint` runs ESLint's JavaScript/TypeScript recommended rules, a small Checkstyle correctness ruleset for main/test Java, actionlint and shell syntax checks. It uploads `lint-report` even on failure. Run `bash scripts/ci/lint.sh` locally (Docker is needed for actionlint). This does not introduce formatting-only rewrites or claim API contract conformance. Lint is a prerequisite for image publication/deployment and is included in the notification summary.
+The workflow is named `CI`; checks use `Area · Purpose` naming. `Lint` runs ESLint's JavaScript/TypeScript recommended rules, a small Checkstyle correctness ruleset for main/test Java, actionlint and shell syntax checks. It uploads `lint-report` even on failure. Run `bash scripts/ci/lint.sh` locally (Docker is needed for actionlint). This does not introduce formatting-only rewrites or claim API contract conformance. Lint is a prerequisite for image publication/deployment and is included in the notification summary.
 
 If branch protection names checks explicitly, update its required check names to match the workflow during rollout; renaming display names does not migrate repository settings automatically.
 

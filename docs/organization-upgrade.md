@@ -55,7 +55,7 @@ Use a distinct Compose project, network name, volume name and host port. Docker 
 
 ## Demonstration
 
-Provision Society A and Training B, invite members to A, publish an internal seminar and public workshop, browse as member and outsider, assign one staff member only to the seminar, check a ticket twice and show attendance remains one. Demonstrate a third organization onboarding without code changes. Show platform admin cannot implicitly read organization booking lists. This expands the original proposal's account ownership model; enterprise hierarchy and SSO remain excluded.
+Provision Society A and Training B, invite members to A, publish an internal seminar and public workshop, browse as member and outsider, assign one staff member only to the seminar, check a ticket twice and show attendance remains one. Verify another organization can onboard without code changes and platform admins cannot implicitly read organization booking lists. Organization membership defines management access; enterprise hierarchy and SSO are outside the implemented scope.
 
 ### Local frontend proxy
 

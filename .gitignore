@@ -22,3 +22,7 @@ release-images/
 deployment/compose.images.json
 
 lint-reports/
+
+# Local presentation decks, scripts, videos and raw captures
+presentation-recordings/
+presentation-content/

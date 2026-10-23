@@ -8,7 +8,7 @@ Host: `swe5001.seventh720.com`, DNS-only A record to the instance's attached sta
 
 `CI` deploys to the GitHub `staging` environment only for main pushes or a manual run on main, after lint, backend, frontend, database/API acceptance, source/dependency security and image security pass. PRs never deploy. The JARs and web assets come from that same CI run. CI builds all seven runtime images, scans them, verifies the application image set without rebuilding, then publishes the same images. Superseded main commits are skipped; deployments are serialized and are not cancelled by newer pushes.
 
-The digest delivery flow passed in [main run 39653776016](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39653776016) for `f69d49d` (PR #24). Image publication and the executed staging deployment succeeded. The current experiment verified the deployed SHA and unchanged container metadata; public and internal Catalog reads now use JDBC projections with live authorization and the existing response/pagination contract. See [current status](progress.md).
+The latest recorded digest deployment is [main run 39751659240](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39751659240) for `fb27bbf` (PR #27). Image publication and staging deployment succeeded. Capacity measurements remain tied to the earlier `f69d49d` release; they were not repeated for the UI-only follow-up. Public and internal Catalog reads use JDBC projections with live authorization and the existing response/pagination contract. See [release status](progress.md).
 
 Environment configuration:
 

@@ -31,4 +31,4 @@ New registration passwords must contain 8–16 printable ASCII characters (U+002
 - The organization-admin overview shows all-time organization totals, independent of event-list filters. Regular organizers retain shared event management and attendance access but cannot view this overview.
 - Ended events remain available as history and cannot be edited or reopened. Check-in requires event assignment and an open check-in window.
 
-See [business rules](../../docs/functional-guide.md) and [test coverage](../../docs/test-coverage.md). Desktop and 390px mobile browser checks passed for the overview and filters; the user has confirmed browser appearance and phone camera check-in work. These checks do not measure device-specific decoding success rates.
+See [business rules](../../docs/functional-guide.md) and [test coverage](../../docs/test-coverage.md). Desktop and 390px mobile browser checks cover the overview and filters. Phone camera check-in has also received a manual device check; device-specific decoding success rates have not been measured.
