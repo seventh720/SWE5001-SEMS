@@ -1,0 +1,11 @@
+{
+  "suite": "event-directory",
+  "startedAt": "2026-10-24T14:44:39.261619+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "environment": "sems-k3s/sems-test",
+  "status": "passed",
+  "assertionScriptSha256": "051e2533746d8417ab02b8d84720329660a6ab51d81f8e5208e8585c1d98b955",
+  "replicasRestored": true,
+  "actions": [],
+  "completedAt": "2026-10-24T14:44:47.971779+00:00"
+}

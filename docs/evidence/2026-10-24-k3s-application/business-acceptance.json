@@ -1,0 +1,109 @@
+{
+  "startedAt": "2026-10-24T14:17:06.925169+00:00",
+  "environment": "sems-k3s/sems-test",
+  "tests": [
+    {
+      "name": "gateway and service readiness",
+      "status": "passed"
+    },
+    {
+      "name": "registration, login, organization permissions and draft concurrency",
+      "status": "passed"
+    },
+    {
+      "name": "publication, booking, private ownership and retry payload validation",
+      "status": "passed"
+    },
+    {
+      "name": "same request key across both Admission Pods",
+      "status": "passed",
+      "requests": 20,
+      "requestsPerPod": 10,
+      "distinctBookings": 1,
+      "reservedTotal": 3
+    },
+    {
+      "name": "100 distinct requests for ten places across both Admission Pods",
+      "status": "passed",
+      "requests": 100,
+      "requestsPerPod": 50,
+      "statusCounts": {
+        "409": 90,
+        "200": 10
+      },
+      "inventoryAudit": "10|10|10"
+    },
+    {
+      "name": "staff authorization and concurrent exactly-once check-in",
+      "status": "passed",
+      "attempts": 10,
+      "firstCheckIns": 1
+    },
+    {
+      "name": "repeated personal cancellation releases inventory once",
+      "status": "passed",
+      "reservedAfterCancellation": 1
+    },
+    {
+      "name": "whole-event cancellation preserves check-in history and closes inventory",
+      "status": "passed",
+      "inventoryConfirmedValidCheckedReceipts": "0|0|0|1|1"
+    },
+    {
+      "name": "database schema isolation",
+      "status": "passed",
+      "deniedCrossSchemaChecks": 6,
+      "deniedPublicCreateChecks": 3,
+      "actualCrossSchemaQuery": "denied"
+    }
+  ],
+  "status": "passed",
+  "admissionPods": [
+    "admission-c5d8c7cb7-hgghg",
+    "admission-c5d8c7cb7-qjxjl"
+  ],
+  "admissionNodes": [
+    "sems-k3s-server",
+    "sems-k3s-worker"
+  ],
+  "sourceCommit": "d3002d10a6f515b14f2013fc89f8805837b1f8ec",
+  "worktreeDirty": true,
+  "manifestSha256": "d2d2cd39dc3be069c7a83af00ecc6cc2e1affe4c8af340232560a518bc64e652",
+  "kubernetesVersion": "v1.36.5+k3s1",
+  "runtimeImages": {
+    "admission-c5d8c7cb7-hgghg": [
+      "ghcr.io/seventh720/swe5001-sems/admission@sha256:d26e22bb2a086249425f284e982fc6e68870a64907c319697b42231413f97f4c"
+    ],
+    "admission-c5d8c7cb7-qjxjl": [
+      "ghcr.io/seventh720/swe5001-sems/admission@sha256:d26e22bb2a086249425f284e982fc6e68870a64907c319697b42231413f97f4c"
+    ],
+    "event-catalog-76cbb8d8cd-hwk6v": [
+      "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:1ab14af2625ddc7c9117138778aca89a938fbda5e9efa687e0fe49210172ca65"
+    ],
+    "event-catalog-76cbb8d8cd-nk6gj": [
+      "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:1ab14af2625ddc7c9117138778aca89a938fbda5e9efa687e0fe49210172ca65"
+    ],
+    "gateway-7888569fc7-bkhvn": [
+      "ghcr.io/seventh720/swe5001-sems/gateway@sha256:16333cd40629728da02632c4c15c6c7fd56e7b593ad1b5f29490b4dbca2126b0"
+    ],
+    "gateway-7888569fc7-gghrt": [
+      "ghcr.io/seventh720/swe5001-sems/gateway@sha256:16333cd40629728da02632c4c15c6c7fd56e7b593ad1b5f29490b4dbca2126b0"
+    ],
+    "identity-5dcb874887-6hdjx": [
+      "ghcr.io/seventh720/swe5001-sems/identity@sha256:5a0e05da55b070ea78bb975140567f01df42530871496dd4d4994b532a35fbd6"
+    ],
+    "identity-5dcb874887-nfhg7": [
+      "ghcr.io/seventh720/swe5001-sems/identity@sha256:5a0e05da55b070ea78bb975140567f01df42530871496dd4d4994b532a35fbd6"
+    ],
+    "postgres-0": [
+      "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50"
+    ],
+    "web-58c8599ff4-g2hlj": [
+      "ghcr.io/seventh720/swe5001-sems/web@sha256:d24dfe78c69b8227700659d3b21f1d76082aa41420214be4dabf7f695027aa6b"
+    ],
+    "web-58c8599ff4-zxfgk": [
+      "ghcr.io/seventh720/swe5001-sems/web@sha256:d24dfe78c69b8227700659d3b21f1d76082aa41420214be4dabf7f695027aa6b"
+    ]
+  },
+  "finishedAt": "2026-10-24T14:17:28.513319+00:00"
+}

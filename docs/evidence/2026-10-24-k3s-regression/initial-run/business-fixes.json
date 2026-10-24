@@ -1,0 +1,22 @@
+{
+  "suite": "business-fixes",
+  "startedAt": "2026-10-24T14:36:26.853593+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "environment": "sems-k3s/sems-test",
+  "status": "passed",
+  "assertionScriptSha256": "3a40ce23261cc5fbc6cb9065b7c7ad26c0ffc2ab9db0db593990df5f70a13c1f",
+  "replicasRestored": true,
+  "actions": [
+    {
+      "at": "2026-10-24T14:36:45.493503+00:00",
+      "operation": "stop",
+      "deployment": "event-catalog"
+    },
+    {
+      "at": "2026-10-24T14:36:47.119662+00:00",
+      "operation": "start",
+      "deployment": "event-catalog"
+    }
+  ],
+  "completedAt": "2026-10-24T14:37:31.042134+00:00"
+}

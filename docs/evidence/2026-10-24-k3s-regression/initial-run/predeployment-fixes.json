@@ -1,0 +1,37 @@
+{
+  "suite": "predeployment-fixes",
+  "startedAt": "2026-10-24T14:49:10.389347+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "environment": "sems-k3s/sems-test",
+  "status": "passed",
+  "assertionScriptSha256": "957e9e7798b051e4fc1db6189ced77e6af950d5c7ea15cf1e51d8943f76be0bd",
+  "replicasRestored": true,
+  "actions": [
+    {
+      "at": "2026-10-24T14:49:24.976946+00:00",
+      "operation": "stop",
+      "deployment": "admission"
+    },
+    {
+      "at": "2026-10-24T14:49:32.088447+00:00",
+      "operation": "restart",
+      "deployment": "identity"
+    },
+    {
+      "at": "2026-10-24T14:50:44.098593+00:00",
+      "operation": "restart",
+      "deployment": "event-catalog"
+    },
+    {
+      "at": "2026-10-24T14:51:56.225019+00:00",
+      "operation": "start",
+      "deployment": "admission"
+    },
+    {
+      "at": "2026-10-24T14:52:26.990567+00:00",
+      "operation": "restart",
+      "deployment": "gateway"
+    }
+  ],
+  "completedAt": "2026-10-24T14:52:56.613538+00:00"
+}

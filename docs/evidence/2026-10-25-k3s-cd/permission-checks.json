@@ -1,0 +1,32 @@
+{
+  "checks": [
+    {
+      "action": "ssm:SendCommand",
+      "resource": "arn:aws:ec2:ap-southeast-1:929219061964:instance/i-061d2aa2de119a95d",
+      "decision": "allowed"
+    },
+    {
+      "action": "ssm:SendCommand",
+      "resource": "arn:aws:ec2:ap-southeast-1:929219061964:instance/i-01771ffae12519628",
+      "decision": "implicitDeny"
+    },
+    {
+      "action": "ec2:TerminateInstances",
+      "resource": "arn:aws:ec2:ap-southeast-1:929219061964:instance/i-061d2aa2de119a95d",
+      "decision": "implicitDeny"
+    },
+    {
+      "action": "iam:CreateRole",
+      "resource": "*",
+      "decision": "implicitDeny"
+    }
+  ],
+  "deploymentBranches": [
+    {
+      "name": "main",
+      "type": "branch"
+    }
+  ],
+  "status": "passed",
+  "oidcExchangeTestedInGitHub": false
+}

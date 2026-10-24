@@ -22,6 +22,9 @@
 
 - [CI 操作](ci.md)：构建、验收、扫描、镜像交付和作业依赖。
 - [云端环境](cloud-staging.md)：Lightsail、HTTPS、发布、备份和回滚。
+- [Kubernetes 配置](kubernetes.md)：本地验证、服务独立部署与云端模板；应用尚未切换云端。
+- [EC2 K3s 环境](k3s.md)：双节点、自建控制平面、Traefik、自建 PostgreSQL、持久化和启停费用。
+- [EC2 K3s 发布](k3s-cd.md)：GitHub OIDC、SSM、digest 锁、串行滚动更新、备份和显式应用回退。
 - [组织升级](organization-upgrade.md)：已有环境的数据迁移与兼容要求。
 - [安全门禁与适用性](security.md)：运行时控制、扫描范围和限时适用性例外。
 
@@ -32,4 +35,10 @@
 - [性能与可用性实验](performance-and-availability.md)：数据、负载、副本对照、故障恢复和库存审计。
 - [云端容量记录](evidence/2026-10-22-cloud-capacity/README.md)：已完成实验的参数、结果和清理记录。
 - [原始验收证据](evidence/)：按日期保留，不替代当前发布状态。
+- [本地 Kubernetes 验收](evidence/2026-10-24-kubernetes-local/README.md)：两个 Admission Pod 的库存、重放、核销、取消及数据隔离；不代表 EKS 容量结论。
+- [EC2 K3s 基础设施验收](evidence/2026-10-24-k3s-bootstrap/README.md)：初始化阶段的两个真实节点、跨节点 DNS/Service、两个公网 HTTP 入口。
+- [EC2 K3s 自建 PostgreSQL 验收](evidence/2026-10-24-k3s-postgres/README.md)：角色/schema 与网络隔离、Pod 重建数据保留、异机备份与临时库恢复。
+- [EC2 K3s 应用与 HTTPS 验收](evidence/2026-10-24-k3s-application/README.md)：跨主机业务并发、可信 HTTPS、Admission 独立扩缩容和 Pod 重建。
+- [EC2 K3s 完整业务回归](evidence/2026-10-24-k3s-regression/README.md)：12 个业务套件、跨节点并发、真实 Catalog Pod 故障、数据库审计及移动浏览器闭环。
+- [EC2 K3s 发布与回退验收](evidence/2026-10-25-k3s-cd/README.md)：SSM 发布、失败候选拒绝、兼容镜像切换及已验证前驱回退；真实 GitHub OIDC 发布待合并验证。
 - [阶段复查归档](archive/README.md)：历史版本的问题与检查结果。

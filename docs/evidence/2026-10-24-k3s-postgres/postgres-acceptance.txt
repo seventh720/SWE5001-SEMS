@@ -1,0 +1,2934 @@
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test get pod postgres-0 -o json
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "creationTimestamp": "2026-10-24T14:04:14Z",
+        "generateName": "postgres-",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/name": "postgres",
+            "app.kubernetes.io/part-of": "sems",
+            "apps.kubernetes.io/pod-index": "0",
+            "controller-revision-hash": "postgres-5f74fbd8c",
+            "statefulset.kubernetes.io/pod-name": "postgres-0"
+        },
+        "name": "postgres-0",
+        "namespace": "sems-test",
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "StatefulSet",
+                "name": "postgres",
+                "uid": "7804bc1c-d645-4624-aeba-83d9d35e8c84"
+            }
+        ],
+        "resourceVersion": "1681",
+        "uid": "b31a99ba-6a0b-49db-af20-ca7a4c8f0daf"
+    },
+    "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+            {
+                "args": [
+                    "postgres",
+                    "-c",
+                    "hba_file=/etc/postgresql/pg_hba.conf"
+                ],
+                "env": [
+                    {
+                        "name": "POSTGRES_DB",
+                        "value": "sems"
+                    },
+                    {
+                        "name": "POSTGRES_USER",
+                        "value": "postgres"
+                    },
+                    {
+                        "name": "PGDATA",
+                        "value": "/var/lib/postgresql/data/pgdata"
+                    }
+                ],
+                "envFrom": [
+                    {
+                        "secretRef": {
+                            "name": "postgres-secrets"
+                        }
+                    }
+                ],
+                "image": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "postgres",
+                "ports": [
+                    {
+                        "containerPort": 5432,
+                        "name": "postgres",
+                        "protocol": "TCP"
+                    }
+                ],
+                "readinessProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 3,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "readOnlyRootFilesystem": true
+                },
+                "startupProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 60,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "hostname": "postgres-0",
+        "nodeName": "sems-k3s-worker",
+        "nodeSelector": {
+            "kubernetes.io/hostname": "sems-k3s-worker"
+        },
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {
+            "fsGroup": 70,
+            "fsGroupChangePolicy": "OnRootMismatch",
+            "runAsGroup": 70,
+            "runAsNonRoot": true,
+            "runAsUser": 70,
+            "seccompProfile": {
+                "type": "RuntimeDefault"
+            }
+        },
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "subdomain": "postgres",
+        "terminationGracePeriodSeconds": 60,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            }
+        ],
+        "volumes": [
+            {
+                "name": "data",
+                "persistentVolumeClaim": {
+                    "claimName": "data-postgres-0"
+                }
+            },
+            {
+                "configMap": {
+                    "defaultMode": 420,
+                    "name": "postgres-auth-f4f4mtf682"
+                },
+                "name": "postgres-auth"
+            },
+            {
+                "emptyDir": {},
+                "name": "socket"
+            },
+            {
+                "emptyDir": {},
+                "name": "temporary"
+            }
+        ]
+    },
+    "status": {
+        "allocatedResources": {
+            "cpu": "250m",
+            "memory": "256Mi"
+        },
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:04:15Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:04:14Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:04:20Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:04:20Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:04:14Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "cpu": "250m",
+                    "memory": "256Mi"
+                },
+                "containerID": "containerd://2eeebf9a7e8d6c09e20c8f45d51ef8ff77e14ec24c4523ec2bffb6130756df3f",
+                "image": "sha256:69e8bef45756082f75d51d4f4c706d0a8dd43898b70503e2253b896f24ee5058",
+                "imageID": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "lastState": {},
+                "name": "postgres",
+                "ready": true,
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "restartCount": 0,
+                "started": true,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-10-24T14:04:15Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 70,
+                        "supplementalGroups": [
+                            70
+                        ],
+                        "uid": 70
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "172.31.39.232",
+        "hostIPs": [
+            {
+                "ip": "172.31.39.232"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "10.42.1.7",
+        "podIPs": [
+            {
+                "ip": "10.42.1.7"
+            }
+        ],
+        "qosClass": "Burstable",
+        "resources": {
+            "limits": {
+                "cpu": "1",
+                "memory": "768Mi"
+            },
+            "requests": {
+                "cpu": "232m",
+                "memory": "256Mi"
+            }
+        },
+        "startTime": "2026-10-24T14:04:14Z"
+    }
+}
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test get pvc data-postgres-0 -o json
+{
+    "apiVersion": "v1",
+    "kind": "PersistentVolumeClaim",
+    "metadata": {
+        "annotations": {
+            "pv.kubernetes.io/bind-completed": "yes",
+            "pv.kubernetes.io/bound-by-controller": "yes",
+            "volume.beta.kubernetes.io/storage-provisioner": "rancher.io/local-path",
+            "volume.kubernetes.io/selected-node": "sems-k3s-worker",
+            "volume.kubernetes.io/storage-provisioner": "rancher.io/local-path"
+        },
+        "creationTimestamp": "2026-10-24T13:59:05Z",
+        "finalizers": [
+            "kubernetes.io/pvc-protection"
+        ],
+        "labels": {
+            "app.kubernetes.io/name": "postgres"
+        },
+        "name": "data-postgres-0",
+        "namespace": "sems-test",
+        "resourceVersion": "1474",
+        "uid": "2b7b065f-520c-4381-bc39-9fbb7fd2d9e0"
+    },
+    "spec": {
+        "accessModes": [
+            "ReadWriteOnce"
+        ],
+        "resources": {
+            "requests": {
+                "storage": "10Gi"
+            }
+        },
+        "storageClassName": "sems-postgres-local",
+        "volumeMode": "Filesystem",
+        "volumeName": "pvc-2b7b065f-520c-4381-bc39-9fbb7fd2d9e0"
+    },
+    "status": {
+        "accessModes": [
+            "ReadWriteOnce"
+        ],
+        "capacity": {
+            "storage": "10Gi"
+        },
+        "phase": "Bound"
+    }
+}
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test get pv pvc-2b7b065f-520c-4381-bc39-9fbb7fd2d9e0 -o json
+{
+    "apiVersion": "v1",
+    "kind": "PersistentVolume",
+    "metadata": {
+        "annotations": {
+            "local.path.provisioner/selected-node": "sems-k3s-worker",
+            "pv.kubernetes.io/provisioned-by": "rancher.io/local-path"
+        },
+        "creationTimestamp": "2026-10-24T13:59:12Z",
+        "finalizers": [
+            "kubernetes.io/pv-protection"
+        ],
+        "name": "pvc-2b7b065f-520c-4381-bc39-9fbb7fd2d9e0",
+        "resourceVersion": "1471",
+        "uid": "0d32c1e6-a903-40d9-83cb-bad9bdf4903e"
+    },
+    "spec": {
+        "accessModes": [
+            "ReadWriteOnce"
+        ],
+        "capacity": {
+            "storage": "10Gi"
+        },
+        "claimRef": {
+            "apiVersion": "v1",
+            "kind": "PersistentVolumeClaim",
+            "name": "data-postgres-0",
+            "namespace": "sems-test",
+            "resourceVersion": "1452",
+            "uid": "2b7b065f-520c-4381-bc39-9fbb7fd2d9e0"
+        },
+        "hostPath": {
+            "path": "/var/lib/rancher/k3s/storage/pvc-2b7b065f-520c-4381-bc39-9fbb7fd2d9e0_sems-test_data-postgres-0",
+            "type": "DirectoryOrCreate"
+        },
+        "nodeAffinity": {
+            "required": {
+                "nodeSelectorTerms": [
+                    {
+                        "matchExpressions": [
+                            {
+                                "key": "kubernetes.io/hostname",
+                                "operator": "In",
+                                "values": [
+                                    "sems-k3s-worker"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "persistentVolumeReclaimPolicy": "Retain",
+        "storageClassName": "sems-postgres-local",
+        "volumeMode": "Filesystem"
+    },
+    "status": {
+        "lastPhaseTransitionTime": "2026-10-24T13:59:12Z",
+        "phase": "Bound"
+    }
+}
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -Atq -c SHOW server_version
+17.11
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -Atq -c SELECT nspname||':'||pg_get_userbyid(nspowner) FROM pg_namespace WHERE nspname IN ('identity','catalog','admission') ORDER BY nspname
+admission:admission_app
+catalog:catalog_app
+identity:identity_app
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- sh -ec PGPASSWORD="$IDENTITY_DB_PASSWORD" psql -h 127.0.0.1 -U identity_app -d sems -Atq -c "SELECT current_user,current_schema()"
+identity_app|identity
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -Atq -c SELECT has_schema_privilege('identity_app','catalog','USAGE')
+f
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -Atq -c SELECT has_schema_privilege('identity_app','admission','USAGE')
+f
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -Atq -c SELECT has_schema_privilege('identity_app','public','CREATE')
+f
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- sh -ec PGPASSWORD="$CATALOG_DB_PASSWORD" psql -h 127.0.0.1 -U catalog_app -d sems -Atq -c "SELECT current_user,current_schema()"
+catalog_app|catalog
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -Atq -c SELECT has_schema_privilege('catalog_app','identity','USAGE')
+f
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -Atq -c SELECT has_schema_privilege('catalog_app','admission','USAGE')
+f
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -Atq -c SELECT has_schema_privilege('catalog_app','public','CREATE')
+f
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- sh -ec PGPASSWORD="$ADMISSION_DB_PASSWORD" psql -h 127.0.0.1 -U admission_app -d sems -Atq -c "SELECT current_user,current_schema()"
+admission_app|admission
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -Atq -c SELECT has_schema_privilege('admission_app','identity','USAGE')
+f
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -Atq -c SELECT has_schema_privilege('admission_app','catalog','USAGE')
+f
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -Atq -c SELECT has_schema_privilege('admission_app','public','CREATE')
+f
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- sh -ec PGPASSWORD=incorrect-test-password psql -h 127.0.0.1 -U identity_app -d sems -c "SELECT 1"
+psql: error: connection to server at "127.0.0.1", port 5432 failed: FATAL:  password authentication failed for user "identity_app"
+command terminated with exit code 2
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test apply -f -
+pod/pg-allowed-7ed92cf26d0c created
+pod/pg-blocked-7ed92cf26d0c created
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test wait --for=condition=Ready pod/pg-allowed-7ed92cf26d0c --timeout=120s
+pod/pg-allowed-7ed92cf26d0c condition met
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test wait --for=condition=Ready pod/pg-blocked-7ed92cf26d0c --timeout=120s
+pod/pg-blocked-7ed92cf26d0c condition met
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec pg-allowed-7ed92cf26d0c -- psql -Atq -c SELECT current_user
+admission_app
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec pg-blocked-7ed92cf26d0c -- psql -Atq -c SELECT 1
+psql: error: connection to server at "postgres.sems-test.svc.cluster.local" (10.43.13.61), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+command terminated with exit code 2
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -Atq -c SET ROLE admission_app; CREATE TABLE admission.sems_probe_7ed92cf26d0c(value text NOT NULL); INSERT INTO admission.sems_probe_7ed92cf26d0c VALUES ('7ed92cf26d0c')
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test delete pod postgres-0 --wait=true --timeout=90s
+pod "postgres-0" deleted from sems-test namespace
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test get pod postgres-0 -o json
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "creationTimestamp": "2026-10-24T14:05:45Z",
+        "generateName": "postgres-",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/name": "postgres",
+            "app.kubernetes.io/part-of": "sems",
+            "apps.kubernetes.io/pod-index": "0",
+            "controller-revision-hash": "postgres-5f74fbd8c",
+            "statefulset.kubernetes.io/pod-name": "postgres-0"
+        },
+        "name": "postgres-0",
+        "namespace": "sems-test",
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "StatefulSet",
+                "name": "postgres",
+                "uid": "7804bc1c-d645-4624-aeba-83d9d35e8c84"
+            }
+        ],
+        "resourceVersion": "1790",
+        "uid": "382d4f7a-83b9-4273-9f43-bd9976f738e5"
+    },
+    "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+            {
+                "args": [
+                    "postgres",
+                    "-c",
+                    "hba_file=/etc/postgresql/pg_hba.conf"
+                ],
+                "env": [
+                    {
+                        "name": "POSTGRES_DB",
+                        "value": "sems"
+                    },
+                    {
+                        "name": "POSTGRES_USER",
+                        "value": "postgres"
+                    },
+                    {
+                        "name": "PGDATA",
+                        "value": "/var/lib/postgresql/data/pgdata"
+                    }
+                ],
+                "envFrom": [
+                    {
+                        "secretRef": {
+                            "name": "postgres-secrets"
+                        }
+                    }
+                ],
+                "image": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "postgres",
+                "ports": [
+                    {
+                        "containerPort": 5432,
+                        "name": "postgres",
+                        "protocol": "TCP"
+                    }
+                ],
+                "readinessProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 3,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "readOnlyRootFilesystem": true
+                },
+                "startupProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 60,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "hostname": "postgres-0",
+        "nodeName": "sems-k3s-worker",
+        "nodeSelector": {
+            "kubernetes.io/hostname": "sems-k3s-worker"
+        },
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {
+            "fsGroup": 70,
+            "fsGroupChangePolicy": "OnRootMismatch",
+            "runAsGroup": 70,
+            "runAsNonRoot": true,
+            "runAsUser": 70,
+            "seccompProfile": {
+                "type": "RuntimeDefault"
+            }
+        },
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "subdomain": "postgres",
+        "terminationGracePeriodSeconds": 60,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            }
+        ],
+        "volumes": [
+            {
+                "name": "data",
+                "persistentVolumeClaim": {
+                    "claimName": "data-postgres-0"
+                }
+            },
+            {
+                "configMap": {
+                    "defaultMode": 420,
+                    "name": "postgres-auth-f4f4mtf682"
+                },
+                "name": "postgres-auth"
+            },
+            {
+                "emptyDir": {},
+                "name": "socket"
+            },
+            {
+                "emptyDir": {},
+                "name": "temporary"
+            }
+        ]
+    },
+    "status": {
+        "allocatedResources": {
+            "cpu": "250m",
+            "memory": "256Mi"
+        },
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "False",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "message": "containers with unready status: [postgres]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "message": "containers with unready status: [postgres]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "image": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "imageID": "",
+                "lastState": {},
+                "name": "postgres",
+                "ready": false,
+                "restartCount": 0,
+                "started": false,
+                "state": {
+                    "waiting": {
+                        "reason": "ContainerCreating"
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "172.31.39.232",
+        "hostIPs": [
+            {
+                "ip": "172.31.39.232"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Pending",
+        "qosClass": "Burstable",
+        "resources": {
+            "limits": {
+                "cpu": "1",
+                "memory": "768Mi"
+            },
+            "requests": {
+                "cpu": "250m",
+                "memory": "256Mi"
+            }
+        },
+        "startTime": "2026-10-24T14:05:45Z"
+    }
+}
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test get pod postgres-0 -o json
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "creationTimestamp": "2026-10-24T14:05:45Z",
+        "generateName": "postgres-",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/name": "postgres",
+            "app.kubernetes.io/part-of": "sems",
+            "apps.kubernetes.io/pod-index": "0",
+            "controller-revision-hash": "postgres-5f74fbd8c",
+            "statefulset.kubernetes.io/pod-name": "postgres-0"
+        },
+        "name": "postgres-0",
+        "namespace": "sems-test",
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "StatefulSet",
+                "name": "postgres",
+                "uid": "7804bc1c-d645-4624-aeba-83d9d35e8c84"
+            }
+        ],
+        "resourceVersion": "1795",
+        "uid": "382d4f7a-83b9-4273-9f43-bd9976f738e5"
+    },
+    "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+            {
+                "args": [
+                    "postgres",
+                    "-c",
+                    "hba_file=/etc/postgresql/pg_hba.conf"
+                ],
+                "env": [
+                    {
+                        "name": "POSTGRES_DB",
+                        "value": "sems"
+                    },
+                    {
+                        "name": "POSTGRES_USER",
+                        "value": "postgres"
+                    },
+                    {
+                        "name": "PGDATA",
+                        "value": "/var/lib/postgresql/data/pgdata"
+                    }
+                ],
+                "envFrom": [
+                    {
+                        "secretRef": {
+                            "name": "postgres-secrets"
+                        }
+                    }
+                ],
+                "image": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "postgres",
+                "ports": [
+                    {
+                        "containerPort": 5432,
+                        "name": "postgres",
+                        "protocol": "TCP"
+                    }
+                ],
+                "readinessProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 3,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "readOnlyRootFilesystem": true
+                },
+                "startupProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 60,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "hostname": "postgres-0",
+        "nodeName": "sems-k3s-worker",
+        "nodeSelector": {
+            "kubernetes.io/hostname": "sems-k3s-worker"
+        },
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {
+            "fsGroup": 70,
+            "fsGroupChangePolicy": "OnRootMismatch",
+            "runAsGroup": 70,
+            "runAsNonRoot": true,
+            "runAsUser": 70,
+            "seccompProfile": {
+                "type": "RuntimeDefault"
+            }
+        },
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "subdomain": "postgres",
+        "terminationGracePeriodSeconds": 60,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            }
+        ],
+        "volumes": [
+            {
+                "name": "data",
+                "persistentVolumeClaim": {
+                    "claimName": "data-postgres-0"
+                }
+            },
+            {
+                "configMap": {
+                    "defaultMode": 420,
+                    "name": "postgres-auth-f4f4mtf682"
+                },
+                "name": "postgres-auth"
+            },
+            {
+                "emptyDir": {},
+                "name": "socket"
+            },
+            {
+                "emptyDir": {},
+                "name": "temporary"
+            }
+        ]
+    },
+    "status": {
+        "allocatedResources": {
+            "cpu": "250m",
+            "memory": "256Mi"
+        },
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:46Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "message": "containers with unready status: [postgres]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "message": "containers with unready status: [postgres]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "cpu": "250m",
+                    "memory": "256Mi"
+                },
+                "containerID": "containerd://25daf609ec7bda939788efb4f516d9e89a550cce4bc69a5e6a513c867af97a44",
+                "image": "sha256:69e8bef45756082f75d51d4f4c706d0a8dd43898b70503e2253b896f24ee5058",
+                "imageID": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "lastState": {},
+                "name": "postgres",
+                "ready": false,
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "restartCount": 0,
+                "started": false,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-10-24T14:05:46Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 70,
+                        "supplementalGroups": [
+                            70
+                        ],
+                        "uid": 70
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "172.31.39.232",
+        "hostIPs": [
+            {
+                "ip": "172.31.39.232"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "10.42.1.8",
+        "podIPs": [
+            {
+                "ip": "10.42.1.8"
+            }
+        ],
+        "qosClass": "Burstable",
+        "resources": {
+            "limits": {
+                "cpu": "1",
+                "memory": "768Mi"
+            },
+            "requests": {
+                "cpu": "250m",
+                "memory": "256Mi"
+            }
+        },
+        "startTime": "2026-10-24T14:05:45Z"
+    }
+}
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test get pod postgres-0 -o json
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "creationTimestamp": "2026-10-24T14:05:45Z",
+        "generateName": "postgres-",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/name": "postgres",
+            "app.kubernetes.io/part-of": "sems",
+            "apps.kubernetes.io/pod-index": "0",
+            "controller-revision-hash": "postgres-5f74fbd8c",
+            "statefulset.kubernetes.io/pod-name": "postgres-0"
+        },
+        "name": "postgres-0",
+        "namespace": "sems-test",
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "StatefulSet",
+                "name": "postgres",
+                "uid": "7804bc1c-d645-4624-aeba-83d9d35e8c84"
+            }
+        ],
+        "resourceVersion": "1795",
+        "uid": "382d4f7a-83b9-4273-9f43-bd9976f738e5"
+    },
+    "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+            {
+                "args": [
+                    "postgres",
+                    "-c",
+                    "hba_file=/etc/postgresql/pg_hba.conf"
+                ],
+                "env": [
+                    {
+                        "name": "POSTGRES_DB",
+                        "value": "sems"
+                    },
+                    {
+                        "name": "POSTGRES_USER",
+                        "value": "postgres"
+                    },
+                    {
+                        "name": "PGDATA",
+                        "value": "/var/lib/postgresql/data/pgdata"
+                    }
+                ],
+                "envFrom": [
+                    {
+                        "secretRef": {
+                            "name": "postgres-secrets"
+                        }
+                    }
+                ],
+                "image": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "postgres",
+                "ports": [
+                    {
+                        "containerPort": 5432,
+                        "name": "postgres",
+                        "protocol": "TCP"
+                    }
+                ],
+                "readinessProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 3,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "readOnlyRootFilesystem": true
+                },
+                "startupProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 60,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "hostname": "postgres-0",
+        "nodeName": "sems-k3s-worker",
+        "nodeSelector": {
+            "kubernetes.io/hostname": "sems-k3s-worker"
+        },
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {
+            "fsGroup": 70,
+            "fsGroupChangePolicy": "OnRootMismatch",
+            "runAsGroup": 70,
+            "runAsNonRoot": true,
+            "runAsUser": 70,
+            "seccompProfile": {
+                "type": "RuntimeDefault"
+            }
+        },
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "subdomain": "postgres",
+        "terminationGracePeriodSeconds": 60,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            }
+        ],
+        "volumes": [
+            {
+                "name": "data",
+                "persistentVolumeClaim": {
+                    "claimName": "data-postgres-0"
+                }
+            },
+            {
+                "configMap": {
+                    "defaultMode": 420,
+                    "name": "postgres-auth-f4f4mtf682"
+                },
+                "name": "postgres-auth"
+            },
+            {
+                "emptyDir": {},
+                "name": "socket"
+            },
+            {
+                "emptyDir": {},
+                "name": "temporary"
+            }
+        ]
+    },
+    "status": {
+        "allocatedResources": {
+            "cpu": "250m",
+            "memory": "256Mi"
+        },
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:46Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "message": "containers with unready status: [postgres]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "message": "containers with unready status: [postgres]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "cpu": "250m",
+                    "memory": "256Mi"
+                },
+                "containerID": "containerd://25daf609ec7bda939788efb4f516d9e89a550cce4bc69a5e6a513c867af97a44",
+                "image": "sha256:69e8bef45756082f75d51d4f4c706d0a8dd43898b70503e2253b896f24ee5058",
+                "imageID": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "lastState": {},
+                "name": "postgres",
+                "ready": false,
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "restartCount": 0,
+                "started": false,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-10-24T14:05:46Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 70,
+                        "supplementalGroups": [
+                            70
+                        ],
+                        "uid": 70
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "172.31.39.232",
+        "hostIPs": [
+            {
+                "ip": "172.31.39.232"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "10.42.1.8",
+        "podIPs": [
+            {
+                "ip": "10.42.1.8"
+            }
+        ],
+        "qosClass": "Burstable",
+        "resources": {
+            "limits": {
+                "cpu": "1",
+                "memory": "768Mi"
+            },
+            "requests": {
+                "cpu": "250m",
+                "memory": "256Mi"
+            }
+        },
+        "startTime": "2026-10-24T14:05:45Z"
+    }
+}
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test get pod postgres-0 -o json
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "creationTimestamp": "2026-10-24T14:05:45Z",
+        "generateName": "postgres-",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/name": "postgres",
+            "app.kubernetes.io/part-of": "sems",
+            "apps.kubernetes.io/pod-index": "0",
+            "controller-revision-hash": "postgres-5f74fbd8c",
+            "statefulset.kubernetes.io/pod-name": "postgres-0"
+        },
+        "name": "postgres-0",
+        "namespace": "sems-test",
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "StatefulSet",
+                "name": "postgres",
+                "uid": "7804bc1c-d645-4624-aeba-83d9d35e8c84"
+            }
+        ],
+        "resourceVersion": "1795",
+        "uid": "382d4f7a-83b9-4273-9f43-bd9976f738e5"
+    },
+    "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+            {
+                "args": [
+                    "postgres",
+                    "-c",
+                    "hba_file=/etc/postgresql/pg_hba.conf"
+                ],
+                "env": [
+                    {
+                        "name": "POSTGRES_DB",
+                        "value": "sems"
+                    },
+                    {
+                        "name": "POSTGRES_USER",
+                        "value": "postgres"
+                    },
+                    {
+                        "name": "PGDATA",
+                        "value": "/var/lib/postgresql/data/pgdata"
+                    }
+                ],
+                "envFrom": [
+                    {
+                        "secretRef": {
+                            "name": "postgres-secrets"
+                        }
+                    }
+                ],
+                "image": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "postgres",
+                "ports": [
+                    {
+                        "containerPort": 5432,
+                        "name": "postgres",
+                        "protocol": "TCP"
+                    }
+                ],
+                "readinessProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 3,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "readOnlyRootFilesystem": true
+                },
+                "startupProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 60,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "hostname": "postgres-0",
+        "nodeName": "sems-k3s-worker",
+        "nodeSelector": {
+            "kubernetes.io/hostname": "sems-k3s-worker"
+        },
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {
+            "fsGroup": 70,
+            "fsGroupChangePolicy": "OnRootMismatch",
+            "runAsGroup": 70,
+            "runAsNonRoot": true,
+            "runAsUser": 70,
+            "seccompProfile": {
+                "type": "RuntimeDefault"
+            }
+        },
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "subdomain": "postgres",
+        "terminationGracePeriodSeconds": 60,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            }
+        ],
+        "volumes": [
+            {
+                "name": "data",
+                "persistentVolumeClaim": {
+                    "claimName": "data-postgres-0"
+                }
+            },
+            {
+                "configMap": {
+                    "defaultMode": 420,
+                    "name": "postgres-auth-f4f4mtf682"
+                },
+                "name": "postgres-auth"
+            },
+            {
+                "emptyDir": {},
+                "name": "socket"
+            },
+            {
+                "emptyDir": {},
+                "name": "temporary"
+            }
+        ]
+    },
+    "status": {
+        "allocatedResources": {
+            "cpu": "250m",
+            "memory": "256Mi"
+        },
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:46Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "message": "containers with unready status: [postgres]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "message": "containers with unready status: [postgres]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "cpu": "250m",
+                    "memory": "256Mi"
+                },
+                "containerID": "containerd://25daf609ec7bda939788efb4f516d9e89a550cce4bc69a5e6a513c867af97a44",
+                "image": "sha256:69e8bef45756082f75d51d4f4c706d0a8dd43898b70503e2253b896f24ee5058",
+                "imageID": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "lastState": {},
+                "name": "postgres",
+                "ready": false,
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "restartCount": 0,
+                "started": false,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-10-24T14:05:46Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 70,
+                        "supplementalGroups": [
+                            70
+                        ],
+                        "uid": 70
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "172.31.39.232",
+        "hostIPs": [
+            {
+                "ip": "172.31.39.232"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "10.42.1.8",
+        "podIPs": [
+            {
+                "ip": "10.42.1.8"
+            }
+        ],
+        "qosClass": "Burstable",
+        "resources": {
+            "limits": {
+                "cpu": "1",
+                "memory": "768Mi"
+            },
+            "requests": {
+                "cpu": "250m",
+                "memory": "256Mi"
+            }
+        },
+        "startTime": "2026-10-24T14:05:45Z"
+    }
+}
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test get pod postgres-0 -o json
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "creationTimestamp": "2026-10-24T14:05:45Z",
+        "generateName": "postgres-",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/name": "postgres",
+            "app.kubernetes.io/part-of": "sems",
+            "apps.kubernetes.io/pod-index": "0",
+            "controller-revision-hash": "postgres-5f74fbd8c",
+            "statefulset.kubernetes.io/pod-name": "postgres-0"
+        },
+        "name": "postgres-0",
+        "namespace": "sems-test",
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "StatefulSet",
+                "name": "postgres",
+                "uid": "7804bc1c-d645-4624-aeba-83d9d35e8c84"
+            }
+        ],
+        "resourceVersion": "1795",
+        "uid": "382d4f7a-83b9-4273-9f43-bd9976f738e5"
+    },
+    "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+            {
+                "args": [
+                    "postgres",
+                    "-c",
+                    "hba_file=/etc/postgresql/pg_hba.conf"
+                ],
+                "env": [
+                    {
+                        "name": "POSTGRES_DB",
+                        "value": "sems"
+                    },
+                    {
+                        "name": "POSTGRES_USER",
+                        "value": "postgres"
+                    },
+                    {
+                        "name": "PGDATA",
+                        "value": "/var/lib/postgresql/data/pgdata"
+                    }
+                ],
+                "envFrom": [
+                    {
+                        "secretRef": {
+                            "name": "postgres-secrets"
+                        }
+                    }
+                ],
+                "image": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "postgres",
+                "ports": [
+                    {
+                        "containerPort": 5432,
+                        "name": "postgres",
+                        "protocol": "TCP"
+                    }
+                ],
+                "readinessProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 3,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "readOnlyRootFilesystem": true
+                },
+                "startupProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 60,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "hostname": "postgres-0",
+        "nodeName": "sems-k3s-worker",
+        "nodeSelector": {
+            "kubernetes.io/hostname": "sems-k3s-worker"
+        },
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {
+            "fsGroup": 70,
+            "fsGroupChangePolicy": "OnRootMismatch",
+            "runAsGroup": 70,
+            "runAsNonRoot": true,
+            "runAsUser": 70,
+            "seccompProfile": {
+                "type": "RuntimeDefault"
+            }
+        },
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "subdomain": "postgres",
+        "terminationGracePeriodSeconds": 60,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            }
+        ],
+        "volumes": [
+            {
+                "name": "data",
+                "persistentVolumeClaim": {
+                    "claimName": "data-postgres-0"
+                }
+            },
+            {
+                "configMap": {
+                    "defaultMode": 420,
+                    "name": "postgres-auth-f4f4mtf682"
+                },
+                "name": "postgres-auth"
+            },
+            {
+                "emptyDir": {},
+                "name": "socket"
+            },
+            {
+                "emptyDir": {},
+                "name": "temporary"
+            }
+        ]
+    },
+    "status": {
+        "allocatedResources": {
+            "cpu": "250m",
+            "memory": "256Mi"
+        },
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:46Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "message": "containers with unready status: [postgres]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "message": "containers with unready status: [postgres]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "cpu": "250m",
+                    "memory": "256Mi"
+                },
+                "containerID": "containerd://25daf609ec7bda939788efb4f516d9e89a550cce4bc69a5e6a513c867af97a44",
+                "image": "sha256:69e8bef45756082f75d51d4f4c706d0a8dd43898b70503e2253b896f24ee5058",
+                "imageID": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "lastState": {},
+                "name": "postgres",
+                "ready": false,
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "restartCount": 0,
+                "started": false,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-10-24T14:05:46Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 70,
+                        "supplementalGroups": [
+                            70
+                        ],
+                        "uid": 70
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "172.31.39.232",
+        "hostIPs": [
+            {
+                "ip": "172.31.39.232"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "10.42.1.8",
+        "podIPs": [
+            {
+                "ip": "10.42.1.8"
+            }
+        ],
+        "qosClass": "Burstable",
+        "resources": {
+            "limits": {
+                "cpu": "1",
+                "memory": "768Mi"
+            },
+            "requests": {
+                "cpu": "250m",
+                "memory": "256Mi"
+            }
+        },
+        "startTime": "2026-10-24T14:05:45Z"
+    }
+}
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test get pod postgres-0 -o json
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "creationTimestamp": "2026-10-24T14:05:45Z",
+        "generateName": "postgres-",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/name": "postgres",
+            "app.kubernetes.io/part-of": "sems",
+            "apps.kubernetes.io/pod-index": "0",
+            "controller-revision-hash": "postgres-5f74fbd8c",
+            "statefulset.kubernetes.io/pod-name": "postgres-0"
+        },
+        "name": "postgres-0",
+        "namespace": "sems-test",
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "StatefulSet",
+                "name": "postgres",
+                "uid": "7804bc1c-d645-4624-aeba-83d9d35e8c84"
+            }
+        ],
+        "resourceVersion": "1800",
+        "uid": "382d4f7a-83b9-4273-9f43-bd9976f738e5"
+    },
+    "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+            {
+                "args": [
+                    "postgres",
+                    "-c",
+                    "hba_file=/etc/postgresql/pg_hba.conf"
+                ],
+                "env": [
+                    {
+                        "name": "POSTGRES_DB",
+                        "value": "sems"
+                    },
+                    {
+                        "name": "POSTGRES_USER",
+                        "value": "postgres"
+                    },
+                    {
+                        "name": "PGDATA",
+                        "value": "/var/lib/postgresql/data/pgdata"
+                    }
+                ],
+                "envFrom": [
+                    {
+                        "secretRef": {
+                            "name": "postgres-secrets"
+                        }
+                    }
+                ],
+                "image": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "postgres",
+                "ports": [
+                    {
+                        "containerPort": 5432,
+                        "name": "postgres",
+                        "protocol": "TCP"
+                    }
+                ],
+                "readinessProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 3,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "readOnlyRootFilesystem": true
+                },
+                "startupProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 60,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "hostname": "postgres-0",
+        "nodeName": "sems-k3s-worker",
+        "nodeSelector": {
+            "kubernetes.io/hostname": "sems-k3s-worker"
+        },
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {
+            "fsGroup": 70,
+            "fsGroupChangePolicy": "OnRootMismatch",
+            "runAsGroup": 70,
+            "runAsNonRoot": true,
+            "runAsUser": 70,
+            "seccompProfile": {
+                "type": "RuntimeDefault"
+            }
+        },
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "subdomain": "postgres",
+        "terminationGracePeriodSeconds": 60,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            }
+        ],
+        "volumes": [
+            {
+                "name": "data",
+                "persistentVolumeClaim": {
+                    "claimName": "data-postgres-0"
+                }
+            },
+            {
+                "configMap": {
+                    "defaultMode": 420,
+                    "name": "postgres-auth-f4f4mtf682"
+                },
+                "name": "postgres-auth"
+            },
+            {
+                "emptyDir": {},
+                "name": "socket"
+            },
+            {
+                "emptyDir": {},
+                "name": "temporary"
+            }
+        ]
+    },
+    "status": {
+        "allocatedResources": {
+            "cpu": "250m",
+            "memory": "256Mi"
+        },
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:46Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "message": "containers with unready status: [postgres]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "message": "containers with unready status: [postgres]",
+                "observedGeneration": 1,
+                "reason": "ContainersNotReady",
+                "status": "False",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "cpu": "250m",
+                    "memory": "256Mi"
+                },
+                "containerID": "containerd://25daf609ec7bda939788efb4f516d9e89a550cce4bc69a5e6a513c867af97a44",
+                "image": "sha256:69e8bef45756082f75d51d4f4c706d0a8dd43898b70503e2253b896f24ee5058",
+                "imageID": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "lastState": {},
+                "name": "postgres",
+                "ready": false,
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "restartCount": 0,
+                "started": true,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-10-24T14:05:46Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 70,
+                        "supplementalGroups": [
+                            70
+                        ],
+                        "uid": 70
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "172.31.39.232",
+        "hostIPs": [
+            {
+                "ip": "172.31.39.232"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "10.42.1.8",
+        "podIPs": [
+            {
+                "ip": "10.42.1.8"
+            }
+        ],
+        "qosClass": "Burstable",
+        "resources": {
+            "limits": {
+                "cpu": "1",
+                "memory": "768Mi"
+            },
+            "requests": {
+                "cpu": "232m",
+                "memory": "256Mi"
+            }
+        },
+        "startTime": "2026-10-24T14:05:45Z"
+    }
+}
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test get pod postgres-0 -o json
+{
+    "apiVersion": "v1",
+    "kind": "Pod",
+    "metadata": {
+        "creationTimestamp": "2026-10-24T14:05:45Z",
+        "generateName": "postgres-",
+        "generation": 1,
+        "labels": {
+            "app.kubernetes.io/name": "postgres",
+            "app.kubernetes.io/part-of": "sems",
+            "apps.kubernetes.io/pod-index": "0",
+            "controller-revision-hash": "postgres-5f74fbd8c",
+            "statefulset.kubernetes.io/pod-name": "postgres-0"
+        },
+        "name": "postgres-0",
+        "namespace": "sems-test",
+        "ownerReferences": [
+            {
+                "apiVersion": "apps/v1",
+                "blockOwnerDeletion": true,
+                "controller": true,
+                "kind": "StatefulSet",
+                "name": "postgres",
+                "uid": "7804bc1c-d645-4624-aeba-83d9d35e8c84"
+            }
+        ],
+        "resourceVersion": "1801",
+        "uid": "382d4f7a-83b9-4273-9f43-bd9976f738e5"
+    },
+    "spec": {
+        "automountServiceAccountToken": false,
+        "containers": [
+            {
+                "args": [
+                    "postgres",
+                    "-c",
+                    "hba_file=/etc/postgresql/pg_hba.conf"
+                ],
+                "env": [
+                    {
+                        "name": "POSTGRES_DB",
+                        "value": "sems"
+                    },
+                    {
+                        "name": "POSTGRES_USER",
+                        "value": "postgres"
+                    },
+                    {
+                        "name": "PGDATA",
+                        "value": "/var/lib/postgresql/data/pgdata"
+                    }
+                ],
+                "envFrom": [
+                    {
+                        "secretRef": {
+                            "name": "postgres-secrets"
+                        }
+                    }
+                ],
+                "image": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "imagePullPolicy": "IfNotPresent",
+                "name": "postgres",
+                "ports": [
+                    {
+                        "containerPort": 5432,
+                        "name": "postgres",
+                        "protocol": "TCP"
+                    }
+                ],
+                "readinessProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 3,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                        "drop": [
+                            "ALL"
+                        ]
+                    },
+                    "readOnlyRootFilesystem": true
+                },
+                "startupProbe": {
+                    "exec": {
+                        "command": [
+                            "sh",
+                            "-ec",
+                            "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""
+                        ]
+                    },
+                    "failureThreshold": 60,
+                    "periodSeconds": 5,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 2
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "dnsPolicy": "ClusterFirst",
+        "enableServiceLinks": true,
+        "hostname": "postgres-0",
+        "nodeName": "sems-k3s-worker",
+        "nodeSelector": {
+            "kubernetes.io/hostname": "sems-k3s-worker"
+        },
+        "preemptionPolicy": "PreemptLowerPriority",
+        "priority": 0,
+        "restartPolicy": "Always",
+        "schedulerName": "default-scheduler",
+        "securityContext": {
+            "fsGroup": 70,
+            "fsGroupChangePolicy": "OnRootMismatch",
+            "runAsGroup": 70,
+            "runAsNonRoot": true,
+            "runAsUser": 70,
+            "seccompProfile": {
+                "type": "RuntimeDefault"
+            }
+        },
+        "serviceAccount": "default",
+        "serviceAccountName": "default",
+        "subdomain": "postgres",
+        "terminationGracePeriodSeconds": 60,
+        "tolerations": [
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/not-ready",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            },
+            {
+                "effect": "NoExecute",
+                "key": "node.kubernetes.io/unreachable",
+                "operator": "Exists",
+                "tolerationSeconds": 300
+            }
+        ],
+        "volumes": [
+            {
+                "name": "data",
+                "persistentVolumeClaim": {
+                    "claimName": "data-postgres-0"
+                }
+            },
+            {
+                "configMap": {
+                    "defaultMode": 420,
+                    "name": "postgres-auth-f4f4mtf682"
+                },
+                "name": "postgres-auth"
+            },
+            {
+                "emptyDir": {},
+                "name": "socket"
+            },
+            {
+                "emptyDir": {},
+                "name": "temporary"
+            }
+        ]
+    },
+    "status": {
+        "allocatedResources": {
+            "cpu": "250m",
+            "memory": "256Mi"
+        },
+        "conditions": [
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:46Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodReadyToStartContainers"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Initialized"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:51Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "Ready"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:51Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "ContainersReady"
+            },
+            {
+                "lastProbeTime": null,
+                "lastTransitionTime": "2026-10-24T14:05:45Z",
+                "observedGeneration": 1,
+                "status": "True",
+                "type": "PodScheduled"
+            }
+        ],
+        "containerStatuses": [
+            {
+                "allocatedResources": {
+                    "cpu": "250m",
+                    "memory": "256Mi"
+                },
+                "containerID": "containerd://25daf609ec7bda939788efb4f516d9e89a550cce4bc69a5e6a513c867af97a44",
+                "image": "sha256:69e8bef45756082f75d51d4f4c706d0a8dd43898b70503e2253b896f24ee5058",
+                "imageID": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+                "lastState": {},
+                "name": "postgres",
+                "ready": true,
+                "resources": {
+                    "limits": {
+                        "cpu": "1",
+                        "memory": "768Mi"
+                    },
+                    "requests": {
+                        "cpu": "250m",
+                        "memory": "256Mi"
+                    }
+                },
+                "restartCount": 0,
+                "started": true,
+                "state": {
+                    "running": {
+                        "startedAt": "2026-10-24T14:05:46Z"
+                    }
+                },
+                "user": {
+                    "linux": {
+                        "gid": 70,
+                        "supplementalGroups": [
+                            70
+                        ],
+                        "uid": 70
+                    }
+                },
+                "volumeMounts": [
+                    {
+                        "mountPath": "/etc/postgresql",
+                        "name": "postgres-auth",
+                        "readOnly": true,
+                        "recursiveReadOnly": "Disabled"
+                    },
+                    {
+                        "mountPath": "/var/lib/postgresql/data",
+                        "name": "data"
+                    },
+                    {
+                        "mountPath": "/var/run/postgresql",
+                        "name": "socket"
+                    },
+                    {
+                        "mountPath": "/tmp",
+                        "name": "temporary"
+                    }
+                ]
+            }
+        ],
+        "hostIP": "172.31.39.232",
+        "hostIPs": [
+            {
+                "ip": "172.31.39.232"
+            }
+        ],
+        "observedGeneration": 1,
+        "phase": "Running",
+        "podIP": "10.42.1.8",
+        "podIPs": [
+            {
+                "ip": "10.42.1.8"
+            }
+        ],
+        "qosClass": "Burstable",
+        "resources": {
+            "limits": {
+                "cpu": "1",
+                "memory": "768Mi"
+            },
+            "requests": {
+                "cpu": "232m",
+                "memory": "256Mi"
+            }
+        },
+        "startTime": "2026-10-24T14:05:45Z"
+    }
+}
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -Atq -c SELECT value FROM admission.sems_probe_7ed92cf26d0c
+7ed92cf26d0c
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test get pvc data-postgres-0 -o json
+{
+    "apiVersion": "v1",
+    "kind": "PersistentVolumeClaim",
+    "metadata": {
+        "annotations": {
+            "pv.kubernetes.io/bind-completed": "yes",
+            "pv.kubernetes.io/bound-by-controller": "yes",
+            "volume.beta.kubernetes.io/storage-provisioner": "rancher.io/local-path",
+            "volume.kubernetes.io/selected-node": "sems-k3s-worker",
+            "volume.kubernetes.io/storage-provisioner": "rancher.io/local-path"
+        },
+        "creationTimestamp": "2026-10-24T13:59:05Z",
+        "finalizers": [
+            "kubernetes.io/pvc-protection"
+        ],
+        "labels": {
+            "app.kubernetes.io/name": "postgres"
+        },
+        "name": "data-postgres-0",
+        "namespace": "sems-test",
+        "resourceVersion": "1474",
+        "uid": "2b7b065f-520c-4381-bc39-9fbb7fd2d9e0"
+    },
+    "spec": {
+        "accessModes": [
+            "ReadWriteOnce"
+        ],
+        "resources": {
+            "requests": {
+                "storage": "10Gi"
+            }
+        },
+        "storageClassName": "sems-postgres-local",
+        "volumeMode": "Filesystem",
+        "volumeName": "pvc-2b7b065f-520c-4381-bc39-9fbb7fd2d9e0"
+    },
+    "status": {
+        "accessModes": [
+            "ReadWriteOnce"
+        ],
+        "capacity": {
+            "storage": "10Gi"
+        },
+        "phase": "Bound"
+    }
+}
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- createdb -U postgres sems_restore_7ed92cf26d0c
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems_restore_7ed92cf26d0c -Atq -c SELECT value FROM admission.sems_probe_7ed92cf26d0c
+7ed92cf26d0c
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- dropdb -U postgres --if-exists sems_restore_7ed92cf26d0c
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test exec postgres-0 -- psql -v ON_ERROR_STOP=1 -U postgres -d sems -c DROP TABLE IF EXISTS admission.sems_probe_7ed92cf26d0c
+DROP TABLE
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-test delete pod pg-allowed-7ed92cf26d0c pg-blocked-7ed92cf26d0c --ignore-not-found=true --wait=true --timeout=30s
+pod "pg-allowed-7ed92cf26d0c" deleted from sems-test namespace
+pod "pg-blocked-7ed92cf26d0c" deleted from sems-test namespace

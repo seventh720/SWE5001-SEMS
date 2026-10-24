@@ -1,0 +1,1278 @@
+{
+  "startedAt": "2026-10-24T14:20:13.723661+00:00",
+  "environment": "sems-k3s/sems-test",
+  "status": "passed",
+  "tests": [
+    {
+      "name": "Admission independently scales from two to one",
+      "status": "passed"
+    },
+    {
+      "name": "Admission independently scales from one to two",
+      "status": "passed",
+      "nodes": [
+        "sems-k3s-worker",
+        "sems-k3s-server"
+      ]
+    },
+    {
+      "name": "one Admission Pod is recreated without restarting other services",
+      "status": "passed",
+      "observedReplacementReadySeconds": 26.503,
+      "deletedPodUid": "d92625cc-a0fa-49b8-8bc0-d59b0b17c0c3",
+      "finalAdmissionPodUids": [
+        "ba4ece71-d530-447e-bc13-a4dff821c520",
+        "11e044b3-5f9e-4c25-8ee0-0668e8e7ec68"
+      ],
+      "bookingAndTicketCountsPreserved": true
+    }
+  ],
+  "baselineOtherServicePodUids": {
+    "identity": [
+      "768dec61-7099-45f1-b364-6464d8b28179",
+      "d11e2854-aa30-477e-8d85-4ebdcd95fd28"
+    ],
+    "event-catalog": [
+      "9acf8b45-70c0-484b-aa5d-29c20dbc5b9a",
+      "f8889e8a-760c-48d9-9a42-fe7714797995"
+    ]
+  },
+  "baselineAdmissionPodUids": [
+    "bf4da25d-8116-46f8-859b-c1505723dddb",
+    "d92625cc-a0fa-49b8-8bc0-d59b0b17c0c3"
+  ],
+  "httpSamples": [
+    {
+      "at": "2026-10-24T14:20:14.408573+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:14.556332+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:14.617744+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:14.669412+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:14.763789+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:15.945210+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:16.011605+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:16.070789+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:16.161905+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:16.486509+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:17.543525+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:17.628961+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:17.715766+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:17.787949+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:18.011927+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:19.099587+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:19.168784+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:19.236813+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:19.287062+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:19.371643+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:20.456279+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:20.641873+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:20.709231+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:20.769806+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:20.855306+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:21.915172+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:21.998114+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:22.296649+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:22.378797+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:22.475332+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:23.592906+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:23.673231+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:23.811500+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:23.871460+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:23.973812+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:25.063292+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:25.123787+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:25.176806+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:25.223206+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:25.379778+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:26.487182+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:26.572624+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:26.677779+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:26.750049+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:26.921211+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:27.995659+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:28.067759+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:28.127854+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:28.189935+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:28.271987+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:29.371941+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:29.548134+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:29.643725+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:29.704251+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:29.782312+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:30.933354+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:30.998620+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:31.166047+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:31.259742+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:31.356277+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:32.450396+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:32.513905+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:32.584940+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:32.763893+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:32.832137+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:33.900087+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:33.967316+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:34.041500+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:34.106707+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:34.267244+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:35.366337+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:35.470716+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:35.578159+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:35.669777+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:35.840607+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:36.906496+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:36.969179+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:37.035613+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:37.078649+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:37.173902+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:38.264081+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:38.345174+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:38.393367+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:38.462048+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:38.550691+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:39.588114+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:39.688241+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:39.764260+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:39.805385+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:39.877323+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:40.982457+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:41.068053+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:41.137481+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:41.195242+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:41.276182+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:42.371072+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:42.424582+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:42.558843+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:42.616938+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:42.780653+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:43.826447+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:43.871767+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:43.922143+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:43.966158+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:44.111249+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:45.187559+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:45.244628+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:45.300069+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:45.366591+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:45.423231+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:46.487750+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:46.541879+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:46.588173+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:46.636162+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:46.692821+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:47.742682+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:47.800250+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:47.846986+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:47.904142+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:47.978900+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:49.044008+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:49.089140+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:49.131903+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:49.185465+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:49.257132+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:50.330059+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:50.383146+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:50.433389+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:50.484962+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:50.548472+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:51.613178+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:51.680316+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:51.731473+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:51.795239+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:51.865895+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:52.926019+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:52.984729+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:53.035251+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:53.083126+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:53.147509+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:54.192226+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:54.240539+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:54.291075+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:54.343965+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:54.407071+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:55.471332+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:55.521123+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:55.938299+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:56.006929+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:56.069420+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:57.141111+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:57.191132+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:57.239974+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:57.288688+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:57.353924+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:58.415294+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:58.476221+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:58.523929+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:58.577509+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:58.633691+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:59.685847+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:59.731173+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:59.777831+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:59.826592+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:20:59.896289+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:00.952081+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:01.007497+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:01.055356+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:01.107972+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:01.183569+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:02.256061+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:02.353315+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:02.429547+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:02.580695+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:02.760458+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:03.824888+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:03.887646+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:03.936115+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:04.001412+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:04.101228+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:05.164631+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:05.211281+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:05.256434+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:05.313177+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:05.382002+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:06.456788+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:06.511262+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:06.573281+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:06.632731+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:06.707214+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:07.767728+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:07.822244+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:07.875310+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:07.941997+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:08.022281+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:09.085131+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:09.127984+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:09.175164+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:09.222770+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:09.306716+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:10.367031+00:00",
+      "path": "/",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:10.419616+00:00",
+      "path": "/health/identity",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:10.466889+00:00",
+      "path": "/health/event-catalog",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:10.525644+00:00",
+      "path": "/health/admission",
+      "status": "200",
+      "exit": 0
+    },
+    {
+      "at": "2026-10-24T14:21:10.582904+00:00",
+      "path": "/api/v1/events?size=5",
+      "status": "200",
+      "exit": 0
+    }
+  ],
+  "httpFailures": [],
+  "finishedAt": "2026-10-24T14:21:11.132172+00:00"
+}

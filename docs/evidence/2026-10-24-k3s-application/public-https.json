@@ -1,0 +1,44 @@
+{
+  "recordedAt": "2026-10-24T14:19:45.699077+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "tlsVerifyResult": 0,
+      "remoteIp": "13.229.121.219"
+    },
+    {
+      "path": "/health/gateway",
+      "status": 200,
+      "tlsVerifyResult": 0,
+      "remoteIp": "13.229.121.219"
+    },
+    {
+      "path": "/health/identity",
+      "status": 200,
+      "tlsVerifyResult": 0,
+      "remoteIp": "13.229.121.219"
+    },
+    {
+      "path": "/health/event-catalog",
+      "status": 200,
+      "tlsVerifyResult": 0,
+      "remoteIp": "13.229.121.219"
+    },
+    {
+      "path": "/health/admission",
+      "status": 200,
+      "tlsVerifyResult": 0,
+      "remoteIp": "13.229.121.219"
+    },
+    {
+      "path": "/internal/v1/events/details",
+      "status": 404,
+      "tlsVerifyResult": 0,
+      "remoteIp": "13.229.121.219"
+    }
+  ],
+  "httpRedirect": "301 https://sems-test.seventh720.com/",
+  "status": "passed"
+}

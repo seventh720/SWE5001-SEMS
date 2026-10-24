@@ -1,0 +1,3 @@
+storageclass.storage.k8s.io/sems-traefik-local created
+persistentvolumeclaim/traefik-acme created
+helmchartconfig.helm.cattle.io/traefik created

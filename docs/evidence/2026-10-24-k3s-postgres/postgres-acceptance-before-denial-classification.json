@@ -1,0 +1,40 @@
+{
+  "startedAt": "2026-10-24T14:04:30.389956+00:00",
+  "environment": "sems-k3s/sems-test",
+  "status": "failed",
+  "tests": [
+    {
+      "name": "database state and volume",
+      "status": "passed"
+    },
+    {
+      "name": "schema ownership and authenticated application roles",
+      "status": "passed",
+      "schemaOwners": [
+        "admission:admission_app",
+        "catalog:catalog_app",
+        "identity:identity_app"
+      ],
+      "crossSchemaDenials": 6,
+      "publicCreateDenials": 3,
+      "invalidPassword": "rejected"
+    },
+    {
+      "name": "database network policy from another node",
+      "status": "failed",
+      "error": ""
+    }
+  ],
+  "databaseManifestSha256": "a8699b2ed1dad15566ac67a3d35f8ea537a93d365927f543dd1e0b633c107a07",
+  "imageID": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+  "version": "17.11",
+  "volume": {
+    "name": "pvc-2b7b065f-520c-4381-bc39-9fbb7fd2d9e0",
+    "claimUid": "2b7b065f-520c-4381-bc39-9fbb7fd2d9e0",
+    "node": "sems-k3s-worker",
+    "reclaimPolicy": "Retain",
+    "path": "/var/lib/rancher/k3s/storage/pvc-2b7b065f-520c-4381-bc39-9fbb7fd2d9e0_sems-test_data-postgres-0"
+  },
+  "cleanupErrors": [],
+  "finishedAt": "2026-10-24T14:04:57.451086+00:00"
+}

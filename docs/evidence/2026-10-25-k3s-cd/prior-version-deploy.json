@@ -1,0 +1,10 @@
+{
+  "CommandId": "fdd165d8-d0be-472f-8fb3-c7f77bea94b7",
+  "InstanceId": "i-061d2aa2de119a95d",
+  "Status": "Success",
+  "ResponseCode": 0,
+  "ExecutionStartDateTime": "2026-10-24T17:06:53.967Z",
+  "ExecutionEndDateTime": "2026-10-24T17:11:17.967Z",
+  "StandardOutputContent": "Pre-deployment backup complete\nReady: identity\nReady: event-catalog\nReady: admission\nReady: web\nReady: gateway\n{\"operation\": \"deploy\", \"releaseId\": \"fb27bbf52142700351318ba18c83bb51a9783298-2026102501-4\", \"sourceCommit\": \"fb27bbf52142700351318ba18c83bb51a9783298\", \"startedAt\": \"2026-10-24T17:06:54.317860+00:00\", \"status\": \"passed\", \"backup\": [{\"file\": \"fb27bbf52142700351318ba18c83bb51a9783298-2026102501-4.dump\", \"bytes\": 298645, \"sha256\": \"0027ef35135b1c7ba806997329c429d1d72d0d0630ed4b9414e5edb89ff99673\"}, {\"file\": \"fb27bbf52142700351318ba18c83bb51a9783298-2026102501-4.roles.sql\", \"bytes\": 1199, \"sha256\": \"c09b36b7ee7f2eb93d2a5a530a9d475ce7b4149a8c9d5076f26c29a24491d409\"}], \"verification\": {\"verifiedHttpsPaths\": [\"/\", \"/health/gateway\", \"/health/identity\", \"/health/event-catalog\", \"/health/admission\"], \"internalApiStatus\": 404, \"adminLoginAndJwt\": true, \"images\": {\"admission\": \"ghcr.io/seventh720/swe5001-sems/admission@sha256:d26e22bb2a086249425f284e982fc6e68870a64907c319697b42231413f97f4c\", \"event-catalog\": \"ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:1ab14af2625ddc7c9117138778aca89a938fbda5e9efa687e0fe49210172ca65\", \"gateway\": \"ghcr.io/seventh720/swe5001-sems/gateway@sha256:16333cd40629728da02632c4c15c6c7fd56e7b593ad1b5f29490b4dbca2126b0\", \"identity\": \"ghcr.io/seventh720/swe5001-sems/identity@sha256:5a0e05da55b070ea78bb975140567f01df42530871496dd4d4994b532a35fbd6\", \"web\": \"ghcr.io/seventh720/swe5001-sems/web@sha256:d24dfe78c69b8227700659d3b21f1d76082aa41420214be4dabf7f695027aa6b\"}}, \"databasePodAndPvcUnchanged\": true, \"completedAt\": \"2026-10-24T17:11:18.282869+00:00\"}\n",
+  "StandardErrorContent": ""
+}

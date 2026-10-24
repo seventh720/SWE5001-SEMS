@@ -1,0 +1,354 @@
+{
+  "environment": "sems-k3s/sems-test",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "startedAt": "2026-10-24T14:36:26.820702+00:00",
+  "status": "failed",
+  "suites": [
+    {
+      "suite": "business-fixes",
+      "startedAt": "2026-10-24T14:36:26.853593+00:00",
+      "baseUrl": "https://sems-test.seventh720.com",
+      "environment": "sems-k3s/sems-test",
+      "status": "passed",
+      "assertionScriptSha256": "3a40ce23261cc5fbc6cb9065b7c7ad26c0ffc2ab9db0db593990df5f70a13c1f",
+      "replicasRestored": true,
+      "actions": [
+        {
+          "at": "2026-10-24T14:36:45.493503+00:00",
+          "operation": "stop",
+          "deployment": "event-catalog"
+        },
+        {
+          "at": "2026-10-24T14:36:47.119662+00:00",
+          "operation": "start",
+          "deployment": "event-catalog"
+        }
+      ],
+      "completedAt": "2026-10-24T14:37:31.042134+00:00",
+      "passedAssertionGroups": [
+        "registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits",
+        "JWT exactly 3600 seconds; last administrator protected under concurrent demotions",
+        "bounded user pages/search and admin/governance/staff pagination validation",
+        "paused-event live venue, original snapshot, private ownership, pre-registration and start+15-minute cutoff with idempotent replay",
+        "Catalog outage preserves ticket access; live details recover",
+        "authentication bursts return 429; booking reads unaffected; normal login recovers"
+      ],
+      "log": "business-fixes.log"
+    },
+    {
+      "suite": "organization",
+      "startedAt": "2026-10-24T14:37:34.145310+00:00",
+      "baseUrl": "https://sems-test.seventh720.com",
+      "environment": "sems-k3s/sems-test",
+      "status": "passed",
+      "assertionScriptSha256": "437d06c4775d6ba126e5b5552687513067aa7f1fac2f1122d59a7f0e8e4053f6",
+      "replicasRestored": true,
+      "actions": [
+        {
+          "at": "2026-10-24T14:37:47.241481+00:00",
+          "operation": "stop",
+          "deployment": "admission"
+        },
+        {
+          "at": "2026-10-24T14:37:49.238235+00:00",
+          "operation": "restart",
+          "deployment": "event-catalog"
+        },
+        {
+          "at": "2026-10-24T14:39:01.118988+00:00",
+          "operation": "start",
+          "deployment": "admission"
+        },
+        {
+          "at": "2026-10-24T14:39:32.017632+00:00",
+          "operation": "restart",
+          "deployment": "gateway"
+        },
+        {
+          "at": "2026-10-24T14:39:46.583249+00:00",
+          "operation": "stop",
+          "deployment": "event-catalog"
+        },
+        {
+          "at": "2026-10-24T14:39:49.629740+00:00",
+          "operation": "start",
+          "deployment": "event-catalog"
+        },
+        {
+          "at": "2026-10-24T14:40:30.017200+00:00",
+          "operation": "restart",
+          "deployment": "gateway"
+        },
+        {
+          "at": "2026-10-24T14:40:56.940416+00:00",
+          "operation": "stop",
+          "deployment": "admission"
+        },
+        {
+          "at": "2026-10-24T14:40:58.588824+00:00",
+          "operation": "restart",
+          "deployment": "event-catalog"
+        },
+        {
+          "at": "2026-10-24T14:42:14.070027+00:00",
+          "operation": "start",
+          "deployment": "admission"
+        },
+        {
+          "at": "2026-10-24T14:42:45.124843+00:00",
+          "operation": "restart",
+          "deployment": "gateway"
+        },
+        {
+          "at": "2026-10-24T14:43:11.856346+00:00",
+          "operation": "stop",
+          "deployment": "admission"
+        },
+        {
+          "at": "2026-10-24T14:43:13.439798+00:00",
+          "operation": "start",
+          "deployment": "admission"
+        },
+        {
+          "at": "2026-10-24T14:43:44.025851+00:00",
+          "operation": "restart",
+          "deployment": "gateway"
+        }
+      ],
+      "completedAt": "2026-10-24T14:44:05.503997+00:00",
+      "passedAssertionGroups": [
+        "registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits",
+        "ticket allocation, sales windows, owner isolation, configuration race, retry-safe publication and public discovery",
+        "pending events stay private; publication survives Catalog restart and Admission outage",
+        "ownership, request validation, per-place credentials, safe retries during Catalog outage, concurrent cancellation and same-key submission",
+        "100 requests/10 places, database inventory-booking-ticket invariants, sales windows, wrong-event ticket and cancellation guards",
+        "booking status filters, pagination totals, separate pages and owner isolation",
+        "category/theme persistence and filtering, registration validation, information-aware idempotency, private owner registration list and immutable published requirements",
+        "profile persistence/privacy/validation, pre-registration upsert and ownership, unchanged inventory, opening transition, explicit confirmation and atomic cleanup",
+        "published presentation ownership/version checks, unchanged ticket contract and historical snapshots, upcoming dashboard privacy/order, independent draft template reuse",
+        "editable schedule/capacity, unchanged inventory and locked requirements, updated confirmed tickets/sales windows, rejection rollback, owner isolation, retry and restart/outage recovery",
+        "multiple contacts, student ID not retained, ownership/version/delete validation, username rules/normalization/availability, login continuity and uniqueness race",
+        "combined event/ticket updates, stable IDs and credentials, quota/version/owner rejection with rollback, name swaps and reference-safe removal, pause/resume outage recovery, existing tickets preserved, new draft setup",
+        "organization provisioning, invitations, membership isolation/revocation, internal offerings, scoped staff, concurrent one-time check-in, attendance and preserved tickets"
+      ],
+      "log": "organization.log"
+    },
+    {
+      "suite": "catalog-read",
+      "startedAt": "2026-10-24T14:44:08.600128+00:00",
+      "baseUrl": "https://sems-test.seventh720.com",
+      "environment": "sems-k3s/sems-test",
+      "status": "passed",
+      "assertionScriptSha256": "a47a3aea8d81e76eb5b51bdc12984f1cc3c60046c7d873205defad58002d947c",
+      "replicasRestored": true,
+      "actions": [],
+      "completedAt": "2026-10-24T14:44:24.412902+00:00",
+      "passedAssertionGroups": [
+        "registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits",
+        "public/internal projections, grouped active totals and pagination, private visibility, live suspension, historical details and protected read/pool/Identity timings"
+      ],
+      "log": "catalog-read.log"
+    },
+    {
+      "suite": "organization-security",
+      "startedAt": "2026-10-24T14:44:27.507064+00:00",
+      "baseUrl": "https://sems-test.seventh720.com",
+      "environment": "sems-k3s/sems-test",
+      "status": "passed",
+      "assertionScriptSha256": "de4525f0ecbd729e64e60a62cc1a22a98100585e18cf576769c0fae860904903",
+      "replicasRestored": true,
+      "actions": [],
+      "completedAt": "2026-10-24T14:44:36.169224+00:00",
+      "passedAssertionGroups": [
+        "registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits",
+        "invitation expiry, live promotion/demotion, assigned task title before bookings and after edits, staff revocation and platform-admin isolation"
+      ],
+      "log": "organization-security.log"
+    },
+    {
+      "suite": "event-directory",
+      "startedAt": "2026-10-24T14:44:39.261619+00:00",
+      "baseUrl": "https://sems-test.seventh720.com",
+      "environment": "sems-k3s/sems-test",
+      "status": "passed",
+      "assertionScriptSha256": "051e2533746d8417ab02b8d84720329660a6ab51d81f8e5208e8585c1d98b955",
+      "replicasRestored": true,
+      "actions": [],
+      "completedAt": "2026-10-24T14:44:47.971779+00:00",
+      "passedAssertionGroups": [
+        "registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits",
+        "scoped search, literal keywords, pagination, two collaborating organizers, publication, stale-write rejection and live demotion"
+      ],
+      "log": "event-directory.log"
+    },
+    {
+      "suite": "organization-management",
+      "startedAt": "2026-10-24T14:44:51.065108+00:00",
+      "baseUrl": "https://sems-test.seventh720.com",
+      "environment": "sems-k3s/sems-test",
+      "status": "failed",
+      "assertionScriptSha256": "4523df6af4133183feadaaaedfccb09e6426267eebc74a0f27c6197495ed62a4",
+      "error": "AttributeError: module 'secrets' has no attribute 'token_hex' (consider renaming '<repo>/scripts/k8s/secrets.py' since it has the same name as the standard library module named 'secrets' and prevents importing that standard library module)",
+      "replicasRestored": true,
+      "actions": [],
+      "completedAt": "2026-10-24T14:44:51.819947+00:00",
+      "passedAssertionGroups": [],
+      "log": "organization-management.log"
+    },
+    {
+      "suite": "visibility",
+      "startedAt": "2026-10-24T14:44:54.899080+00:00",
+      "baseUrl": "https://sems-test.seventh720.com",
+      "environment": "sems-k3s/sems-test",
+      "status": "passed",
+      "assertionScriptSha256": "b5d929402f6b0270ccb1f634e9cac3a5bbbba2d1e90c92645f4f4950157d2114",
+      "replicasRestored": true,
+      "actions": [],
+      "completedAt": "2026-10-24T14:45:05.054850+00:00",
+      "passedAssertionGroups": [
+        "registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits",
+        "published visibility changes both ways; discovery, detail, inventory and new booking restrictions; existing tickets preserved; outsider and stale edits rejected"
+      ],
+      "log": "visibility.log"
+    },
+    {
+      "suite": "notifications",
+      "startedAt": "2026-10-24T14:45:08.139169+00:00",
+      "baseUrl": "https://sems-test.seventh720.com",
+      "environment": "sems-k3s/sems-test",
+      "status": "passed",
+      "assertionScriptSha256": "92fdfff233ad368637cb06baf031c56fb7bf9cdbed171af5aa778f2c920c9ae7",
+      "replicasRestored": true,
+      "actions": [],
+      "completedAt": "2026-10-24T14:45:54.353677+00:00",
+      "passedAssertionGroups": [
+        "registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits",
+        "invitation inbox accept/decline/isolation, duplicate invitations, booking replay/cancel dedup, event edits/outbox retry/rejected changes, five-minute reminder with two replicas, read state and user isolation"
+      ],
+      "log": "notifications.log"
+    },
+    {
+      "suite": "membership-notifications",
+      "startedAt": "2026-10-24T14:45:57.434577+00:00",
+      "baseUrl": "https://sems-test.seventh720.com",
+      "environment": "sems-k3s/sems-test",
+      "status": "passed",
+      "assertionScriptSha256": "1bc41175258c64db255b5e445ffa8473b959f5e76c3fd6e41ec4c477aeec7fa5",
+      "replicasRestored": true,
+      "actions": [],
+      "completedAt": "2026-10-24T14:46:06.245682+00:00",
+      "passedAssertionGroups": [
+        "registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits",
+        "initial appointment, invitation acceptance, role/status changes, no-op/stale suppression, recipient isolation and read state"
+      ],
+      "log": "membership-notifications.log"
+    },
+    {
+      "suite": "organization-governance",
+      "startedAt": "2026-10-24T14:46:09.339430+00:00",
+      "baseUrl": "https://sems-test.seventh720.com",
+      "environment": "sems-k3s/sems-test",
+      "status": "passed",
+      "assertionScriptSha256": "e3cb2b6720c519d6762e17df359fed50c3f8050aaa63c47ec0745377632e1e06",
+      "replicasRestored": true,
+      "actions": [],
+      "completedAt": "2026-10-24T14:46:27.246128+00:00",
+      "passedAssertionGroups": [
+        "registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits",
+        "scoped requests, rejection/approval, stale review, direct edits, closure, public event visibility, cancelled tickets with preserved history and isolated soft deletion"
+      ],
+      "log": "organization-governance.log"
+    },
+    {
+      "suite": "event-cancellation",
+      "startedAt": "2026-10-24T14:46:30.360786+00:00",
+      "baseUrl": "https://sems-test.seventh720.com",
+      "environment": "sems-k3s/sems-test",
+      "status": "passed",
+      "assertionScriptSha256": "aaa0667d504b220b6d6d4d413caa9e21bddbc1c95fad3c020ed687e8640f3cf3",
+      "replicasRestored": true,
+      "actions": [
+        {
+          "at": "2026-10-24T14:46:47.576261+00:00",
+          "operation": "stop",
+          "deployment": "admission"
+        },
+        {
+          "at": "2026-10-24T14:46:49.751823+00:00",
+          "operation": "restart",
+          "deployment": "event-catalog"
+        },
+        {
+          "at": "2026-10-24T14:48:00.231945+00:00",
+          "operation": "start",
+          "deployment": "admission"
+        },
+        {
+          "at": "2026-10-24T14:48:35.995739+00:00",
+          "operation": "restart",
+          "deployment": "gateway"
+        }
+      ],
+      "completedAt": "2026-10-24T14:49:07.255879+00:00",
+      "passedAssertionGroups": [
+        "registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits",
+        "cancellation permissions/version, double-instance booking/check-in/personal-cancel races, ticket invalidation, checked-in history, closed pre-registration, deduplicated notifications and terminal guards",
+        "pause preserves tickets; whole-event cancellation invalidates them",
+        "late transaction failure rolls back all effects and recovers after repair",
+        "Admission outage, Catalog restart, automatic recovery, lost acknowledgement and replay without duplicate effects"
+      ],
+      "log": "event-cancellation.log"
+    },
+    {
+      "suite": "predeployment-fixes",
+      "startedAt": "2026-10-24T14:49:10.389347+00:00",
+      "baseUrl": "https://sems-test.seventh720.com",
+      "environment": "sems-k3s/sems-test",
+      "status": "passed",
+      "assertionScriptSha256": "957e9e7798b051e4fc1db6189ced77e6af950d5c7ea15cf1e51d8943f76be0bd",
+      "replicasRestored": true,
+      "actions": [
+        {
+          "at": "2026-10-24T14:49:24.976946+00:00",
+          "operation": "stop",
+          "deployment": "admission"
+        },
+        {
+          "at": "2026-10-24T14:49:32.088447+00:00",
+          "operation": "restart",
+          "deployment": "identity"
+        },
+        {
+          "at": "2026-10-24T14:50:44.098593+00:00",
+          "operation": "restart",
+          "deployment": "event-catalog"
+        },
+        {
+          "at": "2026-10-24T14:51:56.225019+00:00",
+          "operation": "start",
+          "deployment": "admission"
+        },
+        {
+          "at": "2026-10-24T14:52:26.990567+00:00",
+          "operation": "restart",
+          "deployment": "gateway"
+        }
+      ],
+      "completedAt": "2026-10-24T14:52:56.613538+00:00",
+      "passedAssertionGroups": [
+        "registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits",
+        "the original admin JWT is immediately denied after demotion; independent organization membership still works",
+        "stable bounded SQL pages, whole-directory username/email search, literal wildcards, limits and organization isolation",
+        "approval closure waits for pending revisions, fences stale publication, survives Identity/Catalog restart and Admission outage, cancels outsiders tickets once and preserves check-in history",
+        "platform soft deletion uses the same cancellation protocol and retains personal accounts/history"
+      ],
+      "log": "predeployment-fixes.log"
+    }
+  ],
+  "excluded": [
+    "legacy-data migration (separate migration exercise)",
+    "Docker DNS scaling (replaced by K3s service lifecycle acceptance)",
+    "Docker cold restart (separate native K3s recovery test)"
+  ],
+  "completedAt": "2026-10-24T14:52:59.650620+00:00"
+}

@@ -1,0 +1,11 @@
+{
+  "suite": "organization-security",
+  "startedAt": "2026-10-24T14:44:27.507064+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "environment": "sems-k3s/sems-test",
+  "status": "passed",
+  "assertionScriptSha256": "de4525f0ecbd729e64e60a62cc1a22a98100585e18cf576769c0fae860904903",
+  "replicasRestored": true,
+  "actions": [],
+  "completedAt": "2026-10-24T14:44:36.169224+00:00"
+}

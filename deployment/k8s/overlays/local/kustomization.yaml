@@ -1,0 +1,42 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: sems-local
+resources:
+  - ../../base
+  - postgres.yaml
+images:
+  - name: sems-platform-identity
+    newName: sems-k8s-local-identity
+  - name: sems-platform-event-catalog
+    newName: sems-k8s-local-event-catalog
+  - name: sems-platform-admission
+    newName: sems-k8s-local-admission
+  - name: sems-platform-web
+    newName: sems-k8s-local-web
+  - name: sems-platform-gateway
+    newName: sems-k8s-local-gateway
+  - name: sems-platform-postgres
+    newName: sems-k8s-local-postgres
+replicas:
+  - name: admission
+    count: 2
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+  - target:
+      kind: ConfigMap
+      name: sems-database
+    patch: |-
+      - op: replace
+        path: /data/IDENTITY_DB_URL
+        value: jdbc:postgresql://postgres:5432/sems?currentSchema=identity
+      - op: replace
+        path: /data/CATALOG_DB_URL
+        value: jdbc:postgresql://postgres:5432/sems?currentSchema=catalog
+      - op: replace
+        path: /data/ADMISSION_DB_URL
+        value: jdbc:postgresql://postgres:5432/sems?currentSchema=admission

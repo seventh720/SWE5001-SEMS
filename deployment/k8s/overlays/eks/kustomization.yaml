@@ -1,0 +1,73 @@
+# Template: configure verified images, RDS endpoint and Ingress before applying.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: sems-test
+resources:
+  - ../../base
+  - ingress.yaml
+images:
+  - name: sems-platform-identity
+    newName: registry.example.invalid/sems/identity
+    newTag: configure-before-deploy
+  - name: sems-platform-event-catalog
+    newName: registry.example.invalid/sems/event-catalog
+    newTag: configure-before-deploy
+  - name: sems-platform-admission
+    newName: registry.example.invalid/sems/admission
+    newTag: configure-before-deploy
+  - name: sems-platform-web
+    newName: registry.example.invalid/sems/web
+    newTag: configure-before-deploy
+  - name: sems-platform-gateway
+    newName: registry.example.invalid/sems/gateway
+    newTag: configure-before-deploy
+replicas:
+  - name: identity
+    count: 2
+  - name: event-catalog
+    count: 2
+  - name: admission
+    count: 2
+  - name: web
+    count: 2
+  - name: gateway
+    count: 2
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/topologySpreadConstraints/0/whenUnsatisfiable
+        value: DoNotSchedule
+      - op: add
+        path: /spec/template/spec/topologySpreadConstraints/0/minDomains
+        value: 2
+  - target:
+      kind: ConfigMap
+      name: sems-database
+    patch: |-
+      - op: replace
+        path: /data/IDENTITY_DB_URL
+        value: jdbc:postgresql://configure-rds-endpoint.invalid:5432/sems?currentSchema=identity&sslmode=verify-full&sslrootcert=/run/rds/global-bundle.pem
+      - op: replace
+        path: /data/CATALOG_DB_URL
+        value: jdbc:postgresql://configure-rds-endpoint.invalid:5432/sems?currentSchema=catalog&sslmode=verify-full&sslrootcert=/run/rds/global-bundle.pem
+      - op: replace
+        path: /data/ADMISSION_DB_URL
+        value: jdbc:postgresql://configure-rds-endpoint.invalid:5432/sems?currentSchema=admission&sslmode=verify-full&sslrootcert=/run/rds/global-bundle.pem
+  - target:
+      kind: Deployment
+      name: identity|event-catalog|admission
+    patch: |-
+      - op: add
+        path: /spec/template/spec/volumes/-
+        value:
+          name: rds-ca
+          configMap:
+            name: rds-ca
+      - op: add
+        path: /spec/template/spec/containers/0/volumeMounts/-
+        value:
+          name: rds-ca
+          mountPath: /run/rds
+          readOnly: true

@@ -1,0 +1,35 @@
+{
+  "environment": "sems-k3s/sems-test",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "startedAt": "2026-10-24T15:03:22.026354+00:00",
+  "status": "passed",
+  "suites": [
+    {
+      "suite": "organization-management",
+      "startedAt": "2026-10-24T15:03:22.060860+00:00",
+      "baseUrl": "https://sems-test.seventh720.com",
+      "environment": "sems-k3s/sems-test",
+      "status": "passed",
+      "assertionScriptSha256": "4523df6af4133183feadaaaedfccb09e6426267eebc74a0f27c6197495ed62a4",
+      "replicasRestored": true,
+      "actions": [],
+      "completedAt": "2026-10-24T15:03:45.101676+00:00",
+      "passedAssertionGroups": [
+        "registration password boundaries and English error guidance",
+        "zero totals, administrator-only overview, organization isolation and internal route denial",
+        "member name/email, role and status filters; pagination and membership changes",
+        "book/replay/cancel/check-in loop; paused tickets included; cancelled event attendance excluded",
+        "combined event filters run before paging; all pages, empty and invalid queries",
+        "ended events remain in totals, reject edits/reopening and preserve version",
+        "fixture events cancelled, organizations soft-deleted and memberships revoked; accounts/history retained"
+      ],
+      "log": "organization-management.log"
+    }
+  ],
+  "excluded": [
+    "legacy-data migration (separate migration exercise)",
+    "Docker DNS scaling (replaced by K3s service lifecycle acceptance)",
+    "Docker cold restart (separate native K3s recovery test)"
+  ],
+  "completedAt": "2026-10-24T15:03:48.120442+00:00"
+}

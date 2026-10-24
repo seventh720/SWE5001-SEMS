@@ -1,0 +1,10 @@
+{
+  "CommandId": "95613cb2-b82b-41d7-9235-3af473addd11",
+  "InstanceId": "i-061d2aa2de119a95d",
+  "Status": "Success",
+  "ResponseCode": 0,
+  "ExecutionStartDateTime": "2026-10-24T17:11:21.901Z",
+  "ExecutionEndDateTime": "2026-10-24T17:15:52.901Z",
+  "StandardOutputContent": "Ready: identity\nReady: event-catalog\nReady: admission\nReady: web\nReady: gateway\n{\"operation\": \"rollback\", \"releaseId\": \"fb27bbf52142700351318ba18c83bb51a9783298-2026102501-4\", \"startedAt\": \"2026-10-24T17:11:22.004197+00:00\", \"restoredReleaseId\": \"52df21f34a5f181683f273ae053bf5dc18c08e08-2026102501-3\", \"sourceCommit\": \"52df21f34a5f181683f273ae053bf5dc18c08e08\", \"verification\": {\"verifiedHttpsPaths\": [\"/\", \"/health/gateway\", \"/health/identity\", \"/health/event-catalog\", \"/health/admission\"], \"internalApiStatus\": 404, \"adminLoginAndJwt\": true, \"images\": {\"admission\": \"ghcr.io/seventh720/swe5001-sems/admission@sha256:304c685da2aaf100d45ba4a98316f6e18a916c8bd3ce66e0f4c0dafd99160682\", \"event-catalog\": \"ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:29cb527bb821881420cb7b38405031840516a961d926bdca9fad70dcc5424b7a\", \"gateway\": \"ghcr.io/seventh720/swe5001-sems/gateway@sha256:687e0c2e2382a1a2aa08a7297ab3cfc9e85d9959d9466c1e09cd5e7336a66a33\", \"identity\": \"ghcr.io/seventh720/swe5001-sems/identity@sha256:3b33cacdfd61656a43837fd78470fdfd9a394705525e68b75c2f764d67be7a32\", \"web\": \"ghcr.io/seventh720/swe5001-sems/web@sha256:35935d3cd5fa29c46d7285a9cbf1c6dbeef0be9b2eddef93fa097c3b855e05c8\"}}, \"status\": \"passed\", \"completedAt\": \"2026-10-24T17:15:53.454008+00:00\", \"databaseRestored\": false}\n",
+  "StandardErrorContent": ""
+}

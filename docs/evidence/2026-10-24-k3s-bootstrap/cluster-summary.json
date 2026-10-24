@@ -1,0 +1,315 @@
+{
+  "recordedAt": "2026-10-24T13:48:42.296944+00:00",
+  "sourceCommit": "d3002d10a6f515b14f2013fc89f8805837b1f8ec",
+  "worktreeDirty": true,
+  "context": "sems-k3s",
+  "applicationNamespace": "sems-test",
+  "applicationDeployed": false,
+  "rdsInstanceCreated": false,
+  "httpsConfigured": false,
+  "apiAccess": "localhost SSH tunnel; no public API inbound rule",
+  "nodes": [
+    {
+      "name": "sems-k3s-server",
+      "labels": {
+        "beta.kubernetes.io/arch": "amd64",
+        "beta.kubernetes.io/instance-type": "k3s",
+        "beta.kubernetes.io/os": "linux",
+        "kubernetes.io/arch": "amd64",
+        "kubernetes.io/hostname": "sems-k3s-server",
+        "kubernetes.io/os": "linux",
+        "node-role.kubernetes.io/control-plane": "true",
+        "node.kubernetes.io/instance-type": "k3s",
+        "sems.io/node-group": "apps",
+        "sems.io/node-role": "server"
+      },
+      "addresses": [
+        {
+          "address": "172.31.33.16",
+          "type": "InternalIP"
+        },
+        {
+          "address": "ip-172-31-33-16",
+          "type": "Hostname"
+        }
+      ],
+      "nodeInfo": {
+        "architecture": "amd64",
+        "bootID": "39ac64c3-94a1-4222-8ae2-7b846ab6883b",
+        "containerRuntimeVersion": "containerd://2.3.4-k3s1.36",
+        "kernelVersion": "7.0.0-1014-aws",
+        "kubeProxyVersion": "",
+        "kubeletVersion": "v1.36.5+k3s1",
+        "machineID": "ec2f9b74135a4352e6e78ec32e113fa0",
+        "operatingSystem": "linux",
+        "osImage": "Ubuntu 24.04.5 LTS",
+        "systemUUID": "ec2f9b74-135a-4352-e6e7-8ec32e113fa0"
+      },
+      "capacity": {
+        "cpu": "2",
+        "ephemeral-storage": "29378688Ki",
+        "hugepages-1Gi": "0",
+        "hugepages-2Mi": "0",
+        "memory": "3924212Ki",
+        "pods": "110"
+      },
+      "allocatable": {
+        "cpu": "2",
+        "ephemeral-storage": "28579587664",
+        "hugepages-1Gi": "0",
+        "hugepages-2Mi": "0",
+        "memory": "3924212Ki",
+        "pods": "110"
+      },
+      "conditions": [
+        {
+          "lastHeartbeatTime": "2026-10-24T13:46:00Z",
+          "lastTransitionTime": "2026-10-24T13:42:55Z",
+          "message": "kubelet has sufficient memory available",
+          "reason": "KubeletHasSufficientMemory",
+          "status": "False",
+          "type": "MemoryPressure"
+        },
+        {
+          "lastHeartbeatTime": "2026-10-24T13:46:00Z",
+          "lastTransitionTime": "2026-10-24T13:42:55Z",
+          "message": "kubelet has no disk pressure",
+          "reason": "KubeletHasNoDiskPressure",
+          "status": "False",
+          "type": "DiskPressure"
+        },
+        {
+          "lastHeartbeatTime": "2026-10-24T13:46:00Z",
+          "lastTransitionTime": "2026-10-24T13:42:55Z",
+          "message": "kubelet has sufficient PID available",
+          "reason": "KubeletHasSufficientPID",
+          "status": "False",
+          "type": "PIDPressure"
+        },
+        {
+          "lastHeartbeatTime": "2026-10-24T13:46:00Z",
+          "lastTransitionTime": "2026-10-24T13:42:56Z",
+          "message": "kubelet is posting ready status",
+          "reason": "KubeletReady",
+          "status": "True",
+          "type": "Ready"
+        }
+      ]
+    },
+    {
+      "name": "sems-k3s-worker",
+      "labels": {
+        "beta.kubernetes.io/arch": "amd64",
+        "beta.kubernetes.io/instance-type": "k3s",
+        "beta.kubernetes.io/os": "linux",
+        "kubernetes.io/arch": "amd64",
+        "kubernetes.io/hostname": "sems-k3s-worker",
+        "kubernetes.io/os": "linux",
+        "node-role.kubernetes.io/worker": "true",
+        "node.kubernetes.io/instance-type": "k3s",
+        "sems.io/node-group": "apps",
+        "sems.io/node-role": "worker"
+      },
+      "addresses": [
+        {
+          "address": "172.31.39.232",
+          "type": "InternalIP"
+        },
+        {
+          "address": "ip-172-31-39-232",
+          "type": "Hostname"
+        }
+      ],
+      "nodeInfo": {
+        "architecture": "amd64",
+        "bootID": "ce7dcfef-b89c-487a-a6aa-7df4c475489d",
+        "containerRuntimeVersion": "containerd://2.3.4-k3s1.36",
+        "kernelVersion": "7.0.0-1014-aws",
+        "kubeProxyVersion": "",
+        "kubeletVersion": "v1.36.5+k3s1",
+        "machineID": "ec23a1713ae0b3f103133d4d787f2b99",
+        "operatingSystem": "linux",
+        "osImage": "Ubuntu 24.04.5 LTS",
+        "systemUUID": "ec23a171-3ae0-b3f1-0313-3d4d787f2b99"
+      },
+      "capacity": {
+        "cpu": "2",
+        "ephemeral-storage": "29378688Ki",
+        "hugepages-1Gi": "0",
+        "hugepages-2Mi": "0",
+        "memory": "3924200Ki",
+        "pods": "110"
+      },
+      "allocatable": {
+        "cpu": "2",
+        "ephemeral-storage": "28579587664",
+        "hugepages-1Gi": "0",
+        "hugepages-2Mi": "0",
+        "memory": "3924200Ki",
+        "pods": "110"
+      },
+      "conditions": [
+        {
+          "lastHeartbeatTime": "2026-10-24T13:45:50Z",
+          "lastTransitionTime": "2026-10-24T13:43:48Z",
+          "message": "kubelet has sufficient memory available",
+          "reason": "KubeletHasSufficientMemory",
+          "status": "False",
+          "type": "MemoryPressure"
+        },
+        {
+          "lastHeartbeatTime": "2026-10-24T13:45:50Z",
+          "lastTransitionTime": "2026-10-24T13:43:48Z",
+          "message": "kubelet has no disk pressure",
+          "reason": "KubeletHasNoDiskPressure",
+          "status": "False",
+          "type": "DiskPressure"
+        },
+        {
+          "lastHeartbeatTime": "2026-10-24T13:45:50Z",
+          "lastTransitionTime": "2026-10-24T13:43:48Z",
+          "message": "kubelet has sufficient PID available",
+          "reason": "KubeletHasSufficientPID",
+          "status": "False",
+          "type": "PIDPressure"
+        },
+        {
+          "lastHeartbeatTime": "2026-10-24T13:45:50Z",
+          "lastTransitionTime": "2026-10-24T13:43:48Z",
+          "message": "kubelet is posting ready status",
+          "reason": "KubeletReady",
+          "status": "True",
+          "type": "Ready"
+        }
+      ]
+    }
+  ],
+  "systemPods": [
+    {
+      "namespace": "kube-system",
+      "name": "coredns-7cfb7bc9c7-xrrlz",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "coredns",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/mirrored-coredns-coredns@sha256:7efd3c635b03efd68c4e8398fc45f0d993d0e9ab016f72c1cefb0fd6d01aa286"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "helm-install-traefik-crd-qsjvn",
+      "node": "sems-k3s-server",
+      "phase": "Succeeded",
+      "containers": [
+        {
+          "name": "helm",
+          "ready": false,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/klipper-helm@sha256:5425a2b4613d2458dbdff99218e8d487ebb59c20e7a941f061c0777070f0aac1"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "helm-install-traefik-knct7",
+      "node": "sems-k3s-server",
+      "phase": "Succeeded",
+      "containers": [
+        {
+          "name": "helm",
+          "ready": false,
+          "restartCount": 2,
+          "imageID": "docker.io/rancher/klipper-helm@sha256:5425a2b4613d2458dbdff99218e8d487ebb59c20e7a941f061c0777070f0aac1"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "local-path-provisioner-77b9867795-q4s4k",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "local-path-provisioner",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/local-path-provisioner@sha256:e757967a5ec338f6a9b371c5a9688bedaa8c3578ea3dd4db329ea0084be0a86f"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "metrics-server-6dc596dfb8-tcb7w",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "metrics-server",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/mirrored-metrics-server@sha256:d9862115e7c7881280d3d75ca26bda8ffc0fc213315979575bf23ce9826205c0"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "svclb-traefik-a3b9dad6-dgrlw",
+      "node": "sems-k3s-worker",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "lb-tcp-443",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/klipper-lb@sha256:910944bb0bd94f060a82a56ca1ea1c577d3e49b3473a093a47a985f32e92d94a"
+        },
+        {
+          "name": "lb-tcp-80",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/klipper-lb@sha256:910944bb0bd94f060a82a56ca1ea1c577d3e49b3473a093a47a985f32e92d94a"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "svclb-traefik-a3b9dad6-xmzpb",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "lb-tcp-443",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/klipper-lb@sha256:910944bb0bd94f060a82a56ca1ea1c577d3e49b3473a093a47a985f32e92d94a"
+        },
+        {
+          "name": "lb-tcp-80",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/klipper-lb@sha256:910944bb0bd94f060a82a56ca1ea1c577d3e49b3473a093a47a985f32e92d94a"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "traefik-7c8544f77-wdff7",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "traefik",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/mirrored-library-traefik@sha256:f86a2cab1b5c649070c49f883c743dd32d8485a56e3368c5f93b9e91f1e91259"
+        }
+      ]
+    }
+  ],
+  "k3sManifestSha256": "99bc957e065882c8168e40f5d4eec813c53e2c9a3a0271cbbcf5e3a4f19f910b",
+  "serverDryRun": "passed"
+}

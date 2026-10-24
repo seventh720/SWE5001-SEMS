@@ -1,5 +1,7 @@
 # Lightsail staging
 
+This page records the original site's deployment and rollback procedures. The new workflow target is the independent [EC2 K3s test environment](k3s-cd.md), pending this branch's merge and first main deployment. The original domain, data and shared Lightsail proxy are not migrated by that change. The sections below describe the legacy Lightsail CD implementation.
+
 Host: `swe5001.seventh720.com`, DNS-only A record to the instance's attached static IPv4. The Singapore Lightsail instance runs Ubuntu 24.04 with 2 vCPU and 4 GB RAM. This is a single-host staging deployment, not a high-availability setup.
 
 ## Deploy

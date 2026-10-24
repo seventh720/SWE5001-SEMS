@@ -1,0 +1,59 @@
+{
+  "configuredAt": "2026-10-24T16:48:56.863439+00:00",
+  "region": "ap-southeast-1",
+  "instanceId": "i-061d2aa2de119a95d",
+  "oidcProvider": "arn:aws:iam::929219061964:oidc-provider/token.actions.githubusercontent.com",
+  "deployRole": "arn:aws:iam::929219061964:role/swe5001-github-k3s-deploy",
+  "trustPolicy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Federated": "arn:aws:iam::929219061964:oidc-provider/token.actions.githubusercontent.com"
+        },
+        "Action": "sts:AssumeRoleWithWebIdentity",
+        "Condition": {
+          "StringEquals": {
+            "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+            "token.actions.githubusercontent.com:sub": "repo:seventh720@115573486/SWE5001-SEMS@1415393273:environment:k3s-test"
+          }
+        }
+      }
+    ]
+  },
+  "deployPolicy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": "ssm:SendCommand",
+        "Resource": [
+          "arn:aws:ssm:ap-southeast-1::document/AWS-RunShellScript",
+          "arn:aws:ec2:ap-southeast-1:929219061964:instance/i-061d2aa2de119a95d"
+        ]
+      },
+      {
+        "Effect": "Allow",
+        "Action": "ssm:GetCommandInvocation",
+        "Resource": "*"
+      }
+    ]
+  },
+  "instanceRole": "arn:aws:iam::929219061964:role/swe5001-k3s-ssm",
+  "instanceProfile": "arn:aws:iam::929219061964:instance-profile/swe5001-k3s-ssm",
+  "association": {
+    "IamInstanceProfileAssociation": {
+      "AssociationId": "iip-assoc-03a846253a450f417",
+      "InstanceId": "i-061d2aa2de119a95d",
+      "IamInstanceProfile": {
+        "Arn": "arn:aws:iam::929219061964:instance-profile/swe5001-k3s-ssm",
+        "Id": "AIPA5QWOFVDGHJKL6ZP42"
+      },
+      "State": "associating"
+    }
+  },
+  "githubEnvironment": "k3s-test",
+  "deploymentBranch": "main",
+  "longLivedAwsKeysStoredInGitHub": false
+}

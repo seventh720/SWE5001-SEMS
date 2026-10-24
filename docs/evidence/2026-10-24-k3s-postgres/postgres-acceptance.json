@@ -1,0 +1,59 @@
+{
+  "startedAt": "2026-10-24T14:05:35.997334+00:00",
+  "environment": "sems-k3s/sems-test",
+  "status": "passed",
+  "tests": [
+    {
+      "name": "database state and volume",
+      "status": "passed"
+    },
+    {
+      "name": "schema ownership and authenticated application roles",
+      "status": "passed",
+      "schemaOwners": [
+        "admission:admission_app",
+        "catalog:catalog_app",
+        "identity:identity_app"
+      ],
+      "crossSchemaDenials": 6,
+      "publicCreateDenials": 3,
+      "invalidPassword": "rejected"
+    },
+    {
+      "name": "database network policy from another node",
+      "status": "passed",
+      "allowedClientNode": "sems-k3s-server",
+      "databaseNode": "sems-k3s-worker",
+      "allowedRole": "admission_app",
+      "untrustedClient": "connection blocked",
+      "denialMode": "connection refused"
+    },
+    {
+      "name": "data survives PostgreSQL Pod replacement",
+      "status": "passed",
+      "oldPodUid": "b31a99ba-6a0b-49db-af20-ca7a4c8f0daf",
+      "newPodUid": "382d4f7a-83b9-4273-9f43-bd9976f738e5",
+      "claimUnchanged": true,
+      "probeRowPreserved": true
+    },
+    {
+      "name": "off-node dump and isolated data restore",
+      "status": "passed",
+      "dumpSha256": "ef1a76929bb73a81e09388d09a3cfeea250569b4623faf51b3243b0686860d7a",
+      "probeRowRestored": true,
+      "restoreScope": "Isolated temporary database; data restore without owner/ACL replay"
+    }
+  ],
+  "databaseManifestSha256": "a8699b2ed1dad15566ac67a3d35f8ea537a93d365927f543dd1e0b633c107a07",
+  "imageID": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+  "version": "17.11",
+  "volume": {
+    "name": "pvc-2b7b065f-520c-4381-bc39-9fbb7fd2d9e0",
+    "claimUid": "2b7b065f-520c-4381-bc39-9fbb7fd2d9e0",
+    "node": "sems-k3s-worker",
+    "reclaimPolicy": "Retain",
+    "path": "/var/lib/rancher/k3s/storage/pvc-2b7b065f-520c-4381-bc39-9fbb7fd2d9e0_sems-test_data-postgres-0"
+  },
+  "cleanupErrors": [],
+  "finishedAt": "2026-10-24T14:05:57.819835+00:00"
+}

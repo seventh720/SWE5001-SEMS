@@ -1,0 +1,27 @@
+{
+  "recordedAt": "2026-10-24T13:57:13.173891+00:00",
+  "reason": "Self-managed PostgreSQL selected; RDS networking is unused",
+  "rdsInstanceCreated": false,
+  "deleted": [
+    {
+      "kind": "DBSubnetGroup",
+      "id": "sems-k3s-db"
+    },
+    {
+      "kind": "SecurityGroup",
+      "id": "sg-0b945487ff6c08b6f"
+    },
+    {
+      "kind": "Subnet",
+      "id": "subnet-0b4bbe5a3e3c71cc4"
+    },
+    {
+      "kind": "Subnet",
+      "id": "subnet-068bdad82b6e7dbb3"
+    },
+    {
+      "kind": "RouteTable",
+      "id": "rtb-0f2380f6bea7c2863"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+PASS: gateway and service readiness
+PASS: registration, login, RSA signature, role grants, draft persistence, validation, owner isolation and concurrent edits
+PASS: registration, login, organization permissions and draft concurrency
+PASS: publication, booking, private ownership and retry payload validation
+PASS: same request key across both Admission Pods
+PASS: 100 distinct requests for ten places across both Admission Pods
+PASS: staff authorization and concurrent exactly-once check-in
+PASS: repeated personal cancellation releases inventory once
+PASS: whole-event cancellation preserves check-in history and closes inventory
+PASS: database schema isolation

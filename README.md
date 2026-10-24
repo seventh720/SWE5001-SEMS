@@ -40,7 +40,7 @@ docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.
 
 For frontend development, run `npm --prefix apps/web run dev`; port 15173 proxies APIs to the gateway on 18080. The production frontend is served at the gateway root. Date inputs use the application’s English calendar/time controls in Singapore time (UTC+08:00) and submit UTC timestamps. The local development override exposes PostgreSQL only at `127.0.0.1:15432`; the base Compose file used by CI does not publish a database port.
 
-This is the local HTTP configuration. The [cloud overlay](docs/cloud-staging.md) provides HTTPS and deployment automation; runtime secrets currently use host files rather than a managed cloud secret service.
+This is the local HTTP configuration. The [EC2 K3s environment](docs/k3s.md) provides the new HTTPS test deployment; [K3s delivery](docs/k3s-cd.md) describes the main-only release workflow. The [Lightsail guide](docs/cloud-staging.md) retains the original site's release path. Runtime credentials use restricted host files and Kubernetes Secrets.
 
 ## 3. Acceptance walkthrough
 
@@ -60,17 +60,19 @@ npm --prefix apps/web run test:coverage
 npm --prefix apps/web run build
 ```
 
-Database/API acceptance requires a separate disposable Compose environment; some scripts stop/restart services and inject failures. See [CI operations](docs/ci.md) for entry points, isolation and pipeline behavior. Historical evidence is retained in [docs/evidence](docs/evidence/).
+Database/API acceptance requires an isolated test environment; some scripts stop/restart services and inject failures. See [CI operations](docs/ci.md) for Compose checks and [K3s operations](docs/k3s.md) for Kubernetes adapters. Historical evidence is retained in [docs/evidence](docs/evidence/).
 
 ## 5. Layout and documentation
 
 - `services/` — backend services, migrations and tests.
 - `apps/web/` — frontend and UI tests.
 - `contracts/` — [OpenAPI contracts](contracts/README.md).
-- `deployment/` — local Compose, gateway and database setup.
+- `deployment/` — Compose, Kubernetes overlays, gateway and database setup.
 - `scripts/` — setup and reusable acceptance checks.
 - [Documentation index](docs/README.md)
 - [Development and database guide](docs/development.md)
+- [Kubernetes setup and cloud templates](docs/kubernetes.md)
+- [EC2 K3s environment](docs/k3s.md)
 - [Contributing](CONTRIBUTING.md)
 - [Technical roadmap](docs/roadmap.md)
 - [Business rules](docs/functional-guide.md)

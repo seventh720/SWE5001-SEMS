@@ -1,0 +1,32 @@
+{
+  "suite": "event-cancellation",
+  "startedAt": "2026-10-24T14:46:30.360786+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "environment": "sems-k3s/sems-test",
+  "status": "passed",
+  "assertionScriptSha256": "aaa0667d504b220b6d6d4d413caa9e21bddbc1c95fad3c020ed687e8640f3cf3",
+  "replicasRestored": true,
+  "actions": [
+    {
+      "at": "2026-10-24T14:46:47.576261+00:00",
+      "operation": "stop",
+      "deployment": "admission"
+    },
+    {
+      "at": "2026-10-24T14:46:49.751823+00:00",
+      "operation": "restart",
+      "deployment": "event-catalog"
+    },
+    {
+      "at": "2026-10-24T14:48:00.231945+00:00",
+      "operation": "start",
+      "deployment": "admission"
+    },
+    {
+      "at": "2026-10-24T14:48:35.995739+00:00",
+      "operation": "restart",
+      "deployment": "gateway"
+    }
+  ],
+  "completedAt": "2026-10-24T14:49:07.255879+00:00"
+}

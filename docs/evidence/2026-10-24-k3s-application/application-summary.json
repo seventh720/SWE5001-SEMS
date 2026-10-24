@@ -1,0 +1,464 @@
+{
+  "recordedAt": "2026-10-24T14:23:11.132438+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "sourceCommit": "d3002d10a6f515b14f2013fc89f8805837b1f8ec",
+  "runtimeReleaseCommit": "fb27bbf52142700351318ba18c83bb51a9783298",
+  "worktreeDirty": true,
+  "manifestSha256": "d2d2cd39dc3be069c7a83af00ecc6cc2e1affe4c8af340232560a518bc64e652",
+  "pods": [
+    {
+      "namespace": "kube-system",
+      "name": "coredns-7cfb7bc9c7-xrrlz",
+      "uid": "84e7e2cf-b8b1-4531-a61e-3f2dbf0b3a0b",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "coredns",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/mirrored-coredns-coredns@sha256:7efd3c635b03efd68c4e8398fc45f0d993d0e9ab016f72c1cefb0fd6d01aa286"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "helm-install-traefik-crd-qsjvn",
+      "uid": "67c810ff-f623-4e8e-89d6-bb58b5f8a293",
+      "node": "sems-k3s-server",
+      "phase": "Succeeded",
+      "containers": [
+        {
+          "name": "helm",
+          "ready": false,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/klipper-helm@sha256:5425a2b4613d2458dbdff99218e8d487ebb59c20e7a941f061c0777070f0aac1"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "helm-install-traefik-qchmb",
+      "uid": "40c2b498-b0e1-4b72-8d7a-5d96d5e0585c",
+      "node": "sems-k3s-server",
+      "phase": "Succeeded",
+      "containers": [
+        {
+          "name": "helm",
+          "ready": false,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/klipper-helm@sha256:5425a2b4613d2458dbdff99218e8d487ebb59c20e7a941f061c0777070f0aac1"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "local-path-provisioner-77b9867795-q4s4k",
+      "uid": "38e3f12b-9a17-4a5d-b3c5-c0f105aba9bd",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "local-path-provisioner",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/local-path-provisioner@sha256:e757967a5ec338f6a9b371c5a9688bedaa8c3578ea3dd4db329ea0084be0a86f"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "metrics-server-6dc596dfb8-tcb7w",
+      "uid": "3274bda3-2435-42b1-ad03-66ec4341bfb9",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "metrics-server",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/mirrored-metrics-server@sha256:d9862115e7c7881280d3d75ca26bda8ffc0fc213315979575bf23ce9826205c0"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "svclb-traefik-a3b9dad6-dgrlw",
+      "uid": "8a395cc6-e38c-45dd-9294-166baef27a76",
+      "node": "sems-k3s-worker",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "lb-tcp-443",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/klipper-lb@sha256:910944bb0bd94f060a82a56ca1ea1c577d3e49b3473a093a47a985f32e92d94a"
+        },
+        {
+          "name": "lb-tcp-80",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/klipper-lb@sha256:910944bb0bd94f060a82a56ca1ea1c577d3e49b3473a093a47a985f32e92d94a"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "svclb-traefik-a3b9dad6-xmzpb",
+      "uid": "86867348-6b03-4351-89b0-4b4754b2879f",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "lb-tcp-443",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/klipper-lb@sha256:910944bb0bd94f060a82a56ca1ea1c577d3e49b3473a093a47a985f32e92d94a"
+        },
+        {
+          "name": "lb-tcp-80",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/klipper-lb@sha256:910944bb0bd94f060a82a56ca1ea1c577d3e49b3473a093a47a985f32e92d94a"
+        }
+      ]
+    },
+    {
+      "namespace": "kube-system",
+      "name": "traefik-684d79d597-4zs8p",
+      "uid": "e8fac711-f8bb-4502-a068-3efc78b2046d",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "traefik",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "docker.io/rancher/mirrored-library-traefik@sha256:f86a2cab1b5c649070c49f883c743dd32d8485a56e3368c5f93b9e91f1e91259"
+        }
+      ]
+    },
+    {
+      "namespace": "sems-test",
+      "name": "admission-c5d8c7cb7-bchgk",
+      "uid": "ba4ece71-d530-447e-bc13-a4dff821c520",
+      "node": "sems-k3s-worker",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "admission",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "ghcr.io/seventh720/swe5001-sems/admission@sha256:d26e22bb2a086249425f284e982fc6e68870a64907c319697b42231413f97f4c"
+        }
+      ]
+    },
+    {
+      "namespace": "sems-test",
+      "name": "admission-c5d8c7cb7-vc7lv",
+      "uid": "11e044b3-5f9e-4c25-8ee0-0668e8e7ec68",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "admission",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "ghcr.io/seventh720/swe5001-sems/admission@sha256:d26e22bb2a086249425f284e982fc6e68870a64907c319697b42231413f97f4c"
+        }
+      ]
+    },
+    {
+      "namespace": "sems-test",
+      "name": "event-catalog-76cbb8d8cd-hwk6v",
+      "uid": "9acf8b45-70c0-484b-aa5d-29c20dbc5b9a",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "event-catalog",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:1ab14af2625ddc7c9117138778aca89a938fbda5e9efa687e0fe49210172ca65"
+        }
+      ]
+    },
+    {
+      "namespace": "sems-test",
+      "name": "event-catalog-76cbb8d8cd-nk6gj",
+      "uid": "f8889e8a-760c-48d9-9a42-fe7714797995",
+      "node": "sems-k3s-worker",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "event-catalog",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:1ab14af2625ddc7c9117138778aca89a938fbda5e9efa687e0fe49210172ca65"
+        }
+      ]
+    },
+    {
+      "namespace": "sems-test",
+      "name": "gateway-7888569fc7-bkhvn",
+      "uid": "3d472281-0189-485b-b4a5-275d949b5142",
+      "node": "sems-k3s-worker",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "gateway",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "ghcr.io/seventh720/swe5001-sems/gateway@sha256:16333cd40629728da02632c4c15c6c7fd56e7b593ad1b5f29490b4dbca2126b0"
+        }
+      ]
+    },
+    {
+      "namespace": "sems-test",
+      "name": "gateway-7888569fc7-gghrt",
+      "uid": "fa94e30f-3d96-4b2b-8e29-0cd19d79236a",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "gateway",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "ghcr.io/seventh720/swe5001-sems/gateway@sha256:16333cd40629728da02632c4c15c6c7fd56e7b593ad1b5f29490b4dbca2126b0"
+        }
+      ]
+    },
+    {
+      "namespace": "sems-test",
+      "name": "identity-5dcb874887-6hdjx",
+      "uid": "d11e2854-aa30-477e-8d85-4ebdcd95fd28",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "identity",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "ghcr.io/seventh720/swe5001-sems/identity@sha256:5a0e05da55b070ea78bb975140567f01df42530871496dd4d4994b532a35fbd6"
+        }
+      ]
+    },
+    {
+      "namespace": "sems-test",
+      "name": "identity-5dcb874887-nfhg7",
+      "uid": "768dec61-7099-45f1-b364-6464d8b28179",
+      "node": "sems-k3s-worker",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "identity",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "ghcr.io/seventh720/swe5001-sems/identity@sha256:5a0e05da55b070ea78bb975140567f01df42530871496dd4d4994b532a35fbd6"
+        }
+      ]
+    },
+    {
+      "namespace": "sems-test",
+      "name": "postgres-0",
+      "uid": "382d4f7a-83b9-4273-9f43-bd9976f738e5",
+      "node": "sems-k3s-worker",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "postgres",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50"
+        }
+      ]
+    },
+    {
+      "namespace": "sems-test",
+      "name": "web-58c8599ff4-g2hlj",
+      "uid": "7f176b98-ea98-4249-9b5b-96a81091f865",
+      "node": "sems-k3s-worker",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "web",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "ghcr.io/seventh720/swe5001-sems/web@sha256:d24dfe78c69b8227700659d3b21f1d76082aa41420214be4dabf7f695027aa6b"
+        }
+      ]
+    },
+    {
+      "namespace": "sems-test",
+      "name": "web-58c8599ff4-zxfgk",
+      "uid": "d1a5a6d8-1859-4120-b2b5-01209df62790",
+      "node": "sems-k3s-server",
+      "phase": "Running",
+      "containers": [
+        {
+          "name": "web",
+          "ready": true,
+          "restartCount": 0,
+          "imageID": "ghcr.io/seventh720/swe5001-sems/web@sha256:d24dfe78c69b8227700659d3b21f1d76082aa41420214be4dabf7f695027aa6b"
+        }
+      ]
+    }
+  ],
+  "ingress": {
+    "apiVersion": "networking.k8s.io/v1",
+    "kind": "Ingress",
+    "metadata": {
+      "annotations": {
+        "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"networking.k8s.io/v1\",\"kind\":\"Ingress\",\"metadata\":{\"annotations\":{\"traefik.ingress.kubernetes.io/router.entrypoints\":\"websecure\",\"traefik.ingress.kubernetes.io/router.tls\":\"true\",\"traefik.ingress.kubernetes.io/router.tls.certresolver\":\"letsencrypt\"},\"name\":\"sems\",\"namespace\":\"sems-test\"},\"spec\":{\"ingressClassName\":\"traefik\",\"rules\":[{\"host\":\"sems-test.seventh720.com\",\"http\":{\"paths\":[{\"backend\":{\"service\":{\"name\":\"gateway\",\"port\":{\"name\":\"http\"}}},\"path\":\"/\",\"pathType\":\"Prefix\"}]}}],\"tls\":[{\"hosts\":[\"sems-test.seventh720.com\"]}]}}\n",
+        "traefik.ingress.kubernetes.io/router.entrypoints": "websecure",
+        "traefik.ingress.kubernetes.io/router.tls": "true",
+        "traefik.ingress.kubernetes.io/router.tls.certresolver": "letsencrypt"
+      },
+      "creationTimestamp": "2026-10-24T14:16:05Z",
+      "generation": 1,
+      "name": "sems",
+      "namespace": "sems-test",
+      "resourceVersion": "2580",
+      "uid": "c1a26443-dba3-4d3d-96d2-57d03071108a"
+    },
+    "spec": {
+      "ingressClassName": "traefik",
+      "rules": [
+        {
+          "host": "sems-test.seventh720.com",
+          "http": {
+            "paths": [
+              {
+                "backend": {
+                  "service": {
+                    "name": "gateway",
+                    "port": {
+                      "name": "http"
+                    }
+                  }
+                },
+                "path": "/",
+                "pathType": "Prefix"
+              }
+            ]
+          }
+        }
+      ],
+      "tls": [
+        {
+          "hosts": [
+            "sems-test.seventh720.com"
+          ]
+        }
+      ]
+    },
+    "status": {
+      "loadBalancer": {
+        "ingress": [
+          {
+            "ip": "172.31.33.16"
+          },
+          {
+            "ip": "172.31.39.232"
+          }
+        ]
+      }
+    }
+  },
+  "claims": [
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "annotations": {
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"PersistentVolumeClaim\",\"metadata\":{\"annotations\":{},\"name\":\"traefik-acme\",\"namespace\":\"kube-system\"},\"spec\":{\"accessModes\":[\"ReadWriteOnce\"],\"resources\":{\"requests\":{\"storage\":\"1Gi\"}},\"storageClassName\":\"sems-traefik-local\"}}\n",
+          "pv.kubernetes.io/bind-completed": "yes",
+          "pv.kubernetes.io/bound-by-controller": "yes",
+          "volume.beta.kubernetes.io/storage-provisioner": "rancher.io/local-path",
+          "volume.kubernetes.io/selected-node": "sems-k3s-server",
+          "volume.kubernetes.io/storage-provisioner": "rancher.io/local-path"
+        },
+        "creationTimestamp": "2026-10-24T14:15:16Z",
+        "finalizers": [
+          "kubernetes.io/pvc-protection"
+        ],
+        "name": "traefik-acme",
+        "namespace": "kube-system",
+        "resourceVersion": "2481",
+        "uid": "57bdd13f-72bf-49e4-8a23-6aded0a0b348"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "1Gi"
+          }
+        },
+        "storageClassName": "sems-traefik-local",
+        "volumeMode": "Filesystem",
+        "volumeName": "pvc-57bdd13f-72bf-49e4-8a23-6aded0a0b348"
+      },
+      "status": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "capacity": {
+          "storage": "1Gi"
+        },
+        "phase": "Bound"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "annotations": {
+          "pv.kubernetes.io/bind-completed": "yes",
+          "pv.kubernetes.io/bound-by-controller": "yes",
+          "volume.beta.kubernetes.io/storage-provisioner": "rancher.io/local-path",
+          "volume.kubernetes.io/selected-node": "sems-k3s-worker",
+          "volume.kubernetes.io/storage-provisioner": "rancher.io/local-path"
+        },
+        "creationTimestamp": "2026-10-24T13:59:05Z",
+        "finalizers": [
+          "kubernetes.io/pvc-protection"
+        ],
+        "labels": {
+          "app.kubernetes.io/name": "postgres"
+        },
+        "name": "data-postgres-0",
+        "namespace": "sems-test",
+        "resourceVersion": "1474",
+        "uid": "2b7b065f-520c-4381-bc39-9fbb7fd2d9e0"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "10Gi"
+          }
+        },
+        "storageClassName": "sems-postgres-local",
+        "volumeMode": "Filesystem",
+        "volumeName": "pvc-2b7b065f-520c-4381-bc39-9fbb7fd2d9e0"
+      },
+      "status": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "capacity": {
+          "storage": "10Gi"
+        },
+        "phase": "Bound"
+      }
+    }
+  ],
+  "existingLightsailDataMigrated": false,
+  "formalDomainSwitched": false,
+  "acmeStorageStat": "600 10379 65532:65532",
+  "certificate": "subject=CN=sems-test.seventh720.com\nissuer=C=US, O=Let's Encrypt, CN=YE2\nnotBefore=Oct 24 13:17:44 2026 GMT\nnotAfter=Jan 22 13:17:43 2027 GMT"
+}

@@ -1,0 +1,22 @@
+{
+  "status": "manual-ssm-release-and-rollback-validated",
+  "environment": "sems-k3s/sems-test",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "checkedAt": "2026-10-24T18:57:14.552511+00:00",
+  "sourceCommit": "52df21f34a5f181683f273ae053bf5dc18c08e08",
+  "applicationDeployments": 5,
+  "replicasPerApplication": 2,
+  "nodesPerApplication": 2,
+  "postReleaseBusinessGroupsPassed": 9,
+  "previousRegressionData": {
+    "ticketTypeId": "d03f049e-f8fe-400d-8779-76fe37c9f05e",
+    "reserved": 708,
+    "confirmedQuantity": 708,
+    "validTickets": 708,
+    "duplicateRequestKeys": 0
+  },
+  "githubOidcExchangeVerified": false,
+  "mainWorkflowActivated": false,
+  "formalDomainMigrated": false,
+  "originalDataMigrated": false
+}
