@@ -5,7 +5,8 @@
   "actionlint": {
     "status": "passed",
     "version": "1.7.7",
-    "method": "only workflow source mounted read-only; container network disabled"
+    "method": "only workflow source mounted read-only; container network disabled; explicit invoking UID:GID",
+    "linuxOwnerOnlyDirectoryReproducedAndFixed": true
   },
   "pythonSyntax": "passed",
   "bashSyntax": "passed",

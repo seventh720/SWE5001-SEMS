@@ -35,7 +35,9 @@ action_lint() {
             cp "$file" "$task_lint_dir/.github/"
         fi
     done
-    docker run --rm --network none -v "$task_lint_dir:/repo:ro" -w /repo rhysd/actionlint:1.7.7 || status=$?
+    # mktemp is owner-only; the image's default guest cannot read it on Linux.
+    docker run --rm --network none --user "$(id -u):$(id -g)" \
+        -v "$task_lint_dir:/repo:ro" -w /repo rhysd/actionlint:1.7.7 || status=$?
     rm -rf "$task_lint_dir"
     return "$status"
 }

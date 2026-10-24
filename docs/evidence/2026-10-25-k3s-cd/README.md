@@ -8,6 +8,7 @@
 
 | 检查 | 结果与记录 |
 |---|---|
+| 首次 PR CI 与修复 | run 40123205313 的 Lint 失败：Linux runner 的 0700 临时目录无法由容器默认 guest 读取；其他四项已执行质量检查通过，镜像检查因依赖跳过。已在 Linux 容器内复现退出 3，改用主机 UID/GID 后同一夹具及实际函数通过；见 [ci-lint-fix.json](ci-lint-fix.json)。新一轮远程 CI 待确认 |
 | 发布边界与静态检查 | 9 项发布测试、既有发布测试、Python/Bash 语法、actionlint 1.7.7、diff 检查通过；见 [static-checks.json](static-checks.json) |
 | 权限与 SSM agent | 仅 server 可接收该角色的 SSM 命令；worker、终止实例和创建 IAM 角色为隐式拒绝；environment 仅 main；见 [permission-checks.json](permission-checks.json)、[ssm-agent.json](ssm-agent.json)、[setup.json](setup.json) |
 | 初次发布发现问题 | [deploy.json](deploy.json) 保留首次失败：网关实际健康响应为纯文本 `ok`，检查器原先误按 JSON 解析；成功指针未推进。另发现仅 topology spread 无法保证滚动后同服务副本始终分居两节点 |
