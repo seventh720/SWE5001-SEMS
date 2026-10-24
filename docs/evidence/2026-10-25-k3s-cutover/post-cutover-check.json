@@ -1,0 +1,236 @@
+{
+  "checkedAt": "2026-10-24T20:21:58.370312+00:00",
+  "status": "passed",
+  "applicationPods": {
+    "identity": [
+      {
+        "name": "identity-866d966955-p884f",
+        "uid": "338772b2-9a4d-41f5-9ca2-ec78b8a31eeb",
+        "node": "sems-k3s-server",
+        "image": "ghcr.io/seventh720/swe5001-sems/identity@sha256:5f001cdccb90e7f115edeeb9a0a507b48b769d4303ef8a899e9e11cb5d9836c5"
+      },
+      {
+        "name": "identity-866d966955-znr8g",
+        "uid": "2a023359-e9f0-4609-badb-1c2afe1f5387",
+        "node": "sems-k3s-worker",
+        "image": "ghcr.io/seventh720/swe5001-sems/identity@sha256:5f001cdccb90e7f115edeeb9a0a507b48b769d4303ef8a899e9e11cb5d9836c5"
+      }
+    ],
+    "event-catalog": [
+      {
+        "name": "event-catalog-5c7bb69d94-5stvq",
+        "uid": "ddfd8c83-579e-4179-8d5f-76aa0f6de01f",
+        "node": "sems-k3s-worker",
+        "image": "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:e86a7b2a8b1602f50b3b429c63e88cc7693930d64f65013a7629ac18d95029ca"
+      },
+      {
+        "name": "event-catalog-5c7bb69d94-lf72f",
+        "uid": "89a70cb2-4dca-4ffe-b03c-d831201b17c0",
+        "node": "sems-k3s-server",
+        "image": "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:e86a7b2a8b1602f50b3b429c63e88cc7693930d64f65013a7629ac18d95029ca"
+      }
+    ],
+    "admission": [
+      {
+        "name": "admission-647cdf9bb-94pfp",
+        "uid": "6e53f745-e4de-4a6d-8f89-d247a211752f",
+        "node": "sems-k3s-worker",
+        "image": "ghcr.io/seventh720/swe5001-sems/admission@sha256:092f061fcd51cf6600a918076e7ba44317766b0468923248e7ce2a3c1a1bc428"
+      },
+      {
+        "name": "admission-647cdf9bb-mtkt7",
+        "uid": "0be01a7d-412a-4df4-b7ca-6005a50bf6ce",
+        "node": "sems-k3s-server",
+        "image": "ghcr.io/seventh720/swe5001-sems/admission@sha256:092f061fcd51cf6600a918076e7ba44317766b0468923248e7ce2a3c1a1bc428"
+      }
+    ],
+    "web": [
+      {
+        "name": "web-d4dc79496-4wfrv",
+        "uid": "d266427a-af6e-4d78-9437-be786f95b63a",
+        "node": "sems-k3s-server",
+        "image": "ghcr.io/seventh720/swe5001-sems/web@sha256:3ea85ca77061e746595498175451811a457618ed1978f74069fd8543d174f929"
+      },
+      {
+        "name": "web-d4dc79496-kf7q5",
+        "uid": "2f989ac9-b243-4c12-b053-ca3c5f77f82f",
+        "node": "sems-k3s-worker",
+        "image": "ghcr.io/seventh720/swe5001-sems/web@sha256:3ea85ca77061e746595498175451811a457618ed1978f74069fd8543d174f929"
+      }
+    ],
+    "gateway": [
+      {
+        "name": "gateway-cb4d4f75b-hhqbz",
+        "uid": "9d1948bb-8003-415d-afb4-e232bbed1c33",
+        "node": "sems-k3s-worker",
+        "image": "ghcr.io/seventh720/swe5001-sems/gateway@sha256:cdf01ac98555bc6e4dfc2398902f5baecf418bd10f5f101aef4f48c7a0be8330"
+      },
+      {
+        "name": "gateway-cb4d4f75b-tlbrl",
+        "uid": "ca05657d-3562-4cbf-a410-9783188879ef",
+        "node": "sems-k3s-server",
+        "image": "ghcr.io/seventh720/swe5001-sems/gateway@sha256:cdf01ac98555bc6e4dfc2398902f5baecf418bd10f5f101aef4f48c7a0be8330"
+      }
+    ]
+  },
+  "namespaceEnvironment": "production",
+  "httpsChecks": [
+    {
+      "target": "new-ec2-direct",
+      "peer": "13.229.121.219",
+      "path": "/",
+      "status": 200
+    },
+    {
+      "target": "new-ec2-direct",
+      "peer": "13.229.121.219",
+      "path": "/health/gateway",
+      "status": 200
+    },
+    {
+      "target": "new-ec2-direct",
+      "peer": "13.229.121.219",
+      "path": "/health/identity",
+      "status": 200
+    },
+    {
+      "target": "new-ec2-direct",
+      "peer": "13.229.121.219",
+      "path": "/health/event-catalog",
+      "status": 200
+    },
+    {
+      "target": "new-ec2-direct",
+      "peer": "13.229.121.219",
+      "path": "/health/admission",
+      "status": 200
+    },
+    {
+      "target": "new-ec2-direct",
+      "peer": "13.229.121.219",
+      "path": "/internal/v1/events/details",
+      "status": 404
+    },
+    {
+      "target": "new-ec2-direct",
+      "peer": "13.229.121.219",
+      "path": "/api/v1/auth/me",
+      "status": 200
+    },
+    {
+      "target": "public-dns",
+      "peer": "18.139.212.35",
+      "path": "/",
+      "status": 200
+    },
+    {
+      "target": "public-dns",
+      "peer": "18.139.212.35",
+      "path": "/health/gateway",
+      "status": 200
+    },
+    {
+      "target": "public-dns",
+      "peer": "18.139.212.35",
+      "path": "/health/identity",
+      "status": 200
+    },
+    {
+      "target": "public-dns",
+      "peer": "18.139.212.35",
+      "path": "/health/event-catalog",
+      "status": 200
+    },
+    {
+      "target": "public-dns",
+      "peer": "18.139.212.35",
+      "path": "/health/admission",
+      "status": 200
+    },
+    {
+      "target": "public-dns",
+      "peer": "18.139.212.35",
+      "path": "/internal/v1/events/details",
+      "status": 404
+    },
+    {
+      "target": "public-dns",
+      "peer": "18.139.212.35",
+      "path": "/api/v1/auth/me",
+      "status": 200
+    }
+  ],
+  "formalCertificate": {
+    "subjectAltName": [
+      [
+        "DNS",
+        "swe5001.seventh720.com"
+      ]
+    ],
+    "issuer": [
+      [
+        [
+          "countryName",
+          "US"
+        ]
+      ],
+      [
+        [
+          "organizationName",
+          "Let's Encrypt"
+        ]
+      ],
+      [
+        [
+          "commonName",
+          "YE2"
+        ]
+      ]
+    ],
+    "notBefore": "Oct 24 19:17:30 2026 GMT",
+    "notAfter": "Jan 22 19:17:29 2027 GMT"
+  },
+  "oldServices": [
+    {
+      "name": "/swe5001-identity-1",
+      "running": false,
+      "image": "ghcr.io/seventh720/swe5001-sems/identity@sha256:3b33cacdfd61656a43837fd78470fdfd9a394705525e68b75c2f764d67be7a32"
+    },
+    {
+      "name": "/swe5001-event-catalog-1",
+      "running": false,
+      "image": "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:29cb527bb821881420cb7b38405031840516a961d926bdca9fad70dcc5424b7a"
+    },
+    {
+      "name": "/swe5001-admission-1",
+      "running": false,
+      "image": "ghcr.io/seventh720/swe5001-sems/admission@sha256:304c685da2aaf100d45ba4a98316f6e18a916c8bd3ce66e0f4c0dafd99160682"
+    },
+    {
+      "name": "/swe5001-caddy-1",
+      "running": true,
+      "image": "ghcr.io/seventh720/swe5001-sems/caddy@sha256:4e9377574c10934de38cf3259cdc28a9495461687b9a609f985b6e94e8f73520"
+    },
+    {
+      "name": "/swe5006-frontend-1",
+      "running": true,
+      "image": "ghcr.io/seventh720/swe5006-sems/frontend@sha256:9c2018040bad10561d4e3a0df081498219ff59d72fe6a944fca45848efa2bf21"
+    },
+    {
+      "name": "/swe5006-backend-1",
+      "running": true,
+      "image": "ghcr.io/seventh720/swe5006-sems/backend@sha256:1015a7b9f85f0dfa214ce812079711d532b6e966baf4d84d21ede8d75a3142dc"
+    },
+    {
+      "name": "/swe5006-postgres-1",
+      "running": true,
+      "image": "ghcr.io/seventh720/swe5006-sems/postgres@sha256:b462b52fb7f34c0451a8bf2da5f7c8722740d3fa4cb41370c1f04958e685ea88"
+    }
+  ],
+  "postMigrationBackupOnServer": {
+    "file": "cutover-20261025-final.dump",
+    "bytes": 89645,
+    "sha256": "2a21cf9e2fe74c0f068355b786fdc0c72ea3c77f86780a7671aee65237c943bf"
+  },
+  "localPrivateLoginUpdated": true
+}

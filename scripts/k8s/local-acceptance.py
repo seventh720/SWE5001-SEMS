@@ -18,6 +18,8 @@ import urllib.error
 import urllib.request
 import uuid
 
+from environment_guard import require_disposable_namespace
+
 ROOT = Path(__file__).resolve().parents[2]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--kubeconfig', required=True)
@@ -31,6 +33,8 @@ context, namespace, cache = (
     else ('sems-k3s', 'sems-test', '.secrets/k3s-cloud/cache'))
 kubectl = ['kubectl', '--kubeconfig', str(Path(args.kubeconfig).resolve()),
            '--context', context, '--cache-dir', str(ROOT / cache), '-n', namespace]
+if args.environment == 'k3s':
+    require_disposable_namespace(kubectl, namespace)
 report = {'startedAt': datetime.datetime.now(datetime.timezone.utc).isoformat(),
           'environment': context + '/' + namespace, 'tests': [], 'status': 'running'}
 forwarders = []

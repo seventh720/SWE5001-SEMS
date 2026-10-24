@@ -127,6 +127,7 @@ jobs:
         run: |
           bash -n scripts/cd/*.sh scripts/security/*.sh scripts/performance/*.sh
           python3 scripts/cd/test-release.py
+          python3 scripts/k8s/test-environment-guard.py
           python3 -m venv "$RUNNER_TEMP/k3s-python"
           "$RUNNER_TEMP/k3s-python/bin/pip" install --disable-pip-version-check PyYAML==6.0.3
           "$RUNNER_TEMP/k3s-python/bin/python" scripts/cd/test-k3s-release.py
@@ -246,7 +247,7 @@ jobs:
   deploy:
     outputs:
       selected: ${{ steps.latest.outputs.deploy }}
-    name: Deploy · EC2 K3s Test
+    name: Deploy · EC2 K3s
     needs: [lint, backend, frontend, integration, security, images]
     permissions:
       contents: read
@@ -260,7 +261,7 @@ jobs:
       cancel-in-progress: false
     environment:
       name: k3s-test
-      url: https://sems-test.seventh720.com
+      url: https://swe5001.seventh720.com
     steps:
       - uses: actions/checkout@v7.0.1
       - name: Skip superseded main builds
@@ -302,7 +303,7 @@ jobs:
             --release-id "$release_id" --output "$RUNNER_TEMP/k3s-release.json"
           python3 scripts/cd/submit-k3s.py --instance-id "$K3S_INSTANCE_ID" \
             --release "$RUNNER_TEMP/k3s-release.json" --report ci-logs/k3s-deploy/invocation.json
-          echo "Deployed commit $GITHUB_SHA to https://sems-test.seventh720.com" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deployed commit $GITHUB_SHA to https://swe5001.seventh720.com" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload K3s deployment result
         if: always() && steps.latest.outputs.deploy == 'true'
         uses: actions/upload-artifact@v7.0.2
@@ -367,7 +368,7 @@ jobs:
           elif deploy == 'skipped':
               lines.append('⏭️ Deploy: skipped (PR or unmet conditions)')
           else:
-              lines.append(icons.get(deploy, '❔') + ' Deploy · EC2 K3s Test: ' + deploy)
+              lines.append(icons.get(deploy, '❔') + ' Deploy · EC2 K3s: ' + deploy)
           lines += ['', 'Coverage (line / branch; unit/component only)',
                     'Backend: ' + (os.environ['BACKEND_LINES'] or 'N/A') + ' / ' + (os.environ['BACKEND_BRANCHES'] or 'N/A'),
                     'Frontend: ' + (os.environ['FRONTEND_LINES'] or 'N/A') + ' / ' + (os.environ['FRONTEND_BRANCHES'] or 'N/A'),

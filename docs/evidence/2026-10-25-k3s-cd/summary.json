@@ -1,13 +1,16 @@
 {
-  "status": "manual-ssm-release-and-rollback-validated",
+  "status": "main-oidc-ssm-deployment-verified",
   "environment": "sems-k3s/sems-test",
   "baseUrl": "https://sems-test.seventh720.com",
-  "checkedAt": "2026-10-24T18:57:14.552511+00:00",
-  "sourceCommit": "52df21f34a5f181683f273ae053bf5dc18c08e08",
+  "checkedAt": "2026-10-24T20:00:22.223424+00:00",
+  "sourceCommit": "7a978286920d9362739afaf41c5645f2ecf39d88",
+  "runId": 40126181288,
   "applicationDeployments": 5,
   "replicasPerApplication": 2,
   "nodesPerApplication": 2,
-  "postReleaseBusinessGroupsPassed": 9,
+  "githubOidcExchangeVerified": true,
+  "mainWorkflowActivated": true,
+  "databasePodAndPvcUnchanged": true,
   "previousRegressionData": {
     "ticketTypeId": "d03f049e-f8fe-400d-8779-76fe37c9f05e",
     "reserved": 708,
@@ -15,8 +18,12 @@
     "validTickets": 708,
     "duplicateRequestKeys": 0
   },
-  "githubOidcExchangeVerified": false,
-  "mainWorkflowActivated": false,
+  "lastManualRehearsal": {
+    "sourceCommit": "52df21f34a5f181683f273ae053bf5dc18c08e08",
+    "postReleaseBusinessGroupsPassed": 9,
+    "applicationRollbackVerified": true
+  },
   "formalDomainMigrated": false,
-  "originalDataMigrated": false
+  "originalDataMigrated": false,
+  "followUpCutover": "../2026-10-25-k3s-cutover/summary.json"
 }

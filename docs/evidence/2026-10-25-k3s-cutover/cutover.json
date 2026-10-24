@@ -1,0 +1,69 @@
+{
+  "startedAt": "2026-10-24T20:15:37.447007+00:00",
+  "status": "passed",
+  "steps": [
+    {
+      "name": "SEMS maintenance route active; SWE5006 route preserved",
+      "completedAt": "2026-10-24T20:15:39.642784+00:00"
+    },
+    {
+      "name": "Old SEMS API and background writers stopped",
+      "completedAt": "2026-10-24T20:15:40.497048+00:00"
+    },
+    {
+      "name": "Final source backup and complete table fingerprints saved",
+      "completedAt": "2026-10-24T20:15:50.889899+00:00",
+      "backup": {
+        "file": "source-final.dump",
+        "bytes": 89335,
+        "sha256": "2326f6b91474dd0e0764a37f67fbb18c0543cf9f23cd0202008d65e85381a245"
+      }
+    },
+    {
+      "name": "Formal-domain Ingress created; requesting trusted certificate",
+      "completedAt": "2026-10-24T20:15:51.431656+00:00"
+    },
+    {
+      "name": "All 27 tables restored with exact data fingerprints; old test database retained",
+      "completedAt": "2026-10-24T20:16:19.700578+00:00",
+      "retainedTestDatabase": "sems_test_before_cutover_20261025"
+    },
+    {
+      "name": "Original JWT keys and administrator credentials installed; application DB passwords retained",
+      "completedAt": "2026-10-24T20:16:21.326104+00:00"
+    },
+    {
+      "name": "Three backends ready with migrated database",
+      "completedAt": "2026-10-24T20:18:21.011481+00:00"
+    },
+    {
+      "name": "Formal hostname trusted TLS, five public paths, old JWT, fresh login and internal boundary passed",
+      "completedAt": "2026-10-24T20:18:23.826534+00:00"
+    },
+    {
+      "name": "Original domain now forwards to new K3s; SWE5006 HTTPS remains healthy",
+      "completedAt": "2026-10-24T20:18:25.001446+00:00"
+    }
+  ],
+  "dnsChanged": true,
+  "completedAt": "2026-10-24T20:18:26.142717+00:00",
+  "sourceAndRestoredTableCount": 27,
+  "rowCounts": {
+    "users": 7,
+    "events": 7,
+    "bookings": 3,
+    "tickets": 4
+  },
+  "postMigrationBackup": {
+    "file": "after-cutover.dump",
+    "bytes": 89645,
+    "sha256": "2a21cf9e2fe74c0f068355b786fdc0c72ea3c77f86780a7671aee65237c943bf"
+  },
+  "oldAppsStopped": true,
+  "formalTlsVerified": true,
+  "existingJwtVerified": true,
+  "freshLoginVerified": true,
+  "sharedProjectHealthy": true,
+  "rollbackBoundary": "New writes may exist after bridge activation; do not revert to stale old database without synchronization",
+  "dnsVerifiedAt": "2026-10-24T20:25:46.457077+00:00"
+}

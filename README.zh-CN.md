@@ -40,7 +40,7 @@ docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.
 
 开发前端可执行 `npm --prefix apps/web run dev`，访问15173端口，API代理到18080网关。生产构建的页面运行在网关根路径。日期输入使用应用自定义英文日历和时间选择器，统一为新加坡时间（UTC+08:00），提交为 UTC。本地开发覆盖配置仅向 `127.0.0.1:15432` 开放数据库；CI 使用的基础 Compose 文件不开放数据库端口。
 
-这是本地 HTTP 配置。[EC2 K3s 环境](docs/k3s.md)提供新的 HTTPS 测试站，[K3s 发布流程](docs/k3s-cd.md)说明 main 自动交付配置。[Lightsail 指南](docs/cloud-staging.md)保留原站发布步骤。运行凭据使用受限主机文件和 Kubernetes Secret。
+这是本地 HTTP 配置。[swe5001.seventh720.com](https://swe5001.seventh720.com)现运行于 [EC2 K3s 环境](docs/k3s.md)，原账号与业务数据已迁入。[K3s 发布流程](docs/k3s-cd.md)说明 main 自动交付，[切换记录](docs/evidence/2026-10-25-k3s-cutover/README.md)包含数据、证书和 DNS 验收。[Lightsail 指南](docs/cloud-staging.md)保留历史步骤。运行凭据使用受限主机文件和 Kubernetes Secret。
 
 ## 3. 验收流程
 

@@ -9,6 +9,8 @@ import subprocess
 import time
 import uuid
 
+from environment_guard import require_disposable_namespace
+
 from importlib.util import module_from_spec, spec_from_file_location
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -17,6 +19,7 @@ parser.add_argument('--report', required=True)
 args = parser.parse_args()
 k = ['kubectl', '--kubeconfig', args.kubeconfig, '--context', 'sems-k3s',
      '--cache-dir', '.secrets/k3s-cloud/cache', '-n', 'sems-test']
+require_disposable_namespace(k)
 report = {'startedAt': datetime.datetime.now(datetime.timezone.utc).isoformat(),
           'environment': 'sems-k3s/sems-test', 'status': 'running', 'tests': []}
 suffix = uuid.uuid4().hex[:12]
