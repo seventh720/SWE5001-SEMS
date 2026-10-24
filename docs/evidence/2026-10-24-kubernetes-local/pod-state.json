@@ -1,0 +1,51 @@
+[
+  {
+    "name": "admission-587dbb4478-gn4dp",
+    "node": "sems-local-control-plane",
+    "phase": "Running",
+    "ready": true,
+    "restarts": 1
+  },
+  {
+    "name": "admission-587dbb4478-gr8hh",
+    "node": "sems-local-control-plane",
+    "phase": "Running",
+    "ready": true,
+    "restarts": 1
+  },
+  {
+    "name": "event-catalog-7bb74c8b69-wbkb8",
+    "node": "sems-local-control-plane",
+    "phase": "Running",
+    "ready": true,
+    "restarts": 1
+  },
+  {
+    "name": "gateway-85999f5777-kk9qx",
+    "node": "sems-local-control-plane",
+    "phase": "Running",
+    "ready": true,
+    "restarts": 0
+  },
+  {
+    "name": "identity-58bf9fdbfc-nxfrf",
+    "node": "sems-local-control-plane",
+    "phase": "Running",
+    "ready": true,
+    "restarts": 1
+  },
+  {
+    "name": "postgres-0",
+    "node": "sems-local-control-plane",
+    "phase": "Running",
+    "ready": true,
+    "restarts": 0
+  },
+  {
+    "name": "web-84bfc6b54d-9htg9",
+    "node": "sems-local-control-plane",
+    "phase": "Running",
+    "ready": true,
+    "restarts": 0
+  }
+]

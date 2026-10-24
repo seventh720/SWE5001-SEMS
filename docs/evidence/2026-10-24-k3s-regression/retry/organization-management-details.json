@@ -1,0 +1,96 @@
+{
+  "runId": "qa2eb065381aee",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "mode": "k3s-test-fixtures",
+  "startedAt": "2026-10-24T15:03:22.161057+00:00",
+  "accounts": [
+    {
+      "id": "8a6eaeb1-8499-4681-ab63-72fb855b1fd5",
+      "label": "owner",
+      "email": "qa2eb065381aee-owner@example.com"
+    },
+    {
+      "id": "1fa04685-5b3c-49ab-824f-56998346eea5",
+      "label": "organizer",
+      "email": "qa2eb065381aee-organizer@example.com"
+    },
+    {
+      "id": "a0003f43-319a-4621-b990-51eb6a33e747",
+      "label": "member",
+      "email": "qa2eb065381aee-member@example.com"
+    },
+    {
+      "id": "55023829-d1f5-4e58-a62c-64ea3f3aeec8",
+      "label": "outsider",
+      "email": "qa2eb065381aee-outsider@example.com"
+    }
+  ],
+  "organizations": [
+    {
+      "id": "a80b0f5c-7b0a-43c7-a55d-f8e69a69db8d",
+      "label": "main"
+    },
+    {
+      "id": "255d9855-17b2-43f4-a287-01932549b94e",
+      "label": "empty"
+    }
+  ],
+  "events": [
+    {
+      "id": "df26cbc9-723c-4664-bbee-3b024cc52620",
+      "label": "active",
+      "organizationId": "a80b0f5c-7b0a-43c7-a55d-f8e69a69db8d"
+    },
+    {
+      "id": "62c440a6-cb57-4aeb-a59d-f96c282f7410",
+      "label": "ending",
+      "organizationId": "a80b0f5c-7b0a-43c7-a55d-f8e69a69db8d"
+    },
+    {
+      "id": "46d4f0db-f889-49c5-8492-59d2f04c2a1b",
+      "label": "paused",
+      "organizationId": "a80b0f5c-7b0a-43c7-a55d-f8e69a69db8d"
+    },
+    {
+      "id": "60184ca5-1d3d-4d70-95d7-5b9142e4dd34",
+      "label": "cancelled",
+      "organizationId": "a80b0f5c-7b0a-43c7-a55d-f8e69a69db8d"
+    },
+    {
+      "id": "ced879c0-f5cc-4e92-8960-3a1a68d265a7",
+      "label": "draft public 0",
+      "organizationId": "a80b0f5c-7b0a-43c7-a55d-f8e69a69db8d"
+    },
+    {
+      "id": "1bc87ec8-ea31-4003-bafb-a6b8ce233d95",
+      "label": "draft public 1",
+      "organizationId": "a80b0f5c-7b0a-43c7-a55d-f8e69a69db8d"
+    },
+    {
+      "id": "99078c57-81ad-4256-8d57-d3380b6e7513",
+      "label": "draft private",
+      "organizationId": "a80b0f5c-7b0a-43c7-a55d-f8e69a69db8d"
+    },
+    {
+      "id": "e853d51a-7238-4f21-9088-889c2438acbf",
+      "label": "historical setup",
+      "organizationId": "a80b0f5c-7b0a-43c7-a55d-f8e69a69db8d"
+    }
+  ],
+  "checks": [
+    "registration password boundaries and English error guidance",
+    "zero totals, administrator-only overview, organization isolation and internal route denial",
+    "member name/email, role and status filters; pagination and membership changes",
+    "book/replay/cancel/check-in loop; paused tickets included; cancelled event attendance excluded",
+    "combined event filters run before paging; all pages, empty and invalid queries",
+    "ended events remain in totals, reject edits/reopening and preserve version"
+  ],
+  "cleanup": {
+    "complete": true,
+    "failedFixtureIds": [],
+    "accountsRetained": 4,
+    "historyRetained": true
+  },
+  "success": true,
+  "completedAt": "2026-10-24T15:03:44.304328+00:00"
+}

@@ -1,0 +1,39 @@
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache apply -f deployment/k3s/network-smoke.yaml
+namespace/sems-bootstrap-check created
+pod/http-worker created
+pod/client-server created
+service/bootstrap-http created
+ingress.networking.k8s.io/bootstrap-http created
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-bootstrap-check wait --for=condition=Ready pod --all --timeout=90s
+pod/client-server condition met
+pod/http-worker condition met
+
+
+$ curl --noproxy * --silent --show-error --max-time 10 --header Host: bootstrap.sems-test.example.invalid --write-out
+%{http_code} http://54.151.244.167/
+no available server
+
+503
+
+$ curl --noproxy * --silent --show-error --max-time 10 --header Host: bootstrap.sems-test.example.invalid --write-out
+%{http_code} http://54.151.244.167/
+no available server
+
+503
+
+$ curl --noproxy * --silent --show-error --max-time 10 --header Host: bootstrap.sems-test.example.invalid --write-out
+%{http_code} http://54.151.244.167/
+SEMS_K3S_NETWORK_OK
+
+200
+
+$ curl --noproxy * --silent --show-error --max-time 10 --header Host: bootstrap.sems-test.example.invalid --write-out
+%{http_code} http://13.229.121.219/
+SEMS_K3S_NETWORK_OK
+
+200
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache delete namespace sems-bootstrap-check --ignore-not-found=true --wait=true --timeout=90s
+namespace "sems-bootstrap-check" deleted

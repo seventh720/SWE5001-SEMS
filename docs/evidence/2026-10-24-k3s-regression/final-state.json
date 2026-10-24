@@ -1,0 +1,153 @@
+{
+  "checkedAt": "2026-10-24T15:09:11.652067+00:00",
+  "environment": "sems-k3s/sems-test",
+  "deployments": [
+    {
+      "name": "admission",
+      "desired": 2,
+      "ready": 2,
+      "available": 2
+    },
+    {
+      "name": "event-catalog",
+      "desired": 2,
+      "ready": 2,
+      "available": 2
+    },
+    {
+      "name": "gateway",
+      "desired": 2,
+      "ready": 2,
+      "available": 2
+    },
+    {
+      "name": "identity",
+      "desired": 2,
+      "ready": 2,
+      "available": 2
+    },
+    {
+      "name": "web",
+      "desired": 2,
+      "ready": 2,
+      "available": 2
+    }
+  ],
+  "pods": [
+    {
+      "name": "admission-c5d8c7cb7-sl46w",
+      "node": "sems-k3s-worker",
+      "ready": true,
+      "restarts": 0
+    },
+    {
+      "name": "admission-c5d8c7cb7-xh9pb",
+      "node": "sems-k3s-server",
+      "ready": true,
+      "restarts": 0
+    },
+    {
+      "name": "event-catalog-6c6cfbc4d8-f22qt",
+      "node": "sems-k3s-worker",
+      "ready": true,
+      "restarts": 0
+    },
+    {
+      "name": "event-catalog-6c6cfbc4d8-vxfzb",
+      "node": "sems-k3s-server",
+      "ready": true,
+      "restarts": 0
+    },
+    {
+      "name": "gateway-76cd9db978-kf6d6",
+      "node": "sems-k3s-worker",
+      "ready": true,
+      "restarts": 0
+    },
+    {
+      "name": "gateway-76cd9db978-qm679",
+      "node": "sems-k3s-server",
+      "ready": true,
+      "restarts": 0
+    },
+    {
+      "name": "identity-57f44bd75b-nlhqc",
+      "node": "sems-k3s-server",
+      "ready": true,
+      "restarts": 0
+    },
+    {
+      "name": "identity-57f44bd75b-stzq6",
+      "node": "sems-k3s-worker",
+      "ready": true,
+      "restarts": 0
+    },
+    {
+      "name": "postgres-0",
+      "node": "sems-k3s-worker",
+      "ready": true,
+      "restarts": 0
+    },
+    {
+      "name": "web-58c8599ff4-g2hlj",
+      "node": "sems-k3s-worker",
+      "ready": true,
+      "restarts": 0
+    },
+    {
+      "name": "web-58c8599ff4-zxfgk",
+      "node": "sems-k3s-server",
+      "ready": true,
+      "restarts": 0
+    }
+  ],
+  "volumes": [
+    {
+      "name": "data-postgres-0",
+      "phase": "Bound",
+      "storageClass": "sems-postgres-local"
+    }
+  ],
+  "nodes": [
+    {
+      "name": "sems-k3s-server",
+      "ready": true,
+      "kubernetes": "v1.36.5+k3s1",
+      "containerRuntime": "containerd://2.3.4-k3s1.36"
+    },
+    {
+      "name": "sems-k3s-worker",
+      "ready": true,
+      "kubernetes": "v1.36.5+k3s1",
+      "containerRuntime": "containerd://2.3.4-k3s1.36"
+    }
+  ],
+  "publicHttps": [
+    {
+      "path": "/",
+      "status": 200,
+      "tlsVerified": true
+    },
+    {
+      "path": "/health/gateway",
+      "status": 200,
+      "tlsVerified": true
+    },
+    {
+      "path": "/health/identity",
+      "status": 200,
+      "tlsVerified": true
+    },
+    {
+      "path": "/health/event-catalog",
+      "status": 200,
+      "tlsVerified": true
+    },
+    {
+      "path": "/health/admission",
+      "status": 200,
+      "tlsVerified": true
+    }
+  ],
+  "status": "passed"
+}

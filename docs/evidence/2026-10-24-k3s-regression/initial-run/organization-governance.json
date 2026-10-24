@@ -1,0 +1,11 @@
+{
+  "suite": "organization-governance",
+  "startedAt": "2026-10-24T14:46:09.339430+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "environment": "sems-k3s/sems-test",
+  "status": "passed",
+  "assertionScriptSha256": "e3cb2b6720c519d6762e17df359fed50c3f8050aaa63c47ec0745377632e1e06",
+  "replicasRestored": true,
+  "actions": [],
+  "completedAt": "2026-10-24T14:46:27.246128+00:00"
+}

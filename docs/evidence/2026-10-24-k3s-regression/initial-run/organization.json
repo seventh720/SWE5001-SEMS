@@ -1,0 +1,82 @@
+{
+  "suite": "organization",
+  "startedAt": "2026-10-24T14:37:34.145310+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "environment": "sems-k3s/sems-test",
+  "status": "passed",
+  "assertionScriptSha256": "437d06c4775d6ba126e5b5552687513067aa7f1fac2f1122d59a7f0e8e4053f6",
+  "replicasRestored": true,
+  "actions": [
+    {
+      "at": "2026-10-24T14:37:47.241481+00:00",
+      "operation": "stop",
+      "deployment": "admission"
+    },
+    {
+      "at": "2026-10-24T14:37:49.238235+00:00",
+      "operation": "restart",
+      "deployment": "event-catalog"
+    },
+    {
+      "at": "2026-10-24T14:39:01.118988+00:00",
+      "operation": "start",
+      "deployment": "admission"
+    },
+    {
+      "at": "2026-10-24T14:39:32.017632+00:00",
+      "operation": "restart",
+      "deployment": "gateway"
+    },
+    {
+      "at": "2026-10-24T14:39:46.583249+00:00",
+      "operation": "stop",
+      "deployment": "event-catalog"
+    },
+    {
+      "at": "2026-10-24T14:39:49.629740+00:00",
+      "operation": "start",
+      "deployment": "event-catalog"
+    },
+    {
+      "at": "2026-10-24T14:40:30.017200+00:00",
+      "operation": "restart",
+      "deployment": "gateway"
+    },
+    {
+      "at": "2026-10-24T14:40:56.940416+00:00",
+      "operation": "stop",
+      "deployment": "admission"
+    },
+    {
+      "at": "2026-10-24T14:40:58.588824+00:00",
+      "operation": "restart",
+      "deployment": "event-catalog"
+    },
+    {
+      "at": "2026-10-24T14:42:14.070027+00:00",
+      "operation": "start",
+      "deployment": "admission"
+    },
+    {
+      "at": "2026-10-24T14:42:45.124843+00:00",
+      "operation": "restart",
+      "deployment": "gateway"
+    },
+    {
+      "at": "2026-10-24T14:43:11.856346+00:00",
+      "operation": "stop",
+      "deployment": "admission"
+    },
+    {
+      "at": "2026-10-24T14:43:13.439798+00:00",
+      "operation": "start",
+      "deployment": "admission"
+    },
+    {
+      "at": "2026-10-24T14:43:44.025851+00:00",
+      "operation": "restart",
+      "deployment": "gateway"
+    }
+  ],
+  "completedAt": "2026-10-24T14:44:05.503997+00:00"
+}

@@ -1,0 +1,29 @@
+{
+  "pythonReleaseChecks": {
+    "passed": 9
+  },
+  "actionlint": {
+    "status": "passed",
+    "version": "1.7.7",
+    "method": "only workflow source mounted read-only; container network disabled; explicit invoking UID:GID",
+    "linuxOwnerOnlyDirectoryReproducedAndFixed": true
+  },
+  "pythonSyntax": "passed",
+  "bashSyntax": "passed",
+  "diffWhitespace": "passed",
+  "applicationCodeDifferenceBetweenImageReleases": [
+    "apps/web/README.md"
+  ],
+  "imageArtifacts": [
+    {
+      "runId": 39978065255,
+      "sourceCommit": "52df21f34a5f181683f273ae053bf5dc18c08e08",
+      "zipSha256": "df9c56a49fae01f514339c4203fc5b0946124aa7105f0352956e1d21eedd057f"
+    },
+    {
+      "runId": 39751659240,
+      "sourceCommit": "fb27bbf52142700351318ba18c83bb51a9783298",
+      "zipSha256": "1fc1da8905438e120bc8a46a7e4b86636fbf5f06eb929d3eec3cdf4edaedddc4"
+    }
+  ]
+}

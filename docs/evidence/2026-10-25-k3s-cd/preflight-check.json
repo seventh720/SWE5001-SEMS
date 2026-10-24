@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "expectedCandidateFailure": true,
+  "reason": "immutable Deployment selector rejected by server dry run",
+  "verifiedPointerUnchanged": true,
+  "verifiedPointer": {
+    "releaseId": "52df21f34a5f181683f273ae053bf5dc18c08e08-2026102501-3",
+    "sourceCommit": "52df21f34a5f181683f273ae053bf5dc18c08e08",
+    "verifiedAt": "2026-10-24T17:01:38.183783+00:00"
+  }
+}

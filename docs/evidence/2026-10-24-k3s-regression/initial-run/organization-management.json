@@ -1,0 +1,12 @@
+{
+  "suite": "organization-management",
+  "startedAt": "2026-10-24T14:44:51.065108+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "environment": "sems-k3s/sems-test",
+  "status": "failed",
+  "assertionScriptSha256": "4523df6af4133183feadaaaedfccb09e6426267eebc74a0f27c6197495ed62a4",
+  "error": "AttributeError: module 'secrets' has no attribute 'token_hex' (consider renaming '<repo>/scripts/k8s/secrets.py' since it has the same name as the standard library module named 'secrets' and prevents importing that standard library module)",
+  "replicasRestored": true,
+  "actions": [],
+  "completedAt": "2026-10-24T14:44:51.819947+00:00"
+}

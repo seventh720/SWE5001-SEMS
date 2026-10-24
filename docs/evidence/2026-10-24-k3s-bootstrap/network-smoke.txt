@@ -1,0 +1,876 @@
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache get nodes -o json
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Node",
+            "metadata": {
+                "annotations": {
+                    "alpha.kubernetes.io/provided-node-ip": "172.31.33.16",
+                    "flannel.alpha.coreos.com/backend-data": "{\"VNI\":1,\"VtepMAC\":\"f6:0e:e1:e8:d2:79\"}",
+                    "flannel.alpha.coreos.com/backend-type": "vxlan",
+                    "flannel.alpha.coreos.com/kube-subnet-manager": "true",
+                    "flannel.alpha.coreos.com/public-ip": "172.31.33.16",
+                    "k3s.io/encryption-config-hash": "start-02664f1be6cea43698ccc12ef6c2dafe9e757eb934694f44a9fe245166f067fa",
+                    "k3s.io/hostname": "ip-172-31-33-16",
+                    "k3s.io/internal-ip": "172.31.33.16",
+                    "k3s.io/node-args": "[\"server\",\"--node-name\",\"sems-k3s-server\",\"--node-ip\",\"172.31.33.16\",\"--advertise-address\",\"172.31.33.16\",\"--write-kubeconfig-mode\",\"0600\",\"--secrets-encryption\",\"true\",\"--flannel-backend\",\"vxlan\",\"--node-label\",\"sems.io/node-group=apps\",\"--node-label\",\"sems.io/node-role=server\"]",
+                    "k3s.io/node-config-hash": "7ZTVCJKMD4TK7JXAGTKDKZUG5C6SS2QJ24DZPWRWQ4QL57HZKBFQ====",
+                    "k3s.io/node-env": "{}",
+                    "node.alpha.kubernetes.io/ttl": "0",
+                    "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+                },
+                "creationTimestamp": "2026-10-24T13:42:55Z",
+                "finalizers": [
+                    "wrangler.cattle.io/node"
+                ],
+                "labels": {
+                    "beta.kubernetes.io/arch": "amd64",
+                    "beta.kubernetes.io/instance-type": "k3s",
+                    "beta.kubernetes.io/os": "linux",
+                    "kubernetes.io/arch": "amd64",
+                    "kubernetes.io/hostname": "sems-k3s-server",
+                    "kubernetes.io/os": "linux",
+                    "node-role.kubernetes.io/control-plane": "true",
+                    "node.kubernetes.io/instance-type": "k3s",
+                    "sems.io/node-group": "apps",
+                    "sems.io/node-role": "server"
+                },
+                "name": "sems-k3s-server",
+                "resourceVersion": "835",
+                "uid": "c77b20ca-7526-4ea7-9539-dae9dcea2a74"
+            },
+            "spec": {
+                "podCIDR": "10.42.0.0/24",
+                "podCIDRs": [
+                    "10.42.0.0/24"
+                ],
+                "providerID": "k3s://sems-k3s-server"
+            },
+            "status": {
+                "addresses": [
+                    {
+                        "address": "172.31.33.16",
+                        "type": "InternalIP"
+                    },
+                    {
+                        "address": "ip-172-31-33-16",
+                        "type": "Hostname"
+                    }
+                ],
+                "allocatable": {
+                    "cpu": "2",
+                    "ephemeral-storage": "28579587664",
+                    "hugepages-1Gi": "0",
+                    "hugepages-2Mi": "0",
+                    "memory": "3924212Ki",
+                    "pods": "110"
+                },
+                "capacity": {
+                    "cpu": "2",
+                    "ephemeral-storage": "29378688Ki",
+                    "hugepages-1Gi": "0",
+                    "hugepages-2Mi": "0",
+                    "memory": "3924212Ki",
+                    "pods": "110"
+                },
+                "conditions": [
+                    {
+                        "lastHeartbeatTime": "2026-10-24T13:43:57Z",
+                        "lastTransitionTime": "2026-10-24T13:42:55Z",
+                        "message": "kubelet has sufficient memory available",
+                        "reason": "KubeletHasSufficientMemory",
+                        "status": "False",
+                        "type": "MemoryPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-10-24T13:43:57Z",
+                        "lastTransitionTime": "2026-10-24T13:42:55Z",
+                        "message": "kubelet has no disk pressure",
+                        "reason": "KubeletHasNoDiskPressure",
+                        "status": "False",
+                        "type": "DiskPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-10-24T13:43:57Z",
+                        "lastTransitionTime": "2026-10-24T13:42:55Z",
+                        "message": "kubelet has sufficient PID available",
+                        "reason": "KubeletHasSufficientPID",
+                        "status": "False",
+                        "type": "PIDPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-10-24T13:43:57Z",
+                        "lastTransitionTime": "2026-10-24T13:42:56Z",
+                        "message": "kubelet is posting ready status",
+                        "reason": "KubeletReady",
+                        "status": "True",
+                        "type": "Ready"
+                    }
+                ],
+                "daemonEndpoints": {
+                    "kubeletEndpoint": {
+                        "Port": 10250
+                    }
+                },
+                "declaredFeatures": [
+                    "ExtendWebSocketsToKubelet",
+                    "InPlacePodLevelResourcesVerticalScaling",
+                    "InPlacePodVerticalScalingInitContainers",
+                    "RestartAllContainersOnContainerExits"
+                ],
+                "features": {
+                    "supplementalGroupsPolicy": true
+                },
+                "images": [
+                    {
+                        "names": [
+                            "docker.io/rancher/klipper-helm@sha256:5425a2b4613d2458dbdff99218e8d487ebb59c20e7a941f061c0777070f0aac1",
+                            "docker.io/rancher/klipper-helm:v0.13.3-build20260727"
+                        ],
+                        "sizeBytes": 74172006
+                    },
+                    {
+                        "names": [
+                            "docker.io/rancher/mirrored-library-traefik@sha256:f86a2cab1b5c649070c49f883c743dd32d8485a56e3368c5f93b9e91f1e91259",
+                            "docker.io/rancher/mirrored-library-traefik:3.7.13"
+                        ],
+                        "sizeBytes": 55211119
+                    },
+                    {
+                        "names": [
+                            "docker.io/rancher/mirrored-coredns-coredns@sha256:7efd3c635b03efd68c4e8398fc45f0d993d0e9ab016f72c1cefb0fd6d01aa286",
+                            "docker.io/rancher/mirrored-coredns-coredns:1.14.7"
+                        ],
+                        "sizeBytes": 24261571
+                    },
+                    {
+                        "names": [
+                            "docker.io/rancher/mirrored-metrics-server@sha256:d9862115e7c7881280d3d75ca26bda8ffc0fc213315979575bf23ce9826205c0",
+                            "docker.io/rancher/mirrored-metrics-server:v0.9.0"
+                        ],
+                        "sizeBytes": 23258428
+                    },
+                    {
+                        "names": [
+                            "docker.io/rancher/local-path-provisioner@sha256:e757967a5ec338f6a9b371c5a9688bedaa8c3578ea3dd4db329ea0084be0a86f",
+                            "docker.io/rancher/local-path-provisioner:v0.0.37"
+                        ],
+                        "sizeBytes": 15066012
+                    },
+                    {
+                        "names": [
+                            "docker.io/rancher/klipper-lb@sha256:910944bb0bd94f060a82a56ca1ea1c577d3e49b3473a093a47a985f32e92d94a",
+                            "docker.io/rancher/klipper-lb:v0.4.17"
+                        ],
+                        "sizeBytes": 5280144
+                    },
+                    {
+                        "names": [
+                            "docker.io/rancher/mirrored-pause@sha256:f548e0e8e3dc1896ca956272154dde3314e8cc4fde0a57577ee9fa1c63f5baf4",
+                            "docker.io/rancher/mirrored-pause:3.10.2"
+                        ],
+                        "sizeBytes": 320805
+                    }
+                ],
+                "nodeInfo": {
+                    "architecture": "amd64",
+                    "bootID": "39ac64c3-94a1-4222-8ae2-7b846ab6883b",
+                    "containerRuntimeVersion": "containerd://2.3.4-k3s1.36",
+                    "kernelVersion": "7.0.0-1014-aws",
+                    "kubeProxyVersion": "",
+                    "kubeletVersion": "v1.36.5+k3s1",
+                    "machineID": "ec2f9b74135a4352e6e78ec32e113fa0",
+                    "operatingSystem": "linux",
+                    "osImage": "Ubuntu 24.04.5 LTS",
+                    "systemUUID": "ec2f9b74-135a-4352-e6e7-8ec32e113fa0"
+                },
+                "runtimeHandlers": [
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": true,
+                            "userNamespaces": true
+                        },
+                        "name": ""
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": true,
+                            "userNamespaces": true
+                        },
+                        "name": "runc"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "runhcs-wcow-process"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Node",
+            "metadata": {
+                "annotations": {
+                    "alpha.kubernetes.io/provided-node-ip": "172.31.39.232",
+                    "flannel.alpha.coreos.com/backend-data": "{\"VNI\":1,\"VtepMAC\":\"52:65:60:72:bf:44\"}",
+                    "flannel.alpha.coreos.com/backend-type": "vxlan",
+                    "flannel.alpha.coreos.com/kube-subnet-manager": "true",
+                    "flannel.alpha.coreos.com/public-ip": "172.31.39.232",
+                    "k3s.io/hostname": "ip-172-31-39-232",
+                    "k3s.io/internal-ip": "172.31.39.232",
+                    "k3s.io/node-args": "[\"agent\",\"--server\",\"https://172.31.33.16:6443\",\"--node-name\",\"sems-k3s-worker\",\"--node-ip\",\"172.31.39.232\",\"--token-file\",\"/etc/rancher/k3s/agent-token\",\"--node-label\",\"sems.io/node-group=apps\",\"--node-label\",\"sems.io/node-role=worker\"]",
+                    "k3s.io/node-config-hash": "KTEJL64KLGUGT7KJC7YC4HQFIDV7WZRPQ4PBRZGXUY42BWHRTIHQ====",
+                    "k3s.io/node-env": "{}",
+                    "node.alpha.kubernetes.io/ttl": "0",
+                    "volumes.kubernetes.io/controller-managed-attach-detach": "true"
+                },
+                "creationTimestamp": "2026-10-24T13:43:48Z",
+                "finalizers": [
+                    "wrangler.cattle.io/node"
+                ],
+                "labels": {
+                    "beta.kubernetes.io/arch": "amd64",
+                    "beta.kubernetes.io/instance-type": "k3s",
+                    "beta.kubernetes.io/os": "linux",
+                    "kubernetes.io/arch": "amd64",
+                    "kubernetes.io/hostname": "sems-k3s-worker",
+                    "kubernetes.io/os": "linux",
+                    "node.kubernetes.io/instance-type": "k3s",
+                    "sems.io/node-group": "apps",
+                    "sems.io/node-role": "worker"
+                },
+                "name": "sems-k3s-worker",
+                "resourceVersion": "858",
+                "uid": "4aaa97a0-120f-473c-a7d9-0d3092771029"
+            },
+            "spec": {
+                "podCIDR": "10.42.1.0/24",
+                "podCIDRs": [
+                    "10.42.1.0/24"
+                ],
+                "providerID": "k3s://sems-k3s-worker"
+            },
+            "status": {
+                "addresses": [
+                    {
+                        "address": "172.31.39.232",
+                        "type": "InternalIP"
+                    },
+                    {
+                        "address": "ip-172-31-39-232",
+                        "type": "Hostname"
+                    }
+                ],
+                "allocatable": {
+                    "cpu": "2",
+                    "ephemeral-storage": "28579587664",
+                    "hugepages-1Gi": "0",
+                    "hugepages-2Mi": "0",
+                    "memory": "3924200Ki",
+                    "pods": "110"
+                },
+                "capacity": {
+                    "cpu": "2",
+                    "ephemeral-storage": "29378688Ki",
+                    "hugepages-1Gi": "0",
+                    "hugepages-2Mi": "0",
+                    "memory": "3924200Ki",
+                    "pods": "110"
+                },
+                "conditions": [
+                    {
+                        "lastHeartbeatTime": "2026-10-24T13:44:18Z",
+                        "lastTransitionTime": "2026-10-24T13:43:48Z",
+                        "message": "kubelet has sufficient memory available",
+                        "reason": "KubeletHasSufficientMemory",
+                        "status": "False",
+                        "type": "MemoryPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-10-24T13:44:18Z",
+                        "lastTransitionTime": "2026-10-24T13:43:48Z",
+                        "message": "kubelet has no disk pressure",
+                        "reason": "KubeletHasNoDiskPressure",
+                        "status": "False",
+                        "type": "DiskPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-10-24T13:44:18Z",
+                        "lastTransitionTime": "2026-10-24T13:43:48Z",
+                        "message": "kubelet has sufficient PID available",
+                        "reason": "KubeletHasSufficientPID",
+                        "status": "False",
+                        "type": "PIDPressure"
+                    },
+                    {
+                        "lastHeartbeatTime": "2026-10-24T13:44:18Z",
+                        "lastTransitionTime": "2026-10-24T13:43:48Z",
+                        "message": "kubelet is posting ready status",
+                        "reason": "KubeletReady",
+                        "status": "True",
+                        "type": "Ready"
+                    }
+                ],
+                "daemonEndpoints": {
+                    "kubeletEndpoint": {
+                        "Port": 10250
+                    }
+                },
+                "declaredFeatures": [
+                    "ExtendWebSocketsToKubelet",
+                    "InPlacePodLevelResourcesVerticalScaling",
+                    "InPlacePodVerticalScalingInitContainers",
+                    "RestartAllContainersOnContainerExits"
+                ],
+                "features": {
+                    "supplementalGroupsPolicy": true
+                },
+                "images": [
+                    {
+                        "names": [
+                            "docker.io/rancher/klipper-lb@sha256:910944bb0bd94f060a82a56ca1ea1c577d3e49b3473a093a47a985f32e92d94a",
+                            "docker.io/rancher/klipper-lb:v0.4.17"
+                        ],
+                        "sizeBytes": 5280144
+                    },
+                    {
+                        "names": [
+                            "docker.io/rancher/mirrored-pause@sha256:f548e0e8e3dc1896ca956272154dde3314e8cc4fde0a57577ee9fa1c63f5baf4",
+                            "docker.io/rancher/mirrored-pause:3.10.2"
+                        ],
+                        "sizeBytes": 320805
+                    }
+                ],
+                "nodeInfo": {
+                    "architecture": "amd64",
+                    "bootID": "ce7dcfef-b89c-487a-a6aa-7df4c475489d",
+                    "containerRuntimeVersion": "containerd://2.3.4-k3s1.36",
+                    "kernelVersion": "7.0.0-1014-aws",
+                    "kubeProxyVersion": "",
+                    "kubeletVersion": "v1.36.5+k3s1",
+                    "machineID": "ec23a1713ae0b3f103133d4d787f2b99",
+                    "operatingSystem": "linux",
+                    "osImage": "Ubuntu 24.04.5 LTS",
+                    "systemUUID": "ec23a171-3ae0-b3f1-0313-3d4d787f2b99"
+                },
+                "runtimeHandlers": [
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": true,
+                            "userNamespaces": true
+                        },
+                        "name": ""
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": true,
+                            "userNamespaces": true
+                        },
+                        "name": "runc"
+                    },
+                    {
+                        "features": {
+                            "recursiveReadOnlyMounts": false,
+                            "userNamespaces": false
+                        },
+                        "name": "runhcs-wcow-process"
+                    }
+                ]
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache label node sems-k3s-worker node-role.kubernetes.io/worker=true --overwrite
+node/sems-k3s-worker labeled
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache apply -f deployment/k3s/network-smoke.yaml
+namespace/sems-bootstrap-check created
+pod/http-worker created
+pod/client-server created
+service/bootstrap-http created
+ingress.networking.k8s.io/bootstrap-http created
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-bootstrap-check wait --for=condition=Ready pod --all --timeout=180s
+pod/client-server condition met
+pod/http-worker condition met
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-bootstrap-check get pods -o json
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Pod\",\"metadata\":{\"annotations\":{},\"name\":\"client-server\",\"namespace\":\"sems-bootstrap-check\"},\"spec\":{\"automountServiceAccountToken\":false,\"containers\":[{\"command\":[\"sleep\",\"600\"],\"image\":\"busybox:1.37.0\",\"name\":\"client\",\"resources\":{\"limits\":{\"cpu\":\"100m\",\"memory\":\"32Mi\"},\"requests\":{\"cpu\":\"10m\",\"memory\":\"16Mi\"}},\"securityContext\":{\"allowPrivilegeEscalation\":false,\"capabilities\":{\"drop\":[\"ALL\"]},\"readOnlyRootFilesystem\":true}}],\"nodeName\":\"sems-k3s-server\",\"securityContext\":{\"runAsGroup\":65534,\"runAsNonRoot\":true,\"runAsUser\":65534,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}}}}\n"
+                },
+                "creationTimestamp": "2026-10-24T13:45:24Z",
+                "generation": 1,
+                "name": "client-server",
+                "namespace": "sems-bootstrap-check",
+                "resourceVersion": "924",
+                "uid": "132329a7-bd3f-45a5-a9a8-2a424eab7e93"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "sleep",
+                            "600"
+                        ],
+                        "image": "busybox:1.37.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "client",
+                        "resources": {
+                            "limits": {
+                                "cpu": "100m",
+                                "memory": "32Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "readOnlyRootFilesystem": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "sems-k3s-server",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "runAsGroup": 65534,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65534,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ]
+            },
+            "status": {
+                "allocatedResources": {
+                    "cpu": "10m",
+                    "memory": "16Mi"
+                },
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-24T13:45:24Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-24T13:45:24Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-24T13:45:29Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-24T13:45:29Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-24T13:45:24Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "10m",
+                            "memory": "16Mi"
+                        },
+                        "containerID": "containerd://0a70cde4bc27b165efb2e059f6dc9b721dbbb2b3ad00d86f3d016f0aec1db537",
+                        "image": "docker.io/library/busybox:1.37.0",
+                        "imageID": "docker.io/library/busybox@sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e",
+                        "lastState": {},
+                        "name": "client",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "100m",
+                                "memory": "32Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-24T13:45:29Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65534,
+                                "supplementalGroups": [
+                                    65534
+                                ],
+                                "uid": 65534
+                            }
+                        }
+                    }
+                ],
+                "hostIP": "172.31.33.16",
+                "hostIPs": [
+                    {
+                        "ip": "172.31.33.16"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.42.0.9",
+                "podIPs": [
+                    {
+                        "ip": "10.42.0.9"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "resources": {
+                    "limits": {
+                        "cpu": "100m",
+                        "memory": "32Mi"
+                    },
+                    "requests": {
+                        "cpu": "10m",
+                        "memory": "16Mi"
+                    }
+                },
+                "startTime": "2026-10-24T13:45:24Z"
+            }
+        },
+        {
+            "apiVersion": "v1",
+            "kind": "Pod",
+            "metadata": {
+                "annotations": {
+                    "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Pod\",\"metadata\":{\"annotations\":{},\"labels\":{\"app\":\"bootstrap-http\"},\"name\":\"http-worker\",\"namespace\":\"sems-bootstrap-check\"},\"spec\":{\"automountServiceAccountToken\":false,\"containers\":[{\"args\":[\"printf 'SEMS_K3S_NETWORK_OK\\n' \\u003e /www/index.html; exec httpd -f -p 8080 -h /www\"],\"command\":[\"sh\",\"-c\"],\"image\":\"busybox:1.37.0\",\"name\":\"http\",\"ports\":[{\"containerPort\":8080}],\"readinessProbe\":{\"httpGet\":{\"path\":\"/\",\"port\":8080},\"periodSeconds\":2},\"resources\":{\"limits\":{\"cpu\":\"100m\",\"memory\":\"32Mi\"},\"requests\":{\"cpu\":\"10m\",\"memory\":\"16Mi\"}},\"securityContext\":{\"allowPrivilegeEscalation\":false,\"capabilities\":{\"drop\":[\"ALL\"]},\"readOnlyRootFilesystem\":true},\"volumeMounts\":[{\"mountPath\":\"/www\",\"name\":\"content\"}]}],\"nodeName\":\"sems-k3s-worker\",\"securityContext\":{\"fsGroup\":65534,\"runAsGroup\":65534,\"runAsNonRoot\":true,\"runAsUser\":65534,\"seccompProfile\":{\"type\":\"RuntimeDefault\"}},\"volumes\":[{\"emptyDir\":{},\"name\":\"content\"}]}}\n"
+                },
+                "creationTimestamp": "2026-10-24T13:45:24Z",
+                "generation": 1,
+                "labels": {
+                    "app": "bootstrap-http"
+                },
+                "name": "http-worker",
+                "namespace": "sems-bootstrap-check",
+                "resourceVersion": "920",
+                "uid": "42903496-7d18-444e-b974-4387631893ed"
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "args": [
+                            "printf 'SEMS_K3S_NETWORK_OK\n' \u003e /www/index.html; exec httpd -f -p 8080 -h /www"
+                        ],
+                        "command": [
+                            "sh",
+                            "-c"
+                        ],
+                        "image": "busybox:1.37.0",
+                        "imagePullPolicy": "IfNotPresent",
+                        "name": "http",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/",
+                                "port": 8080,
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 1
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "100m",
+                                "memory": "32Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "readOnlyRootFilesystem": true
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/www",
+                                "name": "content"
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "enableServiceLinks": true,
+                "nodeName": "sems-k3s-worker",
+                "preemptionPolicy": "PreemptLowerPriority",
+                "priority": 0,
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "fsGroup": 65534,
+                    "runAsGroup": 65534,
+                    "runAsNonRoot": true,
+                    "runAsUser": 65534,
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "serviceAccount": "default",
+                "serviceAccountName": "default",
+                "terminationGracePeriodSeconds": 30,
+                "tolerations": [
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/not-ready",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    },
+                    {
+                        "effect": "NoExecute",
+                        "key": "node.kubernetes.io/unreachable",
+                        "operator": "Exists",
+                        "tolerationSeconds": 300
+                    }
+                ],
+                "volumes": [
+                    {
+                        "emptyDir": {},
+                        "name": "content"
+                    }
+                ]
+            },
+            "status": {
+                "allocatedResources": {
+                    "cpu": "10m",
+                    "memory": "16Mi"
+                },
+                "conditions": [
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-24T13:45:24Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodReadyToStartContainers"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-24T13:45:24Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Initialized"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-24T13:45:29Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "Ready"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-24T13:45:29Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "ContainersReady"
+                    },
+                    {
+                        "lastProbeTime": null,
+                        "lastTransitionTime": "2026-10-24T13:45:24Z",
+                        "observedGeneration": 1,
+                        "status": "True",
+                        "type": "PodScheduled"
+                    }
+                ],
+                "containerStatuses": [
+                    {
+                        "allocatedResources": {
+                            "cpu": "10m",
+                            "memory": "16Mi"
+                        },
+                        "containerID": "containerd://8ae780b0111f5717ac17b35a1bb876a5b5dd711dddceb0e3e704e82bc7505109",
+                        "image": "docker.io/library/busybox:1.37.0",
+                        "imageID": "docker.io/library/busybox@sha256:bdf57e528e45e4433820e045b29b4597825a1c9e38353532d90a01445013f82e",
+                        "lastState": {},
+                        "name": "http",
+                        "ready": true,
+                        "resources": {
+                            "limits": {
+                                "cpu": "100m",
+                                "memory": "32Mi"
+                            },
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "16Mi"
+                            }
+                        },
+                        "restartCount": 0,
+                        "started": true,
+                        "state": {
+                            "running": {
+                                "startedAt": "2026-10-24T13:45:29Z"
+                            }
+                        },
+                        "user": {
+                            "linux": {
+                                "gid": 65534,
+                                "supplementalGroups": [
+                                    65534
+                                ],
+                                "uid": 65534
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/www",
+                                "name": "content"
+                            }
+                        ]
+                    }
+                ],
+                "hostIP": "172.31.39.232",
+                "hostIPs": [
+                    {
+                        "ip": "172.31.39.232"
+                    }
+                ],
+                "observedGeneration": 1,
+                "phase": "Running",
+                "podIP": "10.42.1.3",
+                "podIPs": [
+                    {
+                        "ip": "10.42.1.3"
+                    }
+                ],
+                "qosClass": "Burstable",
+                "resources": {
+                    "limits": {
+                        "cpu": "100m",
+                        "memory": "32Mi"
+                    },
+                    "requests": {
+                        "cpu": "10m",
+                        "memory": "16Mi"
+                    }
+                },
+                "startTime": "2026-10-24T13:45:24Z"
+            }
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-bootstrap-check exec client-server -- nslookup bootstrap-http.sems-bootstrap-check.svc.cluster.local
+Server:		10.43.0.10
+Address:	10.43.0.10:53
+
+
+Name:	bootstrap-http.sems-bootstrap-check.svc.cluster.local
+Address: 10.43.228.188
+
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache -n sems-bootstrap-check exec client-server -- wget -qO- -T 10 http://bootstrap-http.sems-bootstrap-check.svc.cluster.local/
+SEMS_K3S_NETWORK_OK
+
+
+$ curl --noproxy * --silent --show-error --max-time 10 --header Host: bootstrap.sems-test.example.invalid http://54.151.244.167/
+SEMS_K3S_NETWORK_OK
+
+
+$ curl --noproxy * --silent --show-error --max-time 10 --header Host: bootstrap.sems-test.example.invalid http://13.229.121.219/
+SEMS_K3S_NETWORK_OK
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache top nodes
+NAME              CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+sems-k3s-server   98m          4%       1269Mi          33%
+sems-k3s-worker   15m          0%       360Mi           9%
+
+
+$ kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s --cache-dir .secrets/k3s-cloud/cache delete namespace sems-bootstrap-check --ignore-not-found=true --wait=true --timeout=90s
+namespace "sems-bootstrap-check" deleted

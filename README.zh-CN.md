@@ -40,7 +40,7 @@ docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.
 
 开发前端可执行 `npm --prefix apps/web run dev`，访问15173端口，API代理到18080网关。生产构建的页面运行在网关根路径。日期输入使用应用自定义英文日历和时间选择器，统一为新加坡时间（UTC+08:00），提交为 UTC。本地开发覆盖配置仅向 `127.0.0.1:15432` 开放数据库；CI 使用的基础 Compose 文件不开放数据库端口。
 
-这是本地 HTTP 配置。[云端覆盖配置](docs/cloud-staging.md)已有 HTTPS 和自动部署；运行密钥目前存放于受限主机文件，尚未接入云托管密钥服务。
+这是本地 HTTP 配置。[EC2 K3s 环境](docs/k3s.md)提供新的 HTTPS 测试站，[K3s 发布流程](docs/k3s-cd.md)说明 main 自动交付配置。[Lightsail 指南](docs/cloud-staging.md)保留原站发布步骤。运行凭据使用受限主机文件和 Kubernetes Secret。
 
 ## 3. 验收流程
 
@@ -60,17 +60,19 @@ npm --prefix apps/web run test:coverage
 npm --prefix apps/web run build
 ```
 
-数据库/API 验收需要独立、可丢弃的 Compose 环境；部分脚本会停止服务、重启及制造故障。完整入口、隔离要求和现有流水线能力见 [CI operations](docs/ci.md)。历史证据见 [docs/evidence](docs/evidence/)。
+数据库/API 验收需要隔离的测试环境；部分脚本会停止服务、重启及制造故障。Compose 入口见 [CI operations](docs/ci.md)，Kubernetes 适配器见 [K3s 操作](docs/k3s.md)。历史证据见 [docs/evidence](docs/evidence/)。
 
 ## 5. 目录与文档
 
 - `services/` — 后端服务、迁移和测试。
 - `apps/web/` — 前端和界面测试。
 - `contracts/` — [OpenAPI 契约](contracts/README.md)。
-- `deployment/` — Compose、网关和数据库配置。
+- `deployment/` — Compose、Kubernetes 环境配置、网关和数据库配置。
 - `scripts/` — 环境初始化和可重用验收脚本。
 - [文档索引 / Documentation index](docs/README.md)
 - [开发与数据库指南](docs/development.md)
+- [Kubernetes 配置与云端模板](docs/kubernetes.md)
+- [EC2 K3s 环境](docs/k3s.md)
 - [贡献流程](CONTRIBUTING.md)
 - [技术改进计划](docs/roadmap.md)
 - [当前业务规则](docs/functional-guide.md)

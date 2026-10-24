@@ -1,0 +1,11 @@
+{
+  "suite": "catalog-read",
+  "startedAt": "2026-10-24T14:44:08.600128+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "environment": "sems-k3s/sems-test",
+  "status": "passed",
+  "assertionScriptSha256": "a47a3aea8d81e76eb5b51bdc12984f1cc3c60046c7d873205defad58002d947c",
+  "replicasRestored": true,
+  "actions": [],
+  "completedAt": "2026-10-24T14:44:24.412902+00:00"
+}

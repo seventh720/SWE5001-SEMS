@@ -1,0 +1,11 @@
+{
+  "suite": "visibility",
+  "startedAt": "2026-10-24T14:44:54.899080+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "environment": "sems-k3s/sems-test",
+  "status": "passed",
+  "assertionScriptSha256": "b5d929402f6b0270ccb1f634e9cac3a5bbbba2d1e90c92645f4f4950157d2114",
+  "replicasRestored": true,
+  "actions": [],
+  "completedAt": "2026-10-24T14:45:05.054850+00:00"
+}

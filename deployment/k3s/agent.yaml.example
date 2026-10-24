@@ -1,0 +1,9 @@
+# Copy to /etc/rancher/k3s/config.yaml; replace the private IP values.
+server: https://CONFIGURE_SERVER_PRIVATE_IP:6443
+node-name: sems-k3s-worker
+node-ip: CONFIGURE_WORKER_PRIVATE_IP
+token-file: /etc/rancher/k3s/agent-token
+node-label:
+  - sems.io/node-group=apps
+  - sems.io/node-role=worker
+# Write the server-generated token to agent-token with root ownership/mode 0600.

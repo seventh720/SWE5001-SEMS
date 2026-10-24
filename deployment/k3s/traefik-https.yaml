@@ -1,0 +1,57 @@
+# Apply separately as a cluster administrator; replace CONFIGURE_ACME_EMAIL.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: sems-traefik-local
+provisioner: rancher.io/local-path
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: traefik-acme
+  namespace: kube-system
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: sems-traefik-local
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    deployment:
+      replicas: 1
+    updateStrategy:
+      type: Recreate
+      rollingUpdate: null
+    nodeSelector:
+      kubernetes.io/hostname: sems-k3s-server
+    podSecurityContext:
+      fsGroup: 65532
+    persistence:
+      enabled: true
+      existingClaim: traefik-acme
+      path: /data
+    certificatesResolvers:
+      letsencrypt:
+        acme:
+          email: CONFIGURE_ACME_EMAIL
+          storage: /data/acme.json
+          keyType: EC256
+          httpChallenge:
+            entryPoint: web
+    ports:
+      web:
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
+              permanent: true

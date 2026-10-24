@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sems-runtime
+data:
+  JAVA_TOOL_OPTIONS: "-Xms128m -Xmx384m -XX:MaxMetaspaceSize=192m"
+  SERVER_SHUTDOWN: graceful
+  SPRING_LIFECYCLE_TIMEOUT_PER_SHUTDOWN_PHASE: 20s
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sems-database
+data:
+  # An overlay must select an actual database. Credentials are separate Secrets.
+  IDENTITY_DB_URL: jdbc:postgresql://configure-database.invalid:5432/sems?currentSchema=identity
+  CATALOG_DB_URL: jdbc:postgresql://configure-database.invalid:5432/sems?currentSchema=catalog
+  ADMISSION_DB_URL: jdbc:postgresql://configure-database.invalid:5432/sems?currentSchema=admission

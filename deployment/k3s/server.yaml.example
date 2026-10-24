@@ -1,0 +1,12 @@
+# Copy to /etc/rancher/k3s/config.yaml; replace the two private IP values.
+node-name: sems-k3s-server
+node-ip: CONFIGURE_SERVER_PRIVATE_IP
+advertise-address: CONFIGURE_SERVER_PRIVATE_IP
+write-kubeconfig-mode: "0600"
+secrets-encryption: true
+flannel-backend: vxlan
+node-label:
+  - sems.io/node-group=apps
+  - sems.io/node-role=server
+# Single server: K3s uses its embedded SQLite datastore, not an HA etcd cluster.
+# Leave the API private; administer through an SSH tunnel to 127.0.0.1:6443.

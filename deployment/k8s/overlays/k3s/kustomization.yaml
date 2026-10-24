@@ -1,0 +1,75 @@
+# K3s test environment: verified release images and self-managed PostgreSQL.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: sems-test
+resources:
+  - ../../base
+  - postgres
+  - ingress.yaml
+images:
+  - name: sems-platform-identity
+    newName: ghcr.io/seventh720/swe5001-sems/identity
+    digest: sha256:3b33cacdfd61656a43837fd78470fdfd9a394705525e68b75c2f764d67be7a32
+  - name: sems-platform-event-catalog
+    newName: ghcr.io/seventh720/swe5001-sems/event-catalog
+    digest: sha256:29cb527bb821881420cb7b38405031840516a961d926bdca9fad70dcc5424b7a
+  - name: sems-platform-admission
+    newName: ghcr.io/seventh720/swe5001-sems/admission
+    digest: sha256:304c685da2aaf100d45ba4a98316f6e18a916c8bd3ce66e0f4c0dafd99160682
+  - name: sems-platform-web
+    newName: ghcr.io/seventh720/swe5001-sems/web
+    digest: sha256:35935d3cd5fa29c46d7285a9cbf1c6dbeef0be9b2eddef93fa097c3b855e05c8
+  - name: sems-platform-gateway
+    newName: ghcr.io/seventh720/swe5001-sems/gateway
+    digest: sha256:687e0c2e2382a1a2aa08a7297ab3cfc9e85d9959d9466c1e09cd5e7336a66a33
+replicas:
+  - name: identity
+    count: 2
+  - name: event-catalog
+    count: 2
+  - name: admission
+    count: 2
+  - name: web
+    count: 2
+  - name: gateway
+    count: 2
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/topologySpreadConstraints/0/whenUnsatisfiable
+        value: DoNotSchedule
+      - op: add
+        path: /spec/template/spec/topologySpreadConstraints/0/minDomains
+        value: 2
+      - op: replace
+        path: /spec/strategy/rollingUpdate/maxSurge
+        value: 0
+      - op: replace
+        path: /spec/strategy/rollingUpdate/maxUnavailable
+        value: 1
+      - op: add
+        path: /spec/template/spec/affinity
+        value:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/part-of: sems
+                matchLabelKeys:
+                  - app.kubernetes.io/name
+  - target:
+      kind: ConfigMap
+      name: sems-database
+    patch: |-
+      - op: replace
+        path: /data/IDENTITY_DB_URL
+        value: jdbc:postgresql://postgres:5432/sems?currentSchema=identity
+      - op: replace
+        path: /data/CATALOG_DB_URL
+        value: jdbc:postgresql://postgres:5432/sems?currentSchema=catalog
+      - op: replace
+        path: /data/ADMISSION_DB_URL
+        value: jdbc:postgresql://postgres:5432/sems?currentSchema=admission

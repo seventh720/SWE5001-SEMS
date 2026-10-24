@@ -1,0 +1,71 @@
+{
+  "startedAt": "2026-10-24T15:03:48.211876+00:00",
+  "environment": "sems-k3s/sems-test",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "status": "passed",
+  "tests": [
+    {
+      "name": "internal API boundaries",
+      "status": "passed",
+      "publicStatus": 404,
+      "internalUnauthenticatedDenied": true
+    },
+    {
+      "name": "booking, same-key replay and live receipt during one Catalog Pod deletion",
+      "status": "passed",
+      "durationSeconds": 75,
+      "workers": 3,
+      "completedBookings": 707,
+      "statusCounts": {
+        "200": 707
+      },
+      "failedOperations": [],
+      "replacementReadySeconds": 36.398,
+      "otherServicesUnchanged": true,
+      "replacementPodUids": [
+        "21d90ec8-3705-4e2f-9378-a28248c13198",
+        "d38a0602-381a-4b70-a0e3-b35ddf1323b5"
+      ]
+    },
+    {
+      "name": "all Catalog replicas down: bounded failure and same-key recovery",
+      "status": "passed",
+      "unavailableStatus": 503,
+      "unavailableSeconds": 0.058,
+      "recoveryStatus": 200,
+      "distinctRecoveredBookings": 1,
+      "gatewayRestarted": false
+    },
+    {
+      "name": "persisted inventory and idempotency audit",
+      "status": "passed",
+      "reserved": 708,
+      "confirmedQuantity": 708,
+      "validTickets": 708,
+      "duplicateRequestKeys": 0
+    }
+  ],
+  "fixtures": {
+    "organizationId": "9b6843f4-4977-43dd-abf6-484117378aff",
+    "eventId": "d59871a9-68ea-4faa-8386-4b6bbae818d6",
+    "ticketTypeId": "d03f049e-f8fe-400d-8779-76fe37c9f05e",
+    "title": "K3s cold restart 3aaca27cc5"
+  },
+  "deletedPod": {
+    "name": "event-catalog-6c6cfbc4d8-zcpq9",
+    "uid": "fc63e49a-64ec-41c1-9ffe-c80df4732075",
+    "node": "sems-k3s-worker"
+  },
+  "traffic": {
+    "durationSeconds": 75,
+    "workers": 3,
+    "completedBookings": 707,
+    "statusCounts": {
+      "200": 707
+    },
+    "failedOperations": [],
+    "replacementReadySeconds": 36.398
+  },
+  "replicasRestored": true,
+  "completedAt": "2026-10-24T15:06:04.217729+00:00"
+}

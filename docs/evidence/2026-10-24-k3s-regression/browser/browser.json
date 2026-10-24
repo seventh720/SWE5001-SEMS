@@ -1,0 +1,94 @@
+{
+  "baseUrl": "https://sems-test.seventh720.com",
+  "environment": "sems-k3s/sems-test",
+  "startedAt": "2026-10-24T14:46:35.044Z",
+  "tests": [
+    {
+      "name": "registration through browser and authenticated dashboard",
+      "status": "passed",
+      "username": "uimvmi7uuy"
+    },
+    {
+      "name": "attendee without staff assignments sees no active tasks",
+      "status": "passed"
+    },
+    {
+      "name": "attendee without memberships sees organization empty state",
+      "status": "passed"
+    },
+    {
+      "name": "390px dashboard layout",
+      "status": "passed",
+      "viewportWidth": 390,
+      "documentWidth": 390,
+      "horizontalOverflow": false
+    },
+    {
+      "name": "390px category listbox fits viewport",
+      "status": "passed",
+      "bounds": {
+        "bottom": 680.953125,
+        "left": 45,
+        "right": 345,
+        "top": 450.953125,
+        "viewportHeight": 844,
+        "viewportWidth": 390
+      }
+    },
+    {
+      "name": "mobile category selection",
+      "status": "passed",
+      "selected": "General"
+    },
+    {
+      "name": "mobile event keyword search and pagination reset",
+      "status": "passed"
+    },
+    {
+      "name": "mobile pre-registration saved without holding places",
+      "status": "passed",
+      "availableBefore": 20,
+      "availableAfter": 20
+    },
+    {
+      "name": "mobile pre-registration removal leaves valid empty first page",
+      "status": "passed"
+    },
+    {
+      "name": "mobile booking confirmation and QR rendering",
+      "status": "passed",
+      "bookingId": "bc105b63-2f4c-4a2e-bb01-8430f8f93e1d",
+      "qr": {
+        "height": 224,
+        "loaded": true,
+        "width": 224
+      }
+    },
+    {
+      "name": "mobile cancellation invalidates ticket and hides QR",
+      "status": "passed"
+    },
+    {
+      "name": "mobile confirmed/cancelled notices and mark-all-read",
+      "status": "passed",
+      "notices": 2,
+      "remainingUnread": 0
+    }
+  ],
+  "screenshots": [
+    "organizations-empty.jpg",
+    "mobile-directory.jpg",
+    "mobile-booking-cancelled.jpg"
+  ],
+  "status": "passed",
+  "completedAt": "2026-10-24T15:32:44.535Z",
+  "limitations": [
+    "No physical phone camera or device permission test in this run."
+  ],
+  "cleanup": {
+    "testSessionSignedOut": true,
+    "preRegistrationRemoved": true,
+    "browserBookingCancelled": true,
+    "viewportReset": true
+  }
+}

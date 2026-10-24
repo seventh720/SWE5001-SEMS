@@ -1,0 +1,118 @@
+# Disposable infrastructure check. Delete this namespace after recording results.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sems-bootstrap-check
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: http-worker
+  namespace: sems-bootstrap-check
+  labels:
+    app: bootstrap-http
+spec:
+  nodeName: sems-k3s-worker
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    fsGroup: 65534
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: http
+      image: busybox:1.37.0
+      command: [sh, -c]
+      args:
+        - "printf 'SEMS_K3S_NETWORK_OK\n' > /www/index.html; exec httpd -f -p 8080 -h /www"
+      ports:
+        - containerPort: 8080
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 8080
+        periodSeconds: 2
+      resources:
+        requests:
+          cpu: 10m
+          memory: 16Mi
+        limits:
+          cpu: 100m
+          memory: 32Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: [ALL]
+      volumeMounts:
+        - name: content
+          mountPath: /www
+  volumes:
+    - name: content
+      emptyDir: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: client-server
+  namespace: sems-bootstrap-check
+spec:
+  nodeName: sems-k3s-server
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: client
+      image: busybox:1.37.0
+      command: [sleep, "600"]
+      resources:
+        requests:
+          cpu: 10m
+          memory: 16Mi
+        limits:
+          cpu: 100m
+          memory: 32Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: [ALL]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bootstrap-http
+  namespace: sems-bootstrap-check
+spec:
+  selector:
+    app: bootstrap-http
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bootstrap-http
+  namespace: sems-bootstrap-check
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: bootstrap.sems-test.example.invalid
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bootstrap-http
+                port:
+                  number: 80

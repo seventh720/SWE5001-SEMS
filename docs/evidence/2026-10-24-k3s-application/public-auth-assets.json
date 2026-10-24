@@ -1,0 +1,12 @@
+{
+  "recordedAt": "2026-10-24T14:21:44.347769+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "publicAdminLogin": "passed",
+  "publicAuthenticatedMe": "passed",
+  "staticAssets": [
+    "/assets/index-CJA_mJG7.css",
+    "/assets/index-CcR2QwPi.js"
+  ],
+  "credentialsPrinted": false,
+  "status": "passed"
+}

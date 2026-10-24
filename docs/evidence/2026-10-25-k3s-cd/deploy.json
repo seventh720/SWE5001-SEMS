@@ -1,0 +1,10 @@
+{
+  "CommandId": "bf5842dc-5296-446b-b35c-8ef7671611d7",
+  "InstanceId": "i-061d2aa2de119a95d",
+  "Status": "Failed",
+  "ResponseCode": 1,
+  "ExecutionStartDateTime": "2026-10-24T16:49:43.067Z",
+  "ExecutionEndDateTime": "2026-10-24T16:54:17.067Z",
+  "StandardOutputContent": "Pre-deployment backup complete\nReady: identity\nReady: event-catalog\nReady: admission\nReady: web\nReady: gateway\nRelease failed; verified pointer unchanged. Backup and previous application snapshot retained.\n",
+  "StandardErrorContent": "Traceback (most recent call last):\n  File \"/var/lib/sems-cd/incoming.zP08an/deploy-k3s.py\", line 203, in <module>\n    main()\n  File \"/var/lib/sems-cd/incoming.zP08an/deploy-k3s.py\", line 184, in main\n    report['verification'] = verify(release['resources'])\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/var/lib/sems-cd/incoming.zP08an/deploy-k3s.py\", line 118, in verify\n    if path.startswith('/health/') and json.load(response).get('status') != 'UP':\n                                       ^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/json/__init__.py\", line 293, in load\n    return loads(fp.read(),\n           ^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/json/__init__.py\", line 346, in loads\n    return _default_decoder.decode(s)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/json/decoder.py\", line 337, in decode\n    obj, end = self.raw_decode(s, idx=_w(s, 0).end())\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/json/decoder.py\", line 355, in raw_decode\n    raise JSONDecodeError(\"Expecting value\", s, err.value) from None\njson.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)\nfailed to run commands: exit status 1"
+}

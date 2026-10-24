@@ -1,0 +1,32 @@
+{
+  "vpcId": "vpc-02bd49f7852b0db8a",
+  "nodeSecurityGroupId": "sg-033d58410556f1809",
+  "subnets": [
+    {
+      "az": "ap-southeast-1a",
+      "cidr": "172.31.96.0/24",
+      "name": "sems-k3s-db-a",
+      "id": "subnet-0b4bbe5a3e3c71cc4",
+      "routeAssociationId": "rtbassoc-07b717f18be513293"
+    },
+    {
+      "az": "ap-southeast-1b",
+      "cidr": "172.31.97.0/24",
+      "name": "sems-k3s-db-b",
+      "id": "subnet-068bdad82b6e7dbb3",
+      "routeAssociationId": "rtbassoc-0dcc0fbe526dc1a22"
+    }
+  ],
+  "createsBillableInstances": false,
+  "routeTableId": "rtb-0f2380f6bea7c2863",
+  "securityGroupId": "sg-0b945487ff6c08b6f",
+  "dbSubnetGroupName": "sems-k3s-db",
+  "dbSubnetGroupStatus": "Complete",
+  "verification": {
+    "privateRoutesOnly": true,
+    "subnetPublicIpAutoAssignment": false,
+    "postgresSourceNodeSecurityGroupOnly": true,
+    "dbSubnetGroupStatus": "Complete",
+    "rdsInstancesInRegion": 0
+  }
+}

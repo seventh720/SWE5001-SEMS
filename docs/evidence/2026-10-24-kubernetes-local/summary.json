@@ -1,0 +1,93 @@
+{
+  "startedAt": "2026-10-24T09:40:59.416961+00:00",
+  "environment": "kind-sems-local/sems-local",
+  "tests": [
+    {
+      "name": "gateway and service readiness",
+      "status": "passed"
+    },
+    {
+      "name": "registration, login, organization permissions and draft concurrency",
+      "status": "passed"
+    },
+    {
+      "name": "publication, booking, private ownership and retry payload validation",
+      "status": "passed"
+    },
+    {
+      "name": "same request key across both Admission Pods",
+      "status": "passed",
+      "requests": 20,
+      "requestsPerPod": 10,
+      "distinctBookings": 1,
+      "reservedTotal": 3
+    },
+    {
+      "name": "100 distinct requests for ten places across both Admission Pods",
+      "status": "passed",
+      "requests": 100,
+      "requestsPerPod": 50,
+      "statusCounts": {
+        "409": 90,
+        "200": 10
+      },
+      "inventoryAudit": "10|10|10"
+    },
+    {
+      "name": "staff authorization and concurrent exactly-once check-in",
+      "status": "passed",
+      "attempts": 10,
+      "firstCheckIns": 1
+    },
+    {
+      "name": "repeated personal cancellation releases inventory once",
+      "status": "passed",
+      "reservedAfterCancellation": 1
+    },
+    {
+      "name": "whole-event cancellation preserves check-in history and closes inventory",
+      "status": "passed",
+      "inventoryConfirmedValidCheckedReceipts": "0|0|0|1|1"
+    },
+    {
+      "name": "database schema isolation",
+      "status": "passed",
+      "deniedCrossSchemaChecks": 6,
+      "deniedPublicCreateChecks": 3,
+      "actualCrossSchemaQuery": "denied"
+    }
+  ],
+  "status": "passed",
+  "admissionPods": [
+    "admission-587dbb4478-gn4dp",
+    "admission-587dbb4478-gr8hh"
+  ],
+  "sourceCommit": "d3002d10a6f515b14f2013fc89f8805837b1f8ec",
+  "worktreeDirty": true,
+  "manifestSha256": "d45db57f5617cd3fc7f870bc3c93125e5c3f8d9555084557c7fb466ee9d4d862",
+  "kubernetesVersion": "v1.36.4",
+  "runtimeImages": {
+    "admission-587dbb4478-gn4dp": [
+      "sha256:24d449652590249dcb02b5647609cfa3cfa875f58e6b53df13ad2e6c9def3c0f"
+    ],
+    "admission-587dbb4478-gr8hh": [
+      "sha256:24d449652590249dcb02b5647609cfa3cfa875f58e6b53df13ad2e6c9def3c0f"
+    ],
+    "event-catalog-7bb74c8b69-wbkb8": [
+      "sha256:97826de096937de5dbb7972a703cd06225585f98a5bffc1c3311d65571e29c0f"
+    ],
+    "gateway-85999f5777-kk9qx": [
+      "sha256:b30c29e30bd539e3441d9bb6a964194bdfd770daf3ad48d1c40b6bd66b8d2b25"
+    ],
+    "identity-58bf9fdbfc-nxfrf": [
+      "docker.io/library/import-2026-10-24@sha256:d507dfae2a34f267d4f43107ef523f03af3b3d4cc41a0d3e92caaa91a7376a41"
+    ],
+    "postgres-0": [
+      "sha256:7e9d1bdd3413a44d0ab77380a3bb5c4108f96e33348aef5d2085ccc3d8a7f8e7"
+    ],
+    "web-84bfc6b54d-9htg9": [
+      "sha256:d0782df9f4be3428aa17629d85f3bec94f7c0a9416b975c2b824be8dc2c1e400"
+    ]
+  },
+  "finishedAt": "2026-10-24T09:41:08.927987+00:00"
+}

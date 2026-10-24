@@ -1,0 +1,18 @@
+{
+  "failedRunId": 40123205313,
+  "failedJob": "Lint",
+  "failedJobId": 120959028864,
+  "error": "no project was found in any parent directories of \".\"",
+  "actionlintExitCode": 3,
+  "cause": "mktemp creates an owner-only directory; the image default guest UID 405 cannot discover workflows owned by the Linux runner UID 1001",
+  "fix": "run the isolated read-only actionlint container with the invoking host UID:GID",
+  "reproduction": {
+    "platform": "Linux inside the pinned actionlint image",
+    "fixtureOwnerUid": 1001,
+    "fixtureMode": "0700",
+    "defaultGuestExitCode": 3,
+    "matchingOwnerExitCode": 0,
+    "actualUpdatedHelperExitCode": 0
+  },
+  "remoteRecheck": "pending new PR run"
+}

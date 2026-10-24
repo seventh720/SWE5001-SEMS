@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: sems
+resources:
+  - namespace.yaml
+  - config.yaml
+  - identity.yaml
+  - event-catalog.yaml
+  - admission.yaml
+  - web.yaml
+  - gateway.yaml
+  - ../../gateway
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: sems
+    includeSelectors: false
+    includeTemplates: true

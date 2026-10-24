@@ -20,7 +20,28 @@ check() {
 }
 check eslint npm --prefix apps/web run lint
 check checkstyle mvn -B -ntp validate
-check actionlint docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.7
+action_lint() {
+    # Local workspaces may hold deployment credentials. Mount only workflow source.
+    local task_lint_dir file status=0
+    task_lint_dir=$(mktemp -d)
+    mkdir -p "$task_lint_dir/.github/workflows" "$task_lint_dir/.git"
+    for file in .github/workflows/*.yml .github/workflows/*.yaml; do
+        if [ -f "$file" ]; then
+            cp "$file" "$task_lint_dir/.github/workflows/"
+        fi
+    done
+    for file in .github/actionlint.yaml .github/actionlint.yml; do
+        if [ -f "$file" ]; then
+            cp "$file" "$task_lint_dir/.github/"
+        fi
+    done
+    # mktemp is owner-only; the image's default guest cannot read it on Linux.
+    docker run --rm --network none --user "$(id -u):$(id -g)" \
+        -v "$task_lint_dir:/repo:ro" -w /repo rhysd/actionlint:1.7.7 || status=$?
+    rm -rf "$task_lint_dir"
+    return "$status"
+}
+check actionlint action_lint
 shell_syntax() {
     local file
     for file in scripts/*.sh scripts/*/*.sh; do

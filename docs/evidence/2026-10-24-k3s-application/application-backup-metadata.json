@@ -1,0 +1,19 @@
+{
+  "recordedAt": "20261024T142309.015082Z",
+  "context": "sems-k3s",
+  "namespace": "sems-test",
+  "database": "sems",
+  "files": {
+    "database": {
+      "path": ".secrets/k3s-cloud/backups/sems-20261024T142309.015082Z.dump",
+      "bytes": 76771,
+      "sha256": "7666425524b12fcf0b1d6a30b49c20e26be29d67ce4bc3adb3310978c02f2e30"
+    },
+    "roles": {
+      "path": ".secrets/k3s-cloud/backups/sems-20261024T142309.015082Z.roles.sql",
+      "bytes": 1201,
+      "sha256": "67b114e86d0ec73e8621c8a3fbc14f33110669a345c183133f7d4237942b6d93"
+    }
+  },
+  "rolePasswords": "Not included; retain runtime.env separately for credential recovery"
+}

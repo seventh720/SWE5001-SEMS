@@ -1,0 +1,11 @@
+{
+  "suite": "membership-notifications",
+  "startedAt": "2026-10-24T14:45:57.434577+00:00",
+  "baseUrl": "https://sems-test.seventh720.com",
+  "environment": "sems-k3s/sems-test",
+  "status": "passed",
+  "assertionScriptSha256": "1bc41175258c64db255b5e445ffa8473b959f5e76c3fd6e41ec4c477aeec7fa5",
+  "replicasRestored": true,
+  "actions": [],
+  "completedAt": "2026-10-24T14:46:06.245682+00:00"
+}
