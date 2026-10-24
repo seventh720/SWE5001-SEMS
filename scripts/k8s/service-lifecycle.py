@@ -8,12 +8,15 @@ import subprocess
 import threading
 import time
 
+from environment_guard import require_disposable_namespace
+
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--kubeconfig', required=True)
 parser.add_argument('--report', required=True)
 args = parser.parse_args()
 k = ['kubectl', '--kubeconfig', args.kubeconfig, '--context', 'sems-k3s',
      '--cache-dir', '.secrets/k3s-cloud/cache', '-n', 'sems-test']
+require_disposable_namespace(k)
 report = {'startedAt': datetime.datetime.now(datetime.timezone.utc).isoformat(),
           'environment': 'sems-k3s/sems-test', 'status': 'running', 'tests': []}
 stop = threading.Event()

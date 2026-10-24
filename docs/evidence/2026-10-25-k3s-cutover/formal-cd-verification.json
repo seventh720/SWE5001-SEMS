@@ -1,0 +1,28 @@
+{
+  "status": "passed",
+  "baseUrl": "https://swe5001.seventh720.com",
+  "sourceCommit": "7a978286920d9362739afaf41c5645f2ecf39d88",
+  "verification": {
+    "verifiedHttpsPaths": [
+      "/",
+      "/health/gateway",
+      "/health/identity",
+      "/health/event-catalog",
+      "/health/admission"
+    ],
+    "internalApiStatus": 404,
+    "adminLoginAndJwt": true,
+    "images": {
+      "admission": "ghcr.io/seventh720/swe5001-sems/admission@sha256:092f061fcd51cf6600a918076e7ba44317766b0468923248e7ce2a3c1a1bc428",
+      "event-catalog": "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:e86a7b2a8b1602f50b3b429c63e88cc7693930d64f65013a7629ac18d95029ca",
+      "gateway": "ghcr.io/seventh720/swe5001-sems/gateway@sha256:cdf01ac98555bc6e4dfc2398902f5baecf418bd10f5f101aef4f48c7a0be8330",
+      "identity": "ghcr.io/seventh720/swe5001-sems/identity@sha256:5f001cdccb90e7f115edeeb9a0a507b48b769d4303ef8a899e9e11cb5d9836c5",
+      "web": "ghcr.io/seventh720/swe5001-sems/web@sha256:3ea85ca77061e746595498175451811a457618ed1978f74069fd8543d174f929"
+    }
+  },
+  "database": {
+    "podUid": "382d4f7a-83b9-4273-9f43-bd9976f738e5",
+    "pvcUid": "2b7b065f-520c-4381-bc39-9fbb7fd2d9e0"
+  },
+  "liveEnvironmentGuardRefused": true
+}

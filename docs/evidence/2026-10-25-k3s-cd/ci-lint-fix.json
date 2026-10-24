@@ -14,5 +14,10 @@
     "matchingOwnerExitCode": 0,
     "actualUpdatedHelperExitCode": 0
   },
-  "remoteRecheck": "pending new PR run"
+  "remoteRecheck": {
+    "runId": 40124975667,
+    "sourceCommit": "eaf63b7c8c309988e37fe250ed65f63189b31171",
+    "status": "success",
+    "qualityGatesPassed": 6
+  }
 }

@@ -1,0 +1,11 @@
+{
+  "releaseBoundaryTestsPassed": 9,
+  "environmentGuardTestsPassed": 3,
+  "guardedEntryPoints": 5,
+  "actualProductionAnnotationRefusalVerified": true,
+  "formalCdVerifier": "passed-read-only",
+  "actionlint": "passed-1.7.7",
+  "pythonSyntax": "passed",
+  "initialReadOnlyVerifierTransportAttempt": "Failed before verification because stdin was not seekable; corrected by buffering the small archive, then verified successfully; no application or database mutation",
+  "applicationBusinessCodeChanged": false
+}

@@ -2,7 +2,10 @@
 
 当前云端 Kubernetes 路线为两台 EC2、自建 K3s、Traefik 入口和集群内自建 PostgreSQL。当前路线不创建 EKS、RDS、NAT Gateway 或 ALB。应用仍通过独立 Deployment、Service、Secret 和数据库账号/schema 划分边界；EKS overlay 仅保留为另一种部署环境的参考模板。
 
-2026-10-24 测试环境已上线：[https://sems-test.seventh720.com](https://sems-test.seventh720.com)。五个应用各两个副本，分别位于两个节点；业务闭环、两个 Admission Pod 的并发一致性、独立扩缩容和单 Pod 恢复已验证，见[应用验收记录](evidence/2026-10-24-k3s-application/README.md)。该环境使用独立测试数据库，正式域名和原 Lightsail 数据尚未迁移。
+2026-10-24 完成独立测试环境验收，2026-10-25 已将正式入口 [swe5001.seventh720.com](https://swe5001.seventh720.com) 和原站数据迁到这里。当前应用为 PR #29 / `7a97828`，五个应用各两个副本、分别位于两节点；[main OIDC/SSM 自动发布](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288)已通过，原账号/订单/票券、JWT、正式 TLS 与 DNS 迁移见[切换记录](evidence/2026-10-25-k3s-cutover/README.md)。
+
+namespace `sems-test` 和 GitHub environment `k3s-test` 保留历史名称；namespace 已标记 `sems.seventh720.com/environment=production`。`sems-test.seventh720.com` 是同一数据的过渡别名，不能再当成可破坏的测试环境。夹具/故障脚本会拒绝该生产标记。
+
 
 ## 节点与网络
 
@@ -112,20 +115,20 @@ python3 scripts/k8s/postgres-acceptance.py \
 
 [K3s overlay](../deployment/k8s/overlays/k3s/kustomization.yaml) 包含上述数据库和通用应用配置，五个应用各两个副本。同服务 Pod 使用 hostname 硬反亲和，滚动策略为 maxSurge 0、maxUnavailable 1，确保更新后仍分布在两节点。数据库 URL 指向 `postgres:5432`。初始化应用镜像固定到 `52df21f34a5f181683f273ae053bf5dc18c08e08` 发布的 amd64 digest；其业务运行代码与 `fb27bbf` 一致。日常 [CD 发布器](k3s-cd.md)从同次 CI 的 image lock 覆盖五个应用引用，数据库镜像独立管理。网关通过 ConfigMap 使用 Kubernetes DNS 适配配置。
 
-三个后端启动时运行各自的 Flyway 迁移。测试管理员凭据保存在本机被忽略的 `.secrets/k3s-cloud/login.txt`；密码和 token 不进入部署记录。原 Lightsail 账号和数据尚未迁入，不应期待旧账号直接登录测试环境。
+三个后端启动时运行各自的 Flyway 迁移。原站账号及密码散列已迁入，签名密钥保留；受限的 `.secrets/k3s-cloud/login.txt` 已更新为原管理员资料。密码、私钥和 token 不进入公开部署记录。此前测试数据保留于独立的旧测试库，当前业务库为迁入的原站数据。
 
 DNS：Cloudflare 的 `sems-test` A 记录指向 server 当前公网 IPv4，使用 DNS only。HTTPS 配置位于 [traefik-https.yaml](../deployment/k3s/traefik-https.yaml)，需将 `CONFIGURE_ACME_EMAIL` 替换成环境联系人邮箱后以集群管理员身份单独部署；本机实际配置保存在忽略的 `.secrets/k3s-cloud/traefik-https.json`。
 
 Traefik 通过 Let's Encrypt HTTP-01 自动签发并配置自动续期，HTTP 重定向到 HTTPS。`traefik-acme` PVC 使用 server 现有 EBS 上的 local-path 目录，Retain 回收策略，保存 `/data/acme.json`，实际文件权限 0600。该 PVC 的 1 GiB 请求也不代表另建 EBS。Traefik 保持单副本并使用 Recreate 更新策略，避免多个实例同时写 ACME 状态；更新时可能短暂中断入口。证书续期流程已配置，尚未经历实际续期周期。
 
-Ingress 使用 `traefik`、真实域名和 `letsencrypt` resolver，证书由 Traefik 的 ACME 状态管理，不需要手工创建 `sems-test-tls` Secret。后续应用更新使用：
+Ingress 使用 `traefik`、真实域名和 `letsencrypt` resolver，证书由 Traefik 的 ACME 状态管理，不需要手工创建 `sems-test-tls` Secret。下面整套 overlay 命令仅用于初始化配置参考；日常更新使用 [CD](k3s-cd.md)。迁移后不要用旧的 bootstrap image pins 覆盖已发布版本：
 
 ```bash
 kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s \
   --cache-dir .secrets/k3s-cloud/cache apply -k deployment/k8s/overlays/k3s
 ```
 
-云端业务验收显式选择环境，默认行为仍为本地 kind：
+以下命令仅适用于迁移前记录或新建的独立测试集群；当前 production namespace 会拒绝运行。默认行为仍为本地 kind：
 
 ```bash
 python3 scripts/k8s/local-acceptance.py --environment k3s \
@@ -154,11 +157,25 @@ python3 scripts/k8s/catalog-recovery.py \
 
 这两项只允许独立的 `sems-k3s/sems-test` 测试环境，串行执行；先备份数据库。它们创建测试数据并故意中断服务，不用于共享正式环境。后者在持续订票、同键重放和读取回执期间强制删除一个 Catalog Pod，再验证全部 Catalog 副本停止时的有界失败及恢复后的幂等性、库存审计，全程不重启 Gateway。历史数据迁移验收和 Docker DNS 拓扑验收不在上述业务适配器范围内。
 
-## 后续数据与域名迁移
+## 正式切换与回迁
 
-正式域名仍由 Lightsail 提供服务。切换需先备份原库，在停止业务写入的窗口完成最终数据恢复和环境凭据/密钥协调，再在新集群配置 `swe5001.seventh720.com` 及证书，修改 DNS 并验证登录、订票和核销。通过后清理旧 SEMS 部署并保留回退备份；原 Lightsail 主机还有其他项目和共享 Caddy，不在 SEMS 切换中整机删除。
+正式域名和原数据已于 2026-10-25 切到 K3s，详见[切换验收](evidence/2026-10-25-k3s-cutover/README.md)。正式 Ingress `sems-public` 与 production 标记由 [sems-public.yaml](../deployment/k3s/sems-public.yaml) 独立管理，CD 应用资源只更新原 `sems` Ingress，因此后续发布不会覆盖正式路由。`sems-test` DNS 别名暂时保留。
 
-未来也可迁到 RDS PostgreSQL：保留三个 schema/角色所有权，通过 pg_dump/pg_restore 恢复，协调连接地址、账号 Secret、可信 CA 和 `verify-full` TLS，再验证后切换。当前自建 PostgreSQL 的本地卷保留供回退，不代表已经创建或接入 RDS。当前范围不承诺零停机数据库迁移。
+旧站三个业务后端停止；旧 IP 的 SEMS 路由临时代理新站，覆盖 DNS 缓存，SWE5006 和共享 Caddy 保留。旧数据库、卷、逻辑备份和新环境旧测试库 `sems_test_before_cutover_20261025` 都没有删除。新写入开放后，回迁必须再次维护、备份并反向同步，不能只改 DNS 回到冻结旧库。
+
+未来可迁到 RDS PostgreSQL：保留三个 schema/角色所有权，通过 pg_dump/pg_restore 恢复，协调连接地址、账号 Secret、可信 CA 和 verify-full TLS，再验证后切换。当前没有创建或接入 RDS，不承诺零停机数据库迁移。
+
+## 数据库只读访问
+
+旧 Navicat SSH 配置仍指向冻结的 Lightsail 数据。访问当前数据时，先按前文建立 K3s API 的 SSH 隧道，再在本机执行：
+
+```bash
+kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s \
+  --cache-dir .secrets/k3s-cloud/cache -n sems-test \
+  port-forward --address 127.0.0.1 svc/postgres 15432:5432
+```
+
+Navicat 连接 `127.0.0.1:15432`、数据库 sems、用户 sems_viewer，沿用原只读密码；该角色及登录 verifier 已迁入。这里已通过 Kubernetes/SSH 隧道转发，Navicat 不再额外开启旧 SSH 配置。不要向公网开放 5432。
 
 ## 启停与费用
 

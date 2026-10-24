@@ -40,5 +40,6 @@
 - [EC2 K3s 自建 PostgreSQL 验收](evidence/2026-10-24-k3s-postgres/README.md)：角色/schema 与网络隔离、Pod 重建数据保留、异机备份与临时库恢复。
 - [EC2 K3s 应用与 HTTPS 验收](evidence/2026-10-24-k3s-application/README.md)：跨主机业务并发、可信 HTTPS、Admission 独立扩缩容和 Pod 重建。
 - [EC2 K3s 完整业务回归](evidence/2026-10-24-k3s-regression/README.md)：12 个业务套件、跨节点并发、真实 Catalog Pod 故障、数据库审计及移动浏览器闭环。
-- [EC2 K3s 发布与回退验收](evidence/2026-10-25-k3s-cd/README.md)：SSM 发布、失败候选拒绝、兼容镜像切换及已验证前驱回退；真实 GitHub OIDC 发布待合并验证。
+- [EC2 K3s 发布与回退验收](evidence/2026-10-25-k3s-cd/README.md)：SSM 发布、失败候选拒绝、兼容镜像切换及已验证前驱回退；真实 GitHub main OIDC/SSM 发布也已通过。
+- [Lightsail → K3s 正式切换](evidence/2026-10-25-k3s-cutover/README.md)：原站 27 张表完整恢复、原账号/JWT、正式域名证书/DNS、共享项目与旧缓存过渡代理。
 - [阶段复查归档](archive/README.md)：历史版本的问题与检查结果。

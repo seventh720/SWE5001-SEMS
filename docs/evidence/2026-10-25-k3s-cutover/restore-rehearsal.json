@@ -1,0 +1,138 @@
+{
+  "status": "passed",
+  "recordedAt": "2026-10-24T20:11:44.858836+00:00",
+  "sourceCommit": "52df21f34a5f181683f273ae053bf5dc18c08e08",
+  "sourcePostgresVersion": "17.11",
+  "targetPostgresVersion": "17.11",
+  "isolatedDatabase": "sems_cutover_probe_20261025",
+  "tableFingerprints": {
+    "admission.bookings": {
+      "rows": 3,
+      "sha256": "d576472e173231ce4e3545913ec7756ef84293ac0b280bc9c478b97e286ef5f5"
+    },
+    "admission.event_cancellation_receipts": {
+      "rows": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    "admission.event_revision_receipts": {
+      "rows": 8,
+      "sha256": "c359636fe9d855080801f36ed7e8cb2592aa9eef50801e2e5d27a234eeb47fcc"
+    },
+    "admission.event_staff_assignments": {
+      "rows": 2,
+      "sha256": "ce40a8d8cb33173db06e8d458a288eb230835c13aec9887cbdcc7f4f89fca3e2"
+    },
+    "admission.flyway_schema_history": {
+      "rows": 10,
+      "sha256": "5cb29763f9d5273c7c3db94fb1ff25a997fbdc77aac62acd4896b6d4265ac131"
+    },
+    "admission.notifications": {
+      "rows": 6,
+      "sha256": "5e0809d5bf7268cd960fd526787bc0c5d73bcd85ae78de361a3106225ded40fe"
+    },
+    "admission.pre_registrations": {
+      "rows": 1,
+      "sha256": "adaf1c664011db570e1568af6b0af638fa7d75fe0d0b3b07bf249cb0f8fcdbdd"
+    },
+    "admission.sales": {
+      "rows": 7,
+      "sha256": "6f25111d2423bd58a5920085131f90aba03e5035d89093cb461f2b3ba77af0ab"
+    },
+    "admission.ticket_types": {
+      "rows": 7,
+      "sha256": "e1af65114ecdbf771f4b137538383a6575deb07f5898bada151b8a787e64b0d3"
+    },
+    "admission.tickets": {
+      "rows": 4,
+      "sha256": "a3160871903141367914be8f50b72a3b2e81b0198f4d03222c97f3222f5846c0"
+    },
+    "catalog.event_cancellations": {
+      "rows": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    "catalog.event_notification_outbox": {
+      "rows": 4,
+      "sha256": "69e16c3344e24719c998752e1ea497dc6a1851d0a63a86b8067fb2b5a1f59a84"
+    },
+    "catalog.event_revisions": {
+      "rows": 8,
+      "sha256": "3ede86a09e85181fa4c3001c6752c0abe6ed2050e4e9eac96cf0c47d10b6e253"
+    },
+    "catalog.events": {
+      "rows": 7,
+      "sha256": "d3c9b592d9e72a80868909ae3ee8803dbe372ff4cd3aa65eb0afc8baee9d86ba"
+    },
+    "catalog.flyway_schema_history": {
+      "rows": 11,
+      "sha256": "cb060c792be324b01a5eb7e2521b55f8203f08f9271595a01736dac9b6da8651"
+    },
+    "catalog.organization_closures": {
+      "rows": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    "identity.booking_profiles": {
+      "rows": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    "identity.flyway_schema_history": {
+      "rows": 10,
+      "sha256": "e30621985f738f302d7e37025971d6eb443a581a49a4c7d658ff21293695bc91"
+    },
+    "identity.membership_notifications": {
+      "rows": 7,
+      "sha256": "2068780e23b3145625d8660b206e1bc93e7858dd95e4d9a7c4f4370b12f2128b"
+    },
+    "identity.organization_closures": {
+      "rows": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    "identity.organization_invitations": {
+      "rows": 2,
+      "sha256": "c4a1ebdf385e06fac26bad3e6f14c8e8817fc04986ca3a732622c1c701d330d7"
+    },
+    "identity.organization_memberships": {
+      "rows": 7,
+      "sha256": "ed26aa792127885641a101f9515b2ef57e8183761ddd6b8e07db61d8a8815d98"
+    },
+    "identity.organization_requests": {
+      "rows": 0,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    "identity.organizations": {
+      "rows": 5,
+      "sha256": "e17152f04fd5ca13d839dffc420e4c015e64f9407f10b6940c3d99aaf3d64d2b"
+    },
+    "identity.roles": {
+      "rows": 4,
+      "sha256": "fac4b3dd6535ed883f7977500c702eff4a42511ce47cef589ea944e4c5623e95"
+    },
+    "identity.user_roles": {
+      "rows": 7,
+      "sha256": "149d637d529714e224811d9f3874762b9f8b6aa38e7a597d3ffc5fa31251549e"
+    },
+    "identity.users": {
+      "rows": 7,
+      "sha256": "266330c8e9c03b8d3a6925d1e419981cfa285a6192e659af1bd24f110cd06721"
+    }
+  },
+  "tableCount": 27,
+  "rowCounts": {
+    "users": 7,
+    "events": 7,
+    "bookings": 3,
+    "tickets": 4
+  },
+  "sourceAdminLogin": true,
+  "jwtKeyPairVerified": true,
+  "sourceAndRestoredAllRowsEqual": true,
+  "relationOwnersEqual": true,
+  "tablePrivilegesEqual": true,
+  "deniedCrossSchemaChecks": 6,
+  "viewerReadOnly": true,
+  "temporaryMissingRoles": [
+    "sems_viewer"
+  ],
+  "liveTargetDatabaseReplaced": false,
+  "sourceStopped": false,
+  "dnsChanged": false
+}

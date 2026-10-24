@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-10-24T20:25:46.457077+00:00",
+  "status": "passed",
+  "hostname": "swe5001.seventh720.com",
+  "expectedA": "13.229.121.219",
+  "sampledResolvers": {
+    "amy.ns.cloudflare.com": [
+      "13.229.121.219"
+    ],
+    "1.1.1.1": [
+      "13.229.121.219"
+    ],
+    "8.8.8.8": [
+      "13.229.121.219"
+    ]
+  },
+  "aaaaRecords": [],
+  "otherRecords": {
+    "sems-test.seventh720.com": [
+      "13.229.121.219"
+    ],
+    "swe5006.seventh720.com": [
+      "18.139.212.35"
+    ]
+  },
+  "localHttpsStatus": 200,
+  "localHttpsPeer": "13.229.121.219",
+  "oldCacheBridgeRetained": true,
+  "allInternetCachesClaimedUpdated": false
+}

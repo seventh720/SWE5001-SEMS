@@ -1,0 +1,43 @@
+{
+  "createdAt": "2026-10-24T20:08:47.127675+00:00",
+  "status": "passed",
+  "liveServicesStopped": false,
+  "files": [
+    {
+      "name": "source.dump",
+      "bytes": 89335,
+      "sha256": "d8c570436b4b34c997c58db9b908f254cd2ea4d7dde541321e52433461a9fa7c"
+    },
+    {
+      "name": "source-roles.sql",
+      "bytes": 1432,
+      "sha256": "70d2d8712eec194ccc97783f9aecdffb40c88eb91633e85d6d1c90bbfd0ff9dc"
+    },
+    {
+      "name": "source-credentials.tar.gz",
+      "bytes": 2270,
+      "sha256": "254d00cc5d95251f428af81a024b0d72b41a429850193002426f84663b6e9e35"
+    },
+    {
+      "name": "source-Caddyfile",
+      "bytes": 225,
+      "sha256": "888d128f1576b3f4c989c81a0359054e698c0b7db00df1505bf4d1f6f2904f0b"
+    },
+    {
+      "name": "target-before.dump",
+      "bytes": 303223,
+      "sha256": "a129e7b2fd91e3f6ac21d803cf1dfb4a9facc6b637aadd735d8809337e1eb3a2"
+    },
+    {
+      "name": "target-before-secrets.json",
+      "bytes": 13927,
+      "sha256": "f38f9ee73599bb30fc4b464929cceeeb2b1dae9d0af40129cb90fda5ac9cbfa8"
+    },
+    {
+      "name": "target-before-resources.json",
+      "bytes": 116428,
+      "sha256": "4882d86d37c8e7164c1f9722274562127a568627922ee2bced917a65b3b474cd"
+    }
+  ],
+  "localTargetCredentialsPreserved": true
+}

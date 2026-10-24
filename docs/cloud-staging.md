@@ -1,8 +1,9 @@
 # Lightsail staging
 
-This page records the original site's deployment and rollback procedures. The new workflow target is the independent [EC2 K3s test environment](k3s-cd.md), pending this branch's merge and first main deployment. The original domain, data and shared Lightsail proxy are not migrated by that change. The sections below describe the legacy Lightsail CD implementation.
+This page records historical deployment and rollback procedures. On 2026-10-25 the formal hostname and original data were [migrated to EC2 K3s](evidence/2026-10-25-k3s-cutover/README.md); current delivery uses [K3s CD](k3s-cd.md). The old SEMS Identity/Catalog/Admission containers are stopped. Its database and volumes remain, and its shared Caddy temporarily forwards old-DNS-cache requests to the new environment while still serving SWE5006.
 
-Host: `swe5001.seventh720.com`, DNS-only A record to the instance's attached static IPv4. The Singapore Lightsail instance runs Ubuntu 24.04 with 2 vCPU and 4 GB RAM. This is a single-host staging deployment, not a high-availability setup.
+Do not run the old deployment or point traffic back at the frozen old database as a routine rollback. New writes may already exist in K3s and must first be synchronized. Historical host: `18.139.212.35`, Singapore Lightsail, Ubuntu 24.04, 2 vCPU and 4 GB RAM. The formal DNS A record now points to `13.229.121.219`.
+
 
 ## Deploy
 
@@ -74,7 +75,9 @@ The initial read-only inspection on 2026-10-19 confirmed readiness and HTTPS for
 
 Staging API and user-reported phone checks passed. The [current capacity report](evidence/2026-10-22-cloud-capacity/README.md) records only `f69d49d`: with 50 ordinary events and 1000 accounts, read 250 VU passed; mixed 250 VU passed client thresholds but failed the server gate with four internal 504s; 500 VU targets were not run; 1000 VU targets were not run. Default pool 10 and original thresholds were retained. After product cleanup, a verified server-side backup and guarded transaction purged 1000 temporary accounts, 50 events and their cancelled orders/tickets; original 24-table fingerprints and six health checks remain intact. Superseded private performance records were removed; business acceptance remains. Ten-minute steady load, independent replica scaling/recovery, compatible rollback and off-host scheduled backups remain pending. Fault injection targets disposable stacks.
 
-## Navicat access
+## Historical Navicat access
+
+The connection below reads the frozen old database after cutover. Use the [current Kubernetes database access guide](k3s.md#数据库只读访问) for the migrated data.
 
 Connect to PostgreSQL at 127.0.0.1:5432, database sems, using sems_viewer. Enable Navicat's SSH tunnel to ubuntu@18.139.212.35:22 with the local Lightsail private key (no passphrase). The generated database password is stored only in the ignored local `.secrets/cloud-staging/navicat.json`. This role has schema usage and SELECT on the identity, catalog and admission tables, with default SELECT grants for future tables created by each service role. It has no data modification privileges. Do not open port 5432 in the Lightsail public firewall.
 

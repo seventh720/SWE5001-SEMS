@@ -1,0 +1,114 @@
+{
+  "checkedAt": "2026-10-24T20:00:22.223424+00:00",
+  "status": "passed",
+  "current": {
+    "releaseId": "7a978286920d9362739afaf41c5645f2ecf39d88-40126181288-1",
+    "sourceCommit": "7a978286920d9362739afaf41c5645f2ecf39d88",
+    "verifiedAt": "2026-10-24T19:56:50.337897+00:00"
+  },
+  "deployments": [
+    {
+      "name": "admission",
+      "replicas": 2,
+      "readyReplicas": 2,
+      "image": "ghcr.io/seventh720/swe5001-sems/admission@sha256:092f061fcd51cf6600a918076e7ba44317766b0468923248e7ce2a3c1a1bc428",
+      "pods": [
+        {
+          "name": "admission-647cdf9bb-2rlmr",
+          "uid": "facb32da-7299-4ad5-bb9f-9ed3f67fbfce",
+          "node": "sems-k3s-server"
+        },
+        {
+          "name": "admission-647cdf9bb-5sb82",
+          "uid": "e53eebaa-a3fa-4087-9d55-f4dabca6a3bd",
+          "node": "sems-k3s-worker"
+        }
+      ]
+    },
+    {
+      "name": "event-catalog",
+      "replicas": 2,
+      "readyReplicas": 2,
+      "image": "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:e86a7b2a8b1602f50b3b429c63e88cc7693930d64f65013a7629ac18d95029ca",
+      "pods": [
+        {
+          "name": "event-catalog-5c7bb69d94-ctqkz",
+          "uid": "8879f14a-e245-4cbc-b8bb-fa3bda01f969",
+          "node": "sems-k3s-worker"
+        },
+        {
+          "name": "event-catalog-5c7bb69d94-k54fs",
+          "uid": "28e5793c-139b-4b72-a60f-1ebb3b5c3b6a",
+          "node": "sems-k3s-server"
+        }
+      ]
+    },
+    {
+      "name": "gateway",
+      "replicas": 2,
+      "readyReplicas": 2,
+      "image": "ghcr.io/seventh720/swe5001-sems/gateway@sha256:cdf01ac98555bc6e4dfc2398902f5baecf418bd10f5f101aef4f48c7a0be8330",
+      "pods": [
+        {
+          "name": "gateway-cb4d4f75b-hhqbz",
+          "uid": "9d1948bb-8003-415d-afb4-e232bbed1c33",
+          "node": "sems-k3s-worker"
+        },
+        {
+          "name": "gateway-cb4d4f75b-tlbrl",
+          "uid": "ca05657d-3562-4cbf-a410-9783188879ef",
+          "node": "sems-k3s-server"
+        }
+      ]
+    },
+    {
+      "name": "identity",
+      "replicas": 2,
+      "readyReplicas": 2,
+      "image": "ghcr.io/seventh720/swe5001-sems/identity@sha256:5f001cdccb90e7f115edeeb9a0a507b48b769d4303ef8a899e9e11cb5d9836c5",
+      "pods": [
+        {
+          "name": "identity-866d966955-n9fw8",
+          "uid": "bb4a73a3-4d3a-4fc2-9702-969235a3e211",
+          "node": "sems-k3s-server"
+        },
+        {
+          "name": "identity-866d966955-v9djn",
+          "uid": "fbd9d4dc-cbc3-44b4-b0a2-057d8bcb4553",
+          "node": "sems-k3s-worker"
+        }
+      ]
+    },
+    {
+      "name": "web",
+      "replicas": 2,
+      "readyReplicas": 2,
+      "image": "ghcr.io/seventh720/swe5001-sems/web@sha256:3ea85ca77061e746595498175451811a457618ed1978f74069fd8543d174f929",
+      "pods": [
+        {
+          "name": "web-d4dc79496-4wfrv",
+          "uid": "d266427a-af6e-4d78-9437-be786f95b63a",
+          "node": "sems-k3s-server"
+        },
+        {
+          "name": "web-d4dc79496-kf7q5",
+          "uid": "2f989ac9-b243-4c12-b053-ca3c5f77f82f",
+          "node": "sems-k3s-worker"
+        }
+      ]
+    }
+  ],
+  "postgres": {
+    "podUid": "382d4f7a-83b9-4273-9f43-bd9976f738e5",
+    "pvcUid": "2b7b065f-520c-4381-bc39-9fbb7fd2d9e0",
+    "pvcPhase": "Bound",
+    "node": "sems-k3s-worker"
+  },
+  "previousRegressionData": {
+    "ticketTypeId": "d03f049e-f8fe-400d-8779-76fe37c9f05e",
+    "reserved": 708,
+    "confirmedQuantity": 708,
+    "validTickets": 708,
+    "duplicateRequestKeys": 0
+  }
+}

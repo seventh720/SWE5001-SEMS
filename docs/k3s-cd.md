@@ -1,12 +1,14 @@
 # EC2 K3s 发布与应用回退
 
-目标为 `sems-k3s/sems-test` 和 `https://sems-test.seventh720.com`。本分支把 `.github/workflows/ci.yml` 的部署阶段接到 K3s；合并后的第一次 GitHub main 发布尚待执行。现有正式域名、Lightsail 数据及共享代理继续独立运行。
+目标为 `sems-k3s/sems-test` 和正式入口 `https://swe5001.seventh720.com`。PR #29 已将 `.github/workflows/ci.yml` 的部署阶段接到 K3s；[main run 40126181288](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288) 已实际通过 GitHub OIDC 认证及 SSM 发布，部署提交为 `7a97828`。同日正式域名和原数据已完成[切换](evidence/2026-10-25-k3s-cutover/README.md)；旧 API 停写，旧 IP 通过共享代理临时转发到新环境，SWE5006 保留。
 
 ## 流水线
 
-PR 运行质量检查，不发布镜像或部署。main push 或 main 上的手动运行依次完成 lint、Java、前端、真实数据库/API、安全和镜像检查，发布同次构建的 GHCR digest 锁，再进入 `Deploy · EC2 K3s Test`。
+PR 运行质量检查，不发布镜像或部署。main push 或 main 上的手动运行依次完成 lint、Java、前端、真实数据库/API、安全和镜像检查，发布同次构建的 GHCR digest 锁，再进入 K3s 部署阶段。本分支将 job 名称和发布后验证入口改为 `Deploy · EC2 K3s` / 正式域名，已在当前现场只读验证；需 PR 合并后成为默认配置。
 
 部署使用 GitHub OIDC 换取短期 AWS 身份，通过 SSM Run Command 在现有 server 执行发布脚本。runner 使用 `kubectl kustomize` 生成配置，不连接集群管理 API，也不持有 kubeconfig、SSH 私钥或数据库密码。K3s 节点使用 containerd，发布主机不运行 Docker Compose。
+
+namespace/environment 的 sems-test/k3s-test 是历史名称，现已承载原站数据；保留 production 标记。正式 Ingress sems-public 独立于应用 CD，配置见 [sems-public.yaml](../deployment/k3s/sems-public.yaml)。
 
 发布资源只包含五个应用 Deployment、六个 Service、三个 ConfigMap 和应用 Ingress。PostgreSQL、数据库凭据、PVC/StorageClass、NetworkPolicy 和 Traefik 独立管理；数据库 Flyway 迁移仍由各后端启动时执行。当前 GHCR 应用镜像允许匿名拉取；改成私有包需要先单独配置集群拉取凭据。
 
@@ -61,12 +63,11 @@ AWS_PROFILE=sems python3 scripts/cd/submit-k3s.py \
 
 ## 已完成演练
 
-[2026-10-25 发布与回退记录](evidence/2026-10-25-k3s-cd/README.md)包含正常发布、失败候选拒绝、兼容旧镜像切换和回退至已验证前驱，最终九组核心业务通过。该记录由本机身份经 SSM 完成，首次 GitHub main 发布仍待验证。
+[2026-10-25 发布与回退记录](evidence/2026-10-25-k3s-cd/README.md)包含正常发布、失败候选拒绝、兼容旧镜像切换和回退至已验证前驱，最终九组核心业务通过。先由本机身份经 SSM 完成演练；随后首次 GitHub main 发布也成功，现场确认五个应用各 2/2、镜像与同次发布报告一致、数据库 Pod/PVC 和既有测试数据保留。
 
 ## 剩余验证
 
-- 合并后真实的 GitHub OIDC 交换、镜像锁下载和 SSM 部署 job，需以实际 Actions 结果确认；本机 AWS 身份执行的 SSM 演练不能替代这一项。
-- 正式替换原站前，完成原数据迁移、角色/权限与历史订单核对、正式域名证书及 DNS 切换验收。
+- 正式域名、原数据和原 JWT 已迁移；后续根据缓存/访问情况清理过渡代理及旧 SEMS 闲置容器，保留共享项目和备份。
 - 高 VU、十分钟稳态、实体手机相机、完整数据库灾难恢复和主机故障仍按各自计划验证。
 
 依据：[GitHub AWS OIDC](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws)、[SSM 实例权限](https://docs.aws.amazon.com/systems-manager/latest/userguide/setup-instance-permissions.html)、[Kubernetes Pod 反亲和](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/)。

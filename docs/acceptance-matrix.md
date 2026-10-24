@@ -1,6 +1,6 @@
 # 能力与质量验收矩阵
 
-整理日期：2026-10-25。正式域名最近发布为 `52df21f`（[CI 与部署](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39978065255)；业务代码与 `fb27bbf` 相同），容量测量单独对应 `f69d49d`。独立 EC2 K3s 测试环境已完成[完整业务与故障回归](evidence/2026-10-24-k3s-regression/README.md)，尚未迁移原数据或切换正式域名。下表区分已完成检查与仍待验证的工程目标；测试通过不表示所有环境和负载均已覆盖。
+整理日期：2026-10-25。正式入口已迁至 EC2 K3s，应用为 `7a97828`（[main CI/CD](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288)）；[27 张表/原账号/JWT/证书/DNS 切换](evidence/2026-10-25-k3s-cutover/README.md)通过。历史[完整业务与故障回归](evidence/2026-10-24-k3s-regression/README.md)在迁移前独立测试库执行；容量测量单独对应 `f69d49d`。测试结果均按版本和环境区分。
 
 | 能力或目标 | 已有证据 | 待验证或限制 |
 |---|---|---|
@@ -14,6 +14,6 @@
 | 独立扩容 | 本地 Admission 2→3→2；EC2 K3s Admission 独立 2→1→2 与 Pod 重建，其他服务不重启 | Catalog 和 Admission 各自 1/2 副本的受控云端收益对照待完成 |
 | 故障恢复 | EC2 K3s 强制删除 Catalog Pod，75 秒内 707 笔订票及重放/实时回执无失败；全部 Catalog 停止后的有界失败、恢复与 708/708/708 库存审计；改期、取消、组织关闭中断恢复通过 | 单 Pod Ready 36.398 秒只是本轮观察值，不能替代云端 60 秒恢复 SLO、主机故障或十分钟稳态实验 |
 | 安全交付 | HTTPS、内部令牌、权限拒绝、源码/依赖/secrets/镜像扫描与 main-only digest 发布 | 有限时效适用性例外见[安全说明](security.md)；扫描不替代渗透或全部业务权限检查 |
-| 备份与回滚 | 部署前数据库备份、digest 锁、就绪检查与已验证指针；[K3s 兼容镜像发布/回退](evidence/2026-10-25-k3s-cd/README.md)、临时库数据恢复通过 | 首次 GitHub OIDC 发布、完整数据库灾难恢复及定期异地备份待完成 |
+| 备份与回滚 | 27 张表完整恢复和原账号/JWT 验证通过；main OIDC/SSM/K3s 发布通过，含发布前数据库备份、digest 锁、就绪检查与已验证指针；[K3s 兼容镜像发布/回退](evidence/2026-10-25-k3s-cd/README.md)、临时库数据恢复通过 | 完整数据库灾难恢复及定期异地备份待完成 |
 
 测试与历史覆盖率见[测试说明](test-coverage.md)，实验方法见[性能与可用性](performance-and-availability.md)，后续任务见[技术改进计划](roadmap.md)。验证记录应保留 commit、镜像 digest、配置、时间、数据、原始结果及数据库核对；失败结果也保留。

@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "applicationCommit": "7a978286920d9362739afaf41c5645f2ecf39d88",
+  "formalUrl": "https://swe5001.seventh720.com",
+  "newIp": "13.229.121.219",
+  "namespace": "sems-test",
+  "namespaceEnvironment": "production",
+  "database": "sems",
+  "sourceTableCount": 27,
+  "allTableDataFingerprintsEqualBeforeApplicationStart": true,
+  "rowCounts": {
+    "users": 7,
+    "events": 7,
+    "bookings": 3,
+    "tickets": 4
+  },
+  "originalJwtAndFreshAdminLoginVerified": true,
+  "applicationDeployments": 5,
+  "replicasPerApplication": 2,
+  "nodesPerApplication": 2,
+  "databasePodAndPvcUnchanged": true,
+  "dnsAuthoritativeAndSampledPublicResolversVerified": true,
+  "oldApiWritersStopped": true,
+  "sharedProjectHealthy": true,
+  "oldProxyBridgeRetained": true,
+  "oldSourceDatabaseRetained": true,
+  "oldTestDatabaseRetainedAs": "sems_test_before_cutover_20261025",
+  "oldVolumesDeleted": false,
+  "scope": "Migration correctness and read-only service checks; no new load/fault tests against the migrated live database"
+}

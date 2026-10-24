@@ -21,6 +21,8 @@ import time
 import traceback
 from types import SimpleNamespace
 
+from environment_guard import require_disposable_namespace
+
 ROOT = Path(__file__).resolve().parents[2]
 BASE = 'https://sems-test.seventh720.com'
 SUITES = (
@@ -46,6 +48,7 @@ class KubernetesRuntime:
         self.k = ['kubectl', '--kubeconfig', str(Path(kubeconfig).resolve()),
                   '--context', 'sems-k3s', '--cache-dir', str(ROOT / '.secrets/k3s-cloud/cache'),
                   '-n', 'sems-test']
+        require_disposable_namespace(self.k)
         self.run = subprocess.run
         self.replicas = {}
         self.actions = []
@@ -176,6 +179,8 @@ def main():
     parser.add_argument('--only', nargs='+', choices=SUITES)
     args = parser.parse_args()
     os.chdir(ROOT)
+    if not args.suite:
+        KubernetesRuntime(args.kubeconfig)  # Refuse live data before launching fixture suites.
     args.output = args.output.resolve()
     args.output.mkdir(parents=True, exist_ok=True)
     spec = importlib.util.spec_from_file_location('k8s_secrets', ROOT / 'scripts/k8s/secrets.py')

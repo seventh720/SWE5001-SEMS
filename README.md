@@ -40,7 +40,7 @@ docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.
 
 For frontend development, run `npm --prefix apps/web run dev`; port 15173 proxies APIs to the gateway on 18080. The production frontend is served at the gateway root. Date inputs use the application’s English calendar/time controls in Singapore time (UTC+08:00) and submit UTC timestamps. The local development override exposes PostgreSQL only at `127.0.0.1:15432`; the base Compose file used by CI does not publish a database port.
 
-This is the local HTTP configuration. The [EC2 K3s environment](docs/k3s.md) provides the new HTTPS test deployment; [K3s delivery](docs/k3s-cd.md) describes the main-only release workflow. The [Lightsail guide](docs/cloud-staging.md) retains the original site's release path. Runtime credentials use restricted host files and Kubernetes Secrets.
+This is the local HTTP configuration. [swe5001.seventh720.com](https://swe5001.seventh720.com) now runs on the [EC2 K3s environment](docs/k3s.md), with the original accounts and data migrated. [K3s delivery](docs/k3s-cd.md) describes main-only releases; the [cutover record](docs/evidence/2026-10-25-k3s-cutover/README.md) covers data/TLS/DNS checks. The [Lightsail guide](docs/cloud-staging.md) is retained for historical reference. Runtime credentials use restricted host files and Kubernetes Secrets.
 
 ## 3. Acceptance walkthrough
 

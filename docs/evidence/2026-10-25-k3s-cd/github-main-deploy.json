@@ -1,0 +1,92 @@
+{
+  "runId": 40126181288,
+  "url": "https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288",
+  "event": "push",
+  "ref": "refs/heads/main",
+  "sourceCommit": "7a978286920d9362739afaf41c5645f2ecf39d88",
+  "status": "success",
+  "oidcAuthentication": "success",
+  "deployJobId": 120970961297,
+  "ssmCommandId": "4e544d1c-0d3f-48cb-a740-6ef8deb58b6e",
+  "jobs": [
+    {
+      "id": 120967978477,
+      "name": "Frontend · Tests & Build",
+      "conclusion": "success"
+    },
+    {
+      "id": 120967978597,
+      "name": "Lint",
+      "conclusion": "success"
+    },
+    {
+      "id": 120967978628,
+      "name": "Backend · Unit Tests & Build",
+      "conclusion": "success"
+    },
+    {
+      "id": 120968249961,
+      "name": "Backend · Integration Tests",
+      "conclusion": "success"
+    },
+    {
+      "id": 120968249987,
+      "name": "Security · SAST, Dependencies & Secrets",
+      "conclusion": "success"
+    },
+    {
+      "id": 120970121060,
+      "name": "Images · Scan, Smoke Test & Publish",
+      "conclusion": "success"
+    },
+    {
+      "id": 120970961297,
+      "name": "Deploy · EC2 K3s Test",
+      "conclusion": "success"
+    },
+    {
+      "id": 120972206660,
+      "name": "Notify · Telegram",
+      "conclusion": "success"
+    }
+  ],
+  "deployment": {
+    "operation": "deploy",
+    "releaseId": "7a978286920d9362739afaf41c5645f2ecf39d88-40126181288-1",
+    "sourceCommit": "7a978286920d9362739afaf41c5645f2ecf39d88",
+    "startedAt": "2026-10-24T19:51:54.028983+00:00",
+    "status": "passed",
+    "backup": [
+      {
+        "file": "7a978286920d9362739afaf41c5645f2ecf39d88-40126181288-1.dump",
+        "bytes": 303223,
+        "sha256": "f4eba1d0a98568f3b645a7844ee8a408d0270826c658a5f010056218ce6fbcdc"
+      },
+      {
+        "file": "7a978286920d9362739afaf41c5645f2ecf39d88-40126181288-1.roles.sql",
+        "bytes": 1199,
+        "sha256": "5d5a9f1f319bf2735d966384b580c5615136aee257fad48307aff364d81b5606"
+      }
+    ],
+    "verification": {
+      "verifiedHttpsPaths": [
+        "/",
+        "/health/gateway",
+        "/health/identity",
+        "/health/event-catalog",
+        "/health/admission"
+      ],
+      "internalApiStatus": 404,
+      "adminLoginAndJwt": true,
+      "images": {
+        "admission": "ghcr.io/seventh720/swe5001-sems/admission@sha256:092f061fcd51cf6600a918076e7ba44317766b0468923248e7ce2a3c1a1bc428",
+        "event-catalog": "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:e86a7b2a8b1602f50b3b429c63e88cc7693930d64f65013a7629ac18d95029ca",
+        "gateway": "ghcr.io/seventh720/swe5001-sems/gateway@sha256:cdf01ac98555bc6e4dfc2398902f5baecf418bd10f5f101aef4f48c7a0be8330",
+        "identity": "ghcr.io/seventh720/swe5001-sems/identity@sha256:5f001cdccb90e7f115edeeb9a0a507b48b769d4303ef8a899e9e11cb5d9836c5",
+        "web": "ghcr.io/seventh720/swe5001-sems/web@sha256:3ea85ca77061e746595498175451811a457618ed1978f74069fd8543d174f929"
+      }
+    },
+    "databasePodAndPvcUnchanged": true,
+    "completedAt": "2026-10-24T19:56:50.337340+00:00"
+  }
+}

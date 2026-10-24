@@ -22,7 +22,7 @@ from k3s_release import APPLICATIONS, allowed, validate_release, validate_resour
 ROOT = Path('/var/lib/sems-cd')
 K = ['/usr/local/bin/kubectl', '--kubeconfig', '/etc/rancher/k3s/k3s.yaml',
      '--context', 'default', '--namespace', 'sems-test']
-BASE = 'https://sems-test.seventh720.com'
+BASE = 'https://swe5001.seventh720.com'
 
 
 def now():

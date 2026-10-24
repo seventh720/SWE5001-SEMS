@@ -1,8 +1,10 @@
 # 发布状态与已知限制
 
-文档整理：2026-10-25（新加坡时间）。正式域名最近发布为 PR #28 / `52df21f`，其业务运行代码与 `fb27bbf` 一致。独立 EC2 K3s 测试环境已上线并完成业务、单服务运维及 SSM 发布演练；本分支将 main CD 改到 K3s，首次 GitHub OIDC 自动发布仍待合并后验证。容量尚未重新测量，正式域名及原数据尚未迁移。
+文档整理：2026-10-25（新加坡时间）。正式域名 `swe5001.seventh720.com` 已切到 EC2 K3s，应用为 PR #29 / `7a97828`，main GitHub OIDC/SSM 自动发布通过。原站 27 张表及原 JWT 密钥已迁入，原账号、订单和票券保留；五个应用各 2 副本、跨两节点。旧 SEMS 后端停写，旧 IP 仅临时代理到新环境，共享 Caddy 和 SWE5006 保留。容量尚未在该部署上重新测量。
 
 ## 最近发布
+
+PR #29 已合并为 `7a97828`，[main CI 与 K3s CD](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288)全部成功。现场五个应用各 2/2、分居两节点，镜像与发布报告一致，数据库 Pod/PVC 与既有测试数据保持；[首次自动发布证据](evidence/2026-10-25-k3s-cd/README.md#首次-main-自动发布)已记录。正式域名随后已完成[数据、证书和 DNS 切换](evidence/2026-10-25-k3s-cutover/README.md)，不再由旧应用处理业务。
 
 PR #28 的文档整理已合并，提交 `52df21f`；[main CI 与当时的 Lightsail 部署](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39978065255)成功。以下功能更新来自此前 PR #27 / `fb27bbf`，其 [main CI](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39751659240)也通过。
 
@@ -24,7 +26,7 @@ PR #28 的文档整理已合并，提交 `52df21f`；[main CI 与当时的 Light
 | 通知与治理 | 业务通知、成员关系更新、邀请、组织变更与关闭流程 | [站内通知](in-app-notifications.md)、[组织升级](organization-upgrade.md) |
 | 会话与密码 | JWT 有效期 1 小时；新密码为 8–16 位可打印 ASCII，拒绝空格，已有密码登录兼容 | [安全说明](security.md) |
 | 数据与服务边界 | 三个 Spring Boot 进程，独立 schema、账号和迁移，认证 HTTP 协作 | [架构决策](adr/0001-service-boundaries.md) |
-| CI/CD | lint、单元/组件、真实数据库/API、安全与镜像扫描、GHCR digest 发布和 main-only 部署 | [CI 操作](ci.md)、[云端环境](cloud-staging.md) |
+| CI/CD | lint、单元/组件、真实数据库/API、安全与镜像扫描、GHCR digest 发布和 main-only 部署 | [CI 操作](ci.md)、[云端环境](k3s.md) |
 
 ## 已完成验证
 
@@ -50,7 +52,7 @@ PR #28 的文档整理已合并，提交 `52df21f`；[main CI 与当时的 Light
 
 此前仅为 RDS 准备过网络对象，随后选择自建 PostgreSQL，已清理这些闲置 DB 子网、路由表、DB subnet group 和数据库安全组；未创建 RDS 实例。PostgreSQL 17 StatefulSet 已在 worker 启动，使用现有 EBS 上的 Retain PVC，三个角色/schema 独立，所有 TCP 连接要求 SCRAM 密码认证，5432 通过集群内 Service 和 NetworkPolicy 限制。数据库独立于原 Lightsail 数据，尚未迁移已有用户。
 
-[自建数据库验收](evidence/2026-10-24-k3s-postgres/README.md)五组通过：真实角色认证与权限、跨节点网络策略、Pod 重建数据保留、异机逻辑备份与临时库数据恢复。保留首次 loopback trust 问题和一次测试错误分类的原始记录；已修正并复验。完整 K3s overlay 的 21 个对象 server-side dry run 通过。此恢复检查不包含凭据/ACL 重建、节点级故障切换或生产恢复时间；当前备份为手动执行。
+[自建数据库验收](evidence/2026-10-24-k3s-postgres/README.md)五组通过：真实角色认证与权限、跨节点网络策略、Pod 重建数据保留、异机逻辑备份与临时库数据恢复。保留首次 loopback trust 问题和一次测试错误分类的原始记录；已修正并复验。完整 K3s overlay 的 21 个对象 server-side dry run 通过。此恢复检查不包含凭据/ACL 重建、节点级故障切换或生产恢复时间；初始化阶段备份为手动执行；当前 CD 已在每次发布前导出数据库，定期异地备份仍待配置。
 
 ## EC2 K3s 应用验收
 
@@ -76,7 +78,15 @@ Admission 独立 2→1→2 扩缩容和单 Pod 重建通过，Identity/Catalog P
 
 初次演练发现纯文本网关健康响应被误判，以及 topology spread 在滚动后出现副本同节点。已修正检查器并加入同服务硬反亲和和逐副本替换，保留首次失败记录。最终镜像补跑九组核心业务通过，包括 100 请求竞争 10 名额、同键重放、并发核销、取消和 schema 隔离。回退只使用此前通过验证的资源，不撤销数据库迁移。
 
-GitHub OIDC 信任、main-only environment 与 server SSM 权限已配置；本分支切换新的 CD 流程，真实 GitHub OIDC 交换及首次 main 发布仍待合并后验证。正式域名与原站数据未迁移。操作见 [K3s 发布与回退](k3s-cd.md)。
+GitHub OIDC 信任、main-only environment 与 server SSM 权限已配置；PR #29 合并后的首次 main 发布已实际完成 OIDC 交换、镜像锁下载与 SSM/K3s 部署。正式域名与原站数据未迁移。操作见 [K3s 发布与回退](k3s-cd.md)。
+
+## 正式域名与原数据切换
+
+2026-10-25 维护窗口内完成 [Lightsail → K3s 切换](evidence/2026-10-25-k3s-cutover/README.md)。先备份两边数据和配置、在隔离库验证 27 张表/所有者/权限；停止旧站三个后端后重新备份并最终恢复，27 张表数据指纹完全一致，保留 7 用户、7 活动、3 订单和 4 票券。新环境旧测试库单独保留，未混入原数据。
+
+正式域名可信 TLS、五个公开路径、内部接口 404、原 JWT 和原管理员重新登录通过；权威及两个公共 DNS 均指向新 IP，本机访问已直达新节点。五个应用各 2/2、分居两节点，数据库 Pod/PVC 未变，迁移后备份在 server 和本机。旧 IP 临时代理新环境以覆盖 DNS 缓存；SWE5006 与共享 Caddy 正常。
+
+历史 namespace/environment 名称仍为 sems-test/k3s-test；前者已标记 production，两个域名共用迁入的数据。夹具/故障脚本须使用独立测试环境，本分支已加入生产标记拦截和正式域名 CD 校验。新写入开放后，数据库回迁必须先同步，不能直接切回冻结旧库。旧卷、旧数据库和备份保留；过渡代理清理及完整灾难恢复另行处理。
 
 ## 最近容量结果
 
@@ -92,8 +102,8 @@ GitHub OIDC 信任、main-only environment 与 server SSM 权限已配置；本�
 
 ## 已知限制与后续工作
 
-- 正式域名仍在单台 Lightsail；新 EC2 测试环境存在单控制平面、单可用区和数据库节点单点。没有主机级 HA、云端自动扩容或已测独立扩容性能收益。
-- 运行密钥使用受限主机文件，备份仍在本机；持续监控、告警及定期异地备份待补。
+- 正式域名运行于两台 EC2 K3s，存在单控制平面、单可用区和数据库节点单点。没有主机级 HA、云端自动扩容或已测独立扩容性能收益。
+- 运行密钥使用受限主机文件；数据库在 worker，发布前逻辑备份位于 server。持续监控、告警及定期异地备份待补。
 - 十分钟稳态、独立副本扩容收益、云端定时恢复和完整数据库灾难恢复待完成；兼容镜像应用回退和临时库数据恢复已分别演练。
 - 自动 OpenAPI 符合性门禁和真实数据库/API 验收覆盖采集待补；单元覆盖率不替代业务或性能验收。
 - 安全门禁通过只适用于当次规则与漏洞库；有期限的 Spring 功能适用性例外见[安全文档](security.md)。
