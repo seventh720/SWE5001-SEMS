@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: observability
 resources:
 - resources.yaml
+- grafana-public.yaml
 labels:
 - pairs:
     app.kubernetes.io/part-of: sems-observability

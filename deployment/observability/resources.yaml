@@ -312,6 +312,24 @@ spec:
           value: 'false'
         - name: GF_AUTH_ANONYMOUS_ENABLED
           value: 'false'
+        - name: GF_SERVER_DOMAIN
+          value: grafana.seventh720.com
+        - name: GF_SERVER_ROOT_URL
+          value: https://grafana.seventh720.com/
+        - name: GF_SECURITY_COOKIE_SECURE
+          value: 'true'
+        - name: GF_SECURITY_COOKIE_SAMESITE
+          value: lax
+        - name: GF_METRICS_BASIC_AUTH_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: grafana-admin
+              key: username
+        - name: GF_METRICS_BASIC_AUTH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-admin
+              key: password
         - name: GF_ANALYTICS_REPORTING_ENABLED
           value: 'false'
         - name: GF_ANALYTICS_CHECK_FOR_UPDATES

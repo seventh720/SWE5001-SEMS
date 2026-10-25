@@ -104,7 +104,7 @@ def execute(args):
         apply(namespace)
         creds = ensure_secret('grafana-admin', lambda: {'username': 'admin', 'password': secrets.token_urlsafe(30)})
         login = args.private_dir / 'grafana-login.txt'
-        login.write_text('URL: http://127.0.0.1:13000\nUsername: ' + creds['username'] + '\nPassword: ' + creds['password'] + '\n')
+        login.write_text('URL: https://grafana.seventh720.com\nUsername: ' + creds['username'] + '\nPassword: ' + creds['password'] + '\n')
         login.chmod(0o600)
         ensure_secret('alertmanager-config', lambda: {'alertmanager.yml': (ROOT / 'deployment/observability/config/alertmanager.yml').read_text()})
         monitor = ensure_secret('postgres-monitor', lambda: {'password': secrets.token_urlsafe(30)})
@@ -127,7 +127,7 @@ def execute(args):
         out('apply', '--dry-run=server', '-f', str(ROOT / 'deployment/observability/postgres-network.yaml'))
         apply(bundle)
         out('apply', '-f', str(ROOT / 'deployment/observability/postgres-network.yaml'))
-        print('Applied private observability stack and read-only database monitoring role', flush=True)
+        print('Applied observability stack with authenticated Grafana HTTPS and read-only database monitoring', flush=True)
         for obj in objects:
             if obj['kind'] not in ('Deployment', 'DaemonSet'):
                 continue

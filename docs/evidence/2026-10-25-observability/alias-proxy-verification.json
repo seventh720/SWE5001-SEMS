@@ -1,0 +1,9 @@
+{
+  "proxyUpstream": "https://13.229.121.219",
+  "tlsServerName": "swe5001.seventh720.com",
+  "semsTestDependency": false,
+  "sharedProjectConfigPreserved": true,
+  "sharedProjectContainersUnchanged": true,
+  "configValidated": true,
+  "reloadSucceeded": true
+}

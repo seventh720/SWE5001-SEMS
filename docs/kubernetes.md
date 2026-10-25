@@ -1,6 +1,6 @@
 # Kubernetes 配置与验证
 
-配置分为公共资源、本地验证和云端环境，使用 kubectl 内置的 Kustomize。[2026-10-24 本地 Kubernetes 验收](evidence/2026-10-24-kubernetes-local/README.md)已完成。云端测试环境使用 [EC2 自建 K3s 与 PostgreSQL](k3s.md)，不使用 EKS、RDS、NAT Gateway 或 ALB；[应用与 HTTPS 验收](evidence/2026-10-24-k3s-application/README.md)已完成，地址为 `https://sems-test.seventh720.com`。EKS 模板保留为另一种环境的参考。正式域名仍使用 [Lightsail](cloud-staging.md)，原数据和正式域名尚未迁移，现有发布流程未切换。
+配置分为公共资源、本地验证和云端环境，使用 kubectl 内置的 Kustomize。[2026-10-24 本地 Kubernetes 验收](evidence/2026-10-24-kubernetes-local/README.md)已完成。正式域名和原数据现已迁到 [EC2 自建 K3s 与 PostgreSQL](k3s.md)，[应用 CD](k3s-cd.md)使用 GitHub OIDC/SSM；[Grafana、告警与追踪](observability.md)已接入。过渡测试域名入口已退休，正式入口为 `https://swe5001.seventh720.com`。EKS 模板保留为另一种环境的参考。
 
 ## 配置结构
 

@@ -4,13 +4,11 @@
 
 ## 打开控制台
 
-在项目目录执行并保持终端打开：
+直接打开 <https://grafana.seventh720.com/d/sems-operations>，使用现有 Grafana 账号登录。用户名和密码保存在本机 `.secrets/observability/grafana-login.txt`。浏览器访问不依赖本机隧道，电脑关闭不会停止监控或 Telegram 通知。
 
-```bash
-python3 scripts/observability/access.py
-```
+域名 `grafana` 在 Cloudflare 使用 DNS only 的 A 记录，当前指向 `13.229.121.219`。现有 Traefik 处理 HTTP → HTTPS 和 Let's Encrypt 自动证书；Grafana 使用正式 root URL、Secure/HttpOnly/SameSite 会话，保留账号登录并关闭匿名访问和自行注册。Grafana 自身 `/metrics` 也有单独的 Basic Auth 保护，复用现有管理员 Secret。Prometheus、Loki、Tempo、Alertmanager、OTLP 和数据库继续通过 ClusterIP 在内部访问。
 
-打开 <http://127.0.0.1:13000/d/sems-operations>。用户名和密码保存在本机 `.secrets/observability/grafana-login.txt`。脚本使用已有 SSH 私钥及专用 kubeconfig，仅绑定本机端口；不开放公网 Grafana、Prometheus、Loki、Tempo、OTLP 或 PostgreSQL 端口。退出终端会关闭该次通道；Grafana Pod 更新时会重连。
+需要诊断集群内部 API 时，仍可执行 `python3 scripts/observability/access.py` 创建本机 HTTP 转发；API 验证可使用 Basic Auth，浏览器登录使用上述正式 HTTPS 地址。该转发仅绑定本机，退出终端后关闭。
 
 Grafana 的 **SEMS · Operations** 面板提供：
 
@@ -45,7 +43,7 @@ flowchart LR
 
 `deployment/observability/` 独立于应用 CD 管理；所有镜像锁定摘要，见 `images.lock.json`。三个后端通过共享 Kustomize component 注入官方 Java Agent，不改变业务镜像、schema 或服务 API。后续 K3s 应用发布会保留 Agent；监控故障时，异步导出使用有限队列，不应成为业务调用的同步依赖。
 
-Grafana、Prometheus、Loki、Tempo 和 Alertmanager 各一实例。两台节点各一个 Node Exporter 和日志采集器。API server 通过 ServiceAccount/TLS 认证采集；Prometheus 有读取节点/Pod 和节点 metrics proxy 的权限，不可读取 Secret。数据库使用独立 `sems_monitor` 登录角色及 `pg_monitor`，默认只读，不授予业务 schema 查询权限。NetworkPolicy 仅允许应用进入 Collector 的 OTLP 端口，以及指定数据库 exporter 连接 PostgreSQL。
+Grafana 的公网 Ingress 见 [grafana-public.yaml](../deployment/observability/grafana-public.yaml)，NetworkPolicy 仅允许 kube-system 内的 Traefik 访问 Grafana 3000 端口。Grafana、Prometheus、Loki、Tempo 和 Alertmanager 各一实例。两台节点各一个 Node Exporter 和日志采集器。API server 通过 ServiceAccount/TLS 认证采集；Prometheus 有读取节点/Pod 和节点 metrics proxy 的权限，不可读取 Secret。数据库使用独立 `sems_monitor` 登录角色及 `pg_monitor`，默认只读，不授予业务 schema 查询权限。NetworkPolicy 仅允许应用进入 Collector 的 OTLP 端口，以及指定数据库 exporter 连接 PostgreSQL。
 
 ## 告警与 Telegram
 
@@ -96,7 +94,14 @@ python3 scripts/observability/verify.py --kubeconfig .secrets/k3s-cloud/kubeconf
   --alert-smoke --report .secrets/observability/alert-verification.json
 ```
 
-自测仅向 Collector 写一条明确标记的合成 gauge，让真实规则进入 firing，再将 gauge 清零，验证 Alertmanager 及已配置 Telegram 的触发/恢复投递计数。它不会停止应用、删除 Pod、创建订单或更改业务表。通知会标记 `ObservabilitySmokeTest`。普通验证只发送公开 GET 和 sampled traceparent，并检查三个服务的 parent/span 关系及查询文本已移除。
+自测仅向 Collector 写一条明确标记的合成 gauge，让真实规则进入 firing，再将 gauge 清零，验证 Alertmanager 及已配置 Telegram 的触发/恢复投递计数。它不会停止应用、删除 Pod、创建订单或更改业务表。通知会标记 `ObservabilitySmokeTest`。普通验证只发送公开 GET 和 sampled traceparent，并检查三个服务的 parent/span 关系及查询文本已移除。公网登录保护验证使用以下独立命令（仅创建临时 Grafana 会话，不修改业务表）：
+
+```bash
+python3 scripts/observability/verify-public.py --kubeconfig .secrets/k3s-cloud/kubeconfig \
+  --report .secrets/observability/public-https-verification.json
+```
+
+该检查验证可信 TLS、HTTP 跳转、匿名面板/数据源/metrics 拒绝、错误登录、现有账号登录及安全 Cookie；结束时退出测试会话。
 
 ## 容量与保留
 
@@ -110,3 +115,10 @@ python3 scripts/observability/verify.py --kubeconfig .secrets/k3s-cloud/kubeconf
 组件均设置 CPU/内存 requests/limits。PVC 使用 Retain 的 local-path 存储，容量声明不是文件系统配额，也不会额外创建收费 EBS；数据占用现有根盘。日志/追踪的删除存在延迟，不能把保留时间当作严格磁盘上限。磁盘低于 20% 会报警。镜像层、K3s 日志及 PostgreSQL 也共享根盘，需要一起观察。
 
 该规模适合当前小流量部署。它不提供监控后端高可用、异地保存、独立于集群的外部告警、AWS CPU credit/账单指标或节点自动扩容。整个集群/控制平面故障时，栈内探测和通知也可能失效；后续若需要主机级独立故障通知，再单独接外部探测/CloudWatch。不要将当前指标快照替代正式负载或灾难恢复测试。
+
+
+## 域名与 Cloudflare 代理
+
+`sems-test.seventh720.com` 的过渡 Ingress 已退休，旧 Lightsail 代理已改为直连 K3s 公网 IP，并校验 `swe5001.seventh720.com` 的源站证书。Cloudflare 中 `sems-test` 的 A 记录可删除；Kubernetes 的 `sems-test` namespace 仍承载生产数据，必须保留。当前 CD 不再渲染 Ingress，正式入口和监控入口独立管理；历史 release 的旧 Ingress 仅保留回退兼容。此变更须合并到 main 后，后续发布才会持续采用新规则。
+
+DNS only 可以长期使用，HTTPS 由源站证书提供。需要 Cloudflare 代理或防护时，可在源站证书和登录验证通过后切为 Proxied，并使用 Full (strict) SSL/TLS；Grafana 的登录/API 不应配置整站缓存。保留现有 HTTP-01 证书校验路径的可达性，避免为该路径增加交互式挑战。切代理不会自动取消或取代 Grafana 登录。

@@ -40,7 +40,8 @@ def main():
         log_path = ROOT / '.secrets/observability/access.log'
         log_path.touch(mode=0o600, exist_ok=True)
         log = log_path.open('a')
-        print('Grafana: http://127.0.0.1:13000/d/sems-operations\n'
+        print('Public Grafana: https://grafana.seventh720.com/d/sems-operations\n'
+              'Local diagnostic HTTP proxy: http://127.0.0.1:13000\n'
               'Credentials: .secrets/observability/grafana-login.txt\n'
               'Keep this terminal open; Ctrl-C closes the console tunnel.', flush=True)
         while True:

@@ -2,9 +2,9 @@
 
 当前云端 Kubernetes 路线为两台 EC2、自建 K3s、Traefik 入口和集群内自建 PostgreSQL。当前路线不创建 EKS、RDS、NAT Gateway 或 ALB。应用仍通过独立 Deployment、Service、Secret 和数据库账号/schema 划分边界；EKS overlay 仅保留为另一种部署环境的参考模板。
 
-2026-10-24 完成独立测试环境验收，2026-10-25 已将正式入口 [swe5001.seventh720.com](https://swe5001.seventh720.com) 和原站数据迁到这里。当前应用为 PR #29 / `7a97828`，五个应用各两个副本、分别位于两节点；[main OIDC/SSM 自动发布](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288)已通过，原账号/订单/票券、JWT、正式 TLS 与 DNS 迁移见[切换记录](evidence/2026-10-25-k3s-cutover/README.md)。
+2026-10-24 完成独立测试环境验收，2026-10-25 已将正式入口 [swe5001.seventh720.com](https://swe5001.seventh720.com) 和原站数据迁到这里。原站迁移时应用为 PR #29 / `7a97828`，五个应用各两个副本、分别位于两节点；[main OIDC/SSM 自动发布](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288)已通过，原账号/订单/票券、JWT、正式 TLS 与 DNS 迁移见[切换记录](evidence/2026-10-25-k3s-cutover/README.md)。
 
-namespace `sems-test` 和 GitHub environment `k3s-test` 保留历史名称；namespace 已标记 `sems.seventh720.com/environment=production`。`sems-test.seventh720.com` 是同一数据的过渡别名，不能再当成可破坏的测试环境。夹具/故障脚本会拒绝该生产标记。
+namespace `sems-test` 和 GitHub environment `k3s-test` 保留历史名称；namespace 已标记 `sems.seventh720.com/environment=production`。`sems-test.seventh720.com` 的过渡域名入口已退休，旧代理已直连正式入口；Cloudflare 中该 A 记录可删除。这不代表可以删除同名 namespace、数据库或 PVC。夹具/故障脚本会拒绝该生产标记。
 
 
 ## 节点与网络

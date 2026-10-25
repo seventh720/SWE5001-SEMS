@@ -1,8 +1,10 @@
 # 发布状态与已知限制
 
-文档整理：2026-10-25（新加坡时间）。正式域名 `swe5001.seventh720.com` 已切到 EC2 K3s，应用为 PR #29 / `7a97828`，main GitHub OIDC/SSM 自动发布通过。原站 27 张表及原 JWT 密钥已迁入，原账号、订单和票券保留；五个应用各 2 副本、跨两节点。旧 SEMS 后端停写，旧 IP 仅临时代理到新环境，共享 Caddy 和 SWE5006 保留。容量尚未在该部署上重新测量。
+文档整理：2026-10-25（新加坡时间）。正式域名 `swe5001.seventh720.com` 已切到 EC2 K3s，原站切换时应用为 PR #29 / `7a97828`，main GitHub OIDC/SSM 自动发布通过。原站 27 张表及原 JWT 密钥已迁入，原账号、订单和票券保留；五个应用各 2 副本、跨两节点。旧 SEMS 后端停写，旧 IP 仅临时代理到新环境，共享 Caddy 和 SWE5006 保留。容量尚未在该部署上重新测量。
 
 ## 最近发布
+
+[PR #31](https://github.com/seventh720/SWE5001-SEMS/pull/31) 的监控、集中日志、Telegram 告警和跨服务追踪已在现场接入，后续固定 HTTPS 入口为 <https://grafana.seventh720.com>，保留账号登录。过渡 sems-test 域名入口已退休，生产 namespace 保留。实现、公开登录验证及别名清理见[可观测性记录](evidence/2026-10-25-observability/README.md)；PR 尚待合并，后续 CD 的采集及入口规则随合并生效。
 
 PR #29 已合并为 `7a97828`，[main CI 与 K3s CD](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288)全部成功。现场五个应用各 2/2、分居两节点，镜像与发布报告一致，数据库 Pod/PVC 与既有测试数据保持；[首次自动发布证据](evidence/2026-10-25-k3s-cd/README.md#首次-main-自动发布)已记录。正式域名随后已完成[数据、证书和 DNS 切换](evidence/2026-10-25-k3s-cutover/README.md)，不再由旧应用处理业务。
 
@@ -26,6 +28,7 @@ PR #28 的文档整理已合并，提交 `52df21f`；[main CI 与当时的 Light
 | 通知与治理 | 业务通知、成员关系更新、邀请、组织变更与关闭流程 | [站内通知](in-app-notifications.md)、[组织升级](organization-upgrade.md) |
 | 会话与密码 | JWT 有效期 1 小时；新密码为 8–16 位可打印 ASCII，拒绝空格，已有密码登录兼容 | [安全说明](security.md) |
 | 数据与服务边界 | 三个 Spring Boot 进程，独立 schema、账号和迁移，认证 HTTP 协作 | [架构决策](adr/0001-service-boundaries.md) |
+| 运维可观测性 | Grafana HTTPS 登录、节点/Pod/JVM/HTTP/数据库指标、集中日志、Telegram 触发/恢复及跨服务追踪 | [可观测性指南](observability.md) |
 | CI/CD | lint、单元/组件、真实数据库/API、安全与镜像扫描、GHCR digest 发布和 main-only 部署 | [CI 操作](ci.md)、[云端环境](k3s.md) |
 
 ## 已完成验证
@@ -40,17 +43,17 @@ PR #28 的文档整理已合并，提交 `52df21f`；[main CI 与当时的 Light
 
 2026-10-24 在独立 kind 创建的 Kubernetes 1.36.4 单节点集群中完成关键业务验收，记录见[本地 Kubernetes 验收](evidence/2026-10-24-kubernetes-local/README.md)。两个 Admission Pod 处理 100 个不同请求竞争 10 个名额，结果为 10 次成功、90 次库存冲突，数据库库存/确认数量/有效票数均为 10；同键重放、并发核销、个人及整场取消、schema 隔离也通过。本次 Java 21 构建的 84 项后端测试与前端构建通过。
 
-新增[配置及运行指南](kubernetes.md)，包含独立本地凭据/数据库和 EKS 模板。当前两个 Admission Pod 共用一个本地节点；首次数据库就绪前每个后端重启一次，随后就绪。该验证不代表 EKS 已部署，也不代表云端吞吐、跨节点恢复或独立扩容收益已经测得。线上仍使用既有 Lightsail 流程。
+新增[配置及运行指南](kubernetes.md)，包含独立本地凭据/数据库和 EKS 模板。当前两个 Admission Pod 共用一个本地节点；首次数据库就绪前每个后端重启一次，随后就绪。该验证不代表 EKS 已部署，也不代表云端吞吐、跨节点恢复或独立扩容收益已经测得。上述本地验证发生于正式迁移前；线上现已使用 EC2 K3s 流程。
 
 ## EC2 K3s 基础设施
 
 2026-10-24 在两台新加坡 `ap-southeast-1a` 的 t3.medium / 30 GiB gp3 / Ubuntu 24.04 实例上安装固定版本 `v1.36.5+k3s1`。server 和 worker 均为 Ready，运行 containerd；控制平面由 server 的 K3s 进程承载。管理 API 通过 SSH 隧道访问，节点间走私网。
 
-[基础设施验收](evidence/2026-10-24-k3s-bootstrap/README.md)通过：server 节点 Pod 的 DNS 查询、经 ClusterIP Service 访问 worker 节点 Pod、两个 EC2 公网 HTTP 入口，以及两个节点的指标读取。临时测试 namespace 已删除。新增 [K3s 部署说明](k3s.md)、节点安装配置和 Traefik/自建 PostgreSQL 应用 overlay；此为初始化阶段记录，当前应用镜像和测试域名已配置。
+[基础设施验收](evidence/2026-10-24-k3s-bootstrap/README.md)通过：server 节点 Pod 的 DNS 查询、经 ClusterIP Service 访问 worker 节点 Pod、两个 EC2 公网 HTTP 入口，以及两个节点的指标读取。临时测试 namespace 已删除。新增 [K3s 部署说明](k3s.md)、节点安装配置和 Traefik/自建 PostgreSQL 应用 overlay；此为初始化阶段记录，正式应用和域名现已接入该集群，过渡测试域名入口已退休。
 
-当前采用自建 K3s 与 PostgreSQL 路线，减少 EKS、RDS、NAT Gateway 和 ALB 的固定费用。业务应用和可信 HTTPS 已部署到 `https://sems-test.seventh720.com`，五个应用各两个副本，分布到两台 EC2。正式域名及原 Lightsail 数据尚未迁移，现有 Lightsail 应用未切换。单控制平面、单可用区、单数据库实例和单副本 Traefik 的限制仍在。
+当前采用自建 K3s 与 PostgreSQL 路线，减少 EKS、RDS、NAT Gateway 和 ALB 的固定费用。业务应用和可信 HTTPS 现使用 `https://swe5001.seventh720.com`，五个应用各两个副本，分布到两台 EC2。原 Lightsail 数据和 JWT 已迁移，旧 API 停写；过渡代理已直连正式入口，不再依赖已退休的测试域名。单控制平面、单可用区、单数据库实例和单副本 Traefik 的限制仍在。
 
-此前仅为 RDS 准备过网络对象，随后选择自建 PostgreSQL，已清理这些闲置 DB 子网、路由表、DB subnet group 和数据库安全组；未创建 RDS 实例。PostgreSQL 17 StatefulSet 已在 worker 启动，使用现有 EBS 上的 Retain PVC，三个角色/schema 独立，所有 TCP 连接要求 SCRAM 密码认证，5432 通过集群内 Service 和 NetworkPolicy 限制。数据库独立于原 Lightsail 数据，尚未迁移已有用户。
+此前仅为 RDS 准备过网络对象，随后选择自建 PostgreSQL，已清理这些闲置 DB 子网、路由表、DB subnet group 和数据库安全组；未创建 RDS 实例。PostgreSQL 17 StatefulSet 已在 worker 启动，使用现有 EBS 上的 Retain PVC，三个角色/schema 独立，所有 TCP 连接要求 SCRAM 密码认证，5432 通过集群内 Service 和 NetworkPolicy 限制。数据库初始化时独立于原 Lightsail；2026-10-25 已完成原账号及业务数据迁移。
 
 [自建数据库验收](evidence/2026-10-24-k3s-postgres/README.md)五组通过：真实角色认证与权限、跨节点网络策略、Pod 重建数据保留、异机逻辑备份与临时库数据恢复。保留首次 loopback trust 问题和一次测试错误分类的原始记录；已修正并复验。完整 K3s overlay 的 21 个对象 server-side dry run 通过。此恢复检查不包含凭据/ACL 重建、节点级故障切换或生产恢复时间；初始化阶段备份为手动执行；当前 CD 已在每次发布前导出数据库，定期异地备份仍待配置。
 

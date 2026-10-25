@@ -7,7 +7,6 @@ components:
 resources:
   - ../../base
   - postgres
-  - ingress.yaml
 images:
   - name: sems-platform-identity
     newName: ghcr.io/seventh720/swe5001-sems/identity

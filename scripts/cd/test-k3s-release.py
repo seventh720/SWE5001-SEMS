@@ -44,6 +44,15 @@ class K3sReleaseTest(unittest.TestCase):
         names = {r['metadata']['name'] for r in resources if r['kind'] == 'ConfigMap'}
         self.assertIn(gateway['spec']['template']['spec']['volumes'][0]['configMap']['name'], names)
 
+    def test_new_releases_leave_ingress_independent_and_accept_legacy_records(self):
+        legacy = {'apiVersion': 'networking.k8s.io/v1', 'kind': 'Ingress',
+                  'metadata': {'name': 'sems', 'namespace': 'sems-test'},
+                  'spec': {'rules': [{'host': 'sems-test.seventh720.com'}]}}
+        release = render(self.lock, self.commit, self.release_id, [*self.documents, legacy])
+        self.assertFalse(any(r['kind'] == 'Ingress' for r in release['resources']))
+        release['resources'].append(legacy)
+        self.assertEqual(validate_release(release)['operation'], 'deploy')
+
     def test_two_node_rollout_keeps_hard_per_service_placement(self):
         for resource in self.release()['resources']:
             if resource['kind'] != 'Deployment': continue

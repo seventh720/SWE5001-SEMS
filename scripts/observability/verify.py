@@ -188,7 +188,12 @@ def main():
                     edges.add((parent[0], service))
             assert {('admission', 'event-catalog'), ('event-catalog', 'identity')} <= edges
             passed('real read-only Admission → Catalog → Identity trace', traceId=trace_id, spanCount=len(spans), crossServiceEdges=sorted(edges), queryTextRemoved=True)
-            logs = wait_for(lambda: proxy('loki', '/loki/api/v1/label/service_name/values')['data'], 'centralized logs')
+            # Loki's default label lookback can omit quiet Java services after startup.
+            # Inspect retained logs rather than requiring every service to emit hourly.
+            log_window = urllib.parse.urlencode({'start': str(time.time_ns() - 48 * 3600 * 10**9),
+                                                'end': str(time.time_ns())})
+            logs = wait_for(lambda: proxy('loki', '/loki/api/v1/label/service_name/values?' + log_window)['data'],
+                            'centralized logs within configured retention')
             assert backend_names <= set(logs)
             passed('centralized application logs', services=logs)
             # Ensure every dashboard PromQL expression is syntactically executable. Empty low-traffic rates are valid.

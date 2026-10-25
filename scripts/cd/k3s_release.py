@@ -18,6 +18,7 @@ def allowed(resource):
     name = resource.get('metadata', {}).get('name', '')
     return ((kind == 'Deployment' and name in APPLICATIONS) or
             (kind == 'Service' and name in (*APPLICATIONS, 'event-catalog-pods')) or
+            # Retain old release/rollback compatibility; new renders exclude Ingresses.
             (kind == 'Ingress' and name == 'sems') or
             (kind == 'ConfigMap' and (name in ('sems-runtime', 'sems-database') or
                                      re.fullmatch(r'gateway-config-[a-z0-9]+', name))))
@@ -80,7 +81,7 @@ def render(lock, commit, release_id, documents):
     images = {name: lock['services'][name]['image'] for name in APPLICATIONS}
     resources = []
     for document in documents:
-        if not document or not allowed(document):
+        if not document or not allowed(document) or document['kind'] == 'Ingress':
             continue
         resource = copy.deepcopy(document)
         if resource['kind'] == 'Deployment':

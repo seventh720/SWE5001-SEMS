@@ -19,3 +19,15 @@
 资源快照只反映当前小流量和验证过程，不能作为容量成绩。监控后端是单实例、同集群本地磁盘，根盘与业务共享；日志/追踪保留期不是严格磁盘配额。整体主机或控制平面故障可能同时影响监控和通知。未新增 HPA/节点自动扩容、外部独立探测或数据库高可用。
 
 Telegram Token、Chat ID、Grafana 密码、数据库监控密码、Deployment 原模板和访问日志保存在忽略的私有目录或 Kubernetes Secret，不进入本记录。
+
+## 固定 HTTPS 与过渡域名退休
+
+用户配置 DNS 后，已启用 <https://grafana.seventh720.com>，复用现有 Traefik/Let's Encrypt 和 Grafana 账号。仅 Traefik 可从 kube-system 进入 Grafana，其他监控后端保持 ClusterIP。Grafana 自身 metrics 端点也要求认证。
+
+[公网验证](public-https-verification.json)通过：可信 TLS、HTTP → HTTPS、匿名面板/数据源/metrics 拦截、错误登录拒绝、现有账号登录、Secure/HttpOnly/SameSite 会话和已登录实时数据。未公开登录凭据或会话值。
+
+旧 Lightsail 过渡代理已改为直连 K3s IP，使用正式域名校验 TLS 证书与 Host，不再依赖 `sems-test.seventh720.com`。Caddy 配置备份、验证、reload 及共享项目配置/容器未变化见[代理记录](alias-proxy-verification.json)；旧 IP 过渡请求、正式站点和 SWE5006 均返回 200。
+
+仅删除过渡 Ingress `sems-test/sems`，保留正式 `sems-public`、生产 namespace、PostgreSQL Pod 和 PVC；Cloudflare 的 `sems-test` A 记录可由维护者删除。新 CD render 排除 Ingress，11 项 release 测试通过，并继续接受历史 release 的旧 Ingress 记录用于回退兼容。PR 合并后新规则才成为后续 main 发布的默认行为。
+
+固定域名及过渡别名退休后的[内部只读复核](after-public-verification.json)也已通过。日志 label 验收显式查询 48 小时保留期，避免 Loki 默认一小时回看窗口将安静服务的已有日志漏掉；不要求服务为验证额外输出业务日志。
