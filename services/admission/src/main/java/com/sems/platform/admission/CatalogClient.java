@@ -12,7 +12,7 @@ public class CatalogClient {
     public Map<UUID,EventDetails> details(List<UUID> ids) {
         if (ids.isEmpty()) return Map.of();
         try {
-            var rows=Objects.requireNonNull(client.post().uri("/internal/v1/events/details").body(Map.of("ids",ids.stream().distinct().toList())).retrieve().body(EventDetails[].class));
+            var rows=read(() -> Objects.requireNonNull(client.post().uri("/internal/v1/events/details").body(Map.of("ids",ids.stream().distinct().toList())).retrieve().body(EventDetails[].class)));
             return Arrays.stream(rows).collect(java.util.stream.Collectors.toMap(EventDetails::id,java.util.function.Function.identity()));
         } catch(RestClientException e) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"Current event details unavailable; retry later");
@@ -21,15 +21,24 @@ public class CatalogClient {
     private final RestClient client;
     public CatalogClient(RestClient client) { this.client=client; }
     public Snapshot owned(UUID event, UUID owner) {
-        return request(() -> client.get().uri("/internal/v1/events/{id}?owner={owner}",event,owner).retrieve().body(Snapshot.class));
+        return request(() -> read(() -> client.get().uri("/internal/v1/events/{id}?owner={owner}",event,owner).retrieve().body(Snapshot.class)));
     }
     public Snapshot prepare(UUID event, UUID owner, long version) {
         return request(() -> client.post().uri("/internal/v1/events/{id}/prepare-sales",event)
                 .body(Map.of("owner",owner,"version",version)).retrieve().body(Snapshot.class));
     }
-    public Snapshot member(UUID event,UUID user) {return request(()->client.get().uri("/internal/v1/events/{id}/member?user={user}",event,user).retrieve().body(Snapshot.class));}
+    public Snapshot member(UUID event,UUID user) {return request(()->read(()->client.get().uri("/internal/v1/events/{id}/member?user={user}",event,user).retrieve().body(Snapshot.class)));}
     public Snapshot published(UUID event,UUID user) {
-        return request(() -> client.get().uri(b->b.path("/internal/v1/events/{id}/published").queryParamIfPresent("user",Optional.ofNullable(user)).build(event)).retrieve().body(Snapshot.class));
+        return request(() -> read(() -> client.get().uri(b->b.path("/internal/v1/events/{id}/published").queryParamIfPresent("user",Optional.ofNullable(user)).build(event)).retrieve().body(Snapshot.class)));
+    }
+    private <T> T read(java.util.function.Supplier<T> call) {
+        try { return call.get(); }
+        catch (RestClientResponseException e) {
+            // A DNS pool update can leave one request on a retired replica.
+            // Repeat one read on transient gateway errors, within the existing timeouts.
+            if (!Set.of(502,503,504).contains(e.getStatusCode().value())) throw e;
+            return call.get();
+        }
     }
     private Snapshot request(java.util.function.Supplier<Snapshot> call) {
         try { return Objects.requireNonNull(call.get()); }
