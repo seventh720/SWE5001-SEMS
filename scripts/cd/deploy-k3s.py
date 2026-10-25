@@ -38,7 +38,7 @@ def save(path, data):
 def command(*args, input=None, timeout=240):
     result = subprocess.run(K + list(args), input=input, capture_output=True, text=True, timeout=timeout)
     if result.returncode:
-        raise RuntimeError('kubectl ' + ' '.join(args[:2]) + ': ' + result.stderr.strip())
+        raise RuntimeError('kubectl ' + ' '.join(args[:3]) + ': ' + result.stderr.strip())
     return result.stdout
 
 
@@ -94,7 +94,11 @@ def apply(resources):
     for name in APPLICATIONS:
         resource = next(r for r in resources if r['kind'] == 'Deployment' and r['metadata']['name'] == name)
         command('apply', '-f', '-', input=json.dumps(resource))
-        command('rollout', 'status', 'deployment/' + name, '--timeout=180s')
+        # Two hard-separated replicas are replaced serially. Cold pulls and the
+        # Java agent run before readiness on BOTH nodes; 180s can expire while
+        # a healthy second replica is still starting. Keep the host subprocess
+        # timeout outside kubectl's wait budget so its diagnostic is retained.
+        command('rollout', 'status', 'deployment/' + name, '--timeout=600s', timeout=630)
         print('Ready: ' + name, flush=True)
 
 

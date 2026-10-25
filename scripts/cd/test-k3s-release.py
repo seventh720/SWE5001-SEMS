@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import yaml
 from k3s_release import APPLICATIONS, REGISTRY, render, validate_release
@@ -82,6 +83,54 @@ class K3sReleaseTest(unittest.TestCase):
             env = {e['name']: e.get('value') for e in pod['containers'][0]['env']}
             self.assertIn('-javaagent:/otel/javaagent.jar', env['JAVA_TOOL_OPTIONS'])
             self.assertEqual(env['OTEL_EXPORTER_OTLP_ENDPOINT'], 'http://otel-collector.observability.svc.cluster.local:4318')
+
+    def test_slow_healthy_two_replica_rollout_finishes_before_next_application(self):
+        spec = importlib.util.spec_from_file_location('k3s_slow_rollout', Path(__file__).with_name('deploy-k3s.py'))
+        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+        applied, ready = [], []
+
+        def fake_kubectl(arguments, **kwargs):
+            args = arguments[len(module.K):]
+            if args[:2] == ['apply', '-f']:
+                resource = json.loads(kwargs['input'])
+                if resource['kind'] == 'Deployment':
+                    self.assertEqual(applied, ready, 'Previous service must be Ready before the next apply')
+                    applied.append(resource['metadata']['name'])
+            elif args[:2] == ['rollout', 'status']:
+                # Virtual 225s: cold pull + two serial Java/agent startups.
+                # This reproduces the old failure without a wall-clock sleep.
+                seconds = int(args[-1].removeprefix('--timeout=').removesuffix('s'))
+                if kwargs['timeout'] < 225:
+                    raise subprocess.TimeoutExpired(arguments, kwargs['timeout'])
+                if seconds < 225:
+                    return subprocess.CompletedProcess(arguments, 1, '', 'timed out waiting for the condition')
+                self.assertGreater(kwargs['timeout'], seconds)
+                ready.append(args[2].removeprefix('deployment/'))
+            return subprocess.CompletedProcess(arguments, 0, '', '')
+
+        with patch.object(module.subprocess, 'run', side_effect=fake_kubectl):
+            module.apply(self.release()['resources'])
+        self.assertEqual(ready, list(APPLICATIONS))
+
+    def test_failed_rollout_names_service_and_stops_following_updates(self):
+        spec = importlib.util.spec_from_file_location('k3s_failed_rollout', Path(__file__).with_name('deploy-k3s.py'))
+        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+        applied = []
+
+        def fake_kubectl(arguments, **kwargs):
+            args = arguments[len(module.K):]
+            if args[:2] == ['apply', '-f']:
+                resource = json.loads(kwargs['input'])
+                if resource['kind'] == 'Deployment':
+                    applied.append(resource['metadata']['name'])
+            if args[:2] == ['rollout', 'status']:
+                return subprocess.CompletedProcess(arguments, 1, '', 'progress deadline exceeded')
+            return subprocess.CompletedProcess(arguments, 0, '', '')
+
+        with patch.object(module.subprocess, 'run', side_effect=fake_kubectl):
+            with self.assertRaisesRegex(RuntimeError, 'deployment/identity: progress deadline exceeded'):
+                module.apply(self.release()['resources'])
+        self.assertEqual(applied, ['identity'])
 
     def test_rollback_selects_verified_predecessor_not_partial_live_snapshot(self):
         spec = importlib.util.spec_from_file_location('k3s_rollback', Path(__file__).with_name('deploy-k3s.py'))

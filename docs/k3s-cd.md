@@ -8,11 +8,13 @@
 2. runner 通过 GitHub OIDC 获取短期 AWS 身份，经 SSM Run Command 在已有 K3s server 执行发布；不向 runner 提供 kubeconfig、SSH 私钥或数据库密码。
 3. 校验源提交、image lock、五个应用 digest、`sems-prod` 和资源允许列表；保存现场应用快照及此前已验证指针，执行 server-side dry run。
 4. 导出 PostgreSQL custom-format dump 和不含密码的角色定义，记录大小与 SHA256。
-5. 依次滚动 Identity、Catalog、Admission、Web、Gateway，等待各服务完成。
+5. 依次滚动 Identity、Catalog、Admission、Web、Gateway；每个服务最多等待 600 秒，包含两个副本依次拉取镜像、运行 Java Agent 和启动就绪的时间。
 6. 核对镜像、两个就绪副本及跨节点分布，验证 HTTPS、健康接口、管理员登录/JWT、内部 API 404，并确认数据库 Pod/PVC UID 未改变。
 7. 全部通过后更新 `/var/lib/sems-cd/current.json`；报告上传 `k3s-deployment` artifact。
 
 同服务 Pod 使用 hostname 硬反亲和，滚动策略为 `maxSurge: 0`、`maxUnavailable: 1`。两节点都需可调度；该策略逐副本替换，不增加临时第三个副本。它不提供节点自动扩容、数据库 HA 或入口故障切换。
+
+主机的 kubectl 子进程上限为 630 秒，整次 SSM 执行上限仍为 1,200 秒。等待超时会保留失败结果，不放宽应用 startup/readiness 探针，也不自动推进成功指针。SSM 失败的 stderr 会显示在 Actions 日志中，详细调用结果仍保存在 artifact。
 
 ## 管理边界
 

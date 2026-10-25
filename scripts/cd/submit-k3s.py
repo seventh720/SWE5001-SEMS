@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tarfile
 import tempfile
 import time
@@ -88,6 +89,7 @@ def main():
         args.report.write_text(json.dumps(report, indent=2) + '\n')
         print(result.get('StandardOutputContent', ''), flush=True)
         if result['Status'] != 'Success' or result['ResponseCode'] != 0:
+            print(result.get('StandardErrorContent', ''), file=sys.stderr, flush=True)
             raise RuntimeError('SSM deployment failed: ' + result['Status'] + '; see report')
         return
     raise TimeoutError('SSM deployment exceeded its execution window; inspect command before retrying')
