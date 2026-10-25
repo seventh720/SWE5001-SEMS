@@ -2,21 +2,31 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-SEMS is a shared event and ticketing platform built with React/TypeScript, three Spring Boot services and PostgreSQL.
+SEMS brings organization membership, event information, registration requirements, bookings, tickets and attendance into one shared platform. Organizers manage the event lifecycle, attendees keep their bookings and QR tickets, and assigned staff check attendance using the same current information.
 
-Implemented: organization-scoped permissions, event publication/editing/pause/cancellation, free bookings, individual QR tickets, assigned-staff check-in, saved registrations, in-app notifications and an organization-admin overview. Event and member management support server-side search, combined filters and pagination. Ended events cannot be edited or reopened.
-
-See [release status](docs/progress.md) for the latest recorded release and known limitations, [business rules](docs/functional-guide.md) for permissions and metric definitions, and [test coverage](docs/test-coverage.md) for verification limits. JWTs last one hour. Check-in opens 15 minutes before the event starts and closes 15 minutes after it starts (exclusive), or at the event end if earlier.
+- **Application:** [swe5001.seventh720.com](https://swe5001.seventh720.com)
+- **Operations:** [Grafana](https://grafana.seventh720.com/d/sems-operations), with account login required.
+- **Documentation:** [index](docs/README.md), [business rules](docs/functional-guide.md), [platform status](docs/progress.md).
 
 ## 1. Architecture and permissions
 
-Identity owns accounts, organizations, memberships and invitations. Event Catalog owns events, visibility, publication and revisions. Admission owns inventory, bookings, tickets, check-in and notifications. Each service has separate schemas, credentials and migrations; cross-service operations use authenticated HTTP.
+The frontend uses React/TypeScript. Three independently deployed Spring Boot services own their APIs, database credentials and Flyway migrations:
 
-Platform ADMIN manages platform accounts and organization provisioning. Organization ORG_ADMIN, ORGANIZER and MEMBER roles govern business access; check-in also requires event assignment. Legacy global ORGANIZER/STAFF claims do not grant business access. Existing installations must follow the [organization upgrade](docs/organization-upgrade.md) and [notification deployment](docs/in-app-notifications.md) instructions.
+| Service | Responsibility | PostgreSQL schema |
+| --- | --- | --- |
+| Identity | Accounts, organizations, memberships, invitations and governance | `identity` |
+| Event Catalog | Events, visibility, publication and revisions | `catalog` |
+| Admission | Inventory, bookings, tickets, staff assignments, check-in and notifications | `admission` |
+
+Services use authenticated HTTP across boundaries. A shared PostgreSQL instance provides separate schemas and service accounts; application code does not query another service's schema. Database locks, unique request keys and durable operation receipts protect inventory and cross-service recovery. See the [architecture decisions](docs/adr/0001-service-boundaries.md).
+
+Production runs on two AWS EC2 nodes with K3s/containerd. Identity, Catalog, Admission, Web and Gateway each have two replicas in `sems-prod`; PostgreSQL uses a retained local volume. Prometheus, Grafana, Loki, Tempo and Telegram alerts run in `observability`. Deployment topology and operating limits are in the [K3s guide](docs/k3s.md).
+
+Platform ADMIN provisions organizations and manages platform accounts. Organization roles `ORG_ADMIN`, `ORGANIZER` and `MEMBER` govern business access; check-in additionally requires an event assignment. Features include public/member-only events, versioned editing, pause/resume/cancellation, free bookings, individual QR tickets, saved registrations, notifications and organization summaries. [Business rules](docs/functional-guide.md) define permissions and lifecycle details.
 
 ## 2. Local setup
 
-Requires Java 21, Maven 3.9+, Node.js 22, npm, OpenSSL, Python 3 and Docker Compose v2. Check `mvn -version` uses Java 21; a newer compiler with `--release 21` is not equivalent to the CI compiler.
+Requires Java 21, Maven 3.9+, Node.js 22, npm, OpenSSL, Python 3 and Docker Compose v2 or later. Start Docker and check that `mvn -version` actually uses Java 21.
 
 ```bash
 git clone git@github.com:seventh720/SWE5001-SEMS.git
@@ -24,34 +34,22 @@ cd SWE5001-SEMS
 bash scripts/setup-local.sh
 mvn verify
 npm --prefix apps/web ci
-npm --prefix apps/web test
 npm --prefix apps/web run build
 docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.dev.yaml up --build -d
 bash scripts/smoke.sh
 ```
 
-Open [the local platform](http://localhost:18080). Setup generates `.env` and `.secrets/` without overwriting existing credentials. Re-running it on an existing setup appends missing internal service tokens; it does not rotate database passwords or RSA keys. The initial admin email is `admin@example.com`; read its random `SEMS_BOOTSTRAP_ADMIN_PASSWORD` from your local `.env`. Do not commit or share that file. Clear bootstrap settings after initialization; the persisted admin can still log in.
+Open [localhost:18080](http://localhost:18080). Setup creates private `.env` and `.secrets/` files. The bootstrap administrator defaults to `admin@example.com`; read its generated password from your own `.env`. Do not commit credentials. Existing database passwords and RSA keys are retained when setup is repeated; changing an environment value does not change an initialized database password.
 
-Database credentials are applied only when a new volume is initialized. Editing `.env` does not rotate existing database passwords. Stop while preserving data:
+For frontend hot reload, run `npm --prefix apps/web run dev` and open port **15173**; API requests use the gateway on **18080**. The development override exposes PostgreSQL only on `127.0.0.1:15432`. Backend ports remain internal. See the [development guide](docs/development.md) for rebuilds, Navicat and migrations.
+
+Stop the local stack while retaining its database:
 
 ```bash
 docker compose --env-file .env -f deployment/compose.yaml -f deployment/compose.dev.yaml down
 ```
 
-For frontend development, run `npm --prefix apps/web run dev`; port 15173 proxies APIs to the gateway on 18080. The production frontend is served at the gateway root. Date inputs use the application’s English calendar/time controls in Singapore time (UTC+08:00) and submit UTC timestamps. The local development override exposes PostgreSQL only at `127.0.0.1:15432`; the base Compose file used by CI does not publish a database port.
-
-This is the local HTTP configuration. [swe5001.seventh720.com](https://swe5001.seventh720.com) now runs on the [EC2 K3s environment](docs/k3s.md), with the original accounts and data migrated. [K3s delivery](docs/k3s-cd.md) describes main-only releases; the [cutover record](docs/evidence/2026-10-25-k3s-cutover/README.md) covers data/TLS/DNS checks. The [Lightsail guide](docs/cloud-staging.md) is retained for historical reference. Runtime credentials use restricted host files and Kubernetes Secrets.
-
-## 3. Acceptance walkthrough
-
-1. Register administrator, organizer, member and attendee accounts; have the platform administrator provision two organizations and their initial organization administrators.
-2. Invite members and accept through Notifications. Create seminar and workshop events, configure free ticket types and publish.
-3. Browse, book and view QR/manual ticket codes. Verify that other attendees and other organizations cannot access private management data.
-4. Assign event staff, check in a ticket twice and confirm attendance increases only once. Verify denial for unassigned staff.
-5. Cancel another unstarted booking with no check-ins and confirm inventory is released once. Verify pause/resume and another organization joining through configuration.
-6. Check organization-admin totals, combine event and member filters, and open event details across pages. Verify regular organizers cannot access the organization overview and ended events cannot be rescheduled to reopen.
-
-## 4. Tests and CI
+## 3. Tests and delivery
 
 ```bash
 mvn verify
@@ -60,22 +58,16 @@ npm --prefix apps/web run test:coverage
 npm --prefix apps/web run build
 ```
 
-Database/API acceptance requires an isolated test environment; some scripts stop/restart services and inject failures. See [CI operations](docs/ci.md) for Compose checks and [K3s operations](docs/k3s.md) for Kubernetes adapters. Historical evidence is retained in [docs/evidence](docs/evidence/).
+[CI](docs/ci.md) checks lint, backend/frontend tests, real API/database acceptance, source security and exact runtime images. Fault-injection and fixture suites require a disposable environment. [Test coverage](docs/test-coverage.md) explains what each check establishes; [test evidence](docs/evidence/README.md) retains measured results and failures.
 
-## 5. Layout and documentation
+Successful eligible `main` runs publish immutable GHCR digests and deploy to K3s through GitHub OIDC and AWS SSM. PR checks do not deploy production. [Delivery and rollback](docs/k3s-cd.md) describes the release boundary. GitHub Releases can record tagged versions and link to the application; the running website is hosted on AWS.
 
-- `services/` — backend services, migrations and tests.
-- `apps/web/` — frontend and UI tests.
-- `contracts/` — [OpenAPI contracts](contracts/README.md).
-- `deployment/` — Compose, Kubernetes overlays, gateway and database setup.
-- `scripts/` — setup and reusable acceptance checks.
-- [Documentation index](docs/README.md)
-- [Development and database guide](docs/development.md)
-- [Kubernetes setup and cloud templates](docs/kubernetes.md)
-- [EC2 K3s environment](docs/k3s.md)
-- [Monitoring, alerts and distributed tracing](docs/observability.md)
-- [Contributing](CONTRIBUTING.md)
-- [Technical roadmap](docs/roadmap.md)
-- [Business rules](docs/functional-guide.md)
-- [Architecture decisions](docs/adr/0001-service-boundaries.md)
-- [Acceptance matrix](docs/acceptance-matrix.md)
+## 4. Documentation and layout
+
+- [Business rules](docs/functional-guide.md) · [API contracts](contracts/README.md)
+- [Development](docs/development.md) · [Contributing](CONTRIBUTING.md) · [Local Kubernetes](docs/kubernetes.md)
+- [Production deployment](docs/k3s.md) · [CI/CD](docs/k3s-cd.md) · [Observability](docs/observability.md)
+- [Security](docs/security.md) · [Acceptance matrix](docs/acceptance-matrix.md) · [Performance experiments](docs/performance-and-availability.md)
+- [Platform status](docs/progress.md) · [Roadmap](docs/roadmap.md) · [All documentation](docs/README.md)
+
+`services/` contains the three backends; `apps/web/` the frontend; `contracts/` the APIs; `deployment/` runtime configuration; `scripts/` setup, delivery and acceptance tools.

@@ -1,63 +1,58 @@
-# CI operations
+# CI 流水线
 
-The workflow runs on main pushes, PRs targeting main and manual dispatch. PR #29 switched delivery to the independent EC2 K3s test environment. The latest published image set is `7a97828`; [main run 40126181288](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288) passed all six quality gates, GitHub OIDC authentication and the SSM/K3s deployment. The formal domain and original data have since been [migrated to K3s](evidence/2026-10-25-k3s-cutover/README.md); the old API writers are stopped and its shared proxy remains as a temporary bridge. The six quality checks are:
+配置入口为 [.github/workflows/ci.yml](../.github/workflows/ci.yml)。流水线运行于 `main` push、目标为 `main` 的 PR 和手动触发；运行结果与产物见 [GitHub Actions](https://github.com/seventh720/SWE5001-SEMS/actions/workflows/ci.yml)。
 
-| Check | Work and evidence |
-|---|---|
-| Lint | ESLint, Checkstyle, actionlint and shell syntax; lint-report artifact |
-| Backend · Unit Tests & Build | Java 21, Maven clean verify, all service unit tests, JaCoCo line/branch reports, JAR artifacts |
-| Frontend · Tests & Build | Node 22, npm ci, Vitest V8 coverage, TypeScript and Vite build, web-dist artifact |
-| Backend · Integration Tests | Downloads tested artifacts, runs real API/database regression with two Admission replicas, then a tiny k6 smoke and inventory audit |
-| Security · SAST, Dependencies & Secrets | Strict Semgrep Java/TypeScript rules; Trivy secrets, npm lockfile and packaged Java dependency checks |
-| Images · Scan, Smoke Test & Publish | Build/scan all runtime images, then run readiness and API/load smoke against those exact tags without rebuilding; only main pushes to GHCR and uploads a digest-only Compose overlay |
+## 六项检查
 
-Backend and frontend run concurrently. Integration and source security depend on both; image scanning/publication depends on lint and all four. Deployment requires all checks. Configure all six named checks in branch protection; this change does not modify repository settings.
+| 检查 | 内容 |
+| --- | --- |
+| Lint | ESLint、Checkstyle、actionlint 和 Shell 语法，保存 lint-report |
+| Backend · Unit Tests & Build | Java 21、Maven clean verify、JaCoCo、三个服务的 JAR |
+| Frontend · Tests & Build | Node 22、Vitest V8、TypeScript 和 Vite 构建 |
+| Backend · Integration Tests | 部署配置检查、真实 API/PostgreSQL 回归、两个 Admission 副本、短时 k6 smoke 与库存审计 |
+| Security · SAST, Dependencies & Secrets | 源码规则、secrets、npm 锁文件和实际 JAR 依赖扫描 |
+| Images · Scan, Smoke Test & Publish | 构建和扫描运行镜像，再用同一批镜像执行启动/API smoke；仅 main 发布 GHCR digest |
 
-Reports and diagnostics are retained for seven days, including failed runs. Missing coverage is shown as N/A, never 100%. Backend coverage is unit-test coverage, reported per service and as a weighted total only when all reports exist. The real HTTP/database tests run separately and are **not included** in these percentages. No percentage threshold is imposed yet; failed tests/typechecking/builds do block their jobs. This establishes an honest baseline for later improvements.
+前后端并行构建，集成和源码安全依赖这两者；镜像任务还依赖 lint。只有符合条件且仍为最新提交的 main 才部署 K3s。PR 验证不发布生产镜像或访问生产凭据。分支保护需在 GitHub 单独要求这六个检查及代码审查。
 
-Telegram uses repository Actions secrets `TELEGRAM_TOKEN` and `TELEGRAM_TO`. Messages use ✅ success, ❌ failure, 🚫 cancelled and ⏭️ skipped for individual checks. They include PR/branch, source commit, actor, run/attempt, unit/component coverage and a logs/artifacts link. Notification waits for staging deployment and distinguishes a skipped/superseded deployment from a successful deployment. PRs report image scanning without implying publication. Fork/Dependabot PRs and cancelled runs do not notify. Notification failure does not override build status. [GitHub secret behavior](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets) and [Telegram API](https://core.telegram.org/bots/api#sendmessage).
+## 集成验收范围
 
-Local commands: `mvn verify`, `npm --prefix apps/web run test:coverage`, `npm --prefix apps/web run build`, then run Compose and `bash scripts/check-db-isolation.sh`. Load `.env` into the shell before `python3 scripts/organization-acceptance.py`. The latter creates unique test data and intentionally stops Admission and restarts Catalog/gateway; run it only against a disposable local/CI Compose environment. Use `COMPOSE_PROJECT_NAME` to select a dedicated test project.
+| 入口 | 主要检查 |
+| --- | --- |
+| `check-db-isolation.sh` | 三个服务账号的 schema 隔离 |
+| `business-fixes-acceptance.py`、`gateway-scaling-acceptance.py` | 基础业务、并发和网关多副本路径 |
+| `organization-acceptance.py` | 组织、发布/编辑、订票、核销及其前置验收链 |
+| `catalog-read-acceptance.py`、`event-directory-acceptance.py`、`visibility-acceptance.py` | 读取投影、搜索/分页、内部可见性及即时权限 |
+| `organization-security-acceptance.py`、`organization-management-acceptance.py` | 组织隔离、角色变化、总览和组合筛选 |
+| `notifications-acceptance.py`、`membership-notifications-acceptance.py` | 通知幂等、成员关系通知和个人已读状态 |
+| `organization-governance-acceptance.py`、`event-cancellation-acceptance.py` | 组织关闭、整场取消、并发与中断恢复 |
+| `predeployment-fixes-acceptance.py`、`organization-migration-acceptance.py` | 旧 token 撤权、关闭围栏、旧库迁移与重放 |
+| `catalog-recovery-acceptance.py` | 冷启动期间订票/重放/回执、全副本停止后的有界失败和恢复 |
 
-Main-only delivery builds/scans tested artifacts, publishes GHCR digests, assumes the repository's AWS role through OIDC and sends an SSM release to the existing K3s server. It backs up PostgreSQL, serially rolls the five applications, checks their digests/node distribution and verifies HTTPS/login before advancing the verified pointer. Database/credential/storage/Traefik resources are managed separately. Follow [K3s delivery](k3s-cd.md). The current branch directs post-release verification and the Actions URL to the formal hostname; the historical GitHub environment name remains `k3s-test` for the existing OIDC trust. Formal Ingress and the production namespace marker are managed separately. The [legacy deployment procedures](cloud-staging.md) are historical; restoring the old database now requires synchronization of any new writes. Capacity measurements on `f69d49d` remain separate from application release verification. OpenAPI conformance and the outstanding capacity/recovery experiments remain unfinished.
+流水线还离线检查 release 范围、K3s 生产保护、监控配置/告警规则和性能工具。准确执行顺序以 workflow 为准。部分验收脚本会嵌套调用前置套件，必须使用独立数据和环境；不要指向 `sems-prod`。
 
-Integration now starts two Admission replicas and runs booking acceptance, including publication regression, 100 competing requests for 10 places, same-key races, per-attendee isolation and repeated cancellation. This is a local correctness check, not a cloud throughput or recovery-target measurement.
+## 本地运行
 
-PR #23 uses parameterized JDBC projections for public Catalog reads, retaining live organization/private-event checks and pagination. `scripts/catalog-read-acceptance.py` checks public/internal fields, full/out-of-range pages, category/private filters, literal backslashes, immediate suspension and protected diagnostics. The backend suite and real PostgreSQL/API checks passed locally and in the merged main run above. PR #24 also moves internal details/publication/member snapshots to narrow JDBC queries with connections released before Identity checks; its 84-test backend suite and expanded real PostgreSQL/API acceptance passed in the merged main run. These correctness checks are separate from cloud capacity results.
-
-Registration acceptance additionally checks requested field validation, category/theme persistence, combined search/filtering, information-aware retries and cross-organizer denial. Existing booking/publication tests still run.
-
-## Current integration entry points
-
-Deployment-bundle validation also runs offline Python checks for release locks, the actual rendered K3s application scope/placement/readiness contracts, result comparison, local experiment execution and the cloud capacity ladder. Pinned observability containers also validate component configurations and alert firing/false-positive cases, without a live cluster. CI integration does not run the cloud load generator or use staging credentials; only the eligible main deployment job obtains the K3s AWS role.
-
-The workflow runs organization-acceptance.py (including the earlier editor/booking regression chain), organization-security-acceptance.py, event-directory-acceptance.py, organization-management-acceptance.py, visibility-acceptance.py, notifications-acceptance.py, membership-notifications-acceptance.py, organization-governance-acceptance.py, event-cancellation-acceptance.py, predeployment-fixes-acceptance.py, organization-migration-acceptance.py and catalog-recovery-acceptance.py. Use the same entry points after builds, readiness and schema-isolation checks in a disposable stack with two Admission replicas. Load that stack’s environment and set SEMS_BASE_URL, SEMS_ENV_FILE and SEMS_COMPOSE_FILE as appropriate.
-
-`organization-management-acceptance.py` is a standalone real-API regression for organization-admin totals, member/event combined filters before paging, access isolation, registration guidance, the booking/check-in/cancellation loop and ended-event editing rejection. It creates four unique accounts, two organizations and eight events. Default mode is restricted to disposable localhost Compose and uses SQL only to move its own fixture timestamps; it never stops services. CI saves the credential-free fixture/cleanup report in `integration-diagnostics`.
+先按 [README](../README.md#2-local-setup)构建并启动独立测试栈。测试项目需要独立的凭据、数据卷、网络和主机端口；仅改 Compose project name 无法覆盖显式命名的资源。
 
 ```bash
-# Load the disposable stack's admin environment first, as above.
-python3 scripts/organization-management-acceptance.py --report ci-logs/organization-management.json
+mvn verify
+npm --prefix apps/web run lint
+npm --prefix apps/web run test:coverage
+npm --prefix apps/web run build
+bash scripts/ci/lint.sh
 ```
 
-The separate `--live --base-url https://swe5001.seventh720.com` mode uses public APIs only and waits for an event to end naturally. Use it only for an explicitly requested staging acceptance run with agreement on data retention. Both modes attempt cleanup in `finally`: cancel fixture offerings, soft-delete fixture organizations and verify organization access is revoked. Accounts, orders, notifications and check-in history remain; this is not a database purge, and the product has no account-delete/disable API. Check the report's `cleanup.complete` and `failedFixtureIds`; a process kill or service outage may require resuming cleanup manually using only those fixture IDs. Reports contain no passwords, tokens or ticket credentials. They do contain generated account emails and fixture IDs, so live reports stay in ignored `.secrets/acceptance/`.
+真实 API 套件还需要测试环境的 bootstrap 管理员变量。`SEMS_BASE_URL`、`SEMS_ENV_FILE`、`SEMS_COMPOSE_FILE` 和 `COMPOSE_PROJECT_NAME` 必须一致地指向同一测试栈；多份 Compose 文件用系统路径分隔符连接。先检查渲染配置，再按 workflow 顺序执行。`business-fixes-acceptance.py` 需要新数据库并先于其他套件。
 
-Give the test stack distinct project, network, volume and host-port names; changing COMPOSE_PROJECT_NAME alone does not override explicitly named Compose resources. Never inject failures into the shared working instance. Historical results are retained in [evidence](evidence/); configured workflow jobs are not proof of a successful current CI run.
+`organization-management-acceptance.py --report ci-logs/organization-management.json` 可单独验证组织总览。其可选 live 模式会在真实 API 创建记录，不能作为普通生产健康探测。生产只读验证使用 [CD 检查](k3s-cd.md)和[监控验证](observability.md)。
 
-P1/P2 业务回归包含 `scripts/business-fixes-acceptance.py`（需先于其他验收、在全新独立数据库运行）和 `scripts/gateway-scaling-acceptance.py`。两者已接入 integration job；运行时会创建测试数据并停启/扩缩测试服务。`scripts/observe-platform.py 10m` 可采集不含凭据的日志及资源快照。
+## 交付、产物与通知
 
-Current test counts, historical measured unit/component coverage and remaining gaps are recorded in [test coverage](test-coverage.md). The event-directory acceptance entry point is included in the workflow; both its local run and PR #14 integration job passed. It tests organization-wide title search, stable pages, literal wildcard characters, shared organizer editing/publication and live demotion.
+main 使用同次测试 JAR/web-dist 构建镜像，保存不可变 image lock，经 GitHub OIDC 换取 AWS 临时身份，再通过 SSM 调用发布器。应用 rollout、数据库备份和 HTTPS/登录检查通过后才推进成功指针。流程见 [K3s 发布与回退](k3s-cd.md)。
 
-See [security policy and scoped exceptions](security.md) and [performance/availability experiments](performance-and-availability.md). `scripts/cd/test-release.py` rejects floating image references and invalid commit IDs; `scripts/performance/test-tools.py` verifies comparison semantics. A small CI smoke proves scripts run, not cloud scaling benefit.
+一般报告和失败诊断保存七天，release-image-lock 保存三十天。单元/组件覆盖率与真实 API/数据库验收分别统计；缺失报告显示 N/A，当前没有覆盖率百分比门槛。发布材料和长期需要的实测数据应按[证据规范](evidence/README.md)保存。
 
-## Lint and check naming (2026-10-20)
+CI Telegram 使用 Actions secrets `TELEGRAM_TOKEN` 和 `TELEGRAM_TO`，与运行时 Alertmanager 的 Telegram Secret 分开。通知区分成功、失败、取消和跳过，也区分 PR 镜像验证与 main 发布；通知不是合并门禁。
 
-The workflow is named `CI`; checks use `Area · Purpose` naming. `Lint` runs ESLint's JavaScript/TypeScript recommended rules, a small Checkstyle correctness ruleset for main/test Java, actionlint and shell syntax checks. It uploads `lint-report` even on failure. Run `bash scripts/ci/lint.sh` locally (Docker is needed for actionlint). This does not introduce formatting-only rewrites or claim API contract conformance. Lint is a prerequisite for image publication/deployment and is included in the notification summary.
-
-If branch protection names checks explicitly, update its required check names to match the workflow during rollout; renaming display names does not migrate repository settings automatically.
-
-`catalog-recovery-acceptance.py` joins integration acceptance: it exercises booking, idempotent replay and current-event receipts during a Catalog cold restart, checks bounded failure with all Catalog replicas down, then checks recovered inventory. It temporarily scales Catalog and restores the original count. Use only a disposable stack. Compose passes `CATALOG_URL=http://gateway:8080`; the Docker-only listener applies bounded failover to reads. Only the read-only batch-details POST allows replay after being sent; prepare-sales does not. Port 8080 is not published and public `/internal/` stays blocked; destination service-token authentication remains required.
-
-### IDE Maven lifecycle mapping
-
-The Checkstyle `lint` execution carries `<?m2e ignore?>`, the [m2e execution mapping](https://eclipse.dev/m2e/documentation/release-notes-17.html) for IDE automatic builds. It prevents the “Plugin execution not covered by lifecycle configuration” marker without disabling `mvn validate`, `mvn verify` or CI lint. If an existing VS Code Java workspace retains the marker, reload its Maven projects (or run **Java: Reload Projects**). IDE marker refresh is separate from command-line build validation.
+IDE 中的 Checkstyle `<?m2e ignore?>` 仅跳过自动构建映射，不关闭 Maven CLI 或 CI 检查。依赖及镜像扫描范围见[安全说明](security.md)。

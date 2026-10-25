@@ -1,133 +1,95 @@
-# 扩容收益与可用性验证
+# 性能、扩容与恢复实验
 
-本版结果统一见[云端容量复测](evidence/2026-10-22-cloud-capacity/README.md)。该记录明确标注已测版本、实际执行范围和失败结果。
+本指南定义如何测试当前三服务架构。生产运行方式见 [K3s 运维](k3s.md)，功能正确性与历史实测见[验收矩阵](acceptance-matrix.md)和[证据索引](evidence/README.md)。测试准备与计划不表示已取得性能成绩。
 
-2026-10-22，已部署PR #24 / `f69d49d`，默认池10。50场活动、1000账号下，250 VU读取通过；混合客户端通过、服务端门槛未通过；500 VU目标档未执行；1000 VU目标档未执行。本次按读取/混合配对逐档过关，250保持60秒、500/1000计划保持180秒；失败不升级。完整逐接口结果、实际执行范围、资源和清理见本版报告；十分钟稳态与独立扩容/恢复仍待本版验证。
+## 当前可以开展的测试
 
-这份文档定义实验方法；实际完成状态见[当前进度](progress.md)。脚本位于 `scripts/performance/`。本地短时 smoke 只说明工具和业务路径能运行，不是云端性能结论。
+| 测试 | 条件与判定 |
+| --- | --- |
+| 手动副本调整 | 独立环境中执行 1→2，确认就绪、两个副本实际接流量及数据一致性 |
+| 扩容收益 | 固定版本、数据、单副本资源及负载，比较 1/2 副本的成功吞吐、分操作 p95 和错误率 |
+| 故障恢复 | 两个健康副本持续接流量时删除一个，核对失败区间、业务恢复及订单/库存 |
+| 自动扩容 | 另行配置和验证指标触发、就绪、分流及缩容；当前未启用 HPA |
+| 主机或数据库 HA | 需要明确故障域、复制/切换和外部验证；当前单控制平面与单 PostgreSQL 不具备这些条件 |
 
-## 可以证明什么
+当前生产只有两个节点，应用使用同服务 hostname 硬反亲和，第三个同服务 Pod 无法调度。增加 replicas 不会自动增加 EC2。1→2 对照可以验证当前支持的水平扩容范围；生产副本为 2，不应把临时调为 1 当作无影响的操作。
 
-| 声明 | 必要证据 | 当前架构的边界 |
-|---|---|---|
-| 服务可以水平扩副本 | 1→2 后两个实例都收到业务流量，数据库一致性通过 | Docker DNS 与数据库锁已有正确性验收；仍需云端实测 |
-| 扩容有收益 | 固定数据/负载/单副本资源，重复比较成功吞吐、分操作 p95、错误率和成本 | 副本增加不保证提升；数据库、Identity 同步调用和热点行锁可能成为瓶颈 |
-| 服务副本故障可恢复 | 持续业务请求中停止一个实例，记录失败区间、恢复时间及数据核对 | 同一主机上的副本只能验证实例故障，不覆盖主机或数据库故障 |
-| 主机/可用区级高可用 | 跨故障域部署，停止整台主机或执行数据库切换，入口和业务持续恢复 | 当前单台 Lightsail、单 PostgreSQL、单入口不满足此部署条件 |
-| 自动扩容 | 指标触发副本调整，记录触发、就绪、分流和缩容全过程 | 手动 `--scale` 不等于自动扩容 |
+## 测试环境与工具准备
 
-高可用需要预先定义 SLO 和故障范围，不能由一张架构图或一次健康检查证明。两台服务器若仍依赖同一台数据库/入口，也未消除系统单点。跨可用区隔离与数据库故障切换是不同层次的措施；参考 [AWS 故障域建议](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_fault_isolation_multiaz_region_system.html) 与 [RDS Multi-AZ 切换说明](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.Failover.html)。不要承诺数据库切换必然在 60 秒内完成；记录实际结果。
+优先使用独立的本地 Kubernetes 集群验证测试流程；云端性能结论需独立云端测试环境。使用同一批应用 digest、单独的数据库/账号/JWT 和测试入口。先记录节点 CPU/内存、Pod requests/limits、数据库连接池、网络、镜像及 source commit。
 
-## 准备独立实验环境
+两台生产节点还承载控制平面和监控。测试前执行 `kubectl top nodes`、`kubectl top pods` 并检查 requests、磁盘和数据库连接余量；不能依据 CPU 空闲就再部署一套 JVM。新 EC2、节点池或其他收费资源需要单独规划。配置和造数不得覆盖正式数据。
 
-使用与发布版相同的镜像 digest、数据库配置和网关配置。负载发生器放在另一台机器，避免抢占被测服务 CPU。先记录机器规格、CPU/内存限制、镜像、commit、数据库连接池、网络条件和副本数。仓库默认云配置的容器内存上限合计约 3136 MiB；已记录的共享主机上，Caddy 上限为 256 MiB，本平台合计约 3264 MiB，主机还承载其他服务。新增一个 Java 副本还需 768 MiB 上限；这不是实际预留值，但不能在未核对主机余量时直接加副本。
+| 工具 | 适用范围 |
+| --- | --- |
+| `scripts/performance/seed.py`、`load.js` | 通过 HTTP 造数和 k6 负载，可用于独立 Compose/Kubernetes 入口 |
+| `compare.py` | 比较匹配的场景、数据集、版本、资源和负载结果 |
+| `local-experiment.py` | 固定的独立 Compose 项目、端口和数据库快照；当前不控制 Kubernetes |
+| `record.py`、`fault.py`、`audit.py` | 依赖 Compose/Docker 的采样、故障和 SQL 审计 |
+| `cloud-capacity.py` / `cloud-guard.py` | 历史 Lightsail 环境的负载及主机保护；不能直接用于当前 K3s |
+| `scripts/k8s/local-acceptance.py` | 独立 kind 的跨 Pod 正确性检查；不测量扩容收益 |
+| `scripts/k8s/catalog-recovery.py` | 历史隔离 K3s 故障入口，保留生产保护；当前生产数据不可使用 |
 
-只在专门的实验组织/数据库中造数和注入故障，不对共享业务数据运行验收链。用环境变量提供管理员登录资料，不把 token、密码、`.env` 或完整 dataset 放进证据、PR 或 CI artifact。
+在 K3s 跑完整对照前，需补齐或选择独立测试用的副本控制、逐 Pod readiness、资源采样、PostgreSQL 快照恢复/审计和失败清理适配。不要将旧工具的 namespace 替换成 `sems-prod` 来绕过保护。`load.js` 本身不要求 Docker 运行时，可由原生 k6 或专用负载机执行。
+
+## 实验顺序
+
+1. **预检与基线：**验证测试栈独立、备份可读、两个实例可接流量、日志/指标可采集。保存初始数据库快照和资源配置。
+2. **短时验证：**先用 10 VU、30 秒预热、60 秒测量跑一组 1/2 副本，确认认证、分流、计时、恢复和库存审计链路可用。它用于检查工具与业务，不作正式容量结论。
+3. **正式对照：**分别比较 Catalog 和 Admission 的 1/2 副本，运行 25、50、100 VU，每组预热 60 秒、测量 600 秒，至少三次交错重复。
+4. **故障实验：**在两副本持续流量中删除一个副本，恢复后继续观察稳定业务窗口。全副本停止是另一项有界失败/恢复检查。
+5. **清理与复核：**恢复测试副本、核对数据库、保存失败及成功结果，再清理本次专用数据和资源。
+
+正式矩阵为 2 类场景 × 2 种副本数 × 3 档 VU × 3 次重复，共 36 轮；仅负载时间约 6.6 小时，造数、镜像启动和数据库恢复另计。可以先选择一档完成完整对照，但报告必须注明实际执行范围。
+
+## 数据、场景和负载
+
+使用测试环境管理员变量，数据集含凭据并保持私有：
 
 ```bash
 mkdir -p .performance
-export SEMS_BASE_URL=https://your-benchmark-host
-# 在当前 shell 安全加载实验环境管理员变量：SEMS_BOOTSTRAP_ADMIN_EMAIL/PASSWORD
-python3 scripts/performance/seed.py --base-url "$SEMS_BASE_URL" \
-  --users 1000 --events 100 --quota 100000 --output .performance/dataset.json
+python3 scripts/performance/seed.py --base-url https://your-benchmark-host \
+  --users 50 --events 10 --quota 100000 --output .performance/dataset.json
 ```
 
-生成器通过真实 API 建立独立组织、100 个已发布活动和 1000 个账号，保持真实认证限流，完成后统一登录。密码和 token 文件权限为 0600，目录被 Git 忽略。重复执行不会覆盖旧数据；失败时保留已生成记录，另建实验或人工清理该实验组织，不自动删除数据。JWT 仍为一小时；每轮前需要时执行同一命令并加 `--refresh`。压测 setup 会验证账号有效性；完整一轮应在 token 到期前完成。
+上例用于较小的初始数据集。正式实验可固定为 1000 账号、100 活动；报告实际值，避免混用旧的 50 活动实验。JWT 为一小时，必要时使用同一 dataset 加 `--refresh`；每轮保持足够票额，避免容量不足被误当作系统性能下降。
 
-## 扩容实验矩阵
+- **Catalog 场景：**80% 按实验关键字分页检索，20% 活动详情。仅改变 Catalog 副本数，其他服务固定。
+- **Admission 场景：**订票后读取回执，活动分布固定。仅改变 Admission 副本数，单独统计成功订单吞吐和 HTTP 请求吞吐。
 
-### Catalog 读取计时与连接池对照
-
-已部署的读取修正结束仓库只读事务后再调用 Identity，内部详情采用六字段投影。`catalog.read` 按组织发现、公开列表/详情、发布/成员快照和内部详情分别计时；`catalog.identity` 区分批量组织状态与成员查询。Hikari 自带 `connections.acquire` / `connections.usage` 分别记录连接获取和占用时间，包含在 `hikaricp` 指标中。
-
-`GET /internal/v1/diagnostics/catalog` 返回上述计时的累计次数、总毫秒和滚动最大值，以及连接池 active/idle/pending/total/max 瞬时值。必须使用现有 `ADMISSION_TO_CATALOG_TOKEN` 服务凭据；公开网关仍返回404，不额外暴露 Actuator metrics。累计计时应以同一进程前后快照求差计算均值；最大值为 Micrometer 时间窗口值，不能当成某一档的 p95，也不能跨服务重建直接相减。读取总计时包含连接等待、JDBC和映射，与Hikari计时重叠，不能直接相加。请求保持期 p95 仍由负载机测量。
-
-Catalog 的 `CATALOG_DB_POOL_SIZE` 可从部署 `.env` 传入，默认保持10。隔离环境对照10/16/20时，其他服务池、CPU/内存、数据与负载必须固定；更改该值后仅重建 Catalog，等待 readiness 和网关 DNS 刷新。至少三次交错重复，同时保留获取/占用、吞吐、状态检查及逐接口延迟。双核 CPU 已饱和时，扩大连接池不能预先视为优化；应按测量结果选择，线上配置另行通过部署流程生效。最新诊断、读取验证和适用范围见[容量实验记录](evidence/2026-10-22-cloud-capacity/README.md)。
-
-### 云端容量阶梯（独立于扩容对照）
-
-`cloud-capacity.js` 和 `cloud-capacity.py` 使用独立负载机访问已部署的 HTTPS 入口，保持真实鉴权与限流。先运行 1 VU 读取/混合预检，再分别执行 50→100→250→500→1000 VU；每档爬升 30 秒，低档保持 30 秒，500/1000 档各保持 180 秒，档间恢复 10 秒。500 VU 也有独立的三分钟成绩，不把爬升或收尾阶段计入保持阶段。最后使用独立的 100 票活动做一次库存竞争。
-
-读取迭代依次请求活动分页、活动详情、本人资料、本人订单，然后等待 1 秒。混合场景每五轮增加订票→读取回执→取消，每 VU 最多 60 次。1000 个账号、100 场普通活动和 1 场库存竞争活动均属于本轮独立组织；注册/登录准备不计入压测成绩。与下面原有 0.1 秒思考时间的扩容负载不同，不能仅凭相同 VU 数比较吞吐。
+同一数据库快照、镜像和单副本资源用于每组；交错测试顺序，并记录单副本所在节点，避免控制平面负载或数据库本地性影响结论。负载发生器尽量独立于被测服务；本机共享 Docker VM 的竞争要记入限制。
 
 ```bash
-python3 scripts/performance/cloud-fixture.py prepare-hot --dataset .performance/dataset.json
-caffeinate -i python3 scripts/performance/cloud-capacity.py \
-  --dataset .performance/dataset.json --reports .performance/cloud-capacity-run \
-  --identity-file .secrets/cd/staging_ed25519 --known-hosts /path/to/trusted-known-hosts \
-  --commit <actual-deployed-sha> --max-vus 1000
-```
-
-`cloud-guard.py` 在主机采样被测平台及同机服务的六项健康检查、容器 CPU/内存、重启/OOM、主机可用内存与数据库连接/锁等待。健康失败或超过 5 秒、可用内存低于 384 MiB、任一容器内存超过 95% 连续三次即停测；容器退出、重启、OOM 或监控断线也停测。负载生成器限制 4 CPU/2 GiB，并记录资源。任何一档未通过即停止后续档位，保留失败结果，不放宽阈值继续判定。
-
-整体与逐接口 p95＜3 秒、意外错误率＜1%，同时要求所有状态和内容检查通过。混合场景的 409 为失败；库存竞争只允许明确的余票不足 409，并另外记录成功数、售罄数及数据库库存审计。JWT、密码和完整原始记录留在 `.performance/`；对外证据仅提交脱敏指标。实验后通过 `cloud-fixture.py cleanup` 取消本轮活动、关闭本轮组织并撤销组织者角色；账号及审计历史的物理清理由受控的精确 ID 事务另行执行，工具不会批量删除其他数据。
-
-Nginx 每 worker 4096 连接、8192 文件额度及上游连接复用是已记录的配置；实验前记录当前版本基线，再根据日志验证瓶颈。Nginx 的连接额度同时覆盖客户端和上游连接，仍受文件额度约束；连接复用池只限制空闲连接，不限制全部上游连接。参见 [Nginx 连接额度](https://nginx.org/en/docs/ngx_core_module.html#worker_connections)和[上游 keepalive](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#keepalive)。
-
-这组实验回答当前部署在指定业务模型下能否达标，不能代替下述 1→2 副本收益、十分钟稳态重复测量和故障恢复实验，也不证明主机级高可用。
-
-### 副本扩容对照
-
-分别运行两类场景，其他参数不变：
-
-- `MODE=catalog`：80% 按实验关键字分页检索，20% 活动详情；Catalog 1/2 副本，其他服务固定。
-- `MODE=booking`：订票后读取回执，活动均匀分散；Admission 1/2 副本，其他服务固定。记录订单吞吐与 HTTP 请求吞吐，不能把两者混用。
-
-每组 25、50、100 VU，预热 60 秒、稳定测量 600 秒，每组至少重复三次，交错执行 1/2 副本降低时间顺序影响。每副本资源相同，基础设施预算充足。订票会增长数据库，应从同一实验快照开始或明确记录数据增长差异；比较脚本要求 dataset、commit、场景及负载参数一致。RUN_ID 每次唯一，避免命中之前的幂等收据。
-
-以下命令在安装 k6 1.3.0 的负载机运行；也可以用 `grafana/k6:1.3.0` 容器挂载脚本、私有 dataset 和结果目录。Docker Desktop 可用 BASE_URL 覆盖为 `host.docker.internal` 访问本地测试栈；不要把这个地址用于云端。
-
-```bash
-DATASET=.performance/dataset.json MODE=catalog VUS=100 \
+DATASET=.performance/dataset.json MODE=catalog VUS=25 \
   RUN_ID=catalog-1-repetition-1 COMMIT=full-tested-commit \
   REPLICAS=catalog1-admission1 WARMUP_SECONDS=60 DURATION_SECONDS=600 \
   SUMMARY_FILE=.performance/catalog-1.json \
   k6 run --out json=.performance/catalog-1-raw.json scripts/performance/load.js
 ```
 
-`measurement` 标签的指标才是稳定期成绩，内置 HTTP 总数还包含 setup 和预热。阈值是每种操作 p95 < 3000ms、意外错误率 < 1%、成功请求数 > 0。409 单独算业务拒绝，既不算系统异常，也不算成功吞吐；性能实验中任何 409 都使容量充足性阈值失败。401、403、429、5xx、超时均是该实验的意外错误，不能忽略。失败的测试仍保存 summary/raw，不删掉失败运行后只展示成功样本。[k6 阈值与退出码](https://grafana.com/docs/k6/latest/using-k6/thresholds/)。
+`measurement` 标签才是稳态测量；setup、预热和收尾分别处理。每轮使用唯一 RUN_ID；匹配的两份 summary 才可交给 `scripts/performance/compare.py`。
 
-在被测主机同步记录（`SEMS_COMPOSE_FILE` 支持以 `:` 分隔多个 Compose 文件；设置正确 `COMPOSE_PROJECT_NAME`）：
+## 指标与判定
 
-```bash
-python3 scripts/performance/record.py --seconds 720 --interval 10 --output resources.jsonl
-python3 scripts/performance/audit.py --dataset .performance/dataset.json --output inventory.json
-python3 scripts/performance/compare.py .performance/catalog-1.json .performance/catalog-2.json
-```
+| 范围 | 保存内容 |
+| --- | --- |
+| 客户端 | 每操作成功数、吞吐、p50/p95/p99、错误状态、预热/测量时间和负载机资源 |
+| 服务 | 各副本实际流量、CPU/内存、重启/OOM、JVM/GC、Hikari 等待、请求与依赖耗时 |
+| 数据库 | 连接数、锁等待、业务快照及 `reserved = confirmed quantities = active tickets`，库存不超 quota |
+| 扩容收益 | 成功吞吐 2 副本 / 1 副本、逐操作 p95、资源增加与重复样本差异 |
 
-资源记录是持续到指定时长的实验采样，不是长期监控/告警平台。网关日志的 upstream 地址证明两个副本实际接流量；另存容器地址映射。审计检查数据库 `reserved = confirmed quantities = active tickets` 且不超 quota。公平比较要求恢复相同数据起点；扩容系数为 `成功吞吐(2副本)/成功吞吐(1副本)`，并比较每操作 p95、资源与额外成本。只有所有门槛通过且重复结果稳定，才能据实陈述收益；结果接近 1 或更差应解释瓶颈，不把“启动成功”改写成“性能提升”。
+负载工具的待验证目标为每操作 p95 < 3 秒、意外错误率 < 1%。401、403、429、5xx 和超时均记录为意外错误；409 业务拒绝单列，不计成功吞吐，容量充足性实验也不能把售罄当成成功。失败阈值和原始样本保留；API 失败、客户端重试、内部只读重试和端到端结果分别统计。
 
-## 故障恢复实验
+Catalog 的受保护内部 diagnostics 和 Grafana 提供读取、Identity 依赖、连接池及系统指标；公网不开放 `/internal/`。计时最大值不是 p95，累计指标须以同一进程前后快照求差；不要把重叠的数据库与应用计时相加。
 
-确认两个健康副本且正在跑业务负载，再在被测主机执行：
+## 恢复时间与运行保护
 
-```bash
-python3 scripts/performance/fault.py --service admission --seconds 60 --output fault.jsonl
-```
+恢复时间从故障请求起算，直到业务连续 30 秒满足预定延迟/错误目标的窗口起点。另报失败请求数、最长失败区间、Pod Ready 时间及数据核对；Pod Ready 不能代替业务恢复。客户端超时的订票请求使用同一个 requestKey 验证最终提交状态。
 
-工具停止一个副本，保留另一副本；在 finally 中恢复被停止容器，并记录 UTC 时间。启动不代表 readiness，必须继续观察业务结果。进程被强制杀死或主机断电时 finally 不保证执行，应手动恢复记录中的容器。脚本不足两个运行副本时拒绝操作；实验前仍需确认两个副本健康。
+预先定义资源保护阈值，发生节点/容器 OOM、非预期重启、磁盘危险、持续内存压力、采集失联或健康检查异常时停止该组并保存失败记录。故障脚本的 finally 不保证能抵御进程强杀或断电，测试结束必须检查副本与数据状态。
 
-从 `stop-requested` 起到连续 30 秒满足错误率/延迟目标的业务窗口起点，定义本次恢复时间；同时报告失败请求数、最长失败区间和订单一致性。Catalog、Admission 分别测，故障阶段保留原始每请求数据。客户端超时的 POST 可能已提交，用同一个 requestKey 查询/重试才能核对是否重复；现有 booking acceptance 已覆盖幂等，故障演练还需保存具体请求的重试证据。
+## 已有结果的边界
 
-主机级 HA 的下一层方案是：跨两台主机/可用区放置 Identity、Catalog、Admission 副本，使用有健康检查与故障切换能力的入口，数据库具备跨故障域复制/自动切换，配置和 JWT 密钥一致，数据库连接数按副本总数预算。之后分别做服务进程故障、主机故障、数据库主实例切换，持续从外部客户端验证业务并核对已提交数据的 RPO/RTO。现有单机 Compose 不能跨主机调度，迁移需要新的部署/服务发现配置；本轮没有把它声称为已完成。
+[历史容量报告](evidence/2026-10-22-cloud-capacity/README.md)属于当时的 Lightsail 版本：250 VU 读取通过，混合负载出现内部 504，500/1000 VU 未执行。K3s 的跨节点并发、Pod 故障和 CI 冷启动回归已验证功能正确性，尚无当前 K3s 的受控吞吐收益或十分钟稳态容量结论。
 
-## 本地工具验证口径
-
-2 VU、2 秒预热、5 秒测量只用于 smoke。CI 会运行数据生成、两个场景及数据库一致性审计；它不跑云端 100 VU 的十分钟实验。最终成绩必须附云端环境参数、镜像 digest、完整原始数据和重复实验汇总。
-
-## 本地完整实验执行器
-
-`local-experiment.py` 仅接受独立的 `sems-architecture` Compose JSON 环境和 `127.0.0.1:18087` 数据集，避免误恢复共享业务或云端数据库。运行前必须设置 Catalog、Admission 的 CPU/内存上限。每轮停止应用、恢复同一份私有数据库快照、等待所有副本就绪并刷新 JWT；故障实验先运行，之后按两种场景、25/50/100 VU、三次重复、交错 1/2 副本顺序运行。默认预热 60 秒、测量 600 秒，36 轮纯负载约 6.6 小时，数据库恢复和故障测试另计。
-
-```bash
-python3 scripts/performance/local-experiment.py \
-  --compose /private/path/compose.json \
-  --dataset /private/path/dataset.json \
-  --output /private/path/unique-results-directory
-```
-
-输出 `progress.json`、环境及镜像 ID、每轮 k6 summary/raw 压缩包、资源采样、网关 upstream、库存审计。故障实验额外记录同一 requestKey 重复提交的响应与最终数据库订单数，以及基于业务流量的连续 30 秒恢复窗口。恢复时间可能为零（剩余副本始终满足目标），也可能为空（观察期没有满足目标）；均不得用容器启动时间替代。
-
-本地执行需要电脑开机、Docker 运行且避免休眠；镜像已缓存后，运行请求走本地网络，不依赖持续互联网连接。负载发生器与服务共享 Docker 虚拟机，其他本地应用也可能竞争资源，必须作为实验限制记录。运行完成或捕获异常后停止专用实验容器；强制终止时仍需人工确认容器状态。原始 dataset、数据库快照和 Compose 中的凭据不能提交。状态为 `complete` 前不应把计划中的 36 轮写成已完成。
-
-补测使用 `--baseline 原始快照 --only-runs 具体轮次...`，必须保留原样本。`summarize-local.py` 会检查每轮真实请求时间连续性；参数写着 600 秒、k6 阈值通过，不足以证明连续测量已完成。用 `--replacement-source 补测目录` 合并经过环境和快照哈希核对的补测，旧结果保留在 `supersededRuns`。`plot-local.py` 从核验后的摘要生成 PNG/PDF 图表，依赖 Matplotlib。
+负载数据、JWT、数据库快照和完整请求记录保存在忽略目录。对外证据只提交脱敏结果、参数、时间、版本和库存审计；所有实验保留实际执行范围与失败结果。

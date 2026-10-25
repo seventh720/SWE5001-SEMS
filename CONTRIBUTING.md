@@ -39,7 +39,7 @@ The six quality checks are:
 - `Security · SAST, Dependencies & Secrets`
 - `Images · Scan, Smoke Test & Publish`
 
-CI runs on pushes to `main`, pull requests targeting `main` and manual dispatch. A branch push without an open pull request does not trigger automatic CI. Only eligible main runs publish images and deploy staging. Notifications report results and are not merge gates.
+CI runs on pushes to `main`, pull requests targeting `main` and manual dispatch. A branch push without an open pull request does not trigger automatic CI. Only eligible main runs publish images and deploy production to K3s. Notifications report results and are not merge gates.
 
 Repository protection must be configured separately to require pull requests, another contributor's approval, renewed approval after updates, resolved discussions and the six checks above. This document does not establish that those settings are enabled.
 
