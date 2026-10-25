@@ -131,6 +131,7 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/k3s-python"
           "$RUNNER_TEMP/k3s-python/bin/pip" install --disable-pip-version-check PyYAML==6.0.3
           "$RUNNER_TEMP/k3s-python/bin/python" scripts/cd/test-k3s-release.py
+          python3 scripts/observability/validate.py
           python3 scripts/performance/test-tools.py
           python3 scripts/performance/test-local-experiment.py
           python3 scripts/performance/test-cloud-capacity.py

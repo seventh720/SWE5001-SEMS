@@ -61,6 +61,18 @@ class K3sReleaseTest(unittest.TestCase):
         self.assertTrue(module.health_up('/health/admission', b'{"status":"UP"}'))
         self.assertFalse(module.health_up('/health/admission', b'ok\n'))
 
+    def test_application_cd_retains_pinned_telemetry_instrumentation(self):
+        agent = json.loads(Path('deployment/observability/images.lock.json').read_text())['java-agent']['image']
+        for resource in self.release()['resources']:
+            if resource['kind'] != 'Deployment' or resource['metadata']['name'] not in ('identity', 'event-catalog', 'admission'):
+                continue
+            pod = resource['spec']['template']['spec']
+            self.assertEqual(pod['initContainers'][0]['image'], agent)
+            self.assertEqual(pod['initContainers'][0]['command'], ['cp', '/javaagent.jar', '/otel/javaagent.jar'])
+            env = {e['name']: e.get('value') for e in pod['containers'][0]['env']}
+            self.assertIn('-javaagent:/otel/javaagent.jar', env['JAVA_TOOL_OPTIONS'])
+            self.assertEqual(env['OTEL_EXPORTER_OTLP_ENDPOINT'], 'http://otel-collector.observability.svc.cluster.local:4318')
+
     def test_rollback_selects_verified_predecessor_not_partial_live_snapshot(self):
         spec = importlib.util.spec_from_file_location('k3s_rollback', Path(__file__).with_name('deploy-k3s.py'))
         module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)

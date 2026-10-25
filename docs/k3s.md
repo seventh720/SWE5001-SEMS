@@ -184,3 +184,7 @@ Navicat 连接 `127.0.0.1:15432`、数据库 sems、用户 sems_viewer，沿用�
 PostgreSQL 随 worker 停止和恢复，不产生单独的 RDS 实例费。停机前完成备份并正常停库；现有 EBS 和保留的公网 IP 仍有独立计费。当前方案避免 EKS、RDS、NAT 和 ALB 的实例/网关小时费用。
 
 参考：[K3s 版本说明](https://docs.k3s.io/release-notes/v1.36.X)、[配置文件](https://docs.k3s.io/installation/configuration)、[网络要求](https://docs.k3s.io/installation/requirements)、[Traefik 与 ServiceLB](https://docs.k3s.io/networking/networking-services)、[StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/)、[PostgreSQL 逻辑备份](https://www.postgresql.org/docs/17/backup-dump.html)。
+
+## 持续监控与追踪
+
+现有节点上的 Prometheus、Grafana、Loki、Tempo 和 OpenTelemetry 采集、Telegram 通知及私有控制台入口见[可观测性指南](observability.md)。监控基础设施独立于应用 CD；三个后端的 Agent component 随后续 K3s 应用发布保留。

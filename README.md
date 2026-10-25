@@ -73,6 +73,7 @@ Database/API acceptance requires an isolated test environment; some scripts stop
 - [Development and database guide](docs/development.md)
 - [Kubernetes setup and cloud templates](docs/kubernetes.md)
 - [EC2 K3s environment](docs/k3s.md)
+- [Monitoring, alerts and distributed tracing](docs/observability.md)
 - [Contributing](CONTRIBUTING.md)
 - [Technical roadmap](docs/roadmap.md)
 - [Business rules](docs/functional-guide.md)

@@ -78,3 +78,5 @@ npm --prefix apps/web run build
 - [当前业务规则](docs/functional-guide.md)
 - [架构决策](docs/adr/0001-service-boundaries.md)
 - [验收矩阵](docs/acceptance-matrix.md)
+
+监控、集中日志、Telegram 告警和分布式追踪见[可观测性指南](docs/observability.md)。

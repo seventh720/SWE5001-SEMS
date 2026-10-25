@@ -43,3 +43,5 @@
 - [EC2 K3s 发布与回退验收](evidence/2026-10-25-k3s-cd/README.md)：SSM 发布、失败候选拒绝、兼容镜像切换及已验证前驱回退；真实 GitHub main OIDC/SSM 发布也已通过。
 - [Lightsail → K3s 正式切换](evidence/2026-10-25-k3s-cutover/README.md)：原站 27 张表完整恢复、原账号/JWT、正式域名证书/DNS、共享项目与旧缓存过渡代理。
 - [阶段复查归档](archive/README.md)：历史版本的问题与检查结果。
+
+- [K3s 可观测性](observability.md)：Grafana 面板、指标、集中日志、Telegram 告警和跨服务追踪。

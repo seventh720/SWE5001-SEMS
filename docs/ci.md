@@ -29,7 +29,7 @@ Registration acceptance additionally checks requested field validation, category
 
 ## Current integration entry points
 
-Deployment-bundle validation also runs offline Python checks for release locks, the actual rendered K3s application scope/placement/readiness contracts, result comparison, local experiment execution and the cloud capacity ladder. CI integration does not run the cloud load generator or use staging credentials; only the eligible main deployment job obtains the K3s AWS role.
+Deployment-bundle validation also runs offline Python checks for release locks, the actual rendered K3s application scope/placement/readiness contracts, result comparison, local experiment execution and the cloud capacity ladder. Pinned observability containers also validate component configurations and alert firing/false-positive cases, without a live cluster. CI integration does not run the cloud load generator or use staging credentials; only the eligible main deployment job obtains the K3s AWS role.
 
 The workflow runs organization-acceptance.py (including the earlier editor/booking regression chain), organization-security-acceptance.py, event-directory-acceptance.py, organization-management-acceptance.py, visibility-acceptance.py, notifications-acceptance.py, membership-notifications-acceptance.py, organization-governance-acceptance.py, event-cancellation-acceptance.py, predeployment-fixes-acceptance.py, organization-migration-acceptance.py and catalog-recovery-acceptance.py. Use the same entry points after builds, readiness and schema-isolation checks in a disposable stack with two Admission replicas. Load that stack’s environment and set SEMS_BASE_URL, SEMS_ENV_FILE and SEMS_COMPOSE_FILE as appropriate.
 

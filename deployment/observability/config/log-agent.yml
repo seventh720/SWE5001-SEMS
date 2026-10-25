@@ -1,0 +1,48 @@
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+  file_storage:
+    directory: /var/lib/otelcol
+receivers:
+  filelog:
+    include:
+      - /var/log/pods/sems-test_*/gateway/*.log
+      - /var/log/pods/sems-test_*/web/*.log
+      - /var/log/pods/sems-test_*/postgres/*.log
+    include_file_path: true
+    start_at: end
+    storage: file_storage
+    max_log_size: 64KiB
+    operators:
+      - type: container
+        id: container-parser
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 95
+    spike_limit_mib: 20
+  transform/resource:
+    error_mode: ignore
+    log_statements:
+      - context: log
+        statements:
+          - set(resource.attributes["service.name"], resource.attributes["k8s.container.name"])
+          - set(resource.attributes["deployment.environment.name"], "production")
+  batch:
+    timeout: 5s
+    send_batch_size: 128
+    send_batch_max_size: 256
+exporters:
+  otlphttp:
+    endpoint: http://otel-collector:4318
+    sending_queue:
+      queue_size: 64
+    retry_on_failure:
+      max_elapsed_time: 30s
+service:
+  extensions: [health_check, file_storage]
+  pipelines:
+    logs:
+      receivers: [filelog]
+      processors: [memory_limiter, transform/resource, batch]
+      exporters: [otlphttp]

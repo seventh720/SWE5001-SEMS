@@ -1,0 +1,13 @@
+# No outbound notifications until an operator configures an authorized receiver.
+route:
+  receiver: dashboard
+  group_by: [alertname, service_name, deployment, node]
+  group_wait: 30s
+  group_interval: 1m
+  repeat_interval: 4h
+receivers:
+  - name: dashboard
+inhibit_rules:
+  - source_matchers: ['severity="critical"']
+    target_matchers: ['severity="warning"']
+    equal: [alertname, service_name, deployment, node]
