@@ -1,58 +1,57 @@
-# EC2 K3s 发布与应用回退
+# K3s 发布与回退
 
-目标为 `sems-k3s/sems-prod` 和正式入口 `https://swe5001.seventh720.com`。PR #29 已将 `.github/workflows/ci.yml` 的部署阶段接到 K3s；[main run 40126181288](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288) 已实际通过 GitHub OIDC 认证及 SSM 发布，部署提交为 `7a97828`。同日正式域名和原数据已完成[切换](evidence/2026-10-25-k3s-cutover/README.md)；旧 API 停写，旧 IP 通过共享代理临时转发到新环境，SWE5006 保留。
+应用发布目标为 `sems-k3s/sems-prod`，正式入口为 <https://swe5001.seventh720.com>。配置入口：[workflow](../.github/workflows/ci.yml)、[release 渲染器](../scripts/cd/k3s_release.py)、[SSM 提交器](../scripts/cd/submit-k3s.py)和[主机发布器](../scripts/cd/deploy-k3s.py)。
 
-## 流水线
+## 发布流程
 
-PR 运行质量检查，不发布镜像或部署。main push 或 main 上的手动运行依次完成 lint、Java、前端、真实数据库/API、安全和镜像检查，发布同次构建的 GHCR digest 锁，再进入 K3s 部署阶段。PR #30 已合并，job 名称和发布后验证入口为 `Deploy · EC2 K3s` / 正式域名。
+1. main 的六项质量检查通过，构建并扫描实际运行镜像，发布同次构建的 GHCR digest 锁。
+2. runner 通过 GitHub OIDC 获取短期 AWS 身份，经 SSM Run Command 在已有 K3s server 执行发布；不向 runner 提供 kubeconfig、SSH 私钥或数据库密码。
+3. 校验源提交、image lock、五个应用 digest、`sems-prod` 和资源允许列表；保存现场应用快照及此前已验证指针，执行 server-side dry run。
+4. 导出 PostgreSQL custom-format dump 和不含密码的角色定义，记录大小与 SHA256。
+5. 依次滚动 Identity、Catalog、Admission、Web、Gateway，等待各服务完成。
+6. 核对镜像、两个就绪副本及跨节点分布，验证 HTTPS、健康接口、管理员登录/JWT、内部 API 404，并确认数据库 Pod/PVC UID 未改变。
+7. 全部通过后更新 `/var/lib/sems-cd/current.json`；报告上传 `k3s-deployment` artifact。
 
-部署使用 GitHub OIDC 换取短期 AWS 身份，通过 SSM Run Command 在现有 server 执行发布脚本。runner 使用 `kubectl kustomize` 生成配置，不连接集群管理 API，也不持有 kubeconfig、SSH 私钥或数据库密码。K3s 节点使用 containerd，发布主机不运行 Docker Compose。
+同服务 Pod 使用 hostname 硬反亲和，滚动策略为 `maxSurge: 0`、`maxUnavailable: 1`。两节点都需可调度；该策略逐副本替换，不增加临时第三个副本。它不提供节点自动扩容、数据库 HA 或入口故障切换。
 
-业务 namespace 已从 `sems-test` 迁到 `sems-prod`，保留 production 标记；GitHub environment `k3s-test` 是既有 OIDC 身份名称，继续使用以保持 IAM 信任，不代表线上运行在测试 namespace。正式 Ingress `sems-public` 独立于应用 CD，配置见 [sems-public.yaml](../deployment/k3s/sems-public.yaml)。过渡域名和旧 namespace 已退休，详见[迁移验收](evidence/2026-10-25-production-namespace/README.md)。
+## 管理边界
 
-迁移建立了保留现有应用 digest 的新发布基线；配置迁移记录独立于 GitHub Actions 发布记录。新发布器仅接受 `sems-prod`，迁移前 `sems-test` 的发布记录不能直接回放。新基线没有可自动回退的跨 namespace 前任；如需使用迁移前镜像，先把已审核的旧 digest 渲染成 `sems-prod` 的新发布，再做兼容性验证。旧 namespace 删除后，尚未合并的旧 main 发布器会在读取/校验应用快照时拒绝发布，不能重建 namespace；合并本次 namespace 迁移 PR 后，后续 main CD 才恢复对新 namespace 的自动更新。
+| 应用 CD 更新 | 独立管理 |
+| --- | --- |
+| 五个 Deployment、六个应用 Service、运行/数据库地址/gateway ConfigMap | Namespace、Secret、PostgreSQL StatefulSet、PVC/StorageClass、NetworkPolicy |
+| 后端的共享 Java Agent component | Traefik/ACME、正式站点 Ingress、Grafana Ingress、监控后端 |
 
-发布资源只包含五个应用 Deployment、六个 Service 和三个 ConfigMap；新发布不再渲染 Ingress，正式入口独立管理。PostgreSQL、数据库凭据、PVC/StorageClass、NetworkPolicy、Traefik 和 [监控后端](observability.md)独立管理；数据库 Flyway 迁移仍由各后端启动时执行。三个后端的 Java Agent 通过共享 Kustomize component 随应用发布；对应接收器须先按可观测性指南安装。当前 GHCR 应用镜像允许匿名拉取；改成私有包需要先单独配置集群拉取凭据。
+Flyway 在对应后端启动时执行。数据库迁移、凭据轮换和数据库恢复须按兼容性单独协调。不要直接 apply 带旧 bootstrap 镜像摘要的完整生产 overlay 来更新应用；日常发布使用同次 CI 的 image lock。
 
-发布过程：
+正式入口使用 [sems-public.yaml](../deployment/k3s/sems-public.yaml)，监控入口使用 [grafana-public.yaml](../deployment/observability/grafana-public.yaml)。Release 不包含 Ingress，也不能重建旧 namespace。
 
-1. 核对源提交、同次 image lock、五个 digest 和 namespace/资源范围。
-2. 集群 server-side dry run，保存应用快照及此前已验证的发布指针。
-3. 导出 PostgreSQL custom-format dump 和不含密码的角色定义，记录大小和 SHA256。
-4. 依次更新 Identity、Catalog、Admission、Web、Gateway，并等待各自完成滚动更新。
-5. 验证五个应用各 2 个副本、实际镜像和跨节点分布；验证可信 HTTPS、内部接口 404、管理员登录及 JWT；确认 PostgreSQL Pod/PVC UID 未变。
-6. 全部通过后才更新 `/var/lib/sems-cd/current.json`，结果上传 Actions artifact `k3s-deployment`。
+## AWS 与 GitHub 身份
 
-两个节点使用同服务 Pod 的硬反亲和：通过稳定的 `app.kubernetes.io/name` 标签匹配，`topologyKey` 为 `kubernetes.io/hostname`。滚动策略为 `maxSurge: 0`、`maxUnavailable: 1`，逐个释放并替换副本。最初只有 topology spread 的演练出现最终副本同节点；增加反亲和后，发布器也显式检查最终节点分布。此策略要求两节点可调度，不提供节点自动扩容或数据库高可用。
+- GitHub environment 名为 `k3s-test`，仅允许 main；这是既有 OIDC/IAM 身份，实际业务 namespace 为 `sems-prod`。
+- 环境变量为 `K3S_DEPLOY_ROLE_ARN` 和 `K3S_INSTANCE_ID`，目标为现有 server。
+- `swe5001-github-k3s-deploy` 只信任此仓库指定 environment 的 OIDC subject，允许对指定实例执行 `AWS-RunShellScript` 及查询结果。
+- server 的 `swe5001-k3s-ssm` 实例角色具有 SSM managed-instance 权限；worker 不需要 GitHub 发布权限。
 
-## 已配置权限
+策略源文件位于 [deployment/k3s/cd](../deployment/k3s/cd/)。该角色能在 server 执行管理员级发布命令，main 的代码审查属于信任边界。修改 environment 名称必须同步 IAM trust，不能仅改显示名。
 
-经维护者授权配置：
+## 发布状态与备份
 
-- GitHub environment：`k3s-test`，仅允许 `main` 分支部署。
-- 变量：`K3S_DEPLOY_ROLE_ARN`、`K3S_INSTANCE_ID`，目标 instance 为 `i-061d2aa2de119a95d`。
-- GitHub 角色：`swe5001-github-k3s-deploy`，仅信任该仓库 `k3s-test` 的 OIDC subject 和 `sts.amazonaws.com` audience。该仓库创建于 2026-10-12，使用包含 owner/repository ID 的 subject。
-- 部署权限：只对该 server 和 AWS `AWS-RunShellScript` 文档允许 `ssm:SendCommand`，并允许读取命令结果。它能在该 server 上执行管理员级发布命令；代码写入及 main 审查权限属于这条信任边界。
-- server 实例角色/instance profile：`swe5001-k3s-ssm`，使用 `AmazonSSMManagedInstanceCore`。worker 未关联该角色。
+server 的 `/var/lib/sems-cd/` 由 root 管理：
 
-具体策略见 [GitHub 信任](../deployment/k3s/cd/github-trust.json)、[部署权限](../deployment/k3s/cd/github-permissions.json)、[实例角色信任](../deployment/k3s/cd/instance-trust.json)。GitHub 未保存长期 AWS access key。旧 `staging` 环境与其 SSH 配置保留，当前公网 SSH 范围未扩大。
+| 路径 | 内容 |
+| --- | --- |
+| `releases/<commit>-<run>-<attempt>/` | 候选资源、应用快照、此前指针和验证结果 |
+| `current.json` / `previous.json` | 当前和此前已验证的发布指针 |
+| `backups/` | 发布前 dump、角色定义及校验元数据 |
+| `deploy.lock` | 串行化 CD 和手动应用修改 |
 
-## 发布文件与备份
+数据库在 worker，以上备份在 server。另用[数据库备份命令](k3s.md#数据库与备份)保存异机副本和独立凭据；当前尚无自动周期、WAL 归档或 PITR。
 
-server 的 `/var/lib/sems-cd/` 由 root 管理，权限受限：
+## 应用回退
 
-- `releases/<commit>-<run>-<attempt>/`：候选资源、发布前应用快照、此前指针、最终结果。
-- `backups/`：发布前 dump、无密码角色定义和校验元数据。
-- `current.json`：最近通过检查的版本；`previous.json`：此前已验证指针。
-- `deploy.lock`：序列化 Actions 与手动发布。
+失败发布不会推进成功指针；已更新的服务可能仍运行候选镜像，应先检查现场状态。`before.json` 仅用于诊断，可能包含未完整发布的资源。回退只选取 `before-pointer.json` 指向且验证通过的前驱，不撤销数据库迁移。
 
-数据库在 worker，以上备份在 server，是跨数据库节点的逻辑备份。还应按 [K3s 数据库步骤](k3s.md#自建-postgresql)保存本机副本；这不是完整 ACL/凭据重建、PITR 或主机灾难恢复演练。
-
-## 显式应用回退
-
-失败时停止发布，保留备份、快照和诊断，不推进成功指针。已经更新的组件可能仍在运行候选版本，需要检查实际状态。数据库迁移不自动撤销。
-
-确认目标版本与当前 schema 兼容后，使用该次发布 `before-pointer.json` 指向的已验证资源回退应用。`before.json` 只作现场诊断，可能包含此前失败发布的部分状态，不能把它当作已验证版本。没有已验证前驱时，应显式发布经过审阅的基线。例如本机已完成 `aws login --profile sems --region ap-southeast-1` 时：
+维护者确认目标镜像与当前 schema 兼容，并完成 AWS 登录后执行：
 
 ```bash
 AWS_PROFILE=sems python3 scripts/cd/submit-k3s.py \
@@ -61,15 +60,6 @@ AWS_PROFILE=sems python3 scripts/cd/submit-k3s.py \
   --report ci-logs/k3s-rollback.json
 ```
 
-该操作先备份当前数据库，再恢复目标发布前的应用资源、等待就绪并检查 HTTPS/登录。它不会恢复数据库，也不应把已有问题的旧部署配置重新引入。密钥、账号密码、数据库卷和 Traefik 不在应用回退范围。
+此命令恢复所指定 release 的已验证前驱，并在操作前再次备份。无已验证前驱时须显式发布审核后的基线；迁移前 `sems-test` 的 release 不能直接回放。需要旧应用镜像时，将兼容的 digest 渲染为 `sems-prod` 的新 release。
 
-## 已完成演练
-
-[2026-10-25 发布与回退记录](evidence/2026-10-25-k3s-cd/README.md)包含正常发布、失败候选拒绝、兼容旧镜像切换和回退至已验证前驱，最终九组核心业务通过。先由本机身份经 SSM 完成演练；随后首次 GitHub main 发布也成功，现场确认五个应用各 2/2、镜像与同次发布报告一致、数据库 Pod/PVC 和既有测试数据保留。
-
-## 剩余验证
-
-- 正式域名、原数据和原 JWT 已迁移；后续根据缓存/访问情况清理过渡代理及旧 SEMS 闲置容器，保留共享项目和备份。
-- 高 VU、十分钟稳态、实体手机相机、完整数据库灾难恢复和主机故障仍按各自计划验证。
-
-依据：[GitHub AWS OIDC](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws)、[SSM 实例权限](https://docs.aws.amazon.com/systems-manager/latest/userguide/setup-instance-permissions.html)、[Kubernetes Pod 反亲和](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/)。
+原站数据库已停止接收 SEMS 写入。把 DNS 指回旧库不能替代数据库回迁；任何数据回迁都需维护、备份、同步和业务核对。历史实测材料见[证据索引](evidence/README.md)。

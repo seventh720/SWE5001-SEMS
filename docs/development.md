@@ -15,8 +15,6 @@ All commands below run from the repository root. Each developer runs their own l
 
 PostgreSQL still listens on 5432 **inside** Docker. Keep service JDBC URLs pointed at `postgres:5432`; 15432 is for host clients. The Compose project is `sems-platform`, with its own `platform-db` volume.
 
-**Existing checkout:** pull the changes and run the two-file Compose startup command in the [local setup guide](../README.md#2-local-setup) again. This recreates the changed port mappings while retaining the existing database volume. Restart Vite and update old browser bookmarks/Navicat connections.
-
 ### Frontend
 
 Start the full stack using the [local setup guide](../README.md#2-local-setup), then use another terminal:

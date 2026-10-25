@@ -1,94 +1,40 @@
-# Flat organization upgrade
+# 旧库组织模型升级
 
-## Scope and authority
+本指南仅用于尚未从个人 organizer 模型迁移到组织模型的旧数据库。当前生产数据已完成该升级，日常部署不重复执行这些步骤。当前权限与治理见[业务规则](functional-guide.md)，跨服务关闭/取消协议见[架构决策](adr/0001-service-boundaries.md)。
 
-The platform administrator provisions organizations and appoints their first administrators. Platform ADMIN is not an implicit organization business administrator. Organization roles are ORG_ADMIN, ORGANIZER and MEMBER; membership states are ACTIVE, SUSPENDED and REMOVED. Users may belong to multiple organizations with independent roles. Global legacy ORGANIZER and STAFF claims no longer authorize business operations.
+## 数据边界
 
-Identity owns organizations, memberships and account-bound invitations. Catalog owns event organization, creator and visibility. Admission owns inventory, event assignments, tickets and check-in. Internal organization lookup uses a new ORGANIZATION_ACCESS_TOKEN. No runtime cross-schema reads or cross-service foreign keys are added.
+Identity 拥有组织、成员和邀请；Catalog 保存活动的组织归属与创建者；Admission 保存销售、工作人员分配和票券。旧 organizer ID 保留历史来源，业务管理权限改由实时组织成员关系决定。平台 ADMIN 和旧全局 ORGANIZER/STAFF 不替代组织角色。
 
-Existing event-specific `/api/v1/organizer/events/{id}` routes are retained to reduce client changes. List requests require `organizationId`; creation includes it in the body. Every operation derives the actual organization from the stored event and checks live membership. Query/body IDs cannot grant access. Organization transfer is unsupported. Creator ID is retained under the legacy organizer_id storage column and exposed as createdBy; it is not an authorization source.
+[migrate-organizations.py](../scripts/migrate-organizations.py)为旧事件/销售生成稳定的组织映射，核对订单、票券和库存指纹，再分别执行服务 schema 事务。它依赖 Compose；不能直接用于 K3s 生产环境。
 
-## Behavior
+## 维护步骤
 
-- Platform admin creates an organization using an existing active account's email as administrator. Organization admin may invite registered users; invite tokens are random, hashed at rest, account-bound and expire after seven days. Recipients receive an in-app invitation and can accept or decline in Notifications; account-bound links can also be shared manually. No email delivery or SSO.
-- Last active organization administrator cannot be removed/demoted. Platform admin can appoint a replacement. Membership updates use optimistic versions and serialize on the organization row.
-- PUBLIC events appear in common discovery. ORGANIZATION_ONLY events require active membership for organization discovery, details, ticket availability, pre-registration and new bookings. Visibility can be changed through the versioned event revision flow, including after publication. Switching to organization-only restricts discovery and new bookings to active members; existing tickets remain valid. Ordinary public attendance does not create membership.
-- Members can read their organization directory. Only ORG_ADMIN changes members/invitations. ORG_ADMIN and ORGANIZER manage all events in their organization and assign staff.
-- Staff assignment is per event, only for active members of that organization. Assigned users check in by camera QR scanning, manual code or a keyboard-style scanner. Camera scanning prefers the rear camera on phones, offers camera selection on PCs, and stops after each detected ticket. HTTPS is required on phones; localhost works for local desktop testing. Membership is checked live; assignment and ticket state are checked under the same sales-row lock used by cancellation. Duplicate scans report the original result without increasing attendance.
-- Existing ticket entitlements and attendee-owned booking history remain valid after membership removal. A removed member cannot view internal event details or create a new booking; request-key replay can retrieve the existing owned booking. Pre-registration snapshots remain personal history, but confirmation rechecks eligibility.
-- Pausing an event does not invalidate tickets or prevent staff from checking them. New check-ins open 15 minutes before the current event start, inclusive; earlier attempts return 409. The database clock is checked under the sales-row lock. Whole-event cancellation is implemented as a separate terminal protocol; see [publication management](publication-management.md). Permanent organization closure invokes it automatically before completion. Temporary platform suspension remains reversible and does not cancel events.
-- Organization suspension disables member/manager/staff permissions and hides public discovery/details/new booking eligibility. Existing personal booking history and tickets remain stored. Approved closure additionally marks all memberships REMOVED with the MEMBER role and revokes pending invitations; reactivation does not restore those roles.
-- Authorization service failure returns 503 for dependent operations rather than using stale roles. Public discovery and new booking eligibility now consult the active-organization directory in Identity; Identity unavailability returns 503. An operation already authorized may finish during membership revocation; this is not a cross-service atomic revocation guarantee.
-
-## Safe deployment and existing data
-
-This release is a coordinated maintenance-window upgrade, not a rolling mixed-version rollout. Do not rebuild the running development stack before backing up and preparing migration.
-
-1. Record current commit and immutable image IDs. Back up PostgreSQL using `pg_dump` and verify the backup can be read/restored in a disposable database. Preserve the existing .env and keys securely.
-2. Stop new external writes (gateway maintenance/stop). Allow PUBLISHING and UPDATING operations to finish; verify no pending event revisions. Stop application services after draining.
-3. Run `bash scripts/setup-local.sh` to add the missing organization service token without replacing existing credentials. Build passing backend JARs and web dist; deploy Identity, Catalog and Admission together with external access still closed. Flyway appends Identity V4, Catalog V6/V7 and Admission V8. Existing records are preserved; organization_id is nullable only for the maintenance migration.
-4. Generate a mapping using the target Compose/environment files:
+1. 记录旧版本/镜像，备份数据库、凭据和 JWT 密钥，并在临时库验证恢复。
+2. 关闭外部写入，排空发布/修订操作。保持维护，使用兼容的三个服务版本执行各自 Flyway 迁移。
+3. 为目标旧库生成计划，检查每个 owner 的存在/活跃状态、组织名称和映射。计划含业务 ID，保持私有。
 
 ```bash
-python3 scripts/migrate-organizations.py --plan /tmp/sems-organization-plan.json
+umask 077
+python3 scripts/migrate-organizations.py \
+  --compose-file /private/path/compose.yaml --env-file /private/path/runtime.env \
+  --plan .secrets/organization-upgrade/plan.json
 ```
 
-The plan creates one initial organization for each legacy organizer and event owner, with the existing owner as ORG_ADMIN. Review/edit organization names and verify all owner IDs. The script refuses inactive/missing owners; assign a valid business owner deliberately before migration. It captures booking/ticket/inventory fingerprints. Do not store this plan publicly.
-
-5. Apply only after checking the backup and maintenance state:
+4. 确认备份与停写后应用审核过的同一份计划：
 
 ```bash
-python3 scripts/migrate-organizations.py --plan /tmp/sems-organization-plan.json --apply --maintenance-confirmed
+python3 scripts/migrate-organizations.py \
+  --compose-file /private/path/compose.yaml --env-file /private/path/runtime.env \
+  --plan .secrets/organization-upgrade/plan.json --apply --maintenance-confirmed
 ```
 
-The tool uses separate service-role transactions, stable organization IDs and idempotent mapping. Interrupted work can be resumed using the same plan. It refuses pending operations, changed business fingerprints, conflicting mappings or remaining unmapped records. Do not reopen traffic after a partial failure. The maintenance administrator's final cross-schema consistency query is not application access.
+5. 检查所有活动/sales 已映射、原订单/请求键/票凭证/状态/库存一致。验证组织管理员权限、跨组织拒绝及旧票可用，再开放流量。
 
-6. Verify the organization administrator can manage migrated events and existing attendee tickets still work. Verify a second organization cannot access management data. Reopen the gateway only after checks pass.
+工具拒绝 pending 操作、变化的数据指纹、冲突映射及未完成记录。中断后使用同一审核计划继续；部分失败时保持维护，不手工跳过一致性校验。
 
-A rollback after accepting new organization data must not simply run the previous owner-based application: that version cannot enforce internal visibility or organization roles. Before reopening, either fix forward or restore the pre-upgrade backup and matching old images during maintenance, explicitly reconciling any post-upgrade writes. SQL migrations do not reverse when images roll back.
+## 兼容性与验证
 
-## Verification
+旧版个人 owner 授权不能安全理解组织内部可见性、暂停/取消、CLOSING/DELETED 和分页 API。应用回退不撤销 Flyway，也不能在接收组织数据后直接运行旧二进制。按[发布回退](k3s-cd.md)核对 schema 与目标镜像；数据恢复需明确同步维护后的写入。
 
-Run `mvn verify`, `npm --prefix apps/web test`, and `npm --prefix apps/web run build`. In a disposable Compose project run `python3 scripts/organization-acceptance.py`; it includes the pre-existing editor acceptance chain, publication/revision outage recovery, 100 requests for 10 places through two Admission replicas, then organization and check-in checks. Set SEMS_BASE_URL, SEMS_ENV_FILE and SEMS_COMPOSE_FILE for isolated environments; set bootstrap credentials in the process environment. Never run fault-injection acceptance against a shared working instance.
-
-Use a distinct Compose project, network name, volume name and host port. Docker Compose's normalized config includes explicit network/volume names: changing only its `name` field does not isolate those resources.
-
-## Demonstration
-
-Provision Society A and Training B, invite members to A, publish an internal seminar and public workshop, browse as member and outsider, assign one staff member only to the seminar, check a ticket twice and show attendance remains one. Verify another organization can onboard without code changes and platform admins cannot implicitly read organization booking lists. Organization membership defines management access; enterprise hierarchy and SSO are outside the implemented scope.
-
-### Local frontend proxy
-
-The unified local environment uses gateway port 18080 and PostgreSQL port 15432. Vite on 15173 proxies to 18080 by default. An optional ignored `apps/web/.env.development.local` can set `API_PROXY_TARGET`; the current local override points to 18080. The old isolated 18081 preview is stopped after migration.
-
-### Local deployment — 15 October 2026
-
-The original database was backed up and restored into a temporary database to verify the backup before migration. Identity V4, Catalog V6/V7 and Admission V8 were applied. Legacy activities were assigned to their existing owner's organization; existing user credentials, bookings, tickets and inventory were preserved. The original admin is also ORG_ADMIN of the migrated organization. Private backup files are under `.secrets/backups/2026-10-15-organization-upgrade` and must not be committed.
-
-For Navicat, use a PostgreSQL connection to `127.0.0.1:15432`, database `sems`, username `postgres` and the existing local `POSTGRES_PASSWORD` value from `.env`. No SSH tunnel is required for this local connection. Expand the `identity`, `catalog` and `admission` schemas. The web admin password is unrelated to the PostgreSQL password. Existing Navicat connections with these settings can simply reconnect and refresh.
-
-## Organization governance
-
-Identity V7 adds organization versions, profile/closure requests and soft-deleted state. Platform ADMIN can edit name/address, appoint administrators, suspend/activate, review requests, and soft-delete. ORG_ADMIN may submit one pending request per organization, with a reason and current organization version. Review requires a note; rejected requests do not change organization data, and stale approvals fail instead of overwriting newer platform edits.
-
-Approved closure and direct soft deletion first persist CLOSING in Identity. Workspaces and new organization operations become unavailable immediately. A durable worker calls Catalog with the organization service token, immutable operation ID and original request time. Catalog fences event writes, waits for prior publication/revision work to settle, and uses the existing cancellation protocol for events unfinished at the closure request time. Admission cancels confirmed bookings and unused tickets and notifies attendees, including people outside the organization. Historical check-ins remain intact.
-
-Only after cancellation completes does Identity revoke memberships/invitations and finalize SUSPENDED (approved closure) or DELETED (soft deletion). Closed organizations cannot be reactivated or reassigned, while a temporary platform suspension can still be activated. The admin list exposes `closureRequested` to distinguish these cases and polls CLOSING progress. Soft-deleted organizations disappear from the list after completion. Personal accounts, historical records and unrelated organizations remain available. Closing does not remove platform ADMIN from an account. No paid-ticket/refund workflow exists.
-
-All stages persist their intent/receipts and retry after outages or lost acknowledgments. No database transaction makes a remote HTTP call. A Catalog database trigger serializes organization event writes with the closure fence, covering requests authorized before closure. Pending publication/revision can finish, but closure waits and cancels the resulting unfinished event. New create/edit/publish work cannot reopen a fenced organization. The original request time remains the cancellation cutoff even if services are unavailable until an event ends.
-
-Catalog filters public pagination using active organization IDs from Identity and resolves the latest organization name. Published booking eligibility also checks organization activity. This introduces an Identity dependency for anonymous discovery. A pre-authorized booking may commit before cancellation obtains the sales lock; it is then included in cancellation. CLOSING is an intermediate state, not a claim that all tickets are already invalid.
-
-Request submissions notify active platform administrators; decisions and profile/closure changes notify affected users through the existing organization inbox. This provides persistent in-app notifications, not external messaging. Request/history API access remains permission checked.
-
-Deploy Identity (V7), Catalog and Web after backup, then reload the gateway. Do not roll Identity back to a version unable to understand DELETED while deleted rows exist. Acceptance: scripts/organization-governance-acceptance.py in an isolated environment.
-
-## Platform authorization and member pagination
-
-Every platform ADMIN method checks both the signed claim and the current active account's database role through `PlatformAccess`. Removing ADMIN takes effect on subsequent requests using the same old token. Granting ADMIN still requires a new login/token. This does not grant organization business membership.
-
-`GET /api/v1/organizations/{org}/members?page=0&size=12&search=...` returns `{items,page,size,totalElements,totalMembers,totalPages}`. The old array response is replaced. Queries are scoped to an authorized organization, search username/email case-insensitively with literal wildcard characters, and order by normalized username and user ID. Size is 1–50; search is at most 200 characters. Counts and rows use a consistent read transaction. The organization preview fetches three entries; the directory and staff picker fetch one page of twelve and ignore stale search responses. Assignment selections are stored by user ID independently of the visible page.
-
-Upgrade order: back up, deploy Catalog V10/V11 (closure fence and fixed trigger schema), then Identity V8/V9 and Web together. Identity V9 recovers identifiable earlier approved closures and soft deletions; it leaves temporary suspensions alone. For legacy deletions without a recorded closure timestamp, migration time is the cutoff. Services remain within their owned schemas. Backward binaries cannot safely handle CLOSING or the new paged API. Inspect pending `identity.organization_closures`, `catalog.organization_closures` and event cancellation receipts when diagnosing recovery; repair connectivity/service failures and let workers continue, rather than manually clearing the fence.
-
-Run `scripts/predeployment-fixes-acceptance.py` on an isolated stack for old-token revocation, member pagination, pending event revisions during closure, stale publication rejection, Admission outage, Identity/Catalog restart, acknowledgment replay and direct deletion. The existing governance and membership-notification scripts also use the paged member contract.
+`organization-migration-acceptance.py` 在独立测试栈核对映射、幂等重放和票券/库存；`organization-acceptance.py`、`organization-governance-acceptance.py` 和 `predeployment-fixes-acceptance.py` 覆盖组织授权、治理与关闭恢复。全部使用独立数据，原始结果见[验收证据](evidence/README.md)。

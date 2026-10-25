@@ -24,8 +24,8 @@ Grafana 的 **SEMS · Operations** 面板提供：
 
 ```mermaid
 flowchart LR
-  J[Identity / Catalog / Admission\nJava Agent init container] -->|OTLP traces, metrics, logs| O[OpenTelemetry Collector]
-  L[每节点日志采集器\ngateway / web / PostgreSQL] -->|OTLP logs| O
+  J[Identity / Catalog / Admission<br/>Java Agent init container] -->|OTLP traces, metrics, logs| O[OpenTelemetry Collector]
+  L[每节点日志采集器<br/>gateway / web / PostgreSQL] -->|OTLP logs| O
   O -->|OTLP| T[Tempo]
   O -->|OTLP| K[Loki]
   P[Prometheus] -->|scrape| O
@@ -34,8 +34,8 @@ flowchart LR
   P --> D[PostgreSQL Exporter]
   P --> B[Blackbox HTTPS probes]
   P -->|rules| A[Alertmanager]
-  A --> TG[Telegram\n触发与恢复通知]
-  G[Grafana\n本机 SSH / port-forward] --> P
+  A --> TG[Telegram<br/>触发与恢复通知]
+  G[Grafana<br/>HTTPS / 账号登录] --> P
   G --> T
   G --> K
   G --> A
@@ -119,8 +119,6 @@ python3 scripts/observability/verify-public.py --kubeconfig .secrets/k3s-cloud/k
 
 ## 域名与 Cloudflare 代理
 
-`sems-test.seventh720.com` 的过渡 Ingress 已退休，旧 Lightsail 代理已改为直连 K3s 公网 IP，并校验 `swe5001.seventh720.com` 的源站证书。Cloudflare 中 `sems-test` 的 A 记录可删除；业务 namespace 已迁到 `sems-prod`，旧 `sems-test` namespace 已清理。数据库监控地址、Pod 指标、日志路径、追踪属性和 Grafana 面板均指向新 namespace，保留原 Grafana 登录和 Telegram Secret。迁移过程和验收见[生产 namespace 迁移](evidence/2026-10-25-production-namespace/README.md)。
-
-当前 CD 不再管理 Ingress，正式入口和监控入口独立管理。应用发布只接受 `sems-prod`，拒绝重放迁移前 namespace 的 release。配置需随本次 namespace 迁移 PR 合并到 main，后续自动发布才会使用新 namespace。
+正式业务域名为 `swe5001.seventh720.com`，监控为 `grafana.seventh720.com`；Cloudflare 使用 DNS only，Traefik 管理 HTTPS。业务位于 `sems-prod`，监控位于 `observability`。应用 CD 与两个公网 Ingress 独立管理。
 
 DNS only 可以长期使用，HTTPS 由源站证书提供。需要 Cloudflare 代理或防护时，可在源站证书和登录验证通过后切为 Proxied，并使用 Full (strict) SSL/TLS；Grafana 的登录/API 不应配置整站缓存。保留现有 HTTP-01 证书校验路径的可达性，避免为该路径增加交互式挑战。切代理不会自动取消或取代 Grafana 登录。

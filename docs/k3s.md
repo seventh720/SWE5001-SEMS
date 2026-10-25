@@ -1,99 +1,99 @@
-# EC2 上的 K3s 环境
+# EC2 K3s 运维
 
-当前云端 Kubernetes 路线为两台 EC2、自建 K3s、Traefik 入口和集群内自建 PostgreSQL。当前路线不创建 EKS、RDS、NAT Gateway 或 ALB。应用仍通过独立 Deployment、Service、Secret 和数据库账号/schema 划分边界；EKS overlay 仅保留为另一种部署环境的参考模板。
+正式站点 <https://swe5001.seventh720.com> 运行在 AWS 新加坡区域的两台 EC2，使用 K3s 和 containerd。业务及 PostgreSQL 位于 `sems-prod`，监控位于 `observability`。应用发布见 [CI/CD](k3s-cd.md)，指标、告警、日志和追踪见[可观测性](observability.md)。
 
-2026-10-24 完成独立测试环境验收，2026-10-25 已将正式入口 [swe5001.seventh720.com](https://swe5001.seventh720.com) 和原站数据迁到这里。原站迁移时应用为 PR #29 / `7a97828`，五个应用各两个副本、分别位于两节点；[main OIDC/SSM 自动发布](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288)已通过，原账号/订单/票券、JWT、正式 TLS 与 DNS 迁移见[切换记录](evidence/2026-10-25-k3s-cutover/README.md)。
+## 物理部署
 
-业务 namespace 为 `sems-prod`，已标记 `sems.seventh720.com/environment=production`；监控位于独立的 `observability`。原 `sems-test` namespace 已迁移并清理，数据库保留同一数据卷与原账号/JWT 密钥，详见[迁移验收](evidence/2026-10-25-production-namespace/README.md)。GitHub environment `k3s-test` 保留既有名称及 OIDC 信任。`sems-test.seventh720.com` 的过渡入口已退休，Cloudflare 中该 A 记录可删除。夹具/故障脚本只允许隔离测试环境，不能用于 `sems-prod`。
+| 项目 | 配置 |
+| --- | --- |
+| 区域 / 可用区 | `ap-southeast-1` / `ap-southeast-1a` |
+| 网络 | 现有 VPC `vpc-02bd49f7852b0db8a`，同一默认子网 |
+| 节点 | 两台 `t3.medium`，每台 2 vCPU、4 GiB 内存、30 GiB gp3 根盘 |
+| Server | `sems-k3s-server`，公网 `13.229.121.219`，私网 `172.31.33.16` |
+| Worker | `sems-k3s-worker`，公网 `54.151.244.167`，私网 `172.31.39.232` |
+| 平台 | Ubuntu 24.04、K3s `v1.36.5+k3s1`、containerd |
+| 节点分组 | 自建节点标签 `sems.io/node-group=apps`，角色为 server / worker；未使用 EKS managed node groups |
 
-
-## 节点与网络
-
-| 节点 | 配置 | 职责 |
-|---|---|---|
-| `sems-k3s-server` | Ubuntu 24.04 x86_64；t3.medium；30 GiB gp3 | K3s 控制平面、内嵌 SQLite 集群状态库、containerd 和应用工作负载 |
-| `sems-k3s-worker` | 同上 | K3s agent、containerd、PostgreSQL 持久化与应用工作负载 |
-
-两台位于 `ap-southeast-1a` 的同一公有子网，节点间通过私有 IP 通信，使用公网 IPv4 经 Internet Gateway 拉取镜像。K3s 的 API server、scheduler、controller manager 等由 server 进程承载，不能根据 `kube-system` 的 Pod 列表断言控制平面不存在。默认 Pod 网段为 `10.42.0.0/16`，Service 网段为 `10.43.0.0/16`，Flannel 使用 VXLAN。
-
-节点共用安全组：TCP 22 仅允许管理者的公网 IP；TCP 80/443 允许网站访问；TCP 6443/10250、UDP 8472 仅允许节点安全组自身。默认允许出站。Kubernetes API 不开放公网访问，本机通过 SSH 隧道管理。
-
-这是单控制平面、单可用区环境，PostgreSQL 也是单实例。两个应用副本不能消除控制平面、可用区或数据库节点的故障风险。Traefik 默认一个副本，ServiceLB 在两个节点监听入口端口；单域名指向一个节点时，该节点仍是域名入口单点。HPA、节点自动扩容、入口故障切换尚未配置。
-
-## 安装
-
-固定版本 `v1.36.5+k3s1`。先将 [server 配置](../deployment/k3s/server.yaml.example) 替换为实际私有 IP，作为 root-only 的 `/etc/rancher/k3s/config.yaml`，再在 server 执行：
-
-```bash
-sudo sh /tmp/install-k3s-node.sh server
+```mermaid
+flowchart TB
+  User[Browser / API client] -->|HTTPS| T
+  subgraph AWS[AWS VPC · ap-southeast-1a]
+    subgraph S[EC2 · sems-k3s-server]
+      CP[K3s API server / scheduler / controllers] --> SQL[(Embedded SQLite)]
+      T[Traefik · TLS / HTTP redirect]
+      AS[sems-prod · one Pod per app<br/>Gateway / Web / Identity / Catalog / Admission]
+      MS[observability<br/>Prometheus / Grafana / Alertmanager]
+    end
+    subgraph W[EC2 · sems-k3s-worker]
+      Agent[K3s agent / kubelet / containerd / Flannel]
+      AW[sems-prod · one Pod per app<br/>Gateway / Web / Identity / Catalog / Admission]
+      PG[sems-prod · postgres-0] --> PV[(Retain local-path · worker EBS)]
+      MW[observability<br/>Loki / Tempo / collectors]
+    end
+    CP -->|Manage workloads| Agent
+    T -->|ClusterIP routing| AS
+    T -->|ClusterIP routing| AW
+    AS -->|PostgreSQL service| PG
+    AW -->|PostgreSQL service| PG
+    AS -->|OTLP| MW
+    AW -->|OTLP| MW
+    MS -->|Query / scrape| MW
+  end
 ```
 
-脚本来自仓库的 [install-k3s-node.sh](../scripts/k8s/install-k3s-node.sh)，从固定 release tag 获取官方 installer；installer 对 K3s 二进制核对 release SHA256。版本和配置应一起变更，不能无记录地跟随 `latest` 升级。
+节点同时运行应用。Server 提供单控制平面及 SQLite；worker 上的 PostgreSQL 为独立 StatefulSet。五个应用各两个副本，使用节点硬反亲和分散；Pod 级 requests/limits、探针和滚动策略见 [K3s overlay](../deployment/k8s/overlays/k3s/)及[公共资源](../deployment/k8s/base/)。Node Exporter 与日志采集器在每节点运行。
 
-通过 SSH 安全读取 server 的 `/var/lib/rancher/k3s/server/agent-token`，写入 worker 的 `/etc/rancher/k3s/agent-token`，root 所有、权限 0600。将 [agent 配置](../deployment/k3s/agent.yaml.example) 的私有 IP 替换后写入 worker，再执行：
+Traefik 单副本在 server，通过 ServiceLB 暴露 80/443；当前正式 DNS 指向 server。两个节点处于同一可用区，数据库、本地卷、控制平面、入口和监控存在单点。应用多副本不等同于这些层面的 HA。
+
+## 网络与访问
+
+节点私网通过 Flannel VXLAN 通信，Pod 网段为 `10.42.0.0/16`，Service 网段为 `10.43.0.0/16`。安全组入站：
+
+| 端口 | 来源 / 用途 |
+| --- | --- |
+| TCP 22 | 管理者公网 IP，SSH |
+| TCP 80/443 | 公网网站与证书验证 |
+| TCP 6443/10250 | 节点安全组自身，Kubernetes API / kubelet |
+| UDP 8472 | 节点安全组自身，VXLAN |
+
+Kubernetes API 和 PostgreSQL 不开放公网。应用通过 ClusterIP 和 Kubernetes DNS 发现服务；`event-catalog-pods` headless Service 仅返回就绪 Catalog Pod，供内部只读请求故障转移。公开 `/internal/` 返回 404，内部 API 另需服务令牌。数据库网络策略只允许对应应用、指定备份工具和监控 exporter。
+
+Cloudflare 的 `swe5001` 与 `grafana` A 记录指向 server，使用 DNS only。Traefik 使用 Let's Encrypt HTTP-01，HTTP 重定向 HTTPS。ACME 状态存于 server 的 Retain PVC。公网 IP 若在停启后变化，需协调 DNS、SSH 信任记录和管理配置。证书与代理设置见[监控域名说明](observability.md#域名与-cloudflare-代理)。
+
+## 集群管理
+
+维护者使用私有 SSH 密钥、已核对的 known_hosts 与专用 kubeconfig；这些文件不随仓库分发。先保持以下隧道运行：
 
 ```bash
-sudo sh /tmp/install-k3s-node.sh agent
-```
-
-不要将 token 放入命令参数、操作日志或版本库。server 的 `/etc/rancher/k3s/k3s.yaml` 含集群管理员凭据；本机副本独立保存在被忽略的 `.secrets/k3s-cloud/kubeconfig`，不覆盖默认 kubeconfig。SSH 私钥也仅在该忽略目录中保留权限 0600 的副本。
-
-本机管理隧道（把 `<server-public-ip>` 替换为实例当前地址）：
-
-```bash
-ssh -i .secrets/k3s-cloud/ssh.pem \
+ssh -N -i .secrets/k3s-cloud/ssh.pem \
   -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
   -o UserKnownHostsFile=.secrets/k3s-cloud/known_hosts \
-  -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 \
-  -N -L 127.0.0.1:16443:127.0.0.1:6443 ubuntu@<server-public-ip>
+  -L 127.0.0.1:16443:127.0.0.1:6443 ubuntu@13.229.121.219
 ```
 
-`known_hosts` 应使用 AWS 实例控制台输出中的主机公钥核对。独立 kubeconfig 的 server 为 `https://127.0.0.1:16443`，context 为 `sems-k3s`。用显式参数访问：
+另开终端，显式指定 context，避免依赖默认集群：
 
 ```bash
-kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s \
-  --cache-dir .secrets/k3s-cloud/cache get nodes -o wide
+sems_kubectl() {
+  kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s \
+    --cache-dir .secrets/k3s-cloud/cache "$@"
+}
+sems_kubectl get nodes -o wide
+sems_kubectl -n sems-prod get deployments,statefulsets,pods -o wide
+sems_kubectl -n observability get pods
+sems_kubectl get ingress -A
+sems_kubectl top nodes
 ```
 
-## 网络验证
+节点安装脚本为 [install-k3s-node.sh](../scripts/k8s/install-k3s-node.sh)，server/agent 配置示例位于 [deployment/k3s](../deployment/k3s/)。初始化新集群需先配置节点私网、受限 API、加入令牌及独立凭据；已有生产环境通过 [CD](k3s-cd.md)更新，不重新执行 bootstrap 全量部署。
 
-[network-smoke.yaml](../deployment/k3s/network-smoke.yaml) 创建一次性 namespace、server 节点客户端 Pod、worker 节点 HTTP Pod、ClusterIP Service 和临时 HTTP Ingress。等待两个 Pod Ready 后验证：
+## 数据库与备份
 
-1. server 节点 Pod 能解析 `bootstrap-http.sems-bootstrap-check.svc.cluster.local`。
-2. 通过该 Service 能从 server 节点访问 worker 节点 Pod，返回 `SEMS_K3S_NETWORK_OK`。
-3. 分别向两个 EC2 公网 IP 发 HTTP 请求，Host 为 `bootstrap.sems-test.example.invalid`，均得到同样响应。
-4. `kubectl top nodes` 能获取两个节点的指标。
+PostgreSQL 为单实例，固定在 worker。数据库 `sems` 的 `identity`、`catalog`、`admission` schema 分别由各服务角色使用。业务账号、原用户密码散列和 JWT 密钥保留；内部数据库连接使用 SCRAM，当前未启用 PostgreSQL TLS。
 
-测试结束删除整个 `sems-bootstrap-check` namespace。这个检查使用 BusyBox 临时镜像；实际运行 digest 要随结果保存。它只验证基础设施连通性，不代表 SEMS 业务、HTTPS、负载容量或故障恢复验收。
+`data-postgres-0` 使用 `sems-postgres-local` / Retain，申请 10 GiB；实际目录位于 worker 根 EBS。PVC 申请值不是磁盘配额，也不另外创建 EBS。Pod 重建重新挂载同一卷；worker 丢失时不能自动把该目录调度到另一节点。Retain 不保护被终止删除的根盘。
 
-上述临时 HTTP Ingress 检查用于初始阶段。启用全局 HTTPS 重定向后，公网检查应改用真实测试域名的 HTTPS，而不是继续期待 IP 地址上的 HTTP 直接返回测试正文。
-
-## 自建 PostgreSQL
-
-[数据库配置](../deployment/k8s/overlays/k3s/postgres/kustomization.yaml) 使用一个 PostgreSQL 17 StatefulSet，固定在 `sems-k3s-worker`，数据通过 `data-postgres-0` PVC 保存在 worker 的现有 EBS 根磁盘上。独立 StorageClass `sems-postgres-local` 使用 K3s local-path provisioner、WaitForFirstConsumer 和 Retain 回收策略；StatefulSet 删除/缩容时也保留 PVC。
-
-PVC 声明为 10 GiB，但 local-path 使用节点目录，未单独创建或收费一块 10 GiB EBS，也不强制执行容量配额。数据库文件和镜像缓存共用 worker 的 30 GiB 磁盘，需监测实际剩余空间。Pod 重建会重新挂载同一份数据；worker 丢失时，不能自动把这个本地卷挂载到 server，需要恢复原节点或从异机备份重建。Retain 不保护 EC2 根盘被终止删除的情况。
-
-镜像固定为既有 `fb27bbf52142700351318ba18c83bb51a9783298` 发布中的 PostgreSQL digest，沿用该次 CI 扫描与真实镜像验收，未在本轮重新扫描。镜像内初始化脚本创建 `sems` 数据库、三个应用角色和独立 schema，并限制 PUBLIC 和跨 schema 权限。容器使用 PostgreSQL Alpine 的 UID/GID 70，管理员密码只进入数据库 Pod；后端使用各自的独立 Secret。
-
-数据库只通过 ClusterIP `postgres:5432` 提供服务。NetworkPolicy 仅允许同 namespace 的三个后端和 `postgres-backup` 标签工具 Pod 访问；EC2 安全组不开放 5432。当前集群内数据库连接未启用 PostgreSQL TLS；它依赖私网、Pod 网络隔离和数据库认证，不能标为 RDS `verify-full` 连接。
-
-准备独立凭据及密钥（脚本默认仍生成本地 kind 环境，以下显式指定云端目录）：
-
-```bash
-bash scripts/k8s/setup-local.sh .secrets/k3s-cloud k3s-admin@example.invalid
-```
-
-使用 [Secret 生成器](../scripts/k8s/secrets.py) 时传 `--namespace sems-prod --include-postgres`，把输出直接通过管道交给显式 context 的 kubectl，不写入日志。已有凭据不会被初始化脚本覆盖；PostgreSQL init 脚本只在空数据目录执行，更新 Secret 也不会自动修改库内密码。
-
-在 `sems-prod` namespace 已存在且 Secret 已创建后，可只部署数据库：
-
-```bash
-kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s \
-  --cache-dir .secrets/k3s-cloud/cache apply -k deployment/k8s/overlays/k3s/postgres
-```
-
-异机逻辑备份保存到本机的忽略目录，权限 0600，角色导出不包含密码；应另行保留受限的 `runtime.env` 供凭据恢复：
+异机逻辑备份保存到本机私有目录：
 
 ```bash
 python3 scripts/k8s/backup-postgres.py \
@@ -101,90 +101,22 @@ python3 scripts/k8s/backup-postgres.py \
   --output-directory .secrets/k3s-cloud/backups
 ```
 
-这提供手动备份，尚无自动周期、WAL 归档或时间点恢复。以下历史数据库验收脚本会创建探针、重建数据库 Pod 并做恢复演练，只能用于独立测试集群，不能在当前正式环境运行：
+备份包含 custom-format 业务库和不含密码的角色定义，需独立保管凭据、密钥并验证恢复。CD 还在 server 保存发布前备份。当前没有自动周期备份、WAL 归档或 PITR。
+
+只读数据库访问通过本机转发，Navicat 不再连接冻结的旧数据库：
 
 ```bash
-python3 scripts/k8s/postgres-acceptance.py \
-  --kubeconfig .secrets/k3s-cloud/kubeconfig \
-  --report ci-logs/k3s-cloud/postgres-acceptance.json
+sems_kubectl -n sems-prod port-forward --address 127.0.0.1 svc/postgres 15432:5432
 ```
 
-之前准备但未使用的 RDS 子网组、两个私有子网、路由表和数据库安全组已删除，未创建过 RDS 实例；历史网络记录及清理记录保留在[基础设施记录](evidence/2026-10-24-k3s-bootstrap/README.md)。
+连接 `127.0.0.1:15432`、数据库 `sems`，使用已保留的 `sems_viewer` 账号和原只读密码。不要将 PostgreSQL 5432 暴露到公网。Flyway、凭据轮换及恢复要求见[开发指南](development.md)和[发布回退](k3s-cd.md)。
 
-## 应用与 HTTPS
+## 扩容、启停与边界
 
-[K3s overlay](../deployment/k8s/overlays/k3s/kustomization.yaml) 包含上述数据库和通用应用配置，五个应用各两个副本。同服务 Pod 使用 hostname 硬反亲和，滚动策略为 maxSurge 0、maxUnavailable 1，确保更新后仍分布在两节点。数据库 URL 指向 `postgres:5432`。初始化应用镜像固定到 `52df21f34a5f181683f273ae053bf5dc18c08e08` 发布的 amd64 digest；其业务运行代码与 `fb27bbf` 一致。日常 [CD 发布器](k3s-cd.md)从同次 CI 的 image lock 覆盖五个应用引用，数据库镜像独立管理。网关通过 ConfigMap 使用 Kubernetes DNS 适配配置。
+- 同服务硬反亲和意味着两个节点最多调度两个副本。`2→3` 不会增加节点，第三个 Pod 将 Pending；当前没有 HPA 或节点自动扩容。
+- 扩容正确性、吞吐收益和故障恢复分别测试。受控 1/2 副本对照、资源预算和工具适配见[扩容实验](performance-and-availability.md)。生产故障/夹具脚本拒绝 `sems-prod`，测试需独立数据和环境。
+- 停止 EC2 会中断服务；实例计算费用停止后，EBS 等保留资源仍有费用。停机前完成备份并正常停库，恢复时先启动 server，再启动 worker，并验证节点、数据和入口。
+- 当前没有 EKS、RDS、NAT Gateway 或 ALB。PostgreSQL、应用与监控共享已有 EC2 的资源。
+- 旧 Lightsail 保留 SWE5006 和共享代理，SEMS 旧后端已停止写入；其旧数据库仅保留历史数据。不要把清理 SEMS 文档当作删除共享主机的依据。
 
-三个后端启动时运行各自的 Flyway 迁移。原站账号及密码散列已迁入，签名密钥保留；受限的 `.secrets/k3s-cloud/login.txt` 已更新为原管理员资料。密码、私钥和 token 不进入公开部署记录。此前测试数据保留于独立的旧测试库，当前业务库为迁入的原站数据。
-
-DNS：Cloudflare 的 `swe5001` A 记录指向 server 当前公网 IPv4，使用 DNS only。HTTPS 配置位于 [traefik-https.yaml](../deployment/k3s/traefik-https.yaml)，需将 `CONFIGURE_ACME_EMAIL` 替换成环境联系人邮箱后以集群管理员身份单独部署；本机实际配置保存在忽略的 `.secrets/k3s-cloud/traefik-https.json`。
-
-Traefik 通过 Let's Encrypt HTTP-01 自动签发并配置自动续期，HTTP 重定向到 HTTPS。`traefik-acme` PVC 使用 server 现有 EBS 上的 local-path 目录，Retain 回收策略，保存 `/data/acme.json`，实际文件权限 0600。该 PVC 的 1 GiB 请求也不代表另建 EBS。Traefik 保持单副本并使用 Recreate 更新策略，避免多个实例同时写 ACME 状态；更新时可能短暂中断入口。证书续期流程已配置，尚未经历实际续期周期。
-
-Ingress 使用 `traefik`、真实域名和 `letsencrypt` resolver，证书由 Traefik 的 ACME 状态管理，不需要手工创建 TLS Secret。下面整套 overlay 命令仅用于初始化配置参考；日常更新使用 [CD](k3s-cd.md)。迁移后不要用旧的 bootstrap image pins 覆盖已发布版本：
-
-```bash
-kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s \
-  --cache-dir .secrets/k3s-cloud/cache apply -k deployment/k8s/overlays/k3s
-```
-
-以下命令仅适用于迁移前记录或新建的独立测试集群；脚本仍指向隔离的 `sems-test`，该 namespace 在正式集群已不存在，因此会失败并停止；生产标记及 `sems-prod` 名称也会触发保护。默认行为仍为本地 kind：
-
-```bash
-python3 scripts/k8s/local-acceptance.py --environment k3s \
-  --kubeconfig .secrets/k3s-cloud/kubeconfig \
-  --env-file .secrets/k3s-cloud/runtime.env \
-  --report ci-logs/k3s-cloud/business-acceptance.json
-```
-
-该检查会创建唯一的测试账号、组织、活动和订单，测试数据保留在独立测试库；不要把该测试库当作已经迁入原站数据的正式环境。
-
-[service-lifecycle.py](../scripts/k8s/service-lifecycle.py) 验证 Admission 手动 2→1→2 扩缩容和单 Pod 重建，同时采样公网读取/健康接口，并比较 Identity/Catalog Pod UID 与订单/票券数量。它不验证新版本镜像升级、兼容回滚、性能扩容收益或主机级故障恢复。当前九组业务验收和该轮运维检查通过，完整结果见[应用验收记录](evidence/2026-10-24-k3s-application/README.md)。
-
-扩展业务回归使用 [business-regression.py](../scripts/k8s/business-regression.py)，依次复用现有业务断言，将测试数据 SQL、服务停启和重启操作转换为真实的 `kubectl exec`、Deployment 缩放和滚动重启。执行环境不需要 Docker daemon 或 Compose。每个套件在独立进程中运行，保存日志、脚本 SHA256、Kubernetes 操作和结果，结束时恢复原副本数。
-
-```bash
-python3 scripts/k8s/business-regression.py \
-  --kubeconfig .secrets/k3s-cloud/kubeconfig \
-  --env-file .secrets/k3s-cloud/runtime.env \
-  --output ci-logs/k3s-regression/full
-
-python3 scripts/k8s/catalog-recovery.py \
-  --kubeconfig .secrets/k3s-cloud/kubeconfig \
-  --env-file .secrets/k3s-cloud/runtime.env \
-  --report ci-logs/k3s-regression/catalog-recovery.json
-```
-
-这两项只允许独立的 `sems-k3s/sems-test` 测试环境，串行执行；先备份数据库。它们创建测试数据并故意中断服务，不用于共享正式环境。后者在持续订票、同键重放和读取回执期间强制删除一个 Catalog Pod，再验证全部 Catalog 副本停止时的有界失败及恢复后的幂等性、库存审计，全程不重启 Gateway。历史数据迁移验收和 Docker DNS 拓扑验收不在上述业务适配器范围内。
-
-## 正式切换与回迁
-
-正式域名和原数据已于 2026-10-25 切到 K3s，详见[切换验收](evidence/2026-10-25-k3s-cutover/README.md)。正式 Ingress `sems-public` 与 production 标记由 [sems-public.yaml](../deployment/k3s/sems-public.yaml) 独立管理，应用 CD 不再管理 Ingress，因此后续发布不会覆盖正式路由。业务 namespace 已迁到 `sems-prod`，旧 `sems-test` namespace 已清理；同名 DNS 别名可删除。
-
-旧站三个业务后端停止；旧 IP 的 SEMS 路由临时代理新站，覆盖 DNS 缓存，SWE5006 和共享 Caddy 保留。旧数据库、卷、逻辑备份和新环境旧测试库 `sems_test_before_cutover_20261025` 都没有删除。新写入开放后，回迁必须再次维护、备份并反向同步，不能只改 DNS 回到冻结旧库。
-
-未来可迁到 RDS PostgreSQL：保留三个 schema/角色所有权，通过 pg_dump/pg_restore 恢复，协调连接地址、账号 Secret、可信 CA 和 verify-full TLS，再验证后切换。当前没有创建或接入 RDS，不承诺零停机数据库迁移。
-
-## 数据库只读访问
-
-旧 Navicat SSH 配置仍指向冻结的 Lightsail 数据。访问当前数据时，先按前文建立 K3s API 的 SSH 隧道，再在本机执行：
-
-```bash
-kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s \
-  --cache-dir .secrets/k3s-cloud/cache -n sems-prod \
-  port-forward --address 127.0.0.1 svc/postgres 15432:5432
-```
-
-Navicat 连接 `127.0.0.1:15432`、数据库 sems、用户 sems_viewer，沿用原只读密码；该角色及登录 verifier 已迁入。这里已通过 Kubernetes/SSH 隧道转发，Navicat 不再额外开启旧 SSH 配置。不要向公网开放 5432。
-
-## 启停与费用
-
-暂停测试时停止两台 EC2 可结束实例计算费，但 EBS 和保留的 Elastic IP 仍计费。自动分配的公网 IP 在停止/启动后可能变化，需要同步管理隧道、SSH 主机记录和 DNS；节点私网 IP 是集群配置的一部分。恢复时先启动 server，再启动 worker，检查节点与系统组件就绪。
-
-PostgreSQL 随 worker 停止和恢复，不产生单独的 RDS 实例费。停机前完成备份并正常停库；现有 EBS 和保留的公网 IP 仍有独立计费。当前方案避免 EKS、RDS、NAT 和 ALB 的实例/网关小时费用。
-
-参考：[K3s 版本说明](https://docs.k3s.io/release-notes/v1.36.X)、[配置文件](https://docs.k3s.io/installation/configuration)、[网络要求](https://docs.k3s.io/installation/requirements)、[Traefik 与 ServiceLB](https://docs.k3s.io/networking/networking-services)、[StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/)、[PostgreSQL 逻辑备份](https://www.postgresql.org/docs/17/backup-dump.html)。
-
-## 持续监控与追踪
-
-现有节点上的 Prometheus、Grafana、Loki、Tempo 和 OpenTelemetry 采集、Telegram 通知及私有控制台入口见[可观测性指南](observability.md)。监控基础设施独立于应用 CD；三个后端的 Agent component 随后续 K3s 应用发布保留。
+实测结果按版本保存在[证据目录](evidence/README.md)，待办见[路线图](roadmap.md)。

@@ -1,116 +1,34 @@
-# 发布状态与已知限制
+# 当前平台状态
 
-文档整理：2026-10-25（新加坡时间）。正式域名 `swe5001.seventh720.com` 已切到 EC2 K3s，原站切换时应用为 PR #29 / `7a97828`，main GitHub OIDC/SSM 自动发布通过。原站 27 张表及原 JWT 密钥已迁入，原账号、订单和票券保留；五个应用各 2 副本、跨两节点。旧 SEMS 后端停写，旧 IP 仅临时代理到新环境，共享 Caddy 和 SWE5006 保留。容量尚未在该部署上重新测量。
+正式入口：[swe5001.seventh720.com](https://swe5001.seventh720.com)。运维入口：[Grafana](https://grafana.seventh720.com/d/sems-operations)，需要登录。代码与部署状态以 [main CI/CD](https://github.com/seventh720/SWE5001-SEMS/actions/workflows/ci.yml?query=branch%3Amain) 和实际运行镜像为准。
 
-## 最近发布
+## 当前实现
 
-[PR #31](https://github.com/seventh720/SWE5001-SEMS/pull/31) 的监控、集中日志、Telegram 告警和跨服务追踪已接入并合并，固定 HTTPS 入口为 <https://grafana.seventh720.com>，保留账号登录。实现、公开登录验证及别名清理见[可观测性记录](evidence/2026-10-25-observability/README.md)。
+| 范围 | 状态 |
+| --- | --- |
+| 业务 | 组织与成员治理、活动发布/修订/取消、免费报名、二维码票券、核销、预约、通知及组织总览 |
+| 服务边界 | Identity、Event Catalog、Admission 独立部署，分别拥有 schema、凭据和迁移 |
+| 生产运行 | 新加坡区域两台 EC2，K3s/containerd，单控制平面、单可用区 |
+| 应用副本 | 五个应用各两个副本，分布在两个节点；业务 namespace 为 `sems-prod` |
+| 数据 | 自建 PostgreSQL 单实例，worker 本地 Retain 卷；原账号和业务数据保留 |
+| 交付 | main CI/CD 已验证：六项检查、GHCR digest、GitHub OIDC、AWS SSM、备份及发布后校验 |
+| 可观测性 | `observability` 中的指标、日志、链路追踪、Grafana 和 Telegram 触发/恢复通知 |
+| 访问 | 公网 HTTPS；内部 API、数据库与监控后端仅内部访问；集群管理经 SSH 隧道 |
 
-业务与正式数据随后已迁入 `sems-prod`，旧 `sems-test` namespace 已清理，`observability` 保持独立；详见[迁移记录](evidence/2026-10-25-production-namespace/README.md)。namespace 迁移配置通过独立 PR 更新，待其合并后，后续 main CD 才会使用新 namespace；合并前旧发布器因旧 namespace 不存在而拒绝更新。
+正式数据和 JWT 密钥已完成迁移，旧 `sems-test` namespace 及过渡 Ingress 已清理。旧 Lightsail 仍承载 SWE5006，并保留 SEMS 的缓存过渡代理；不再作为 SEMS 应用发布目标。部署细节见 [K3s 运维](k3s.md)。
 
-PR #29 已合并为 `7a97828`，[main CI 与 K3s CD](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288)全部成功。现场五个应用各 2/2、分居两节点，镜像与发布报告一致，数据库 Pod/PVC 与既有测试数据保持；[首次自动发布证据](evidence/2026-10-25-k3s-cd/README.md#首次-main-自动发布)已记录。正式域名随后已完成[数据、证书和 DNS 切换](evidence/2026-10-25-k3s-cutover/README.md)，不再由旧应用处理业务。
+## 验证范围
 
-PR #28 的文档整理已合并，提交 `52df21f`；[main CI 与当时的 Lightsail 部署](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39978065255)成功。以下功能更新来自此前 PR #27 / `fb27bbf`，其 [main CI](https://github.com/seventh720/SWE5001-SEMS/actions/runs/39751659240)也通过。
+main 的构建、集成、安全、镜像和实际 K3s 发布均已通过。业务回归覆盖权限、并发库存、重放、核销、取消和跨服务中断恢复。Catalog 只读调用对瞬态 502/503/504 最多重试一次，写操作依赖业务幂等协议。完整结果和首次失败记录见[验收证据](evidence/README.md)。
 
-- 创建组织成功后显示 “Organization created.” 通知，8 秒后消失且可手动关闭。列表刷新失败会单独提示，不覆盖已完成的创建结果。
-- 管理页 403/404 显示 “Event unavailable” 和明确的不可用/权限提示，重试按钮独立布局并支持窄屏换行。
-- 该轮本地 141 项前端测试、构建和 lint 通过；云端页面与资源检查通过。
-- 前序版本的 Catalog 窄字段 JDBC 读取、4096 网关连接额度、上游连接复用和 Caddy 工具链安全补丁保留在该版本中。
+历史容量实验曾通过 250 VU 读取，混合负载的服务端门禁失败；这些结果属于当时版本和 Lightsail 环境。当前 K3s 尚未完成相同负载复测、十分钟稳态或受控 1/2 副本收益对照。功能回归通过不代表这些容量目标已达成。
 
-容量实验对应较早提交 `f69d49d`，不把其结果标作对 `fb27bbf` 的重新测量。
+## 已知限制
 
-## 已实现能力
+- 单控制平面、单可用区、单 PostgreSQL；本地卷依赖原节点。入口和监控也存在单点。
+- 未配置 HPA、节点自动扩容、数据库自动切换、定期异地备份或 PITR。
+- 同一服务使用节点硬反亲和；当前两个节点最多放置两个副本，第三个副本需要额外可调度节点或另行设计测试拓扑。
+- 库存热点由同一 sales 行锁串行化，服务副本增加后的收益需要实测。
+- 未接入自动 OpenAPI 符合性门禁；设备覆盖和数据库灾难恢复仍有待补充。
 
-| 范围 | 行为与边界 | 说明 |
-|---|---|---|
-| 多组织权限 | 平台管理与组织角色分离，同组织管理者共享活动，跨组织隔离 | [业务规则](functional-guide.md) |
-| 活动生命周期 | 草稿、发布、编辑、改期、暂停/恢复和整场取消；已结束活动不能重开 | [发布管理](publication-management.md) |
-| 订票与核销 | 免费预订、独立票券、预约、个人取消、工作人员核销和统计 | 库存、订单与票券在 Admission 本地事务内更新 |
-| 组织管理 | ORG_ADMIN 总览、活动和成员检索、组合筛选、服务端分页 | 总览不受列表筛选影响，普通 ORGANIZER 无总览权限 |
-| 通知与治理 | 业务通知、成员关系更新、邀请、组织变更与关闭流程 | [站内通知](in-app-notifications.md)、[组织升级](organization-upgrade.md) |
-| 会话与密码 | JWT 有效期 1 小时；新密码为 8–16 位可打印 ASCII，拒绝空格，已有密码登录兼容 | [安全说明](security.md) |
-| 数据与服务边界 | 三个 Spring Boot 进程，独立 schema、账号和迁移，认证 HTTP 协作 | [架构决策](adr/0001-service-boundaries.md) |
-| 运维可观测性 | Grafana HTTPS 登录、节点/Pod/JVM/HTTP/数据库指标、集中日志、Telegram 触发/恢复及跨服务追踪 | [可观测性指南](observability.md) |
-| CI/CD | lint、单元/组件、真实数据库/API、安全与镜像扫描、GHCR digest 发布和 main-only 部署 | [CI 操作](ci.md)、[云端环境](k3s.md) |
-
-## 已完成验证
-
-- 组织总览、筛选/分页、生命周期、组织与角色隔离，以及发现、订票、重复核销和取消的真实 API 闭环通过；记录见[组织管理验收](evidence/2026-10-20-organization-management/verification.md)。
-- 两个 Admission 实例处理 100 请求竞争 10 名额，持久化结果无超卖；同键重放、异载荷拒绝和重复取消由独立数据库/API 验收覆盖。
-- Catalog 冷启动恢复、全部副本不可用时的有界失败，以及恢复后订单与库存检查已纳入集成验收。这些检查不证明云端恢复时间或主机级高可用。
-- 桌面和 390px 移动布局检查通过；手机摄像头核销已有维护者实机确认。未测量特定设备的识别率。
-- Catalog 公共及内部读取优化的 84 项后端测试、真实 PostgreSQL/API 回归和 schema 隔离检查通过，基线为 `f69d49d`。不同版本的测试数与覆盖范围见[测试说明](test-coverage.md)。
-
-## 本地 Kubernetes 验证
-
-2026-10-24 在独立 kind 创建的 Kubernetes 1.36.4 单节点集群中完成关键业务验收，记录见[本地 Kubernetes 验收](evidence/2026-10-24-kubernetes-local/README.md)。两个 Admission Pod 处理 100 个不同请求竞争 10 个名额，结果为 10 次成功、90 次库存冲突，数据库库存/确认数量/有效票数均为 10；同键重放、并发核销、个人及整场取消、schema 隔离也通过。本次 Java 21 构建的 84 项后端测试与前端构建通过。
-
-新增[配置及运行指南](kubernetes.md)，包含独立本地凭据/数据库和 EKS 模板。当前两个 Admission Pod 共用一个本地节点；首次数据库就绪前每个后端重启一次，随后就绪。该验证不代表 EKS 已部署，也不代表云端吞吐、跨节点恢复或独立扩容收益已经测得。上述本地验证发生于正式迁移前；线上现已使用 EC2 K3s 流程。
-
-## EC2 K3s 基础设施
-
-2026-10-24 在两台新加坡 `ap-southeast-1a` 的 t3.medium / 30 GiB gp3 / Ubuntu 24.04 实例上安装固定版本 `v1.36.5+k3s1`。server 和 worker 均为 Ready，运行 containerd；控制平面由 server 的 K3s 进程承载。管理 API 通过 SSH 隧道访问，节点间走私网。
-
-[基础设施验收](evidence/2026-10-24-k3s-bootstrap/README.md)通过：server 节点 Pod 的 DNS 查询、经 ClusterIP Service 访问 worker 节点 Pod、两个 EC2 公网 HTTP 入口，以及两个节点的指标读取。临时测试 namespace 已删除。新增 [K3s 部署说明](k3s.md)、节点安装配置和 Traefik/自建 PostgreSQL 应用 overlay；此为初始化阶段记录，正式应用和域名现已接入该集群，过渡测试域名入口已退休。
-
-当前采用自建 K3s 与 PostgreSQL 路线，减少 EKS、RDS、NAT Gateway 和 ALB 的固定费用。业务应用和可信 HTTPS 现使用 `https://swe5001.seventh720.com`，五个应用各两个副本，分布到两台 EC2。原 Lightsail 数据和 JWT 已迁移，旧 API 停写；过渡代理已直连正式入口，不再依赖已退休的测试域名。单控制平面、单可用区、单数据库实例和单副本 Traefik 的限制仍在。
-
-此前仅为 RDS 准备过网络对象，随后选择自建 PostgreSQL，已清理这些闲置 DB 子网、路由表、DB subnet group 和数据库安全组；未创建 RDS 实例。PostgreSQL 17 StatefulSet 已在 worker 启动，使用现有 EBS 上的 Retain PVC，三个角色/schema 独立，所有 TCP 连接要求 SCRAM 密码认证，5432 通过集群内 Service 和 NetworkPolicy 限制。数据库初始化时独立于原 Lightsail；2026-10-25 已完成原账号及业务数据迁移。
-
-[自建数据库验收](evidence/2026-10-24-k3s-postgres/README.md)五组通过：真实角色认证与权限、跨节点网络策略、Pod 重建数据保留、异机逻辑备份与临时库数据恢复。保留首次 loopback trust 问题和一次测试错误分类的原始记录；已修正并复验。完整 K3s overlay 的 21 个对象 server-side dry run 通过。此恢复检查不包含凭据/ACL 重建、节点级故障切换或生产恢复时间；初始化阶段备份为手动执行；当前 CD 已在每次发布前导出数据库，定期异地备份仍待配置。
-
-## EC2 K3s 应用验收
-
-[2026-10-24 应用与 HTTPS 验收](evidence/2026-10-24-k3s-application/README.md)九组业务检查通过。两个真实 EC2 节点上的 Admission 各接收 50 个请求，共 100 个不同请求竞争 10 个名额，得到 10 次成功、90 次库存冲突，数据库库存/确认数量/有效票数均为 10。同键重放、并发核销、个人及整场取消和 schema 隔离也通过。
-
-Admission 独立 2→1→2 扩缩容和单 Pod 重建通过，Identity/Catalog Pod UID 不变、订单/票券数量保留；该轮单次替代 Pod Ready 观察值为 26.503 秒。期间对首页、公开活动读取及三个健康接口的 205 次 HTTPS 采样全部成功。此为低负载单次运维验证，不代表容量提升、恢复时间 SLO、主机级 HA 或新版本兼容回滚。
-
-公网可信 TLS、HTTP→HTTPS 重定向、登录/JWT、前端静态资源和内部接口 404 检查通过。Traefik 的 ACME 状态保存在 server EBS 上的 Retain PVC，自动续期已配置但尚未经历续期周期。应用沿用 `fb27bbf` 发布的已验证镜像 digest，本轮未重新扫描；测试数据和管理员凭据独立于原站，业务数据库已保存异机备份。正式域名切换、原数据迁移和旧 SEMS 清理仍待后续执行；共享 Lightsail 主机上的其他项目和 Caddy 保留。
-
-## EC2 K3s 扩展业务回归
-
-[2026-10-24 完整业务与故障回归](evidence/2026-10-24-k3s-regression/README.md)最终通过 12 个业务套件、9 组跨节点检查、4 组 Catalog 故障检查和 12 组真实浏览器检查。既有断言通过 Kubernetes 执行 SQL、Deployment 停启与重启，不依赖 Docker daemon。组织管理套件首次遇到测试运行器的 Python 模块遮蔽问题，已修正并单独补测，首次失败记录保留。
-
-真实发布、预登记、联系人、统一编辑、改期、通知去重、组织审批与关闭、权限即时撤销、取消事务回滚及确认丢失重放通过。两台 EC2 上的 Admission 再次得到 100 请求/10 名额的 10×200、90×409，库存/订单/票券均为 10。
-
-三条工作流持续 75 秒，707 笔订票及对应重试、最新回执在一次强制 Catalog Pod 删除期间全部成功；替代 Pod Ready 单次观察值 36.398 秒，其他服务 Pod UID 不变。全部 Catalog 停止时新订票返回有界 503，恢复后同键重试仅一单，未重启 Gateway；数据库审计为 708/708/708、重复请求键 0。
-
-前端 141 项、构建和 lint 通过；390px 浏览器完成预登记、报名、二维码渲染、取消及通知已读，取消后二维码隐藏。最终五个应用均为 2/2，数据库卷及可信 HTTPS 正常。测试库保留唯一夹具与历史，未切换正式域名或迁移原数据；未复测实体手机摄像头或高 VU 容量，不能用上述功能结果替代容量、主机恢复或回滚实验。
-
-## EC2 K3s 发布与回退
-
-[2026-10-25 发布验收](evidence/2026-10-25-k3s-cd/README.md)通过：本机身份经 SSM 发布 `52df21f`、拒绝不可变 selector 候选且不推进成功指针、发布兼容旧镜像 `fb27bbf`，再显式回退至此前已验证的 `52df21f`。发布前数据库逻辑备份保存在 server；数据库在 worker，Pod/PVC 未随应用发布改变。最终五个应用各 2/2、分居两个节点，既有回归数据仍为 708/708/708。
-
-初次演练发现纯文本网关健康响应被误判，以及 topology spread 在滚动后出现副本同节点。已修正检查器并加入同服务硬反亲和和逐副本替换，保留首次失败记录。最终镜像补跑九组核心业务通过，包括 100 请求竞争 10 名额、同键重放、并发核销、取消和 schema 隔离。回退只使用此前通过验证的资源，不撤销数据库迁移。
-
-GitHub OIDC 信任、main-only environment 与 server SSM 权限已配置；PR #29 合并后的首次 main 发布已实际完成 OIDC 交换、镜像锁下载与 SSM/K3s 部署。正式域名与原站数据未迁移。操作见 [K3s 发布与回退](k3s-cd.md)。
-
-## 正式域名与原数据切换
-
-2026-10-25 维护窗口内完成 [Lightsail → K3s 切换](evidence/2026-10-25-k3s-cutover/README.md)。先备份两边数据和配置、在隔离库验证 27 张表/所有者/权限；停止旧站三个后端后重新备份并最终恢复，27 张表数据指纹完全一致，保留 7 用户、7 活动、3 订单和 4 票券。新环境旧测试库单独保留，未混入原数据。
-
-正式域名可信 TLS、五个公开路径、内部接口 404、原 JWT 和原管理员重新登录通过；权威及两个公共 DNS 均指向新 IP，本机访问已直达新节点。五个应用各 2/2、分居两节点，数据库 Pod/PVC 未变，迁移后备份在 server 和本机。旧 IP 临时代理新环境以覆盖 DNS 缓存；SWE5006 与共享 Caddy 正常。
-
-历史 namespace/environment 名称仍为 sems-test/k3s-test；前者已标记 production，两个域名共用迁入的数据。夹具/故障脚本须使用独立测试环境，本分支已加入生产标记拦截和正式域名 CD 校验。新写入开放后，数据库回迁必须先同步，不能直接切回冻结旧库。旧卷、旧数据库和备份保留；过渡代理清理及完整灾难恢复另行处理。
-
-## 最近容量结果
-
-[2026-10-22 容量记录](evidence/2026-10-22-cloud-capacity/README.md)使用 50 场普通活动、1000 个账号、默认连接池 10 和既定阈值：
-
-| 场景 | 结果 |
-|---|---|
-| 250 VU 读取 | 通过，保持期 p95 933 ms |
-| 250 VU 混合 | 整体 p95 1545 ms，订票 p95 2518 ms；客户端检查通过，但 4 次内部详情 504 导致服务端零错误门禁未通过 |
-| 500 / 1000 VU | 未执行 |
-
-250 VU 保持期为 60 秒，不能替代十分钟稳态。内部详情超时的唯一根因尚未确定；详情降级保留已提交票券访问，不消除内部错误。实验的临时账号、活动、订单和票券已清理，原始验证记录保留。
-
-## 已知限制与后续工作
-
-- 正式域名运行于两台 EC2 K3s，存在单控制平面、单可用区和数据库节点单点。没有主机级 HA、云端自动扩容或已测独立扩容性能收益。
-- 运行密钥使用受限主机文件；数据库在 worker，发布前逻辑备份位于 server。持续监控、告警及定期异地备份待补。
-- 十分钟稳态、独立副本扩容收益、云端定时恢复和完整数据库灾难恢复待完成；兼容镜像应用回退和临时库数据恢复已分别演练。
-- 自动 OpenAPI 符合性门禁和真实数据库/API 验收覆盖采集待补；单元覆盖率不替代业务或性能验收。
-- 安全门禁通过只适用于当次规则与漏洞库；有期限的 Spring 功能适用性例外见[安全文档](security.md)。
-
-具体任务与验收条件见[技术改进计划](roadmap.md)。历史检查和原始结果见[归档](archive/README.md)与 [evidence](evidence/)。
+后续工作见[工程待办](roadmap.md)，测试计划见[性能与扩容实验](performance-and-availability.md)。

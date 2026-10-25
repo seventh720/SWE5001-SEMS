@@ -19,7 +19,7 @@ npm --prefix apps/web run test:coverage
 npm --prefix apps/web run build
 ```
 
-The build includes TypeScript checks; `dist/` must exist before building the Compose web image. Container rebuild instructions are in the root guide.
+The build includes TypeScript checks; `dist/` must exist before building the Compose web image. Container rebuild instructions are in the [development guide](../../docs/development.md).
 
 ## Interface conventions
 
