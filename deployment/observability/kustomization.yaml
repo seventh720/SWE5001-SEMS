@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: observability
+resources:
+- resources.yaml
+- grafana-public.yaml
+labels:
+- pairs:
+    app.kubernetes.io/part-of: sems-observability
+  includeSelectors: false
+  includeTemplates: true
+configMapGenerator:
+- name: prometheus-config
+  files:
+  - config/prometheus.yml
+  - config/rules.yml
+- name: blackbox-config
+  files:
+  - config/blackbox.yml
+- name: loki-config
+  files:
+  - config/loki.yml
+- name: tempo-config
+  files:
+  - config/tempo.yml
+- name: otel-collector-config
+  files:
+  - config/otel.yml
+- name: log-agent-config
+  files:
+  - config/log-agent.yml
+- name: grafana-datasources
+  files:
+  - config/datasources.yml
+- name: grafana-provider
+  files:
+  - config/dashboards.yml
+- name: grafana-dashboards
+  files:
+  - dashboards/sems.json

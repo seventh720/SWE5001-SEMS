@@ -1,0 +1,57 @@
+auth_enabled: false
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
+common:
+  instance_addr: 127.0.0.1
+  path_prefix: /data
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+  storage:
+    filesystem:
+      chunks_directory: /data/chunks
+      rules_directory: /data/rules
+schema_config:
+  configs:
+    - from: '2026-10-01'
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+limits_config:
+  retention_period: 48h
+  ingestion_rate_mb: 0.01
+  ingestion_burst_size_mb: 1
+  max_query_parallelism: 2
+  max_query_series: 500
+  split_queries_by_interval: 1h
+  allow_structured_metadata: true
+  otlp_config:
+    resource_attributes:
+      ignore_defaults: true
+      attributes_config:
+        - action: index_label
+          attributes: [service.name, k8s.namespace.name, deployment.environment.name]
+        - action: structured_metadata
+          attributes: [k8s.pod.name, service.instance.id]
+compactor:
+  working_directory: /data/compactor
+  retention_enabled: true
+  delete_request_store: filesystem
+  retention_delete_delay: 1h
+  compaction_interval: 10m
+query_range:
+  results_cache:
+    cache:
+      embedded_cache:
+        enabled: true
+        max_size_mb: 16
+ingester:
+  chunk_idle_period: 10m
+  max_chunk_age: 1h
+analytics:
+  reporting_enabled: false

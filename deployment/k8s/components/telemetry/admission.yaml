@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admission
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: otel-java-agent
+        image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java@sha256:9dad1c6e3e2ecee48fc164a19bcfde703510bee972c8cb421689fde89b5f89e9
+        command:
+        - cp
+        - /javaagent.jar
+        - /otel/javaagent.jar
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            cpu: 200m
+            memory: 96Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - name: otel-agent
+          mountPath: /otel
+      containers:
+      - name: admission
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: -Xms128m -Xmx384m -XX:MaxMetaspaceSize=192m -javaagent:/otel/javaagent.jar
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: SOURCE_COMMIT
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.annotations['sems.seventh720.com/source-commit']
+        - name: OTEL_SERVICE_NAME
+          value: admission
+        - name: OTEL_RESOURCE_ATTRIBUTES
+          value: deployment.environment.name=production,k8s.namespace.name=sems-test,k8s.pod.name=$(POD_NAME),service.version=$(SOURCE_COMMIT)
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://otel-collector.observability.svc.cluster.local:4318
+        - name: OTEL_EXPORTER_OTLP_PROTOCOL
+          value: http/protobuf
+        - name: OTEL_TRACES_SAMPLER
+          value: parentbased_traceidratio
+        - name: OTEL_TRACES_SAMPLER_ARG
+          value: '0.1'
+        - name: OTEL_METRIC_EXPORT_INTERVAL
+          value: '30000'
+        - name: OTEL_LOGS_EXPORTER
+          value: otlp
+        - name: OTEL_INSTRUMENTATION_JDBC_STATEMENT_SANITIZER_ENABLED
+          value: 'true'
+        - name: OTEL_INSTRUMENTATION_HTTP_SERVER_EXCLUDE_URLS
+          value: /actuator/health.*
+        - name: LOGGING_PATTERN_LEVEL
+          value: '%5p [trace_id=%X{trace_id:-} span_id=%X{span_id:-}]'
+        volumeMounts:
+        - name: otel-agent
+          mountPath: /otel
+          readOnly: true
+      volumes:
+      - name: otel-agent
+        emptyDir:
+          sizeLimit: 64Mi

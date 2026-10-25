@@ -1,0 +1,73 @@
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 180
+    spike_limit_mib: 40
+  transform/privacy:
+    error_mode: ignore
+    trace_statements:
+      - context: span
+        statements:
+          - delete_key(attributes, "url.query")
+          - delete_key(attributes, "db.statement")
+          - delete_key(attributes, "db.query.text")
+          - delete_key(attributes, "exception.message")
+          - delete_key(attributes, "exception.stacktrace")
+          - replace_pattern(attributes["url.full"], "[?].*", "")
+          - replace_pattern(attributes["http.url"], "[?].*", "")
+      - context: spanevent
+        statements:
+          - delete_key(attributes, "exception.message")
+          - delete_key(attributes, "exception.stacktrace")
+    log_statements:
+      - context: log
+        statements:
+          - replace_pattern(body, "(?i)(password|authorization|x-service-token)=[^ ,;]+", "$$1=[REDACTED]")
+  batch:
+    timeout: 5s
+    send_batch_size: 256
+    send_batch_max_size: 512
+exporters:
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    enable_open_metrics: true
+    metric_expiration: 3m
+    resource_constant_labels:
+      included: [service.name, k8s.pod.name, k8s.namespace.name, deployment.environment.name]
+  otlphttp/tempo:
+    endpoint: http://tempo:4318
+    sending_queue:
+      queue_size: 256
+    retry_on_failure:
+      max_elapsed_time: 30s
+  otlphttp/loki:
+    endpoint: http://loki:3100/otlp
+    sending_queue:
+      queue_size: 256
+    retry_on_failure:
+      max_elapsed_time: 30s
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, transform/privacy, batch]
+      exporters: [otlphttp/tempo]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, transform/privacy, batch]
+      exporters: [otlphttp/loki]

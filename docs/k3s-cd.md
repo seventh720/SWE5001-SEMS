@@ -4,13 +4,13 @@
 
 ## 流水线
 
-PR 运行质量检查，不发布镜像或部署。main push 或 main 上的手动运行依次完成 lint、Java、前端、真实数据库/API、安全和镜像检查，发布同次构建的 GHCR digest 锁，再进入 K3s 部署阶段。本分支将 job 名称和发布后验证入口改为 `Deploy · EC2 K3s` / 正式域名，已在当前现场只读验证；需 PR 合并后成为默认配置。
+PR 运行质量检查，不发布镜像或部署。main push 或 main 上的手动运行依次完成 lint、Java、前端、真实数据库/API、安全和镜像检查，发布同次构建的 GHCR digest 锁，再进入 K3s 部署阶段。PR #30 已合并，job 名称和发布后验证入口为 `Deploy · EC2 K3s` / 正式域名。
 
 部署使用 GitHub OIDC 换取短期 AWS 身份，通过 SSM Run Command 在现有 server 执行发布脚本。runner 使用 `kubectl kustomize` 生成配置，不连接集群管理 API，也不持有 kubeconfig、SSH 私钥或数据库密码。K3s 节点使用 containerd，发布主机不运行 Docker Compose。
 
-namespace/environment 的 sems-test/k3s-test 是历史名称，现已承载原站数据；保留 production 标记。正式 Ingress sems-public 独立于应用 CD，配置见 [sems-public.yaml](../deployment/k3s/sems-public.yaml)。
+namespace/environment 的 sems-test/k3s-test 是历史名称，现已承载原站数据；保留 production 标记。过渡域名 Ingress sems 已退休，旧代理直连正式入口，不再依赖 sems-test DNS。正式 Ingress sems-public 独立于应用 CD，配置见 [sems-public.yaml](../deployment/k3s/sems-public.yaml)。
 
-发布资源只包含五个应用 Deployment、六个 Service、三个 ConfigMap 和应用 Ingress。PostgreSQL、数据库凭据、PVC/StorageClass、NetworkPolicy 和 Traefik 独立管理；数据库 Flyway 迁移仍由各后端启动时执行。当前 GHCR 应用镜像允许匿名拉取；改成私有包需要先单独配置集群拉取凭据。
+发布资源只包含五个应用 Deployment、六个 Service 和三个 ConfigMap；新发布不再渲染 Ingress，正式入口独立管理。PostgreSQL、数据库凭据、PVC/StorageClass、NetworkPolicy、Traefik 和 [监控后端](observability.md)独立管理；数据库 Flyway 迁移仍由各后端启动时执行。三个后端的 Java Agent 通过共享 Kustomize component 随应用发布；对应接收器须先按可观测性指南安装。当前 GHCR 应用镜像允许匿名拉取；改成私有包需要先单独配置集群拉取凭据。
 
 发布过程：
 

@@ -2,9 +2,9 @@
 
 当前云端 Kubernetes 路线为两台 EC2、自建 K3s、Traefik 入口和集群内自建 PostgreSQL。当前路线不创建 EKS、RDS、NAT Gateway 或 ALB。应用仍通过独立 Deployment、Service、Secret 和数据库账号/schema 划分边界；EKS overlay 仅保留为另一种部署环境的参考模板。
 
-2026-10-24 完成独立测试环境验收，2026-10-25 已将正式入口 [swe5001.seventh720.com](https://swe5001.seventh720.com) 和原站数据迁到这里。当前应用为 PR #29 / `7a97828`，五个应用各两个副本、分别位于两节点；[main OIDC/SSM 自动发布](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288)已通过，原账号/订单/票券、JWT、正式 TLS 与 DNS 迁移见[切换记录](evidence/2026-10-25-k3s-cutover/README.md)。
+2026-10-24 完成独立测试环境验收，2026-10-25 已将正式入口 [swe5001.seventh720.com](https://swe5001.seventh720.com) 和原站数据迁到这里。原站迁移时应用为 PR #29 / `7a97828`，五个应用各两个副本、分别位于两节点；[main OIDC/SSM 自动发布](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288)已通过，原账号/订单/票券、JWT、正式 TLS 与 DNS 迁移见[切换记录](evidence/2026-10-25-k3s-cutover/README.md)。
 
-namespace `sems-test` 和 GitHub environment `k3s-test` 保留历史名称；namespace 已标记 `sems.seventh720.com/environment=production`。`sems-test.seventh720.com` 是同一数据的过渡别名，不能再当成可破坏的测试环境。夹具/故障脚本会拒绝该生产标记。
+namespace `sems-test` 和 GitHub environment `k3s-test` 保留历史名称；namespace 已标记 `sems.seventh720.com/environment=production`。`sems-test.seventh720.com` 的过渡域名入口已退休，旧代理已直连正式入口；Cloudflare 中该 A 记录可删除。这不代表可以删除同名 namespace、数据库或 PVC。夹具/故障脚本会拒绝该生产标记。
 
 
 ## 节点与网络
@@ -184,3 +184,7 @@ Navicat 连接 `127.0.0.1:15432`、数据库 sems、用户 sems_viewer，沿用�
 PostgreSQL 随 worker 停止和恢复，不产生单独的 RDS 实例费。停机前完成备份并正常停库；现有 EBS 和保留的公网 IP 仍有独立计费。当前方案避免 EKS、RDS、NAT 和 ALB 的实例/网关小时费用。
 
 参考：[K3s 版本说明](https://docs.k3s.io/release-notes/v1.36.X)、[配置文件](https://docs.k3s.io/installation/configuration)、[网络要求](https://docs.k3s.io/installation/requirements)、[Traefik 与 ServiceLB](https://docs.k3s.io/networking/networking-services)、[StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/)、[PostgreSQL 逻辑备份](https://www.postgresql.org/docs/17/backup-dump.html)。
+
+## 持续监控与追踪
+
+现有节点上的 Prometheus、Grafana、Loki、Tempo 和 OpenTelemetry 采集、Telegram 通知及私有控制台入口见[可观测性指南](observability.md)。监控基础设施独立于应用 CD；三个后端的 Agent component 随后续 K3s 应用发布保留。

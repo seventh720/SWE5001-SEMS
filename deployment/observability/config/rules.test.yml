@@ -1,0 +1,47 @@
+rule_files: [rules.yml]
+evaluation_interval: 30s
+tests:
+  - name: sustained memory pressure fires after hold time
+    interval: 30s
+    input_series:
+      - series: 'node_memory_MemAvailable_bytes{node="worker",instance="node"}'
+        values: '100+0x30'
+      - series: 'node_memory_MemTotal_bytes{node="worker",instance="node"}'
+        values: '1000+0x30'
+    alert_rule_test:
+      - eval_time: 9m
+        alertname: NodeMemoryPressure
+        exp_alerts: []
+      - eval_time: 10m
+        alertname: NodeMemoryPressure
+        exp_alerts:
+          - exp_labels: {severity: warning, node: worker, instance: node}
+            exp_annotations:
+              summary: 'Node memory above 85%: worker'
+              description: Inspect application and observability memory. Do not raise limits without checking node capacity.
+  - name: 404s and low request volume do not page as server errors
+    interval: 30s
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{service_name="catalog",http_response_status_code="404"}'
+        values: '0+10x30'
+      - series: 'http_server_request_duration_seconds_count{service_name="quiet",http_response_status_code="503"}'
+        values: '0+0.2x30'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: ServiceErrorRateHigh
+        exp_alerts: []
+  - name: sustained high error ratio fires at meaningful volume
+    interval: 30s
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{service_name="admission",http_response_status_code="503"}'
+        values: '0+10x30'
+      - series: 'http_server_request_duration_seconds_count{service_name="admission",http_response_status_code="200"}'
+        values: '0+90x30'
+    alert_rule_test:
+      - eval_time: 12m
+        alertname: ServiceErrorRateHigh
+        exp_alerts:
+          - exp_labels: {severity: warning, service_name: admission}
+            exp_annotations:
+              summary: 'HTTP 5xx above 5%: admission'
+              description: At least 20 requests in five minutes are required. Use Tempo and Loki to locate the failing dependency.

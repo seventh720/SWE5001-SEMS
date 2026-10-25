@@ -1,0 +1,138 @@
+groups:
+- name: sems-availability
+  rules:
+  - alert: PublicEndpointUnavailable
+    expr: probe_success{job="public-https"} == 0
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: 'Public HTTPS check failed: {{ $labels.instance }}'
+      description: Check Traefik, gateway, backend readiness and DNS. Probes run inside this cluster.
+  - alert: MonitoringTargetMissing
+    expr: up == 0
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: 'Metrics unavailable: {{ $labels.job }} / {{ $labels.instance }}'
+      description: Check target health, credentials and NetworkPolicy before assuming business downtime.
+  - alert: NodeNotReady
+    expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: 'Node is not Ready: {{ $labels.node }}'
+      description: Check EC2 state and K3s agent/server. This cluster has a single control plane.
+  - alert: ApplicationReplicaUnavailable
+    expr: kube_deployment_status_replicas_available{namespace="sems-test"} < kube_deployment_spec_replicas{namespace="sems-test"}
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: 'Reduced ready replicas: {{ $labels.deployment }}'
+      description: Inspect rollout status, Pod events, image pulls, scheduling and readiness.
+  - alert: ContainerRestarting
+    expr: increase(kube_pod_container_status_restarts_total{namespace=~"sems-test|observability"}[15m]) > 2
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: 'Repeated restarts: {{ $labels.pod }} / {{ $labels.container }}'
+      description: Inspect previous logs and termination reason, especially OOMKilled.
+  - alert: PostgresUnavailable
+    expr: pg_up == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: PostgreSQL exporter cannot connect to the live database
+      description: Check postgres-0, PVC, NetworkPolicy and the dedicated monitoring role.
+- name: sems-capacity
+  rules:
+  - alert: NodeMemoryPressure
+    expr: 1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes > 0.85
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: 'Node memory above 85%: {{ $labels.node }}'
+      description: Inspect application and observability memory. Do not raise limits without checking node capacity.
+  - alert: NodeCpuHigh
+    expr: 1 - avg by(node) (rate(node_cpu_seconds_total{mode="idle"}[5m])) > 0.85
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: 'Node CPU above 85%: {{ $labels.node }}'
+      description: Check load and t3 CPU credit balance in AWS before resizing.
+  - alert: NodeDiskLow
+    expr: node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay"}
+      < 0.20
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: 'Root EBS disk below 20% free: {{ $labels.node }}'
+      description: Check PostgreSQL, telemetry retention, logs and container images. Local-path PVC sizes are not quotas.
+  - alert: PostgresConnectionsHigh
+    expr: sum(pg_stat_database_numbackends{datname="sems"}) / max(pg_settings_max_connections) > 0.75
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: PostgreSQL connections above 75% of the configured limit
+      description: Inspect pool saturation, long transactions and locks before increasing max_connections.
+  - alert: TlsCertificateExpiring
+    expr: probe_ssl_earliest_cert_expiry{job="public-https"} - time() < 7 * 24 * 3600
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: 'TLS certificate expires within seven days: {{ $labels.instance }}'
+      description: Inspect Traefik ACME renewal logs and HTTP-01 reachability; retain the ACME PVC.
+  - alert: DatabasePoolWaiting
+    expr: sum by(service_name)(db_client_connections_pending_requests) > 0
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: 'JDBC pool has sustained waiting requests: {{ $labels.service_name }}'
+      description: Inspect slow queries, transaction duration, connection limits and dependency spans. Do not increase pools beyond
+        database capacity.
+- name: sems-requests
+  rules:
+  - alert: ServiceErrorRateHigh
+    expr: sum by(service_name) (rate(http_server_request_duration_seconds_count{http_response_status_code=~"5..",http_route!~"/actuator/.*"}[5m])) / clamp_min(sum
+      by(service_name) (rate(http_server_request_duration_seconds_count{http_route!~"/actuator/.*"}[5m])), 0.001) > 0.05 and on(service_name) sum by(service_name)
+      (increase(http_server_request_duration_seconds_count{http_route!~"/actuator/.*"}[5m])) >= 20
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: 'HTTP 5xx above 5%: {{ $labels.service_name }}'
+      description: At least 20 requests in five minutes are required. Use Tempo and Loki to locate the failing dependency.
+  - alert: ServiceLatencyHigh
+    expr: histogram_quantile(0.95, sum by(service_name,le) (rate(http_server_request_duration_seconds_bucket{http_route!~"/actuator/.*"}[5m])))
+      > 2 and on(service_name) sum by(service_name) (increase(http_server_request_duration_seconds_count{http_route!~"/actuator/.*"}[5m]))
+      >= 20
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: 'HTTP p95 above two seconds: {{ $labels.service_name }}'
+      description: Inspect database pool, dependency spans and node saturation. This is an operations threshold, not a measured performance
+        guarantee.
+- name: sems-observability-smoke
+  rules:
+  - alert: ObservabilitySmokeTest
+    expr: sems_observability_smoke == 1
+    for: 30s
+    labels:
+      severity: info
+      test: 'true'
+    annotations:
+      summary: Synthetic monitoring test; no business service was stopped
+      description: "Checks Prometheus \u2192 Alertmanager \u2192 configured notification receiver, followed by recovery. The test gauge\
+        \ is set back to zero."
