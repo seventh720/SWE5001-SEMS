@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-10-25T10:05:54.377498+00:00",
+  "prometheusAlerts": [],
+  "alertmanagerAlerts": [],
+  "pgUp": [
+    {
+      "metric": {
+        "__name__": "pg_up",
+        "instance": "postgres-exporter:9187",
+        "job": "postgres"
+      },
+      "value": [
+        1792922754.389,
+        "1"
+      ]
+    }
+  ]
+}

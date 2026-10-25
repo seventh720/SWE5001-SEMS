@@ -63,7 +63,7 @@ scrape_configs:
         replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
     metric_relabel_configs:
       - source_labels: [namespace]
-        regex: sems-test|observability|kube-system
+        regex: sems-prod|observability|kube-system
         action: keep
       - source_labels: [container]
         regex: "|POD"

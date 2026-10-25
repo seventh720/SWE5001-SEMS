@@ -8,7 +8,7 @@ import re
 import subprocess
 
 APPLICATIONS = ('identity', 'event-catalog', 'admission', 'web', 'gateway')
-NAMESPACE = 'sems-test'
+NAMESPACE = 'sems-prod'
 REGISTRY = 'ghcr.io/seventh720/swe5001-sems/'
 COMMIT_ANNOTATION = 'sems.seventh720.com/source-commit'
 
@@ -18,8 +18,6 @@ def allowed(resource):
     name = resource.get('metadata', {}).get('name', '')
     return ((kind == 'Deployment' and name in APPLICATIONS) or
             (kind == 'Service' and name in (*APPLICATIONS, 'event-catalog-pods')) or
-            # Retain old release/rollback compatibility; new renders exclude Ingresses.
-            (kind == 'Ingress' and name == 'sems') or
             (kind == 'ConfigMap' and (name in ('sems-runtime', 'sems-database') or
                                      re.fullmatch(r'gateway-config-[a-z0-9]+', name))))
 
@@ -44,11 +42,8 @@ def validate_resources(resources, images=None):
             if images is not None and ref != images.get(name):
                 raise ValueError(name + ': deployment/image lock mismatch')
             if resource['spec']['replicas'] != 2:
-                raise ValueError('Test applications must retain two replicas')
+                raise ValueError('Production applications must retain two replicas')
             deployed[name] = ref
-        if resource['kind'] == 'Ingress':
-            if [r['host'] for r in resource['spec']['rules']] != ['sems-test.seventh720.com']:
-                raise ValueError('Unexpected ingress host')
     if set(deployed) != set(APPLICATIONS):
         raise ValueError('Release must contain the five application Deployments')
     return deployed

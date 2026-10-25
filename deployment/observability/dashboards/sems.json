@@ -97,7 +97,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "kube_deployment_status_replicas_available{namespace=\"sems-test\"}",
+          "expr": "kube_deployment_status_replicas_available{namespace=\"sems-prod\"}",
           "legendFormat": "{{deployment}}",
           "instant": true
         }
@@ -474,7 +474,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by(namespace,pod)(rate(container_cpu_usage_seconds_total{namespace=~\"sems-test|observability\",container!=\"\",container!=\"POD\"}[5m]))",
+          "expr": "sum by(namespace,pod)(rate(container_cpu_usage_seconds_total{namespace=~\"sems-prod|observability\",container!=\"\",container!=\"POD\"}[5m]))",
           "legendFormat": "{{namespace}} / {{pod}}",
           "instant": false
         }
@@ -526,7 +526,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by(namespace,pod)(container_memory_working_set_bytes{namespace=~\"sems-test|observability\",container!=\"\",container!=\"POD\"})",
+          "expr": "sum by(namespace,pod)(container_memory_working_set_bytes{namespace=~\"sems-prod|observability\",container!=\"\",container!=\"POD\"})",
           "legendFormat": "{{namespace}} / {{pod}}",
           "instant": false
         }

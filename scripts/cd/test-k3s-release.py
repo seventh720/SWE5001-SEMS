@@ -34,7 +34,7 @@ class K3sReleaseTest(unittest.TestCase):
                                          'StorageClass', 'NetworkPolicy') for r in resources))
         self.assertFalse(any(r['metadata']['name'].startswith('postgres') for r in resources))
         for r in resources:
-            self.assertEqual(r['metadata']['namespace'], 'sems-test')
+            self.assertEqual(r['metadata']['namespace'], 'sems-prod')
             if r['kind'] == 'Deployment':
                 self.assertEqual(r['spec']['template']['spec']['containers'][0]['image'], self.lock['services'][r['metadata']['name']]['image'])
 
@@ -44,14 +44,14 @@ class K3sReleaseTest(unittest.TestCase):
         names = {r['metadata']['name'] for r in resources if r['kind'] == 'ConfigMap'}
         self.assertIn(gateway['spec']['template']['spec']['volumes'][0]['configMap']['name'], names)
 
-    def test_new_releases_leave_ingress_independent_and_accept_legacy_records(self):
+    def test_releases_leave_ingress_independent_and_reject_legacy_records(self):
         legacy = {'apiVersion': 'networking.k8s.io/v1', 'kind': 'Ingress',
-                  'metadata': {'name': 'sems', 'namespace': 'sems-test'},
+                  'metadata': {'name': 'sems', 'namespace': 'sems-prod'},
                   'spec': {'rules': [{'host': 'sems-test.seventh720.com'}]}}
         release = render(self.lock, self.commit, self.release_id, [*self.documents, legacy])
         self.assertFalse(any(r['kind'] == 'Ingress' for r in release['resources']))
         release['resources'].append(legacy)
-        self.assertEqual(validate_release(release)['operation'], 'deploy')
+        with self.assertRaises(ValueError): validate_release(release)
 
     def test_two_node_rollout_keeps_hard_per_service_placement(self):
         for resource in self.release()['resources']:
@@ -65,6 +65,7 @@ class K3sReleaseTest(unittest.TestCase):
     def test_gateway_and_backend_readiness_have_different_contracts(self):
         spec = importlib.util.spec_from_file_location('k3s_deployer', Path(__file__).with_name('deploy-k3s.py'))
         module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+        self.assertEqual(module.K[-1], 'sems-prod')
         self.assertTrue(module.health_up('/health/gateway', b'ok\n'))
         self.assertFalse(module.health_up('/health/gateway', b'{"status":"UP"}'))
         self.assertTrue(module.health_up('/health/admission', b'{"status":"UP"}'))
@@ -113,11 +114,17 @@ class K3sReleaseTest(unittest.TestCase):
             with self.assertRaises(ValueError): self.release(bad)
 
     def test_reject_infrastructure_or_wrong_namespace(self):
-        for resource in ({'apiVersion': 'v1', 'kind': 'Secret', 'metadata': {'name': 'identity-secrets', 'namespace': 'sems-test'}},
-                         {'apiVersion': 'v1', 'kind': 'Service', 'metadata': {'name': 'postgres', 'namespace': 'sems-test'}}):
+        for resource in ({'apiVersion': 'v1', 'kind': 'Secret', 'metadata': {'name': 'identity-secrets', 'namespace': 'sems-prod'}},
+                         {'apiVersion': 'v1', 'kind': 'Service', 'metadata': {'name': 'postgres', 'namespace': 'sems-prod'}}):
             release = self.release(); release['resources'].append(resource)
             with self.assertRaises(ValueError): validate_release(release)
         release = self.release(); release['resources'][0]['metadata']['namespace'] = 'default'
+        with self.assertRaises(ValueError): validate_release(release)
+
+    def test_pre_migration_namespace_cannot_be_replayed(self):
+        release = self.release()
+        for resource in release['resources']:
+            resource['metadata']['namespace'] = 'sems-test'
         with self.assertRaises(ValueError): validate_release(release)
 
     def test_rollback_requires_compatibility_confirmation(self):

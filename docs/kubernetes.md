@@ -9,7 +9,7 @@ deployment/k8s/
   base/                 三个后端、Web、Gateway、Service、ConfigMap、健康探针
   kind.yaml             固定 Kubernetes 1.36.4 镜像的独立本地单节点集群
   overlays/local/       sems-local；独立 PostgreSQL StatefulSet/PVC；Admission 两副本
-  overlays/k3s/         sems-test；双节点 EC2 K3s；自建 PostgreSQL/PVC、Traefik HTTPS
+  overlays/k3s/         sems-prod；双节点 EC2 K3s；自建 PostgreSQL/PVC、Traefik HTTPS
   overlays/eks/         sems-test；RDS TLS、ALB HTTPS、每个应用两副本
 deployment/k3s/          K3s 节点配置示例与一次性网络检查
 deployment/gateway/     Compose/Kubernetes 共用路由规则及 Kubernetes 启动适配

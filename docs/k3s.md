@@ -4,7 +4,7 @@
 
 2026-10-24 完成独立测试环境验收，2026-10-25 已将正式入口 [swe5001.seventh720.com](https://swe5001.seventh720.com) 和原站数据迁到这里。原站迁移时应用为 PR #29 / `7a97828`，五个应用各两个副本、分别位于两节点；[main OIDC/SSM 自动发布](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288)已通过，原账号/订单/票券、JWT、正式 TLS 与 DNS 迁移见[切换记录](evidence/2026-10-25-k3s-cutover/README.md)。
 
-namespace `sems-test` 和 GitHub environment `k3s-test` 保留历史名称；namespace 已标记 `sems.seventh720.com/environment=production`。`sems-test.seventh720.com` 的过渡域名入口已退休，旧代理已直连正式入口；Cloudflare 中该 A 记录可删除。这不代表可以删除同名 namespace、数据库或 PVC。夹具/故障脚本会拒绝该生产标记。
+业务 namespace 为 `sems-prod`，已标记 `sems.seventh720.com/environment=production`；监控位于独立的 `observability`。原 `sems-test` namespace 已迁移并清理，数据库保留同一数据卷与原账号/JWT 密钥，详见[迁移验收](evidence/2026-10-25-production-namespace/README.md)。GitHub environment `k3s-test` 保留既有名称及 OIDC 信任。`sems-test.seventh720.com` 的过渡入口已退休，Cloudflare 中该 A 记录可删除。夹具/故障脚本只允许隔离测试环境，不能用于 `sems-prod`。
 
 
 ## 节点与网络
@@ -84,9 +84,9 @@ PVC 声明为 10 GiB，但 local-path 使用节点目录，未单独创建或收
 bash scripts/k8s/setup-local.sh .secrets/k3s-cloud k3s-admin@example.invalid
 ```
 
-使用 [Secret 生成器](../scripts/k8s/secrets.py) 时传 `--include-postgres`，把输出直接通过管道交给显式 context 的 kubectl，不写入日志。已有凭据不会被初始化脚本覆盖；PostgreSQL init 脚本只在空数据目录执行，更新 Secret 也不会自动修改库内密码。
+使用 [Secret 生成器](../scripts/k8s/secrets.py) 时传 `--namespace sems-prod --include-postgres`，把输出直接通过管道交给显式 context 的 kubectl，不写入日志。已有凭据不会被初始化脚本覆盖；PostgreSQL init 脚本只在空数据目录执行，更新 Secret 也不会自动修改库内密码。
 
-在 `sems-test` namespace 已存在且 Secret 已创建后，可只部署数据库：
+在 `sems-prod` namespace 已存在且 Secret 已创建后，可只部署数据库：
 
 ```bash
 kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s \
@@ -101,7 +101,7 @@ python3 scripts/k8s/backup-postgres.py \
   --output-directory .secrets/k3s-cloud/backups
 ```
 
-这提供手动备份，尚无自动周期、WAL 归档或时间点恢复。数据库验收脚本会检查真实账号认证、schema/网络隔离、Pod 重建数据保留，并把备份恢复到一次性数据库；不写入业务表：
+这提供手动备份，尚无自动周期、WAL 归档或时间点恢复。以下历史数据库验收脚本会创建探针、重建数据库 Pod 并做恢复演练，只能用于独立测试集群，不能在当前正式环境运行：
 
 ```bash
 python3 scripts/k8s/postgres-acceptance.py \
@@ -117,18 +117,18 @@ python3 scripts/k8s/postgres-acceptance.py \
 
 三个后端启动时运行各自的 Flyway 迁移。原站账号及密码散列已迁入，签名密钥保留；受限的 `.secrets/k3s-cloud/login.txt` 已更新为原管理员资料。密码、私钥和 token 不进入公开部署记录。此前测试数据保留于独立的旧测试库，当前业务库为迁入的原站数据。
 
-DNS：Cloudflare 的 `sems-test` A 记录指向 server 当前公网 IPv4，使用 DNS only。HTTPS 配置位于 [traefik-https.yaml](../deployment/k3s/traefik-https.yaml)，需将 `CONFIGURE_ACME_EMAIL` 替换成环境联系人邮箱后以集群管理员身份单独部署；本机实际配置保存在忽略的 `.secrets/k3s-cloud/traefik-https.json`。
+DNS：Cloudflare 的 `swe5001` A 记录指向 server 当前公网 IPv4，使用 DNS only。HTTPS 配置位于 [traefik-https.yaml](../deployment/k3s/traefik-https.yaml)，需将 `CONFIGURE_ACME_EMAIL` 替换成环境联系人邮箱后以集群管理员身份单独部署；本机实际配置保存在忽略的 `.secrets/k3s-cloud/traefik-https.json`。
 
 Traefik 通过 Let's Encrypt HTTP-01 自动签发并配置自动续期，HTTP 重定向到 HTTPS。`traefik-acme` PVC 使用 server 现有 EBS 上的 local-path 目录，Retain 回收策略，保存 `/data/acme.json`，实际文件权限 0600。该 PVC 的 1 GiB 请求也不代表另建 EBS。Traefik 保持单副本并使用 Recreate 更新策略，避免多个实例同时写 ACME 状态；更新时可能短暂中断入口。证书续期流程已配置，尚未经历实际续期周期。
 
-Ingress 使用 `traefik`、真实域名和 `letsencrypt` resolver，证书由 Traefik 的 ACME 状态管理，不需要手工创建 `sems-test-tls` Secret。下面整套 overlay 命令仅用于初始化配置参考；日常更新使用 [CD](k3s-cd.md)。迁移后不要用旧的 bootstrap image pins 覆盖已发布版本：
+Ingress 使用 `traefik`、真实域名和 `letsencrypt` resolver，证书由 Traefik 的 ACME 状态管理，不需要手工创建 TLS Secret。下面整套 overlay 命令仅用于初始化配置参考；日常更新使用 [CD](k3s-cd.md)。迁移后不要用旧的 bootstrap image pins 覆盖已发布版本：
 
 ```bash
 kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s \
   --cache-dir .secrets/k3s-cloud/cache apply -k deployment/k8s/overlays/k3s
 ```
 
-以下命令仅适用于迁移前记录或新建的独立测试集群；当前 production namespace 会拒绝运行。默认行为仍为本地 kind：
+以下命令仅适用于迁移前记录或新建的独立测试集群；脚本仍指向隔离的 `sems-test`，该 namespace 在正式集群已不存在，因此会失败并停止；生产标记及 `sems-prod` 名称也会触发保护。默认行为仍为本地 kind：
 
 ```bash
 python3 scripts/k8s/local-acceptance.py --environment k3s \
@@ -159,7 +159,7 @@ python3 scripts/k8s/catalog-recovery.py \
 
 ## 正式切换与回迁
 
-正式域名和原数据已于 2026-10-25 切到 K3s，详见[切换验收](evidence/2026-10-25-k3s-cutover/README.md)。正式 Ingress `sems-public` 与 production 标记由 [sems-public.yaml](../deployment/k3s/sems-public.yaml) 独立管理，CD 应用资源只更新原 `sems` Ingress，因此后续发布不会覆盖正式路由。`sems-test` DNS 别名暂时保留。
+正式域名和原数据已于 2026-10-25 切到 K3s，详见[切换验收](evidence/2026-10-25-k3s-cutover/README.md)。正式 Ingress `sems-public` 与 production 标记由 [sems-public.yaml](../deployment/k3s/sems-public.yaml) 独立管理，应用 CD 不再管理 Ingress，因此后续发布不会覆盖正式路由。业务 namespace 已迁到 `sems-prod`，旧 `sems-test` namespace 已清理；同名 DNS 别名可删除。
 
 旧站三个业务后端停止；旧 IP 的 SEMS 路由临时代理新站，覆盖 DNS 缓存，SWE5006 和共享 Caddy 保留。旧数据库、卷、逻辑备份和新环境旧测试库 `sems_test_before_cutover_20261025` 都没有删除。新写入开放后，回迁必须再次维护、备份并反向同步，不能只改 DNS 回到冻结旧库。
 
@@ -171,7 +171,7 @@ python3 scripts/k8s/catalog-recovery.py \
 
 ```bash
 kubectl --kubeconfig .secrets/k3s-cloud/kubeconfig --context sems-k3s \
-  --cache-dir .secrets/k3s-cloud/cache -n sems-test \
+  --cache-dir .secrets/k3s-cloud/cache -n sems-prod \
   port-forward --address 127.0.0.1 svc/postgres 15432:5432
 ```
 

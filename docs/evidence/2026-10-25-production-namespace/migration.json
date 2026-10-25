@@ -1,0 +1,41 @@
+{
+  "status": "passed",
+  "verifiedAt": "2026-10-25T10:02:59.561653+00:00",
+  "fromNamespace": "sems-test",
+  "toNamespace": "sems-prod",
+  "observabilityNamespace": "observability",
+  "formalUrl": "https://swe5001.seventh720.com",
+  "grafanaUrl": "https://grafana.seventh720.com",
+  "maintenanceStartedAt": "2026-10-25T09:55:36.575132+00:00",
+  "maintenanceEndedAt": "2026-10-25T09:59:44.741244+00:00",
+  "maintenanceSeconds": 248.166112,
+  "counts": {
+    "identity.users": 7,
+    "catalog.events": 7,
+    "admission.bookings": 3,
+    "admission.tickets": 4
+  },
+  "pvName": "pvc-2b7b065f-520c-4381-bc39-9fbb7fd2d9e0",
+  "pvUidPreserved": true,
+  "pvcNamespace": "sems-prod",
+  "pvcUidChangedAsExpected": true,
+  "tableCount": 27,
+  "originalJwtVerified": true,
+  "allBusinessSecretsPreserved": true,
+  "observabilitySecretsPreserved": true,
+  "oldNamespaceDeleted": true,
+  "newPaidResourcesCreated": false,
+  "releaseId": "48c28b1ca3ad362cf420e8b1ef65982271b8ee19-20261025100157-1",
+  "applicationSourceCommit": "48c28b1ca3ad362cf420e8b1ef65982271b8ee19",
+  "checks": [
+    "All six business Secrets, bootstrap credentials and JWT key bytes preserved",
+    "Grafana, Telegram and database monitor credentials unchanged",
+    "Only sems-prod and observability remain as SEMS namespaces; production marker retained",
+    "Original Retain PV and host path preserved; new PVC is bound in sems-prod",
+    "All 27 table row counts and SHA256 values, role verifiers and database cluster identifier matched before app startup",
+    "All data and roles still match after application and monitoring startup",
+    "Application release passes server-side dry run in sems-prod",
+    "Actual host CD verifier passes with sems-prod: digests, two nodes, HTTPS, administrator and JWT"
+  ],
+  "automaticCdRequiresNamespaceMigrationPrMerge": true
+}

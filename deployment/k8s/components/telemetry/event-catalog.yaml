@@ -44,7 +44,7 @@ spec:
         - name: OTEL_SERVICE_NAME
           value: event-catalog
         - name: OTEL_RESOURCE_ATTRIBUTES
-          value: deployment.environment.name=production,k8s.namespace.name=sems-test,k8s.pod.name=$(POD_NAME),service.version=$(SOURCE_COMMIT)
+          value: deployment.environment.name=production,k8s.namespace.name=sems-prod,k8s.pod.name=$(POD_NAME),service.version=$(SOURCE_COMMIT)
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://otel-collector.observability.svc.cluster.local:4318
         - name: OTEL_EXPORTER_OTLP_PROTOCOL

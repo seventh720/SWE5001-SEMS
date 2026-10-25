@@ -1,8 +1,8 @@
-# Applied separately from application CD; retain the historical namespace name.
+# Applied separately from application CD; business namespace and production marker.
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: sems-test
+  name: sems-prod
   annotations:
     sems.seventh720.com/environment: production
 ---
@@ -10,7 +10,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: sems-public
-  namespace: sems-test
+  namespace: sems-prod
   labels:
     app.kubernetes.io/part-of: sems
   annotations:

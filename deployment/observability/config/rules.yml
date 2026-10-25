@@ -26,7 +26,7 @@ groups:
       summary: 'Node is not Ready: {{ $labels.node }}'
       description: Check EC2 state and K3s agent/server. This cluster has a single control plane.
   - alert: ApplicationReplicaUnavailable
-    expr: kube_deployment_status_replicas_available{namespace="sems-test"} < kube_deployment_spec_replicas{namespace="sems-test"}
+    expr: kube_deployment_status_replicas_available{namespace="sems-prod"} < kube_deployment_spec_replicas{namespace="sems-prod"}
     for: 5m
     labels:
       severity: warning
@@ -34,7 +34,7 @@ groups:
       summary: 'Reduced ready replicas: {{ $labels.deployment }}'
       description: Inspect rollout status, Pod events, image pulls, scheduling and readiness.
   - alert: ContainerRestarting
-    expr: increase(kube_pod_container_status_restarts_total{namespace=~"sems-test|observability"}[15m]) > 2
+    expr: increase(kube_pod_container_status_restarts_total{namespace=~"sems-prod|observability"}[15m]) > 2
     for: 2m
     labels:
       severity: warning

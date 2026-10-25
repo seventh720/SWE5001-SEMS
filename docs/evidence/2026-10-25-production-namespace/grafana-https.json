@@ -1,0 +1,34 @@
+{
+  "startedAt": "2026-10-25T10:01:49.422825+00:00",
+  "url": "https://grafana.seventh720.com",
+  "status": "passed",
+  "checks": [
+    {
+      "name": "trusted HTTPS login page",
+      "status": "passed"
+    },
+    {
+      "name": "HTTP redirects to HTTPS",
+      "status": "passed",
+      "response": 301
+    },
+    {
+      "name": "anonymous dashboard, datasource and metrics access denied",
+      "status": "passed"
+    },
+    {
+      "name": "incorrect login rejected",
+      "status": "passed"
+    },
+    {
+      "name": "existing account login with Secure, HttpOnly, SameSite session",
+      "status": "passed"
+    },
+    {
+      "name": "authenticated dashboard and live metric data",
+      "status": "passed",
+      "targets": 17
+    }
+  ],
+  "finishedAt": "2026-10-25T10:01:50.816329+00:00"
+}
