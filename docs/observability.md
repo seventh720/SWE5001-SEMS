@@ -1,6 +1,6 @@
 # K3s 监控、日志、告警与追踪
 
-正式站点的可观测性运行于现有两台 EC2 的 `observability` namespace，使用 containerd/Kubernetes。无需新增 EC2、EKS、负载均衡器或付费监控订阅。它使用现有节点的 CPU、内存和根 EBS 空间；当前业务 namespace `sems-test` 承载生产数据。
+正式站点的可观测性运行于现有两台 EC2 的 `observability` namespace，使用 containerd/Kubernetes。无需新增 EC2、EKS、负载均衡器或付费监控订阅。它使用现有节点的 CPU、内存和根 EBS 空间；业务与正式数据位于 `sems-prod`，监控独立位于 `observability`。
 
 ## 打开控制台
 
@@ -119,6 +119,8 @@ python3 scripts/observability/verify-public.py --kubeconfig .secrets/k3s-cloud/k
 
 ## 域名与 Cloudflare 代理
 
-`sems-test.seventh720.com` 的过渡 Ingress 已退休，旧 Lightsail 代理已改为直连 K3s 公网 IP，并校验 `swe5001.seventh720.com` 的源站证书。Cloudflare 中 `sems-test` 的 A 记录可删除；Kubernetes 的 `sems-test` namespace 仍承载生产数据，必须保留。当前 CD 不再渲染 Ingress，正式入口和监控入口独立管理；历史 release 的旧 Ingress 仅保留回退兼容。此变更须合并到 main 后，后续发布才会持续采用新规则。
+`sems-test.seventh720.com` 的过渡 Ingress 已退休，旧 Lightsail 代理已改为直连 K3s 公网 IP，并校验 `swe5001.seventh720.com` 的源站证书。Cloudflare 中 `sems-test` 的 A 记录可删除；业务 namespace 已迁到 `sems-prod`，旧 `sems-test` namespace 已清理。数据库监控地址、Pod 指标、日志路径、追踪属性和 Grafana 面板均指向新 namespace，保留原 Grafana 登录和 Telegram Secret。迁移过程和验收见[生产 namespace 迁移](evidence/2026-10-25-production-namespace/README.md)。
+
+当前 CD 不再管理 Ingress，正式入口和监控入口独立管理。应用发布只接受 `sems-prod`，拒绝重放迁移前 namespace 的 release。配置需随本次 namespace 迁移 PR 合并到 main，后续自动发布才会使用新 namespace。
 
 DNS only 可以长期使用，HTTPS 由源站证书提供。需要 Cloudflare 代理或防护时，可在源站证书和登录验证通过后切为 Proxied，并使用 Full (strict) SSL/TLS；Grafana 的登录/API 不应配置整站缓存。保留现有 HTTP-01 证书校验路径的可达性，避免为该路径增加交互式挑战。切代理不会自动取消或取代 Grafana 登录。

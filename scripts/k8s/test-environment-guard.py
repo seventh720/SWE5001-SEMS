@@ -21,6 +21,12 @@ class EnvironmentGuardTest(unittest.TestCase):
                     {'metadata': {'annotations': annotations}})):
                 require_disposable_namespace(['kubectl'])
 
+    def test_production_name_is_protected_without_annotation(self):
+        with patch('environment_guard.subprocess.check_output', return_value=json.dumps(
+                {'metadata': {'annotations': {}}})):
+            with self.assertRaises(RuntimeError):
+                require_disposable_namespace(['kubectl'], namespace='sems-prod')
+
     def test_unavailable_cluster_fails_closed(self):
         with patch('environment_guard.subprocess.check_output', side_effect=subprocess.CalledProcessError(1, 'kubectl')):
             with self.assertRaises(subprocess.CalledProcessError):

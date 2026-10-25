@@ -84,14 +84,14 @@ def execute(args):
                'type': 'Opaque', 'stringData': values})
         return values
 
-    ns = get('namespace', 'sems-test', 'sems-test')
+    ns = get('namespace', 'sems-prod', 'sems-prod')
     if ns['metadata'].get('annotations', {}).get('sems.seventh720.com/environment') != 'production':
         raise RuntimeError('Expected the explicitly marked SEMS production namespace')
     nodes = json.loads(out('get', 'nodes', '-o', 'json'))['items']
     if {n['metadata']['name'] for n in nodes} != {'sems-k3s-server', 'sems-k3s-worker'}:
         raise RuntimeError('Refusing an unexpected cluster layout')
-    before = get('pod', 'postgres-0', 'sems-test')
-    claim = get('pvc', 'data-postgres-0', 'sems-test')
+    before = get('pod', 'postgres-0', 'sems-prod')
+    claim = get('pvc', 'data-postgres-0', 'sems-prod')
     if args.operation == 'install':
         rendered = subprocess.check_output(['kubectl', 'kustomize', str(ROOT / 'deployment/observability')], text=True)
         # Kustomize can emit JSON directly through kubectl, avoiding a runtime YAML dependency.
@@ -117,7 +117,7 @@ def execute(args):
                "GRANT CONNECT ON DATABASE sems TO sems_monitor;\n"
                "ALTER ROLE sems_monitor SET default_transaction_read_only=on;\n"
                "ALTER ROLE sems_monitor SET statement_timeout='5s';\n")
-        result = run(k + ['-n', 'sems-test', 'exec', '-i', 'postgres-0', '--',
+        result = run(k + ['-n', 'sems-prod', 'exec', '-i', 'postgres-0', '--',
                           'psql', '-X', '-v', 'ON_ERROR_STOP=1', '-U', 'postgres', '-d', 'sems', '-f', '-'],
                      data=sql, check=False)
         if result.returncode:
@@ -142,7 +142,7 @@ def execute(args):
         stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
         snapshots = []
         for name in BACKENDS:
-            deployment = get('deployment', name, 'sems-test')
+            deployment = get('deployment', name, 'sems-prod')
             snapshots.append(deployment)
         snapshot = args.private_dir / ('before-instrumentation-' + stamp + '.json')
         snapshot.write_text(json.dumps(snapshots)); snapshot.chmod(0o600)
@@ -151,19 +151,19 @@ def execute(args):
             # Patch only instrumentation; preserve live app image, replica placement and all credentials.
             data = json.dumps(patch)
             for dry in [True, False]:
-                cmd = ['-n', 'sems-test', 'patch', 'deployment', name, '--type=strategic', '--patch-file=/dev/stdin']
+                cmd = ['-n', 'sems-prod', 'patch', 'deployment', name, '--type=strategic', '--patch-file=/dev/stdin']
                 if dry:
                     cmd.append('--dry-run=server')
                 out(*cmd, data=data)
             print('Rolling out instrumentation: ' + name, flush=True)
             try:
-                out('-n', 'sems-test', 'rollout', 'status', 'deployment/' + name, '--timeout=240s', timeout=260)
+                out('-n', 'sems-prod', 'rollout', 'status', 'deployment/' + name, '--timeout=240s', timeout=260)
             except Exception:
                 # Restore only this template (including its original image), before proceeding to any next service.
                 prior = next(d for d in snapshots if d['metadata']['name'] == name)
                 replacement = [{'op': 'replace', 'path': '/spec/template', 'value': prior['spec']['template']}]
-                out('-n', 'sems-test', 'patch', 'deployment', name, '--type=json', '--patch-file=/dev/stdin', data=json.dumps(replacement))
-                out('-n', 'sems-test', 'rollout', 'status', 'deployment/' + name, '--timeout=240s', timeout=260)
+                out('-n', 'sems-prod', 'patch', 'deployment', name, '--type=json', '--patch-file=/dev/stdin', data=json.dumps(replacement))
+                out('-n', 'sems-prod', 'rollout', 'status', 'deployment/' + name, '--timeout=240s', timeout=260)
                 raise RuntimeError(name + ': instrumentation failed and its original template was restored')
         print('Instrumented all three backends without changing business images or data', flush=True)
     else:
@@ -208,8 +208,8 @@ def execute(args):
         out('-n', 'observability', 'patch', 'deployment', 'alertmanager', '--type=strategic', '--patch-file=/dev/stdin', data=json.dumps(patch))
         out('-n', 'observability', 'rollout', 'status', 'deployment/alertmanager', '--timeout=120s', timeout=140)
         print('Telegram receiver enabled; firing and resolved notifications configured', flush=True)
-    after = get('pod', 'postgres-0', 'sems-test')
-    after_claim = get('pvc', 'data-postgres-0', 'sems-test')
+    after = get('pod', 'postgres-0', 'sems-prod')
+    after_claim = get('pvc', 'data-postgres-0', 'sems-prod')
     if after['metadata']['uid'] != before['metadata']['uid'] or after_claim['metadata']['uid'] != claim['metadata']['uid']:
         raise RuntimeError('Unexpected database Pod/PVC identity change')
     print('Database Pod and PVC identities preserved', flush=True)

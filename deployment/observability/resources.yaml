@@ -579,7 +579,7 @@ spec:
       - name: kube-state-metrics
         image: registry.k8s.io/kube-state-metrics/kube-state-metrics@sha256:42cfe3723a5f058171c627537fb57a3ea0f26e4380fa18555a95cb1a1b4cfc5b
         args:
-        - --namespaces=sems-test,observability,kube-system
+        - --namespaces=sems-prod,observability,kube-system
         - --resources=nodes,pods,deployments,replicasets,statefulsets,persistentvolumeclaims,daemonsets
         ports:
         - name: http
@@ -957,7 +957,7 @@ spec:
           mountPath: /tmp
         env:
         - name: DATA_SOURCE_URI
-          value: postgres.sems-test.svc.cluster.local:5432/sems?sslmode=disable
+          value: postgres.sems-prod.svc.cluster.local:5432/sems?sslmode=disable
         - name: DATA_SOURCE_USER
           value: sems_monitor
         - name: DATA_SOURCE_PASS
@@ -1167,7 +1167,7 @@ spec:
   - from:
     - namespaceSelector:
         matchLabels:
-          kubernetes.io/metadata.name: sems-test
+          kubernetes.io/metadata.name: sems-prod
     ports:
     - port: 4317
       protocol: TCP

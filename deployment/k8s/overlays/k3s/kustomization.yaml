@@ -1,7 +1,7 @@
-# K3s test environment: verified release images and self-managed PostgreSQL.
+# K3s production environment: verified release images and self-managed PostgreSQL.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: sems-test
+namespace: sems-prod
 components:
   - ../../components/telemetry
 resources:
@@ -35,6 +35,13 @@ replicas:
   - name: gateway
     count: 2
 patches:
+  - target:
+      kind: Namespace
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          sems.seventh720.com/environment: production
   - target:
       kind: Deployment
     patch: |-

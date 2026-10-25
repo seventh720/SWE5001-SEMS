@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-10-25T10:03:31.627534+00:00",
+  "prometheusAlerts": [],
+  "alertmanagerAlerts": [
+    {
+      "labels": {
+        "alertname": "PostgresUnavailable",
+        "cluster": "sems-k3s",
+        "environment": "production",
+        "instance": "postgres-exporter:9187",
+        "job": "postgres",
+        "severity": "critical"
+      },
+      "status": {
+        "inhibitedBy": [],
+        "mutedBy": [],
+        "silencedBy": [],
+        "state": "active"
+      },
+      "startsAt": "2026-10-25T09:57:33.985Z",
+      "endsAt": "2026-10-25T10:04:33.985Z"
+    }
+  ],
+  "pgUp": [
+    {
+      "metric": {
+        "__name__": "pg_up",
+        "instance": "postgres-exporter:9187",
+        "job": "postgres"
+      },
+      "value": [
+        1792922611.641,
+        "1"
+      ]
+    }
+  ]
+}

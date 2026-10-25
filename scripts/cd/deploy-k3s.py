@@ -17,11 +17,11 @@ import subprocess
 import urllib.error
 import urllib.request
 
-from k3s_release import APPLICATIONS, allowed, validate_release, validate_resources
+from k3s_release import APPLICATIONS, NAMESPACE, allowed, validate_release, validate_resources
 
 ROOT = Path('/var/lib/sems-cd')
 K = ['/usr/local/bin/kubectl', '--kubeconfig', '/etc/rancher/k3s/k3s.yaml',
-     '--context', 'default', '--namespace', 'sems-test']
+     '--context', 'default', '--namespace', NAMESPACE]
 BASE = 'https://swe5001.seventh720.com'
 
 

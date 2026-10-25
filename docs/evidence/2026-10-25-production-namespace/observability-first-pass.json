@@ -1,0 +1,152 @@
+{
+  "startedAt": "2026-10-25T10:02:43.211630+00:00",
+  "status": "failed",
+  "checks": [
+    {
+      "name": "five applications retain two ready replicas",
+      "status": "passed",
+      "namespace": "sems-prod",
+      "images": {
+        "admission": "ghcr.io/seventh720/swe5001-sems/admission@sha256:bcfcc2398018c1de04d8a7aa1245584745effd94d3de0b770e1bf588e147b030",
+        "event-catalog": "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:215d9117b5bfc21625827cfdcef75643edd7efdbf0666c353798f25957c19764",
+        "gateway": "ghcr.io/seventh720/swe5001-sems/gateway@sha256:ce846ef0b5dd886b0cf6ef93cb616138965efb17158a970f4ab6048bce8c5b5d",
+        "identity": "ghcr.io/seventh720/swe5001-sems/identity@sha256:1147685921c50b4b29172f41188e68b71095e8b306f8684444a19d2a0a766a33",
+        "web": "ghcr.io/seventh720/swe5001-sems/web@sha256:99e88f4229c478dc588264a3ded946e0da5128185faf61e69b51b3d7e19cad22"
+      }
+    },
+    {
+      "name": "Grafana dashboard and all four data sources",
+      "status": "passed"
+    },
+    {
+      "name": "node, Pod, control-plane, PostgreSQL and HTTPS scrapes",
+      "status": "passed",
+      "targetCount": 17
+    },
+    {
+      "name": "JVM and HTTP metrics from all six backend Pods",
+      "status": "passed",
+      "seriesByPod": {
+        "jvm_memory_used_bytes": 6,
+        "http_server_request_duration_seconds_count": 6
+      }
+    },
+    {
+      "name": "real read-only Admission → Catalog → Identity trace",
+      "status": "passed",
+      "traceId": "6f68f8e1c27ab38fd4bc32b01a4834d0",
+      "spanCount": 12,
+      "crossServiceEdges": [
+        [
+          "admission",
+          "event-catalog"
+        ],
+        [
+          "event-catalog",
+          "identity"
+        ]
+      ],
+      "queryTextRemoved": true
+    },
+    {
+      "name": "centralized application logs",
+      "status": "passed",
+      "services": [
+        "admission",
+        "event-catalog",
+        "gateway",
+        "identity",
+        "postgres",
+        "web"
+      ]
+    },
+    {
+      "name": "all dashboard metric queries execute",
+      "status": "passed",
+      "panels": [
+        {
+          "title": "Public HTTPS readiness",
+          "series": 4
+        },
+        {
+          "title": "Application ready replicas",
+          "series": 5
+        },
+        {
+          "title": "PostgreSQL reachable",
+          "series": 1
+        },
+        {
+          "title": "Active alerts",
+          "series": 1
+        },
+        {
+          "title": "Node CPU used",
+          "series": 2
+        },
+        {
+          "title": "Node memory used",
+          "series": 2
+        },
+        {
+          "title": "Root disk available",
+          "series": 2
+        },
+        {
+          "title": "Control-plane API request p95",
+          "series": 7
+        },
+        {
+          "title": "Pod CPU",
+          "series": 30
+        },
+        {
+          "title": "Pod memory working set",
+          "series": 30
+        },
+        {
+          "title": "HTTP requests per second",
+          "series": 3
+        },
+        {
+          "title": "HTTP p95 duration",
+          "series": 3
+        },
+        {
+          "title": "HTTP 5xx fraction",
+          "series": 3
+        },
+        {
+          "title": "JVM heap used",
+          "series": 6
+        },
+        {
+          "title": "JVM GC duration per second",
+          "series": 3
+        },
+        {
+          "title": "JDBC pool connections",
+          "series": 6
+        },
+        {
+          "title": "Database sessions",
+          "series": 1
+        },
+        {
+          "title": "Database locks",
+          "series": 9
+        },
+        {
+          "title": "Database transactions per second",
+          "series": 1
+        },
+        {
+          "title": "Database deadlocks",
+          "series": 1
+        }
+      ]
+    }
+  ],
+  "error": "Operational alerts require review: ['PostgresUnavailable']",
+  "finishedAt": "2026-10-25T10:03:01.188408+00:00"
+}

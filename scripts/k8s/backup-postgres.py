@@ -15,8 +15,8 @@ def backup(kubeconfig, directory):
     directory.chmod(0o700)
     timestamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S.%fZ')
     kubectl = ['kubectl', '--kubeconfig', str(kubeconfig), '--context', 'sems-k3s',
-               '--cache-dir', '.secrets/k3s-cloud/cache', '-n', 'sems-test']
-    result = {'recordedAt': timestamp, 'context': 'sems-k3s', 'namespace': 'sems-test',
+               '--cache-dir', '.secrets/k3s-cloud/cache', '-n', 'sems-prod']
+    result = {'recordedAt': timestamp, 'context': 'sems-k3s', 'namespace': 'sems-prod',
               'database': 'sems', 'files': {},
               'rolePasswords': 'Not included; retain runtime.env separately for credential recovery'}
     commands = {

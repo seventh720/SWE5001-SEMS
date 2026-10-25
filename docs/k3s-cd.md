@@ -1,6 +1,6 @@
 # EC2 K3s 发布与应用回退
 
-目标为 `sems-k3s/sems-test` 和正式入口 `https://swe5001.seventh720.com`。PR #29 已将 `.github/workflows/ci.yml` 的部署阶段接到 K3s；[main run 40126181288](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288) 已实际通过 GitHub OIDC 认证及 SSM 发布，部署提交为 `7a97828`。同日正式域名和原数据已完成[切换](evidence/2026-10-25-k3s-cutover/README.md)；旧 API 停写，旧 IP 通过共享代理临时转发到新环境，SWE5006 保留。
+目标为 `sems-k3s/sems-prod` 和正式入口 `https://swe5001.seventh720.com`。PR #29 已将 `.github/workflows/ci.yml` 的部署阶段接到 K3s；[main run 40126181288](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288) 已实际通过 GitHub OIDC 认证及 SSM 发布，部署提交为 `7a97828`。同日正式域名和原数据已完成[切换](evidence/2026-10-25-k3s-cutover/README.md)；旧 API 停写，旧 IP 通过共享代理临时转发到新环境，SWE5006 保留。
 
 ## 流水线
 
@@ -8,7 +8,9 @@ PR 运行质量检查，不发布镜像或部署。main push 或 main 上的手�
 
 部署使用 GitHub OIDC 换取短期 AWS 身份，通过 SSM Run Command 在现有 server 执行发布脚本。runner 使用 `kubectl kustomize` 生成配置，不连接集群管理 API，也不持有 kubeconfig、SSH 私钥或数据库密码。K3s 节点使用 containerd，发布主机不运行 Docker Compose。
 
-namespace/environment 的 sems-test/k3s-test 是历史名称，现已承载原站数据；保留 production 标记。过渡域名 Ingress sems 已退休，旧代理直连正式入口，不再依赖 sems-test DNS。正式 Ingress sems-public 独立于应用 CD，配置见 [sems-public.yaml](../deployment/k3s/sems-public.yaml)。
+业务 namespace 已从 `sems-test` 迁到 `sems-prod`，保留 production 标记；GitHub environment `k3s-test` 是既有 OIDC 身份名称，继续使用以保持 IAM 信任，不代表线上运行在测试 namespace。正式 Ingress `sems-public` 独立于应用 CD，配置见 [sems-public.yaml](../deployment/k3s/sems-public.yaml)。过渡域名和旧 namespace 已退休，详见[迁移验收](evidence/2026-10-25-production-namespace/README.md)。
+
+迁移建立了保留现有应用 digest 的新发布基线；配置迁移记录独立于 GitHub Actions 发布记录。新发布器仅接受 `sems-prod`，迁移前 `sems-test` 的发布记录不能直接回放。新基线没有可自动回退的跨 namespace 前任；如需使用迁移前镜像，先把已审核的旧 digest 渲染成 `sems-prod` 的新发布，再做兼容性验证。旧 namespace 删除后，尚未合并的旧 main 发布器会在读取/校验应用快照时拒绝发布，不能重建 namespace；合并本次 namespace 迁移 PR 后，后续 main CD 才恢复对新 namespace 的自动更新。
 
 发布资源只包含五个应用 Deployment、六个 Service 和三个 ConfigMap；新发布不再渲染 Ingress，正式入口独立管理。PostgreSQL、数据库凭据、PVC/StorageClass、NetworkPolicy、Traefik 和 [监控后端](observability.md)独立管理；数据库 Flyway 迁移仍由各后端启动时执行。三个后端的 Java Agent 通过共享 Kustomize component 随应用发布；对应接收器须先按可观测性指南安装。当前 GHCR 应用镜像允许匿名拉取；改成私有包需要先单独配置集群拉取凭据。
 

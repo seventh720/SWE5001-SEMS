@@ -101,10 +101,10 @@ def main():
         return json.loads(subprocess.check_output(k + ['-n', namespace, 'get', kind] + ([name] if name else []) + ['-o', 'json'], text=True))
 
     try:
-        ns = get('namespace', 'sems-test', 'sems-test')
+        ns = get('namespace', 'sems-prod', 'sems-prod')
         assert ns['metadata']['annotations']['sems.seventh720.com/environment'] == 'production'
         backend_names = {'identity', 'event-catalog', 'admission'}
-        deployments = get('deployment', namespace='sems-test')['items']
+        deployments = get('deployment', namespace='sems-prod')['items']
         images = {}
         for d in deployments:
             assert d['status'].get('availableReplicas') == d['spec']['replicas'] == 2
@@ -112,7 +112,7 @@ def main():
             images[name] = d['spec']['template']['spec']['containers'][0]['image']
             if name in backend_names:
                 assert d['spec']['template']['spec']['initContainers'][0]['name'] == 'otel-java-agent'
-        passed('five applications retain two ready replicas', images=images)
+        passed('five applications retain two ready replicas', namespace='sems-prod', images=images)
         with forward(k, 'grafana', 3000) as grafana, forward(k, 'otel-collector', 4318) as otlp:
             secret = get('secret', 'grafana-admin')['data']
             username, password = [base64.b64decode(secret[key]).decode() for key in ['username', 'password']]
@@ -144,7 +144,7 @@ def main():
             observations = {}
             for metric in ['jvm_memory_used_bytes', 'http_server_request_duration_seconds_count']:
                 def current_pod_metrics():
-                    rows = query('count by(service_name,k8s_pod_name) (' + metric + ')')
+                    rows = query('count by(service_name,k8s_pod_name) (' + metric + '{k8s_namespace_name="sems-prod"})')
                     return rows if len({r['metric'].get('k8s_pod_name') for r in rows}) == 6 else None
                 samples = wait_for(current_pod_metrics, 'metrics from six current Pods')
                 assert {s['metric']['service_name'] for s in samples} == backend_names
@@ -174,6 +174,7 @@ def main():
             batches = wait_for(trace_ready, 'one propagated trace across all three services')
             spans = {}
             for b in batches:
+                assert any(a['key'] == 'k8s.namespace.name' and a['value'].get('stringValue') == 'sems-prod' for a in b['resource']['attributes'])
                 service = next(a['value']['stringValue'] for a in b['resource']['attributes'] if a['key'] == 'service.name')
                 for scope in b.get('scopeSpans', b.get('instrumentationLibrarySpans', [])):
                     for span in scope['spans']:

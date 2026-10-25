@@ -45,3 +45,25 @@ tests:
             exp_annotations:
               summary: 'HTTP 5xx above 5%: admission'
               description: At least 20 requests in five minutes are required. Use Tempo and Loki to locate the failing dependency.
+  - name: production namespace replica loss fires and old namespace is excluded
+    interval: 30s
+    input_series:
+      - series: 'kube_deployment_status_replicas_available{namespace="sems-prod",deployment="identity"}'
+        values: '1+0x20'
+      - series: 'kube_deployment_spec_replicas{namespace="sems-prod",deployment="identity"}'
+        values: '2+0x20'
+      - series: 'kube_deployment_status_replicas_available{namespace="sems-test",deployment="admission"}'
+        values: '0+0x20'
+      - series: 'kube_deployment_spec_replicas{namespace="sems-test",deployment="admission"}'
+        values: '2+0x20'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: ApplicationReplicaUnavailable
+        exp_alerts: []
+      - eval_time: 5m
+        alertname: ApplicationReplicaUnavailable
+        exp_alerts:
+          - exp_labels: {severity: warning, namespace: sems-prod, deployment: identity}
+            exp_annotations:
+              summary: 'Reduced ready replicas: identity'
+              description: Inspect rollout status, Pod events, image pulls, scheduling and readiness.

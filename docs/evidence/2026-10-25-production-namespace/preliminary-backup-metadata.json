@@ -1,0 +1,30 @@
+{
+  "at": "2026-10-25T09:54:54.136230+00:00",
+  "databases": [
+    "postgres",
+    "sems",
+    "sems_test_before_cutover_20261025"
+  ],
+  "files": [
+    {
+      "file": "preliminary-globals.sql",
+      "bytes": 2592,
+      "sha256": "af495f296bb7095e95c0ec2e8ee90fb6b8864d9bff2d99c651ad2cfbae510c3f"
+    },
+    {
+      "file": "preliminary-postgres.dump",
+      "bytes": 1057,
+      "sha256": "5cba30bada2aa28b815c2770ab3dcec07fedf07aabc8d4ff27ea781aaef8d863"
+    },
+    {
+      "file": "preliminary-sems.dump",
+      "bytes": 89693,
+      "sha256": "a95cd2f916b2c7f7a235ab3ccafd01cb02abbfd4932492f29f0c91de2a3a3e33"
+    },
+    {
+      "file": "preliminary-sems_test_before_cutover_20261025.dump",
+      "bytes": 303484,
+      "sha256": "6bd43986464c566ff04a1180b69480c664f280192fb783e0c4e16f630a170882"
+    }
+  ]
+}

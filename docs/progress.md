@@ -4,7 +4,9 @@
 
 ## 最近发布
 
-[PR #31](https://github.com/seventh720/SWE5001-SEMS/pull/31) 的监控、集中日志、Telegram 告警和跨服务追踪已在现场接入，后续固定 HTTPS 入口为 <https://grafana.seventh720.com>，保留账号登录。过渡 sems-test 域名入口已退休，生产 namespace 保留。实现、公开登录验证及别名清理见[可观测性记录](evidence/2026-10-25-observability/README.md)；PR 尚待合并，后续 CD 的采集及入口规则随合并生效。
+[PR #31](https://github.com/seventh720/SWE5001-SEMS/pull/31) 的监控、集中日志、Telegram 告警和跨服务追踪已接入并合并，固定 HTTPS 入口为 <https://grafana.seventh720.com>，保留账号登录。实现、公开登录验证及别名清理见[可观测性记录](evidence/2026-10-25-observability/README.md)。
+
+业务与正式数据随后已迁入 `sems-prod`，旧 `sems-test` namespace 已清理，`observability` 保持独立；详见[迁移记录](evidence/2026-10-25-production-namespace/README.md)。namespace 迁移配置通过独立 PR 更新，待其合并后，后续 main CD 才会使用新 namespace；合并前旧发布器因旧 namespace 不存在而拒绝更新。
 
 PR #29 已合并为 `7a97828`，[main CI 与 K3s CD](https://github.com/seventh720/SWE5001-SEMS/actions/runs/40126181288)全部成功。现场五个应用各 2/2、分居两节点，镜像与发布报告一致，数据库 Pod/PVC 与既有测试数据保持；[首次自动发布证据](evidence/2026-10-25-k3s-cd/README.md#首次-main-自动发布)已记录。正式域名随后已完成[数据、证书和 DNS 切换](evidence/2026-10-25-k3s-cutover/README.md)，不再由旧应用处理业务。
 
