@@ -1,0 +1,1369 @@
+{
+  "result": {
+    "name": "booking-r1-vu100-600s",
+    "mode": "booking",
+    "vus": 100,
+    "counts": {
+      "identity": 1,
+      "event-catalog": 1,
+      "admission": 1
+    },
+    "duration": 600,
+    "warmup": 60,
+    "loadExitCode": 0,
+    "error": null,
+    "inventoryPassed": true,
+    "gatewayCoveragePassed": true,
+    "serverGatePassed": false,
+    "passed": false,
+    "replicaTrafficAssessed": true,
+    "eachReplicaServed": true
+  },
+  "measurement": {
+    "name": "booking-r1-vu100-600s",
+    "mode": "booking",
+    "vus": 100,
+    "replicas": {
+      "identity": 1,
+      "event-catalog": 1,
+      "admission": 1
+    },
+    "plannedMeasurementSeconds": 600,
+    "actualTotalRuntimeSeconds": 665.29952546,
+    "firstMeasurementResponseAt": "2026-11-06T15:26:50.829355+00:00",
+    "lastMeasurementResponseAt": "2026-11-06T15:36:50.573190+00:00",
+    "measurementResponseTimestampSpanSeconds": 599.7438349723816,
+    "rawMeasurementRequests": 80064,
+    "summaryMeasurementRequests": 80064,
+    "rawAndSummaryCountsMatch": true,
+    "successfulHttpRps": 133.44,
+    "unexpectedErrorRate": 0,
+    "perOperationP95Ms": {
+      "book": 1765.0369070999993,
+      "receipt": 1093.7246106
+    },
+    "requestsByOperationAndStatus": {
+      "book": {
+        "200": 40032
+      },
+      "receipt": {
+        "200": 40032
+      }
+    },
+    "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+    "nodeMeanCpuCores": {
+      "sems-k3s-server": 0.6753493287294118,
+      "sems-k3s-worker": 1.6325312607411764
+    },
+    "nodeMinimumAvailableMiB": {
+      "sems-k3s-server": 1557.27734375,
+      "sems-k3s-worker": 1699.7890625
+    },
+    "podMeanCpuCores": {
+      "web-57fb5b59f4-ghslq": 6.398294117647059e-05,
+      "gateway-59b5f5c979-kg59m": 0.05409423458823529,
+      "event-catalog-755bf4fd9f-m8wvj": 0.31049260867058825,
+      "gateway-59b5f5c979-whnj2": 0.05063939597647059,
+      "web-57fb5b59f4-469j6": 6.83743294117647e-05,
+      "admission-77d9d9cfd4-hljwq": 0.9894598314352941,
+      "postgres-0": 0.31844375188235297,
+      "identity-7656ff6b5d-7l722": 0.1450263961764706
+    },
+    "podMaximumWorkingSetMiB": {
+      "web-57fb5b59f4-ghslq": 3.9609375,
+      "gateway-59b5f5c979-kg59m": 11.28515625,
+      "event-catalog-755bf4fd9f-m8wvj": 454.10546875,
+      "gateway-59b5f5c979-whnj2": 11.84765625,
+      "web-57fb5b59f4-469j6": 3.83203125,
+      "admission-77d9d9cfd4-hljwq": 444.734375,
+      "postgres-0": 323.359375,
+      "identity-7656ff6b5d-7l722": 442.28515625
+    },
+    "singleSampleOnly": true,
+    "passed": false
+  },
+  "summary": {
+    "metadata": {
+      "runId": "ea502a0bb9fe-booking-r1-vu100-600s",
+      "dataset": "00aba1990c97",
+      "mode": "booking",
+      "vus": 100,
+      "warmup": 60,
+      "duration": 600,
+      "base": "https://swe5001.seventh720.com",
+      "distribution": "spread",
+      "thinkSeconds": 0.1,
+      "postgresCpuLimit": "1",
+      "commit": "5e9081a9f5421fa5bdbd965d750641f3666dd5f3",
+      "replicas": "identity1-event-catalog1-admission1",
+      "note": "Read measurement-tagged metrics only; HTTP counts include setup and warmup. No HA claim."
+    },
+    "metrics": {
+      "http_req_blocked": {
+        "type": "trend",
+        "contains": "time",
+        "values": {
+          "p(95)": 0.001,
+          "avg": 0.17864903074287125,
+          "min": 4.1e-05,
+          "med": 0.0005,
+          "max": 284.153709,
+          "p(90)": 0.000833
+        }
+      },
+      "operation_duration": {
+        "type": "trend",
+        "contains": "time",
+        "values": {
+          "med": 656.5241255,
+          "max": 9128.298504,
+          "p(90)": 1382.9998963,
+          "p(95)": 1646.56021515,
+          "avg": 738.2559310693465,
+          "min": 38.003417
+        }
+      },
+      "unexpected_error_rate{scenario:measurement}": {
+        "thresholds": {
+          "rate<0.01": {
+            "ok": true
+          }
+        },
+        "type": "rate",
+        "contains": "default",
+        "values": {
+          "passes": 0,
+          "fails": 80064,
+          "rate": 0
+        }
+      },
+      "business_rejection_rate{scenario:measurement}": {
+        "contains": "default",
+        "values": {
+          "rate": 0,
+          "passes": 0,
+          "fails": 80064
+        },
+        "thresholds": {
+          "rate==0": {
+            "ok": true
+          }
+        },
+        "type": "rate"
+      },
+      "unexpected_error_rate": {
+        "type": "rate",
+        "contains": "default",
+        "values": {
+          "rate": 0,
+          "passes": 0,
+          "fails": 83594
+        }
+      },
+      "vus": {
+        "contains": "default",
+        "values": {
+          "value": 100,
+          "min": 0,
+          "max": 100
+        },
+        "type": "gauge"
+      },
+      "successful_requests{scenario:measurement,operation:receipt}": {
+        "type": "counter",
+        "contains": "default",
+        "values": {
+          "count": 40032,
+          "rate": 60.171394188686904
+        },
+        "thresholds": {
+          "count>0": {
+            "ok": true
+          }
+        }
+      },
+      "vus_max": {
+        "contains": "default",
+        "values": {
+          "value": 100,
+          "min": 100,
+          "max": 100
+        },
+        "type": "gauge"
+      },
+      "iteration_duration": {
+        "type": "trend",
+        "contains": "time",
+        "values": {
+          "p(90)": 2403.8217928,
+          "p(95)": 2766.9014006999987,
+          "avg": 1577.6502953037293,
+          "min": 289.339667,
+          "med": 1471.432626,
+          "max": 11035.355338
+        }
+      },
+      "http_req_connecting": {
+        "type": "trend",
+        "contains": "time",
+        "values": {
+          "min": 0,
+          "med": 0,
+          "max": 63.77975,
+          "p(90)": 0,
+          "p(95)": 0,
+          "avg": 0.06275091060291059
+        }
+      },
+      "business_rejection_rate": {
+        "type": "rate",
+        "contains": "default",
+        "values": {
+          "passes": 0,
+          "fails": 83594,
+          "rate": 0
+        }
+      },
+      "http_req_failed": {
+        "type": "rate",
+        "contains": "default",
+        "values": {
+          "rate": 0,
+          "passes": 0,
+          "fails": 83694
+        }
+      },
+      "operation_duration{scenario:measurement,operation:book}": {
+        "type": "trend",
+        "contains": "time",
+        "values": {
+          "med": 870.8970005000001,
+          "max": 4633.736252,
+          "p(90)": 1535.1496007,
+          "p(95)": 1765.0369070999993,
+          "avg": 902.2049348937044,
+          "min": 77.621001
+        },
+        "thresholds": {
+          "p(95)<3000": {
+            "ok": true
+          }
+        }
+      },
+      "successful_requests": {
+        "type": "counter",
+        "contains": "default",
+        "values": {
+          "count": 83594,
+          "rate": 125.64866920985943
+        }
+      },
+      "http_req_tls_handshaking": {
+        "type": "trend",
+        "contains": "time",
+        "values": {
+          "max": 221.728458,
+          "p(90)": 0,
+          "p(95)": 0,
+          "avg": 0.11429259476187066,
+          "min": 0,
+          "med": 0
+        }
+      },
+      "successful_requests{scenario:measurement,operation:book}": {
+        "contains": "default",
+        "values": {
+          "count": 40032,
+          "rate": 60.171394188686904
+        },
+        "thresholds": {
+          "count>0": {
+            "ok": true
+          }
+        },
+        "type": "counter"
+      },
+      "http_req_duration": {
+        "type": "trend",
+        "contains": "time",
+        "values": {
+          "min": 15.90325,
+          "med": 655.7967085,
+          "max": 9128.298504,
+          "p(90)": 1382.7494797000002,
+          "p(95)": 1646.1707053999999,
+          "avg": 737.4256452017462
+        }
+      },
+      "http_req_receiving": {
+        "type": "trend",
+        "contains": "time",
+        "values": {
+          "p(90)": 34.0540456,
+          "p(95)": 47.8322751,
+          "avg": 10.312445935287943,
+          "min": 0.006209,
+          "med": 1.0193125,
+          "max": 730.528917
+        }
+      },
+      "http_reqs": {
+        "type": "counter",
+        "contains": "default",
+        "values": {
+          "count": 83694,
+          "rate": 125.79897744874005
+        }
+      },
+      "data_sent": {
+        "type": "counter",
+        "contains": "data",
+        "values": {
+          "count": 15018782,
+          "rate": 22574.466725518472
+        }
+      },
+      "successful_requests{scenario:measurement}": {
+        "thresholds": {
+          "count>0": {
+            "ok": true
+          }
+        },
+        "type": "counter",
+        "contains": "default",
+        "values": {
+          "rate": 120.34278837737381,
+          "count": 80064
+        }
+      },
+      "http_req_waiting": {
+        "type": "trend",
+        "contains": "time",
+        "values": {
+          "med": 645.9559795,
+          "max": 9115.279046,
+          "p(90)": 1368.2141054,
+          "p(95)": 1632.5114861999982,
+          "avg": 727.007014967938,
+          "min": 15.146125
+        }
+      },
+      "operation_duration{scenario:measurement,operation:receipt}": {
+        "type": "trend",
+        "contains": "time",
+        "values": {
+          "max": 2433.521737,
+          "p(90)": 923.1620924,
+          "p(95)": 1093.7246106,
+          "avg": 496.24539686350295,
+          "min": 38.003417,
+          "med": 441.4980425
+        },
+        "thresholds": {
+          "p(95)<3000": {
+            "ok": true
+          }
+        }
+      },
+      "data_received": {
+        "type": "counter",
+        "contains": "data",
+        "values": {
+          "count": 92424101,
+          "rate": 138921.0385143388
+        }
+      },
+      "iterations": {
+        "type": "counter",
+        "contains": "default",
+        "values": {
+          "count": 41779,
+          "rate": 62.797279121931204
+        }
+      },
+      "http_req_sending": {
+        "contains": "time",
+        "values": {
+          "avg": 0.10618429851602261,
+          "min": 0.008917,
+          "med": 0.099083,
+          "max": 11.2625,
+          "p(90)": 0.1675,
+          "p(95)": 0.19543134999999984
+        },
+        "type": "trend"
+      }
+    },
+    "state": {
+      "isStdOutTTY": false,
+      "isStdErrTTY": false,
+      "testRunDurationMs": 665299.52546
+    }
+  },
+  "gateway": {
+    "entryByPhaseAndStatus": {
+      "warmup:200": 3563,
+      "warmup:499": 65,
+      "measurement:200": 80064
+    },
+    "internalByStatus": {
+      "200": 125569,
+      "504": 16
+    },
+    "upstreamErrorsByStatus": {
+      "504": 16
+    },
+    "requestsWithMultipleUpstreams": 0,
+    "malformedLines": 0,
+    "expectedMeasurementRequests": 80064,
+    "recordedMeasurementRequests": 80064,
+    "measurementCoveragePassed": true,
+    "serverGatePassed": false
+  },
+  "podPlacementAndResources": {
+    "admission-77d9d9cfd4-hljwq": {
+      "uid": "d1739faf-2f96-4996-beff-872e50304ebe",
+      "service": "admission",
+      "node": "sems-k3s-worker",
+      "ip": "10.42.1.160",
+      "containers": [
+        {
+          "name": "admission",
+          "image": "sha256:53e8213bc1d66f9e01e23459b2894198a0dd1ea57b57b5407e763d29246a3f8a",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/admission@sha256:d3a355ff4c758c517bd601d03a89494a928a5b666e3a70fe784e134b90913b95",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "768Mi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "512Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "event-catalog-755bf4fd9f-m8wvj": {
+      "uid": "b83a07fb-4186-48df-9d2b-610455c13718",
+      "service": "event-catalog",
+      "node": "sems-k3s-server",
+      "ip": "10.42.0.175",
+      "containers": [
+        {
+          "name": "event-catalog",
+          "image": "sha256:ddfad5b47a48fdbf9b2dcc419899de9b9176204ce032330f10bc10dd28c9e72a",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:7a9d700221f671b1ba062a01b690b31330dd8cd5e268b1d9ea22b71aa0daba84",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "768Mi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "512Mi"
+          }
+        }
+      ],
+      "poolSizes": [
+        {
+          "name": "CATALOG_DB_POOL_SIZE",
+          "value": "10"
+        }
+      ]
+    },
+    "gateway-59b5f5c979-kg59m": {
+      "uid": "413ce15a-d7d2-4d49-8706-53481c5927a7",
+      "service": "gateway",
+      "node": "sems-k3s-server",
+      "ip": "10.42.0.144",
+      "containers": [
+        {
+          "name": "gateway",
+          "image": "sha256:215fc33aeae677768846fd3e4bcbacb33a48ea2b32ab4b203cfe329763d24c67",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/gateway@sha256:66fce0b1bab9830fc7d8db74207fb4a10bb015bda97b9f6dddc2c9e0a2469ad9",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "500m",
+            "memory": "128Mi"
+          },
+          "requests": {
+            "cpu": "50m",
+            "memory": "64Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "gateway-59b5f5c979-whnj2": {
+      "uid": "1806047b-538e-4028-bc26-8bc663425477",
+      "service": "gateway",
+      "node": "sems-k3s-worker",
+      "ip": "10.42.1.123",
+      "containers": [
+        {
+          "name": "gateway",
+          "image": "sha256:215fc33aeae677768846fd3e4bcbacb33a48ea2b32ab4b203cfe329763d24c67",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/gateway@sha256:66fce0b1bab9830fc7d8db74207fb4a10bb015bda97b9f6dddc2c9e0a2469ad9",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "500m",
+            "memory": "128Mi"
+          },
+          "requests": {
+            "cpu": "50m",
+            "memory": "64Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "identity-7656ff6b5d-7l722": {
+      "uid": "eed008ec-16f9-434b-abde-2787db3cb043",
+      "service": "identity",
+      "node": "sems-k3s-worker",
+      "ip": "10.42.1.159",
+      "containers": [
+        {
+          "name": "identity",
+          "image": "sha256:075691439a882fa683e42e2346e76f0753e22c9b155093c99bf14cabbb02ceef",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/identity@sha256:6a9eb90e1187b3796f484239a49575f8a263971cbb7fa09d121b5fb632ca0b4e",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "768Mi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "512Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "postgres-0": {
+      "uid": "b70dc15e-fe76-4957-9e76-5bb55abfbdae",
+      "service": "postgres",
+      "node": "sems-k3s-worker",
+      "ip": "10.42.1.112",
+      "containers": [
+        {
+          "name": "postgres",
+          "image": "sha256:69e8bef45756082f75d51d4f4c706d0a8dd43898b70503e2253b896f24ee5058",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+          "restartCount": 1
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "768Mi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "256Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "web-57fb5b59f4-469j6": {
+      "uid": "d9c506c6-2884-4733-875a-6fc1e0496368",
+      "service": "web",
+      "node": "sems-k3s-worker",
+      "ip": "10.42.1.121",
+      "containers": [
+        {
+          "name": "web",
+          "image": "sha256:88aa44580c92d90047336a806510ea4462c27bd0f264e85db887a065c4bdb04e",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/web@sha256:4c556dc66ed90fe5463db892e6d456ad27aaf2d8f41cb9cfba8c58f04492b659",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "500m",
+            "memory": "128Mi"
+          },
+          "requests": {
+            "cpu": "50m",
+            "memory": "64Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "web-57fb5b59f4-ghslq": {
+      "uid": "78f2dbee-4a19-4c68-a193-abada6743e0e",
+      "service": "web",
+      "node": "sems-k3s-server",
+      "ip": "10.42.0.142",
+      "containers": [
+        {
+          "name": "web",
+          "image": "sha256:88aa44580c92d90047336a806510ea4462c27bd0f264e85db887a065c4bdb04e",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/web@sha256:4c556dc66ed90fe5463db892e6d456ad27aaf2d8f41cb9cfba8c58f04492b659",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "500m",
+            "memory": "128Mi"
+          },
+          "requests": {
+            "cpu": "50m",
+            "memory": "64Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    }
+  },
+  "businessTrafficByTestedPod": {
+    "admission-77d9d9cfd4-hljwq": {
+      "200": 83692
+    }
+  },
+  "inventory": {
+    "passed": true,
+    "eventCount": 100,
+    "rows": [
+      {
+        "id": "054cea2a-061f-42af-8408-b9d94e8ad604",
+        "quota": 1000000,
+        "reserved": 413,
+        "confirmed": 413,
+        "tickets": 413
+      },
+      {
+        "id": "06bfc93a-0be8-4680-92ba-dc196b394b8c",
+        "quota": 1000000,
+        "reserved": 421,
+        "confirmed": 421,
+        "tickets": 421
+      },
+      {
+        "id": "08ea4adc-237c-4da6-aa2d-aaad16bba5f7",
+        "quota": 1000000,
+        "reserved": 424,
+        "confirmed": 424,
+        "tickets": 424
+      },
+      {
+        "id": "0d5276bc-253c-47a0-b3d4-2c08fcbcd975",
+        "quota": 1000000,
+        "reserved": 417,
+        "confirmed": 417,
+        "tickets": 417
+      },
+      {
+        "id": "0e37a4c1-329b-4909-ab22-88261e4dc6a0",
+        "quota": 1000000,
+        "reserved": 417,
+        "confirmed": 417,
+        "tickets": 417
+      },
+      {
+        "id": "0ef3938e-ce26-4177-82ff-c61de8136010",
+        "quota": 1000000,
+        "reserved": 422,
+        "confirmed": 422,
+        "tickets": 422
+      },
+      {
+        "id": "1138e61a-61d3-42a5-8f4e-40b8d0c661cf",
+        "quota": 1000000,
+        "reserved": 421,
+        "confirmed": 421,
+        "tickets": 421
+      },
+      {
+        "id": "117d28d0-c22d-47eb-8add-72d7df12e22e",
+        "quota": 1000000,
+        "reserved": 426,
+        "confirmed": 426,
+        "tickets": 426
+      },
+      {
+        "id": "12726072-eeca-4fd0-b0f9-14627fe86164",
+        "quota": 1000000,
+        "reserved": 423,
+        "confirmed": 423,
+        "tickets": 423
+      },
+      {
+        "id": "128cea94-b9eb-47c3-a229-3e4c960935e4",
+        "quota": 1000000,
+        "reserved": 425,
+        "confirmed": 425,
+        "tickets": 425
+      },
+      {
+        "id": "19da0cb3-7dbf-43f4-8923-136351fb682b",
+        "quota": 1000000,
+        "reserved": 408,
+        "confirmed": 408,
+        "tickets": 408
+      },
+      {
+        "id": "1e042d2c-b0bd-4997-b077-19ef6ca282d4",
+        "quota": 1000000,
+        "reserved": 398,
+        "confirmed": 398,
+        "tickets": 398
+      },
+      {
+        "id": "1ef82d9c-8098-460e-853d-07ab636e92cd",
+        "quota": 1000000,
+        "reserved": 420,
+        "confirmed": 420,
+        "tickets": 420
+      },
+      {
+        "id": "22af3f3f-3930-4d1f-b870-539aadf0a010",
+        "quota": 1000000,
+        "reserved": 412,
+        "confirmed": 412,
+        "tickets": 412
+      },
+      {
+        "id": "235ba510-817e-401b-8aa1-04650bae1622",
+        "quota": 1000000,
+        "reserved": 406,
+        "confirmed": 406,
+        "tickets": 406
+      },
+      {
+        "id": "29a1d0a3-3667-46b4-b8a4-5b3d0a29a0f8",
+        "quota": 1000000,
+        "reserved": 437,
+        "confirmed": 437,
+        "tickets": 437
+      },
+      {
+        "id": "2d886d8d-d36e-44eb-bef3-8727c708f58d",
+        "quota": 1000000,
+        "reserved": 418,
+        "confirmed": 418,
+        "tickets": 418
+      },
+      {
+        "id": "32869748-faea-4b1f-9493-3efafd451658",
+        "quota": 1000000,
+        "reserved": 422,
+        "confirmed": 422,
+        "tickets": 422
+      },
+      {
+        "id": "36e7fec1-d975-4242-92a3-e6e2e3128cc5",
+        "quota": 1000000,
+        "reserved": 414,
+        "confirmed": 414,
+        "tickets": 414
+      },
+      {
+        "id": "3726a5fd-8966-4c72-b50e-b15aba45cda0",
+        "quota": 1000000,
+        "reserved": 417,
+        "confirmed": 417,
+        "tickets": 417
+      },
+      {
+        "id": "37da349e-13b8-46f3-8ad9-b1941c88308a",
+        "quota": 1000000,
+        "reserved": 412,
+        "confirmed": 412,
+        "tickets": 412
+      },
+      {
+        "id": "3c12a7d4-65fd-4c53-854c-4c5481d09023",
+        "quota": 1000000,
+        "reserved": 418,
+        "confirmed": 418,
+        "tickets": 418
+      },
+      {
+        "id": "3d6fc1b0-7097-46b1-8519-81189867ab03",
+        "quota": 1000000,
+        "reserved": 427,
+        "confirmed": 427,
+        "tickets": 427
+      },
+      {
+        "id": "3daefc03-c968-48e2-8bfc-9313c81c10b4",
+        "quota": 1000000,
+        "reserved": 420,
+        "confirmed": 420,
+        "tickets": 420
+      },
+      {
+        "id": "422010a0-789f-4348-8f79-e1f10460b175",
+        "quota": 1000000,
+        "reserved": 407,
+        "confirmed": 407,
+        "tickets": 407
+      },
+      {
+        "id": "44285e14-ec1e-4e12-85fb-a722fc0e12dd",
+        "quota": 1000000,
+        "reserved": 425,
+        "confirmed": 425,
+        "tickets": 425
+      },
+      {
+        "id": "4c498a2f-7ce0-494c-9200-d43c3c940123",
+        "quota": 1000000,
+        "reserved": 409,
+        "confirmed": 409,
+        "tickets": 409
+      },
+      {
+        "id": "4ceeea56-39b8-4a6e-9370-fde96a20afae",
+        "quota": 1000000,
+        "reserved": 414,
+        "confirmed": 414,
+        "tickets": 414
+      },
+      {
+        "id": "50eae32b-228a-40f5-90cc-b0aac94fd02d",
+        "quota": 1000000,
+        "reserved": 413,
+        "confirmed": 413,
+        "tickets": 413
+      },
+      {
+        "id": "51215175-c20d-4cfe-bf62-335e776031b7",
+        "quota": 1000000,
+        "reserved": 432,
+        "confirmed": 432,
+        "tickets": 432
+      },
+      {
+        "id": "55445de9-03b9-4628-b247-3cf5fc3a3548",
+        "quota": 1000000,
+        "reserved": 412,
+        "confirmed": 412,
+        "tickets": 412
+      },
+      {
+        "id": "5e2801ef-0189-4c6d-bd11-5fd0c94d5400",
+        "quota": 1000000,
+        "reserved": 421,
+        "confirmed": 421,
+        "tickets": 421
+      },
+      {
+        "id": "604fa336-4ee8-4515-a966-34703a53bdc3",
+        "quota": 1000000,
+        "reserved": 403,
+        "confirmed": 403,
+        "tickets": 403
+      },
+      {
+        "id": "615f2832-c756-4d7d-a27d-ca943ec0f4fe",
+        "quota": 1000000,
+        "reserved": 423,
+        "confirmed": 423,
+        "tickets": 423
+      },
+      {
+        "id": "64f7d439-809a-4a76-8b6a-ff4c037800f1",
+        "quota": 1000000,
+        "reserved": 424,
+        "confirmed": 424,
+        "tickets": 424
+      },
+      {
+        "id": "6762e562-4fe7-4567-8056-9cee85204625",
+        "quota": 1000000,
+        "reserved": 439,
+        "confirmed": 439,
+        "tickets": 439
+      },
+      {
+        "id": "67b42d80-44b3-466a-9a6c-c3b709d15690",
+        "quota": 1000000,
+        "reserved": 409,
+        "confirmed": 409,
+        "tickets": 409
+      },
+      {
+        "id": "697f4e66-9724-4676-bf90-5202e0191447",
+        "quota": 1000000,
+        "reserved": 421,
+        "confirmed": 421,
+        "tickets": 421
+      },
+      {
+        "id": "69ac6065-8da5-4709-9556-2e4c723a308b",
+        "quota": 1000000,
+        "reserved": 430,
+        "confirmed": 430,
+        "tickets": 430
+      },
+      {
+        "id": "6ef248af-e84b-40c6-a488-3f13d51df92a",
+        "quota": 1000000,
+        "reserved": 426,
+        "confirmed": 426,
+        "tickets": 426
+      },
+      {
+        "id": "71b387c6-9efb-4251-b70f-ae83d470d153",
+        "quota": 1000000,
+        "reserved": 415,
+        "confirmed": 415,
+        "tickets": 415
+      },
+      {
+        "id": "734a4aa9-65fe-4f44-b100-a05a3e337fd1",
+        "quota": 1000000,
+        "reserved": 415,
+        "confirmed": 415,
+        "tickets": 415
+      },
+      {
+        "id": "7909ea46-9f34-48fc-a26c-8bd36ffcbee1",
+        "quota": 1000000,
+        "reserved": 425,
+        "confirmed": 425,
+        "tickets": 425
+      },
+      {
+        "id": "7a1f8d28-bb58-4c70-9d9c-a8734a32ddff",
+        "quota": 1000000,
+        "reserved": 430,
+        "confirmed": 430,
+        "tickets": 430
+      },
+      {
+        "id": "7e1de545-412d-4d56-8d06-78ac2afd18fa",
+        "quota": 1000000,
+        "reserved": 405,
+        "confirmed": 405,
+        "tickets": 405
+      },
+      {
+        "id": "84762716-e1ce-45ca-92a0-ee93daf29f44",
+        "quota": 1000000,
+        "reserved": 417,
+        "confirmed": 417,
+        "tickets": 417
+      },
+      {
+        "id": "8969457a-8171-477d-9e59-3208408f3f9d",
+        "quota": 1000000,
+        "reserved": 415,
+        "confirmed": 415,
+        "tickets": 415
+      },
+      {
+        "id": "8a5a84d9-6ff1-4e2e-b050-3181ee607263",
+        "quota": 1000000,
+        "reserved": 419,
+        "confirmed": 419,
+        "tickets": 419
+      },
+      {
+        "id": "8baa150d-11e9-4a7f-9453-6a36a3394788",
+        "quota": 1000000,
+        "reserved": 423,
+        "confirmed": 423,
+        "tickets": 423
+      },
+      {
+        "id": "8baafbc2-c17a-4085-ab19-de7edb454db2",
+        "quota": 1000000,
+        "reserved": 419,
+        "confirmed": 419,
+        "tickets": 419
+      },
+      {
+        "id": "91f28ee6-af34-446f-9336-eb72e15e0fe1",
+        "quota": 1000000,
+        "reserved": 420,
+        "confirmed": 420,
+        "tickets": 420
+      },
+      {
+        "id": "9297519d-8e40-4111-97ff-628b81713616",
+        "quota": 1000000,
+        "reserved": 413,
+        "confirmed": 413,
+        "tickets": 413
+      },
+      {
+        "id": "96c1cafb-555a-4988-a7b8-14112bcc5811",
+        "quota": 1000000,
+        "reserved": 410,
+        "confirmed": 410,
+        "tickets": 410
+      },
+      {
+        "id": "970b2ace-7f84-4f88-83f1-dafc5dec958e",
+        "quota": 1000000,
+        "reserved": 401,
+        "confirmed": 401,
+        "tickets": 401
+      },
+      {
+        "id": "a097b1c0-1f03-4d56-af34-a4225cc5fc0e",
+        "quota": 1000000,
+        "reserved": 417,
+        "confirmed": 417,
+        "tickets": 417
+      },
+      {
+        "id": "a14c4355-d314-4a61-a38b-11c1fe9bf412",
+        "quota": 1000000,
+        "reserved": 428,
+        "confirmed": 428,
+        "tickets": 428
+      },
+      {
+        "id": "a936c16d-e02e-4d10-811d-704cd9356dcf",
+        "quota": 1000000,
+        "reserved": 428,
+        "confirmed": 428,
+        "tickets": 428
+      },
+      {
+        "id": "ab4a27f5-0566-46d2-b35c-805a173983a5",
+        "quota": 1000000,
+        "reserved": 429,
+        "confirmed": 429,
+        "tickets": 429
+      },
+      {
+        "id": "ab7547b8-7962-4372-aa52-f4f9c3fe6a19",
+        "quota": 1000000,
+        "reserved": 419,
+        "confirmed": 419,
+        "tickets": 419
+      },
+      {
+        "id": "abd109c3-b09a-4d9c-bec1-eef4c8631f0e",
+        "quota": 1000000,
+        "reserved": 419,
+        "confirmed": 419,
+        "tickets": 419
+      },
+      {
+        "id": "ac4e5614-4045-43c3-9edb-f56a06efa9db",
+        "quota": 1000000,
+        "reserved": 429,
+        "confirmed": 429,
+        "tickets": 429
+      },
+      {
+        "id": "b4f6277a-1e76-4759-a85f-0340d35d2424",
+        "quota": 1000000,
+        "reserved": 399,
+        "confirmed": 399,
+        "tickets": 399
+      },
+      {
+        "id": "b6bbba0e-17d5-4c9c-80bc-b268cf7bd89f",
+        "quota": 1000000,
+        "reserved": 424,
+        "confirmed": 424,
+        "tickets": 424
+      },
+      {
+        "id": "b869abdb-6f62-40d4-ab0d-9d0ab5d454e8",
+        "quota": 1000000,
+        "reserved": 425,
+        "confirmed": 425,
+        "tickets": 425
+      },
+      {
+        "id": "bc5bb07d-9a4b-412a-aba3-76e3b1779a1a",
+        "quota": 1000000,
+        "reserved": 428,
+        "confirmed": 428,
+        "tickets": 428
+      },
+      {
+        "id": "bd091975-591d-4115-b10a-c75c4f173a23",
+        "quota": 1000000,
+        "reserved": 411,
+        "confirmed": 411,
+        "tickets": 411
+      },
+      {
+        "id": "bd4ec30d-d24f-4d2e-b871-84689839c9aa",
+        "quota": 1000000,
+        "reserved": 416,
+        "confirmed": 416,
+        "tickets": 416
+      },
+      {
+        "id": "beb5cf52-b483-42aa-8666-5fea83fd13e3",
+        "quota": 1000000,
+        "reserved": 422,
+        "confirmed": 422,
+        "tickets": 422
+      },
+      {
+        "id": "c5b3bc77-9141-46c4-929f-01e317057b36",
+        "quota": 1000000,
+        "reserved": 426,
+        "confirmed": 426,
+        "tickets": 426
+      },
+      {
+        "id": "c5d26cba-8c47-42da-bee4-8f92b9fe512b",
+        "quota": 1000000,
+        "reserved": 423,
+        "confirmed": 423,
+        "tickets": 423
+      },
+      {
+        "id": "c71d7bf7-dfb1-44f9-83ea-dee4866dc60d",
+        "quota": 1000000,
+        "reserved": 414,
+        "confirmed": 414,
+        "tickets": 414
+      },
+      {
+        "id": "c7a28112-ee82-42ab-ab3f-bb4103fe35af",
+        "quota": 1000000,
+        "reserved": 413,
+        "confirmed": 413,
+        "tickets": 413
+      },
+      {
+        "id": "c919e26c-5885-4e38-a2c3-f3f7dfd7c648",
+        "quota": 1000000,
+        "reserved": 426,
+        "confirmed": 426,
+        "tickets": 426
+      },
+      {
+        "id": "c977fe22-7165-461f-84c9-b395cea58fa3",
+        "quota": 1000000,
+        "reserved": 425,
+        "confirmed": 425,
+        "tickets": 425
+      },
+      {
+        "id": "ca9387ad-0d6e-4acd-bd26-48475317f1ad",
+        "quota": 1000000,
+        "reserved": 407,
+        "confirmed": 407,
+        "tickets": 407
+      },
+      {
+        "id": "cbaee3b6-af7c-4871-a182-f646bf799915",
+        "quota": 1000000,
+        "reserved": 435,
+        "confirmed": 435,
+        "tickets": 435
+      },
+      {
+        "id": "cdd12a29-9c57-40b9-a27e-731486448505",
+        "quota": 1000000,
+        "reserved": 424,
+        "confirmed": 424,
+        "tickets": 424
+      },
+      {
+        "id": "cffba94e-0463-4a71-bc8e-4de97c3afb0d",
+        "quota": 1000000,
+        "reserved": 431,
+        "confirmed": 431,
+        "tickets": 431
+      },
+      {
+        "id": "d6524d3e-4d89-4896-88f2-0564885d5715",
+        "quota": 1000000,
+        "reserved": 397,
+        "confirmed": 397,
+        "tickets": 397
+      },
+      {
+        "id": "d7c05b2a-0b58-4290-81d3-b9c2fe05e0e7",
+        "quota": 1000000,
+        "reserved": 410,
+        "confirmed": 410,
+        "tickets": 410
+      },
+      {
+        "id": "d9ad0b0c-9336-4ff7-994e-2589c60642c9",
+        "quota": 1000000,
+        "reserved": 422,
+        "confirmed": 422,
+        "tickets": 422
+      },
+      {
+        "id": "dd1e168a-d755-4206-9e75-08b9756f3e9a",
+        "quota": 1000000,
+        "reserved": 418,
+        "confirmed": 418,
+        "tickets": 418
+      },
+      {
+        "id": "ddb456df-594c-4d47-83e5-ffeb692142fa",
+        "quota": 1000000,
+        "reserved": 420,
+        "confirmed": 420,
+        "tickets": 420
+      },
+      {
+        "id": "ddfa2feb-7fbe-447d-97f9-14b8530d6866",
+        "quota": 1000000,
+        "reserved": 422,
+        "confirmed": 422,
+        "tickets": 422
+      },
+      {
+        "id": "e32f72e8-9ac0-46ae-a0a7-8334c12e009c",
+        "quota": 1000000,
+        "reserved": 423,
+        "confirmed": 423,
+        "tickets": 423
+      },
+      {
+        "id": "e67a71c9-96a8-4e99-99fd-22e934481f2c",
+        "quota": 1000000,
+        "reserved": 430,
+        "confirmed": 430,
+        "tickets": 430
+      },
+      {
+        "id": "e72562ef-1798-4f3f-b53a-629d9747f47f",
+        "quota": 1000000,
+        "reserved": 418,
+        "confirmed": 418,
+        "tickets": 418
+      },
+      {
+        "id": "e847aa6d-7718-4413-8527-0bc0c25f2278",
+        "quota": 1000000,
+        "reserved": 414,
+        "confirmed": 414,
+        "tickets": 414
+      },
+      {
+        "id": "eedf2bca-d4e6-4fb4-9bf0-71ab92855d3f",
+        "quota": 1000000,
+        "reserved": 429,
+        "confirmed": 429,
+        "tickets": 429
+      },
+      {
+        "id": "ef2223ca-b73b-4586-82fb-d62623598246",
+        "quota": 1000000,
+        "reserved": 407,
+        "confirmed": 407,
+        "tickets": 407
+      },
+      {
+        "id": "efd73ad0-d406-4192-9440-5a658468be5c",
+        "quota": 1000000,
+        "reserved": 415,
+        "confirmed": 415,
+        "tickets": 415
+      },
+      {
+        "id": "f035f898-61c5-4dd7-8aa5-39405244b15e",
+        "quota": 1000000,
+        "reserved": 417,
+        "confirmed": 417,
+        "tickets": 417
+      },
+      {
+        "id": "f0a51541-af50-4457-9126-ace6fdd3fe0d",
+        "quota": 1000000,
+        "reserved": 420,
+        "confirmed": 420,
+        "tickets": 420
+      },
+      {
+        "id": "f1cc4bf9-ec7c-4b2c-b748-cba725220812",
+        "quota": 1000000,
+        "reserved": 421,
+        "confirmed": 421,
+        "tickets": 421
+      },
+      {
+        "id": "f2b4cf11-8dd8-410d-8c01-9dbb5e925bf5",
+        "quota": 1000000,
+        "reserved": 415,
+        "confirmed": 415,
+        "tickets": 415
+      },
+      {
+        "id": "f318f788-4c0f-4c00-b89b-3f386942b7a7",
+        "quota": 1000000,
+        "reserved": 420,
+        "confirmed": 420,
+        "tickets": 420
+      },
+      {
+        "id": "f44dbaa2-9b95-4e70-a479-df98be9612fc",
+        "quota": 1000000,
+        "reserved": 412,
+        "confirmed": 412,
+        "tickets": 412
+      },
+      {
+        "id": "fb6c6b2e-a4ca-49b4-af7d-eee3212ecbf9",
+        "quota": 1000000,
+        "reserved": 422,
+        "confirmed": 422,
+        "tickets": 422
+      },
+      {
+        "id": "fd121696-4986-4b9e-a8c4-d9aedec83ab4",
+        "quota": 1000000,
+        "reserved": 415,
+        "confirmed": 415,
+        "tickets": 415
+      },
+      {
+        "id": "fd355105-19b9-4ced-8d4f-ee19372fb5b5",
+        "quota": 1000000,
+        "reserved": 419,
+        "confirmed": 419,
+        "tickets": 419
+      }
+    ]
+  },
+  "sampledDatabaseAndGenerator": {
+    "databaseSampleCount": 85,
+    "maximumObservedConnections": 31,
+    "maximumObservedActiveConnections": 1,
+    "maximumObservedBlockedConnections": 0,
+    "maximumObservedLockWaitConnections": 0,
+    "observedDeadlocksCounterChange": 0,
+    "generatorSampleCount": 85,
+    "generatorMaximumDockerCpuPercent": 28.37,
+    "generatorMaximumMemoryPercentOf1GiBLimit": 43.02,
+    "scope": "Sampled extrema during measurement, not continuous maxima. No JVM/GC or Hikari wait-time profile was collected."
+  }
+}

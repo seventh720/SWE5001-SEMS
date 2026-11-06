@@ -1,0 +1,1149 @@
+{
+  "applicationCommit": "5e9081a9f5421fa5bdbd965d750641f3666dd5f3",
+  "harnessRevision": {
+    "applicationCommit": "5e9081a9f5421fa5bdbd965d750641f3666dd5f3",
+    "harnessCommit": "ef7c6c9b3fc37a55dd2b25a317bb40650be25292",
+    "offlineTestsPassed": 33,
+    "sourceHashesFile": "source-hashes.json"
+  },
+  "sourceHashes": {
+    "recordedAt": "2026-11-06T12:23:07.168986+00:00",
+    "sha256": {
+      "cloud-maintenance.py": "6b8f6c4c6eebd684eee23ecc57af5e8d5219030d9990d9e6f6c29150cfa5d66f",
+      "seed.py": "224e3e16dbac65de701508072abf0b352cefcf5e4180284997c14079bb7abc68",
+      "load.js": "80845800ee6c9f06bfdc128d0741aad090a672588c3076ed274a9f69dc7da5e7",
+      "cloud-capacity.js": "3e012bcddef5eb1b02c478c4fa4afc6e380a36fdb9520721cc219ed16b0c1990",
+      "k8s-experiment.py": "ec56e79da9d01b71a72cf224f841fa069fd77ed6adfb2bbcdd00281f3847e3a0"
+    }
+  },
+  "capturedAt": "2026-11-06T12:20:15.617589+00:00",
+  "restoration": {
+    "at": "2026-11-06T15:39:34.586370+00:00",
+    "originalTableFingerprintsMatch": true,
+    "tables": 27,
+    "originalReplicasReady": true,
+    "databaseConnectionConfigRestored": true,
+    "databasePodAndPvcUnchanged": true,
+    "temporaryDatabaseRemoved": true
+  },
+  "newCloudResourcesCreated": false,
+  "temporaryLogicalDatabaseInExistingPostgres": true,
+  "dataset": {
+    "distinctAccounts": 1000,
+    "publishedEvents": 100,
+    "quotaPerEvent": 1000000
+  },
+  "environment": {
+    "nodes": 2,
+    "instanceType": "t3.medium",
+    "vCPUPerNode": 2,
+    "memoryGiBPerNode": 4,
+    "database": "Single existing PostgreSQL 17.11 Pod/PVC, 1 CPU / 768Mi limit",
+    "backendPerReplicaLimit": {
+      "cpu": "1",
+      "memory": "768Mi"
+    },
+    "backendPerReplicaRequest": {
+      "cpu": "250m",
+      "memory": "512Mi"
+    },
+    "generator": "Local Docker k6 1.3.0, 2 CPU / 1GiB limit, public HTTPS endpoint",
+    "coLocated": [
+      "K3s control plane",
+      "observability",
+      "PostgreSQL",
+      "gateway/web"
+    ]
+  },
+  "executionStatus": "stopped",
+  "executionError": "Trial did not pass; no higher load scheduled: booking-r1-vu100-600s",
+  "trialCountIncludingPreflights": 15,
+  "formalTrialCount": 12,
+  "plannedFormalTrialCount": 13,
+  "notExecuted": [
+    "booking-r2-vu100-600s"
+  ],
+  "allTrialsPassed": false,
+  "rows": [
+    {
+      "name": "preflight-mixed-1",
+      "mode": "mixed",
+      "vus": 1,
+      "replicas": {
+        "identity": 2,
+        "event-catalog": 2,
+        "admission": 2
+      },
+      "plannedMeasurementSeconds": 30,
+      "actualTotalRuntimeSeconds": 40.345006241,
+      "firstMeasurementResponseAt": "2026-11-06T12:51:04.386973+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T12:51:32.771612+00:00",
+      "measurementResponseTimestampSpanSeconds": 28.384639024734497,
+      "rawMeasurementRequests": 92,
+      "summaryMeasurementRequests": 92,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 3.066666666666667,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "me": 147.25854614999986,
+        "orders": 148.87099164999944,
+        "book": 1461.9697838,
+        "receipt": 371.33623379999995,
+        "events": 197.87753159999937,
+        "event-detail": 115.92099789999946,
+        "cancel": 330.12821519999994
+      },
+      "requestsByOperationAndStatus": {
+        "events": {
+          "200": 20
+        },
+        "event-detail": {
+          "200": 20
+        },
+        "me": {
+          "200": 20
+        },
+        "orders": {
+          "200": 20
+        },
+        "book": {
+          "200": 4
+        },
+        "receipt": {
+          "200": 4
+        },
+        "cancel": {
+          "200": 4
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 0.34776979175,
+        "sems-k3s-worker": 0.34323763375
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 979.02734375,
+        "sems-k3s-worker": 1826.8125
+      },
+      "podMeanCpuCores": {
+        "identity-7656ff6b5d-7n29t": 0.04478930875,
+        "web-57fb5b59f4-ghslq": 5.9637e-05,
+        "admission-77d9d9cfd4-tjdpm": 0.16000363974999998,
+        "event-catalog-755bf4fd9f-vxdjg": 0.094715152,
+        "gateway-59b5f5c979-kg59m": 0.000743981,
+        "web-57fb5b59f4-469j6": 6.653825e-05,
+        "postgres-0": 0.02574359925,
+        "identity-7656ff6b5d-rbpfc": 0.09417309825,
+        "gateway-59b5f5c979-whnj2": 0.0008440629999999999,
+        "event-catalog-755bf4fd9f-5vzf9": 0.04011854875,
+        "admission-77d9d9cfd4-7d4rn": 0.0700978915
+      },
+      "podMaximumWorkingSetMiB": {
+        "identity-7656ff6b5d-7n29t": 382.87890625,
+        "web-57fb5b59f4-ghslq": 3.5546875,
+        "admission-77d9d9cfd4-tjdpm": 337.10546875,
+        "event-catalog-755bf4fd9f-vxdjg": 375.25,
+        "gateway-59b5f5c979-kg59m": 4.97265625,
+        "web-57fb5b59f4-469j6": 4.0546875,
+        "postgres-0": 160.921875,
+        "identity-7656ff6b5d-rbpfc": 370.04296875,
+        "gateway-59b5f5c979-whnj2": 5.72265625,
+        "event-catalog-755bf4fd9f-5vzf9": 366.421875,
+        "admission-77d9d9cfd4-7d4rn": 330.99609375
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "preflight-mixed-5",
+      "mode": "mixed",
+      "vus": 5,
+      "replicas": {
+        "identity": 2,
+        "event-catalog": 2,
+        "admission": 2
+      },
+      "plannedMeasurementSeconds": 30,
+      "actualTotalRuntimeSeconds": 41.075090506,
+      "firstMeasurementResponseAt": "2026-11-06T12:53:44.036712+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T12:54:13.948282+00:00",
+      "measurementResponseTimestampSpanSeconds": 29.911570072174072,
+      "rawMeasurementRequests": 558,
+      "summaryMeasurementRequests": 558,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 18.6,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "book": 117.70233299999998,
+        "event-detail": 85.559625,
+        "cancel": 85.4071502,
+        "me": 58.696959,
+        "orders": 103.35276069999996,
+        "receipt": 79.27687519999998,
+        "events": 87.543792
+      },
+      "requestsByOperationAndStatus": {
+        "events": {
+          "200": 121
+        },
+        "event-detail": {
+          "200": 121
+        },
+        "me": {
+          "200": 121
+        },
+        "orders": {
+          "200": 120
+        },
+        "book": {
+          "200": 25
+        },
+        "receipt": {
+          "200": 25
+        },
+        "cancel": {
+          "200": 25
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 0.743786811,
+        "sems-k3s-worker": 0.62767220025
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 967.40234375,
+        "sems-k3s-worker": 1762.74609375
+      },
+      "podMeanCpuCores": {
+        "event-catalog-755bf4fd9f-tdfwp": 0.1590147395,
+        "admission-77d9d9cfd4-9xp7p": 0.243639455,
+        "web-57fb5b59f4-ghslq": 6.64445e-05,
+        "identity-7656ff6b5d-pmpk5": 0.061986949,
+        "gateway-59b5f5c979-kg59m": 0.004709949,
+        "event-catalog-755bf4fd9f-sh78z": 0.2499963595,
+        "identity-7656ff6b5d-2plj9": 0.218902804,
+        "web-57fb5b59f4-469j6": 7.9089e-05,
+        "admission-77d9d9cfd4-tw8w7": 0.08567136424999999,
+        "postgres-0": 0.039062536,
+        "gateway-59b5f5c979-whnj2": 0.0028350544999999998
+      },
+      "podMaximumWorkingSetMiB": {
+        "event-catalog-755bf4fd9f-tdfwp": 380.74609375,
+        "admission-77d9d9cfd4-9xp7p": 360.34765625,
+        "web-57fb5b59f4-ghslq": 3.5546875,
+        "identity-7656ff6b5d-pmpk5": 378.20703125,
+        "gateway-59b5f5c979-kg59m": 5.203125,
+        "event-catalog-755bf4fd9f-sh78z": 379.578125,
+        "identity-7656ff6b5d-2plj9": 384.546875,
+        "web-57fb5b59f4-469j6": 3.5546875,
+        "admission-77d9d9cfd4-tw8w7": 335.5546875,
+        "postgres-0": 162.7109375,
+        "gateway-59b5f5c979-whnj2": 5.98828125
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "preflight-mixed-10",
+      "mode": "mixed",
+      "vus": 10,
+      "replicas": {
+        "identity": 2,
+        "event-catalog": 2,
+        "admission": 2
+      },
+      "plannedMeasurementSeconds": 30,
+      "actualTotalRuntimeSeconds": 41.116013047,
+      "firstMeasurementResponseAt": "2026-11-06T12:56:26.557417+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T12:56:56.492563+00:00",
+      "measurementResponseTimestampSpanSeconds": 29.93514609336853,
+      "rawMeasurementRequests": 1128,
+      "summaryMeasurementRequests": 1128,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 37.6,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "orders": 98.99967699999999,
+        "me": 67.13766684999999,
+        "cancel": 154.17200364999994,
+        "event-detail": 80.10274100000001,
+        "receipt": 130.71991249999994,
+        "book": 171.31320434999998,
+        "events": 87.13241869999997
+      },
+      "requestsByOperationAndStatus": {
+        "orders": {
+          "200": 246
+        },
+        "event-detail": {
+          "200": 244
+        },
+        "me": {
+          "200": 244
+        },
+        "events": {
+          "200": 244
+        },
+        "book": {
+          "200": 50
+        },
+        "receipt": {
+          "200": 50
+        },
+        "cancel": {
+          "200": 50
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 1.10680948425,
+        "sems-k3s-worker": 0.8513998295
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 938.23046875,
+        "sems-k3s-worker": 1729.73046875
+      },
+      "podMeanCpuCores": {
+        "gateway-59b5f5c979-kg59m": 0.007809007,
+        "web-57fb5b59f4-ghslq": 8.87535e-05,
+        "admission-77d9d9cfd4-gc48j": 0.290810261,
+        "identity-7656ff6b5d-q6cmp": 0.22551632924999998,
+        "event-catalog-755bf4fd9f-568fh": 0.28106114625,
+        "postgres-0": 0.0541263975,
+        "gateway-59b5f5c979-whnj2": 0.00498028,
+        "event-catalog-755bf4fd9f-wwvr8": 0.1859941575,
+        "identity-7656ff6b5d-6pdxf": 0.12725790675,
+        "admission-77d9d9cfd4-k5gsw": 0.24354605299999998,
+        "web-57fb5b59f4-469j6": 6.518225e-05
+      },
+      "podMaximumWorkingSetMiB": {
+        "gateway-59b5f5c979-kg59m": 5.19140625,
+        "web-57fb5b59f4-ghslq": 3.8046875,
+        "admission-77d9d9cfd4-gc48j": 342.046875,
+        "identity-7656ff6b5d-q6cmp": 387.5,
+        "event-catalog-755bf4fd9f-568fh": 376.3203125,
+        "postgres-0": 166.82421875,
+        "gateway-59b5f5c979-whnj2": 6.046875,
+        "event-catalog-755bf4fd9f-wwvr8": 378.953125,
+        "identity-7656ff6b5d-6pdxf": 373.55078125,
+        "admission-77d9d9cfd4-k5gsw": 341.48828125,
+        "web-57fb5b59f4-469j6": 3.5546875
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "mixed-100vu-600s",
+      "mode": "mixed",
+      "vus": 100,
+      "replicas": {
+        "identity": 2,
+        "event-catalog": 2,
+        "admission": 2
+      },
+      "plannedMeasurementSeconds": 600,
+      "actualTotalRuntimeSeconds": 661.078731792,
+      "firstMeasurementResponseAt": "2026-11-06T13:01:06.137891+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T13:11:06.023795+00:00",
+      "measurementResponseTimestampSpanSeconds": 599.8859038352966,
+      "rawMeasurementRequests": 178959,
+      "summaryMeasurementRequests": 178959,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 298.265,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "orders": 402.76574219999975,
+        "cancel": 367.775725,
+        "book": 524.5671755999999,
+        "me": 197.01903809999973,
+        "event-detail": 267.432042,
+        "receipt": 306.89489599999973,
+        "events": 303.6357080499999
+      },
+      "requestsByOperationAndStatus": {
+        "receipt": {
+          "200": 7786
+        },
+        "orders": {
+          "200": 38909
+        },
+        "me": {
+          "200": 38899
+        },
+        "events": {
+          "200": 38900
+        },
+        "book": {
+          "200": 7777
+        },
+        "event-detail": {
+          "200": 38901
+        },
+        "cancel": {
+          "200": 7787
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 1.3608806176623376,
+        "sems-k3s-worker": 1.6878540665844155
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 744.9765625,
+        "sems-k3s-worker": 1542.07421875
+      },
+      "podMeanCpuCores": {
+        "admission-77d9d9cfd4-78hq2": 0.29879959883116886,
+        "event-catalog-755bf4fd9f-f5wfw": 0.3422692712207792,
+        "gateway-59b5f5c979-kg59m": 0.06802016681818182,
+        "identity-7656ff6b5d-wt5sl": 0.2430494783116883,
+        "web-57fb5b59f4-ghslq": 6.517866233766234e-05,
+        "web-57fb5b59f4-469j6": 6.905609090909091e-05,
+        "gateway-59b5f5c979-whnj2": 0.060115716935064935,
+        "identity-7656ff6b5d-xk27d": 0.2825462299220779,
+        "admission-77d9d9cfd4-xh75n": 0.3522800458961039,
+        "postgres-0": 0.46081108748051947,
+        "event-catalog-755bf4fd9f-74j52": 0.3728674217012987
+      },
+      "podMaximumWorkingSetMiB": {
+        "admission-77d9d9cfd4-78hq2": 382.9375,
+        "event-catalog-755bf4fd9f-f5wfw": 432.19921875,
+        "gateway-59b5f5c979-kg59m": 8.85546875,
+        "identity-7656ff6b5d-wt5sl": 430.99609375,
+        "web-57fb5b59f4-ghslq": 3.4375,
+        "web-57fb5b59f4-469j6": 3.5546875,
+        "gateway-59b5f5c979-whnj2": 10.28125,
+        "identity-7656ff6b5d-xk27d": 428.9453125,
+        "admission-77d9d9cfd4-xh75n": 391.06640625,
+        "postgres-0": 223.51171875,
+        "event-catalog-755bf4fd9f-74j52": 431.25390625
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "catalog-r1-vu25-600s",
+      "mode": "catalog",
+      "vus": 25,
+      "replicas": {
+        "identity": 1,
+        "event-catalog": 1,
+        "admission": 1
+      },
+      "plannedMeasurementSeconds": 600,
+      "actualTotalRuntimeSeconds": 661.0547614589999,
+      "firstMeasurementResponseAt": "2026-11-06T13:13:56.265862+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T13:23:56.197266+00:00",
+      "measurementResponseTimestampSpanSeconds": 599.9314041137695,
+      "rawMeasurementRequests": 109169,
+      "summaryMeasurementRequests": 109169,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 181.94833333333332,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "list": 63.4738187,
+        "detail": 56.36262549999999
+      },
+      "requestsByOperationAndStatus": {
+        "list": {
+          "200": 87338
+        },
+        "detail": {
+          "200": 21831
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 0.7641039828023256,
+        "sems-k3s-worker": 0.6647429623720931
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 1593.0,
+        "sems-k3s-worker": 2057.4765625
+      },
+      "podMeanCpuCores": {
+        "event-catalog-755bf4fd9f-qlgbk": 0.4175393776744186,
+        "gateway-59b5f5c979-kg59m": 0.035261991709302325,
+        "web-57fb5b59f4-ghslq": 6.341709302325581e-05,
+        "web-57fb5b59f4-469j6": 6.619688372093023e-05,
+        "admission-77d9d9cfd4-qzxd2": 0.009172219023255814,
+        "postgres-0": 0.2597343892906977,
+        "gateway-59b5f5c979-whnj2": 0.0341512148372093,
+        "identity-7656ff6b5d-l2nzk": 0.23171742205813953
+      },
+      "podMaximumWorkingSetMiB": {
+        "event-catalog-755bf4fd9f-qlgbk": 443.11328125,
+        "gateway-59b5f5c979-kg59m": 5.65234375,
+        "web-57fb5b59f4-ghslq": 3.93359375,
+        "web-57fb5b59f4-469j6": 4.0546875,
+        "admission-77d9d9cfd4-qzxd2": 341.13671875,
+        "postgres-0": 142.921875,
+        "gateway-59b5f5c979-whnj2": 6.734375,
+        "identity-7656ff6b5d-l2nzk": 414.609375
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "catalog-r2-vu25-600s",
+      "mode": "catalog",
+      "vus": 25,
+      "replicas": {
+        "identity": 1,
+        "event-catalog": 2,
+        "admission": 1
+      },
+      "plannedMeasurementSeconds": 600,
+      "actualTotalRuntimeSeconds": 660.891645708,
+      "firstMeasurementResponseAt": "2026-11-06T13:26:43.376143+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T13:36:43.283737+00:00",
+      "measurementResponseTimestampSpanSeconds": 599.9075939655304,
+      "rawMeasurementRequests": 111702,
+      "summaryMeasurementRequests": 111702,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 186.17,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "list": 58.17074939999999,
+        "detail": 51.730233399999996
+      },
+      "requestsByOperationAndStatus": {
+        "list": {
+          "200": 89365
+        },
+        "detail": {
+          "200": 22337
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 0.6399331084883721,
+        "sems-k3s-worker": 0.9279793563023255
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 1283.44921875,
+        "sems-k3s-worker": 2005.2734375
+      },
+      "podMeanCpuCores": {
+        "web-57fb5b59f4-ghslq": 6.288459302325582e-05,
+        "admission-77d9d9cfd4-6jjd5": 0.008761452174418604,
+        "gateway-59b5f5c979-kg59m": 0.0374373001627907,
+        "event-catalog-755bf4fd9f-ckwxv": 0.25389439808139536,
+        "web-57fb5b59f4-469j6": 6.82485e-05,
+        "postgres-0": 0.27594823455813955,
+        "event-catalog-755bf4fd9f-smzn8": 0.2711853536860465,
+        "gateway-59b5f5c979-whnj2": 0.036618392558139534,
+        "identity-7656ff6b5d-kh5sf": 0.23705900423255813
+      },
+      "podMaximumWorkingSetMiB": {
+        "web-57fb5b59f4-ghslq": 3.93359375,
+        "admission-77d9d9cfd4-6jjd5": 341.9453125,
+        "gateway-59b5f5c979-kg59m": 5.73828125,
+        "event-catalog-755bf4fd9f-ckwxv": 422.859375,
+        "web-57fb5b59f4-469j6": 3.8046875,
+        "postgres-0": 161.42578125,
+        "event-catalog-755bf4fd9f-smzn8": 421.015625,
+        "gateway-59b5f5c979-whnj2": 6.61328125,
+        "identity-7656ff6b5d-kh5sf": 417.5859375
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "catalog-r1-vu50-600s",
+      "mode": "catalog",
+      "vus": 50,
+      "replicas": {
+        "identity": 1,
+        "event-catalog": 1,
+        "admission": 1
+      },
+      "plannedMeasurementSeconds": 600,
+      "actualTotalRuntimeSeconds": 661.998829626,
+      "firstMeasurementResponseAt": "2026-11-06T13:39:43.260134+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T13:49:43.015468+00:00",
+      "measurementResponseTimestampSpanSeconds": 599.7553339004517,
+      "rawMeasurementRequests": 174060,
+      "summaryMeasurementRequests": 174060,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 290.1,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "detail": 154.34585044999997,
+        "list": 196.73954224999997
+      },
+      "requestsByOperationAndStatus": {
+        "detail": {
+          "200": 34814
+        },
+        "list": {
+          "200": 139246
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 1.2995793995058824,
+        "sems-k3s-worker": 0.9517191362705882
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 1544.45703125,
+        "sems-k3s-worker": 2102.32421875
+      },
+      "podMeanCpuCores": {
+        "web-57fb5b59f4-ghslq": 6.661090588235294e-05,
+        "event-catalog-755bf4fd9f-6c26q": 0.8279988324470589,
+        "gateway-59b5f5c979-kg59m": 0.05298279815294118,
+        "postgres-0": 0.4056943461647059,
+        "gateway-59b5f5c979-whnj2": 0.05071293256470588,
+        "admission-77d9d9cfd4-xsfp5": 0.010008945647058823,
+        "identity-7656ff6b5d-cw7qs": 0.34795493122352944,
+        "web-57fb5b59f4-469j6": 7.56297294117647e-05
+      },
+      "podMaximumWorkingSetMiB": {
+        "web-57fb5b59f4-ghslq": 3.93359375,
+        "event-catalog-755bf4fd9f-6c26q": 453.1484375,
+        "gateway-59b5f5c979-kg59m": 6.0234375,
+        "postgres-0": 140.23046875,
+        "gateway-59b5f5c979-whnj2": 6.8515625,
+        "admission-77d9d9cfd4-xsfp5": 335.65234375,
+        "identity-7656ff6b5d-cw7qs": 436.4296875,
+        "web-57fb5b59f4-469j6": 3.8046875
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "catalog-r2-vu50-600s",
+      "mode": "catalog",
+      "vus": 50,
+      "replicas": {
+        "identity": 1,
+        "event-catalog": 2,
+        "admission": 1
+      },
+      "plannedMeasurementSeconds": 600,
+      "actualTotalRuntimeSeconds": 662.110854001,
+      "firstMeasurementResponseAt": "2026-11-06T13:52:54.784735+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T14:02:54.770926+00:00",
+      "measurementResponseTimestampSpanSeconds": 599.986191034317,
+      "rawMeasurementRequests": 204376,
+      "summaryMeasurementRequests": 204376,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 340.62666666666667,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "list": 101.54954199999999,
+        "detail": 81.92173319999998
+      },
+      "requestsByOperationAndStatus": {
+        "detail": {
+          "200": 40873
+        },
+        "list": {
+          "200": 163503
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 0.9679742026941176,
+        "sems-k3s-worker": 1.6379596778470589
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 1223.4453125,
+        "sems-k3s-worker": 1960.203125
+      },
+      "podMeanCpuCores": {
+        "admission-77d9d9cfd4-qdzbb": 0.010803385258823529,
+        "gateway-59b5f5c979-kg59m": 0.061813653211764706,
+        "web-57fb5b59f4-ghslq": 6.347131764705882e-05,
+        "event-catalog-755bf4fd9f-wpq9b": 0.40691240649411764,
+        "gateway-59b5f5c979-whnj2": 0.05874000176470588,
+        "identity-7656ff6b5d-8f2pd": 0.4051895042352941,
+        "web-57fb5b59f4-469j6": 7.1467e-05,
+        "event-catalog-755bf4fd9f-kj8wj": 0.5612033540352941,
+        "postgres-0": 0.4868779058470588
+      },
+      "podMaximumWorkingSetMiB": {
+        "admission-77d9d9cfd4-qdzbb": 341.4375,
+        "gateway-59b5f5c979-kg59m": 6.171875,
+        "web-57fb5b59f4-ghslq": 3.93359375,
+        "event-catalog-755bf4fd9f-wpq9b": 426.83984375,
+        "gateway-59b5f5c979-whnj2": 6.984375,
+        "identity-7656ff6b5d-8f2pd": 430.171875,
+        "web-57fb5b59f4-469j6": 3.8046875,
+        "event-catalog-755bf4fd9f-kj8wj": 428.98828125,
+        "postgres-0": 166.5859375
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "catalog-r1-vu100-600s",
+      "mode": "catalog",
+      "vus": 100,
+      "replicas": {
+        "identity": 1,
+        "event-catalog": 1,
+        "admission": 1
+      },
+      "plannedMeasurementSeconds": 600,
+      "actualTotalRuntimeSeconds": 663.1700328339999,
+      "firstMeasurementResponseAt": "2026-11-06T14:06:40.317249+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T14:16:40.074646+00:00",
+      "measurementResponseTimestampSpanSeconds": 599.7573969364166,
+      "rawMeasurementRequests": 141468,
+      "summaryMeasurementRequests": 141468,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 235.78,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "detail": 432.7903759999998,
+        "list": 588.6349003999997
+      },
+      "requestsByOperationAndStatus": {
+        "detail": {
+          "200": 28295
+        },
+        "list": {
+          "200": 113173
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 1.3661661008941177,
+        "sems-k3s-worker": 0.8153869834352941
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 1454.92578125,
+        "sems-k3s-worker": 2121.1953125
+      },
+      "podMeanCpuCores": {
+        "gateway-59b5f5c979-kg59m": 0.038926333188235296,
+        "event-catalog-755bf4fd9f-6z99w": 0.9974100350823529,
+        "web-57fb5b59f4-ghslq": 6.768465882352941e-05,
+        "identity-7656ff6b5d-ssw7m": 0.30669358281176473,
+        "postgres-0": 0.3284392454235294,
+        "gateway-59b5f5c979-whnj2": 0.03923804876470588,
+        "admission-77d9d9cfd4-cfg95": 0.009190526517647058,
+        "web-57fb5b59f4-469j6": 6.75976e-05
+      },
+      "podMaximumWorkingSetMiB": {
+        "gateway-59b5f5c979-kg59m": 6.515625,
+        "event-catalog-755bf4fd9f-6z99w": 489.578125,
+        "web-57fb5b59f4-ghslq": 3.68359375,
+        "identity-7656ff6b5d-ssw7m": 445.45703125,
+        "postgres-0": 141.4765625,
+        "gateway-59b5f5c979-whnj2": 7.34375,
+        "admission-77d9d9cfd4-cfg95": 331.5546875,
+        "web-57fb5b59f4-469j6": 4.0546875
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "catalog-r2-vu100-600s",
+      "mode": "catalog",
+      "vus": 100,
+      "replicas": {
+        "identity": 1,
+        "event-catalog": 2,
+        "admission": 1
+      },
+      "plannedMeasurementSeconds": 600,
+      "actualTotalRuntimeSeconds": 663.167845126,
+      "firstMeasurementResponseAt": "2026-11-06T14:20:24.327110+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T14:30:24.318028+00:00",
+      "measurementResponseTimestampSpanSeconds": 599.9909179210663,
+      "rawMeasurementRequests": 214607,
+      "summaryMeasurementRequests": 214607,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 357.67833333333334,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "detail": 367.0524754,
+        "list": 483.6154729499998
+      },
+      "requestsByOperationAndStatus": {
+        "detail": {
+          "200": 42925
+        },
+        "list": {
+          "200": 171682
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 1.000774859113924,
+        "sems-k3s-worker": 1.9764516821772151
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 1157.953125,
+        "sems-k3s-worker": 1900.61328125
+      },
+      "podMeanCpuCores": {
+        "gateway-59b5f5c979-kg59m": 0.057363253101265825,
+        "event-catalog-755bf4fd9f-dcgkv": 0.43857253058227846,
+        "web-57fb5b59f4-ghslq": 6.216088607594936e-05,
+        "admission-77d9d9cfd4-4hjhm": 0.009749379734177215,
+        "web-57fb5b59f4-469j6": 7.029194936708861e-05,
+        "event-catalog-755bf4fd9f-9hgt4": 0.8465733796202531,
+        "identity-7656ff6b5d-rrz2r": 0.4337160471012658,
+        "postgres-0": 0.5062303193037975,
+        "gateway-59b5f5c979-whnj2": 0.05175077872151899
+      },
+      "podMaximumWorkingSetMiB": {
+        "gateway-59b5f5c979-kg59m": 6.79296875,
+        "event-catalog-755bf4fd9f-dcgkv": 447.9296875,
+        "web-57fb5b59f4-ghslq": 3.93359375,
+        "admission-77d9d9cfd4-4hjhm": 331.265625,
+        "web-57fb5b59f4-469j6": 3.8046875,
+        "event-catalog-755bf4fd9f-9hgt4": 469.0234375,
+        "identity-7656ff6b5d-rrz2r": 456.046875,
+        "postgres-0": 167.89453125,
+        "gateway-59b5f5c979-whnj2": 7.72265625
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "booking-r1-vu25-600s",
+      "mode": "booking",
+      "vus": 25,
+      "replicas": {
+        "identity": 1,
+        "event-catalog": 1,
+        "admission": 1
+      },
+      "plannedMeasurementSeconds": 600,
+      "actualTotalRuntimeSeconds": 661.503553876,
+      "firstMeasurementResponseAt": "2026-11-06T14:33:07.331675+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T14:43:07.375710+00:00",
+      "measurementResponseTimestampSpanSeconds": 600.0440349578857,
+      "rawMeasurementRequests": 125072,
+      "summaryMeasurementRequests": 125072,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 208.45333333333335,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "receipt": 115.42461499999997,
+        "book": 189.07063474999995
+      },
+      "requestsByOperationAndStatus": {
+        "book": {
+          "200": 62536
+        },
+        "receipt": {
+          "200": 62536
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 0.8653551143529412,
+        "sems-k3s-worker": 1.6963923602117648
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 1524.02734375,
+        "sems-k3s-worker": 1915.59765625
+      },
+      "podMeanCpuCores": {
+        "gateway-59b5f5c979-kg59m": 0.0829747183764706,
+        "web-57fb5b59f4-ghslq": 8.1376e-05,
+        "event-catalog-755bf4fd9f-ww4v6": 0.4246123153764706,
+        "admission-77d9d9cfd4-6l8h5": 0.8314421953294118,
+        "identity-7656ff6b5d-4qq6t": 0.18660167032941177,
+        "postgres-0": 0.4509404813176471,
+        "web-57fb5b59f4-469j6": 9.847176470588236e-05,
+        "gateway-59b5f5c979-whnj2": 0.07518778630588235
+      },
+      "podMaximumWorkingSetMiB": {
+        "gateway-59b5f5c979-kg59m": 7.8828125,
+        "web-57fb5b59f4-ghslq": 3.93359375,
+        "event-catalog-755bf4fd9f-ww4v6": 441.89453125,
+        "admission-77d9d9cfd4-6l8h5": 431.39453125,
+        "identity-7656ff6b5d-4qq6t": 419.01171875,
+        "postgres-0": 227.20703125,
+        "web-57fb5b59f4-469j6": 3.8046875,
+        "gateway-59b5f5c979-whnj2": 8.73046875
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "booking-r2-vu25-600s",
+      "mode": "booking",
+      "vus": 25,
+      "replicas": {
+        "identity": 1,
+        "event-catalog": 1,
+        "admission": 2
+      },
+      "plannedMeasurementSeconds": 600,
+      "actualTotalRuntimeSeconds": 661.169890001,
+      "firstMeasurementResponseAt": "2026-11-06T14:46:09.039558+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T14:56:08.629248+00:00",
+      "measurementResponseTimestampSpanSeconds": 599.5896899700165,
+      "rawMeasurementRequests": 132364,
+      "summaryMeasurementRequests": 132364,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 220.60666666666665,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "receipt": 84.70430354999999,
+        "book": 142.3119143
+      },
+      "requestsByOperationAndStatus": {
+        "book": {
+          "200": 66182
+        },
+        "receipt": {
+          "200": 66182
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 1.4283471946744186,
+        "sems-k3s-worker": 1.4759038861976745
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 1100.96875,
+        "sems-k3s-worker": 1784.21875
+      },
+      "podMeanCpuCores": {
+        "admission-77d9d9cfd4-qb6q5": 0.4979456116511628,
+        "gateway-59b5f5c979-kg59m": 0.08533588394186047,
+        "event-catalog-755bf4fd9f-cqzb4": 0.47906613827906974,
+        "web-57fb5b59f4-ghslq": 6.907848837209303e-05,
+        "postgres-0": 0.49872802409302325,
+        "web-57fb5b59f4-469j6": 6.867893023255813e-05,
+        "admission-77d9d9cfd4-qf7zw": 0.4720765764534884,
+        "identity-7656ff6b5d-76ttx": 0.1995690238255814,
+        "gateway-59b5f5c979-whnj2": 0.08058243255813953
+      },
+      "podMaximumWorkingSetMiB": {
+        "admission-77d9d9cfd4-qb6q5": 411.15234375,
+        "gateway-59b5f5c979-kg59m": 7.9296875,
+        "event-catalog-755bf4fd9f-cqzb4": 419.625,
+        "web-57fb5b59f4-ghslq": 3.70703125,
+        "postgres-0": 340.32421875,
+        "web-57fb5b59f4-469j6": 3.82421875,
+        "admission-77d9d9cfd4-qf7zw": 410.3125,
+        "identity-7656ff6b5d-76ttx": 420.2421875,
+        "gateway-59b5f5c979-whnj2": 8.77734375
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "booking-r1-vu50-600s",
+      "mode": "booking",
+      "vus": 50,
+      "replicas": {
+        "identity": 1,
+        "event-catalog": 1,
+        "admission": 1
+      },
+      "plannedMeasurementSeconds": 600,
+      "actualTotalRuntimeSeconds": 662.4702082089999,
+      "firstMeasurementResponseAt": "2026-11-06T14:59:25.762937+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T15:09:25.473957+00:00",
+      "measurementResponseTimestampSpanSeconds": 599.7110199928284,
+      "rawMeasurementRequests": 85226,
+      "summaryMeasurementRequests": 85226,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 142.04333333333332,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "book": 578.8572581999999,
+        "receipt": 386.9642089999998
+      },
+      "requestsByOperationAndStatus": {
+        "book": {
+          "200": 42613
+        },
+        "receipt": {
+          "200": 42613
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 0.6877798309186046,
+        "sems-k3s-worker": 1.6498500116627908
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 1435.796875,
+        "sems-k3s-worker": 1785.21484375
+      },
+      "podMeanCpuCores": {
+        "gateway-59b5f5c979-kg59m": 0.05609256130232558,
+        "web-57fb5b59f4-ghslq": 6.400561627906976e-05,
+        "event-catalog-755bf4fd9f-lvcqp": 0.31553647989534883,
+        "gateway-59b5f5c979-whnj2": 0.0519165403372093,
+        "postgres-0": 0.3237874657674419,
+        "admission-77d9d9cfd4-frj85": 0.9889549435930233,
+        "identity-7656ff6b5d-f4zq9": 0.14587617103488373,
+        "web-57fb5b59f4-469j6": 6.699387209302326e-05
+      },
+      "podMaximumWorkingSetMiB": {
+        "gateway-59b5f5c979-kg59m": 8.99609375,
+        "web-57fb5b59f4-ghslq": 3.7109375,
+        "event-catalog-755bf4fd9f-lvcqp": 440.4453125,
+        "gateway-59b5f5c979-whnj2": 9.6875,
+        "postgres-0": 327.2265625,
+        "admission-77d9d9cfd4-frj85": 419.32421875,
+        "identity-7656ff6b5d-f4zq9": 437.92578125,
+        "web-57fb5b59f4-469j6": 3.82421875
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "booking-r2-vu50-600s",
+      "mode": "booking",
+      "vus": 50,
+      "replicas": {
+        "identity": 1,
+        "event-catalog": 1,
+        "admission": 2
+      },
+      "plannedMeasurementSeconds": 600,
+      "actualTotalRuntimeSeconds": 662.598152585,
+      "firstMeasurementResponseAt": "2026-11-06T15:12:54.319750+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T15:22:54.049626+00:00",
+      "measurementResponseTimestampSpanSeconds": 599.7298760414124,
+      "rawMeasurementRequests": 160618,
+      "summaryMeasurementRequests": 160618,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 267.69666666666666,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "book": 332.5578751999999,
+        "receipt": 201.0062088
+      },
+      "requestsByOperationAndStatus": {
+        "book": {
+          "200": 80309
+        },
+        "receipt": {
+          "200": 80309
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 1.6787116117317074,
+        "sems-k3s-worker": 1.733492902487805
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 1036.55078125,
+        "sems-k3s-worker": 1763.6953125
+      },
+      "podMeanCpuCores": {
+        "web-57fb5b59f4-ghslq": 7.12220975609756e-05,
+        "gateway-59b5f5c979-kg59m": 0.0978424123902439,
+        "admission-77d9d9cfd4-8mqp2": 0.5988905960853659,
+        "event-catalog-755bf4fd9f-nt2g6": 0.5693576465853658,
+        "web-57fb5b59f4-469j6": 7.069217073170732e-05,
+        "identity-7656ff6b5d-r82ln": 0.23560269080487806,
+        "gateway-59b5f5c979-whnj2": 0.08380877314634147,
+        "admission-77d9d9cfd4-nlw2j": 0.5772327540609756,
+        "postgres-0": 0.6206652821219513
+      },
+      "podMaximumWorkingSetMiB": {
+        "web-57fb5b59f4-ghslq": 3.7109375,
+        "gateway-59b5f5c979-kg59m": 9.40234375,
+        "admission-77d9d9cfd4-8mqp2": 428.55078125,
+        "event-catalog-755bf4fd9f-nt2g6": 451.67578125,
+        "web-57fb5b59f4-469j6": 3.8203125,
+        "identity-7656ff6b5d-r82ln": 424.13671875,
+        "gateway-59b5f5c979-whnj2": 10.734375,
+        "admission-77d9d9cfd4-nlw2j": 420.8828125,
+        "postgres-0": 361.17578125
+      },
+      "singleSampleOnly": true,
+      "passed": true,
+      "allGatesPassed": true
+    },
+    {
+      "name": "booking-r1-vu100-600s",
+      "mode": "booking",
+      "vus": 100,
+      "replicas": {
+        "identity": 1,
+        "event-catalog": 1,
+        "admission": 1
+      },
+      "plannedMeasurementSeconds": 600,
+      "actualTotalRuntimeSeconds": 665.29952546,
+      "firstMeasurementResponseAt": "2026-11-06T15:26:50.829355+00:00",
+      "lastMeasurementResponseAt": "2026-11-06T15:36:50.573190+00:00",
+      "measurementResponseTimestampSpanSeconds": 599.7438349723816,
+      "rawMeasurementRequests": 80064,
+      "summaryMeasurementRequests": 80064,
+      "rawAndSummaryCountsMatch": true,
+      "successfulHttpRps": 133.44,
+      "unexpectedErrorRate": 0,
+      "perOperationP95Ms": {
+        "book": 1765.0369070999993,
+        "receipt": 1093.7246106
+      },
+      "requestsByOperationAndStatus": {
+        "book": {
+          "200": 40032
+        },
+        "receipt": {
+          "200": 40032
+        }
+      },
+      "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+      "nodeMeanCpuCores": {
+        "sems-k3s-server": 0.6753493287294118,
+        "sems-k3s-worker": 1.6325312607411764
+      },
+      "nodeMinimumAvailableMiB": {
+        "sems-k3s-server": 1557.27734375,
+        "sems-k3s-worker": 1699.7890625
+      },
+      "podMeanCpuCores": {
+        "web-57fb5b59f4-ghslq": 6.398294117647059e-05,
+        "gateway-59b5f5c979-kg59m": 0.05409423458823529,
+        "event-catalog-755bf4fd9f-m8wvj": 0.31049260867058825,
+        "gateway-59b5f5c979-whnj2": 0.05063939597647059,
+        "web-57fb5b59f4-469j6": 6.83743294117647e-05,
+        "admission-77d9d9cfd4-hljwq": 0.9894598314352941,
+        "postgres-0": 0.31844375188235297,
+        "identity-7656ff6b5d-7l722": 0.1450263961764706
+      },
+      "podMaximumWorkingSetMiB": {
+        "web-57fb5b59f4-ghslq": 3.9609375,
+        "gateway-59b5f5c979-kg59m": 11.28515625,
+        "event-catalog-755bf4fd9f-m8wvj": 454.10546875,
+        "gateway-59b5f5c979-whnj2": 11.84765625,
+        "web-57fb5b59f4-469j6": 3.83203125,
+        "admission-77d9d9cfd4-hljwq": 444.734375,
+        "postgres-0": 323.359375,
+        "identity-7656ff6b5d-7l722": 442.28515625
+      },
+      "singleSampleOnly": true,
+      "passed": false,
+      "allGatesPassed": false
+    }
+  ],
+  "limitations": [
+    "One sample per condition, sequential 1 then 2 replicas; no repeated/interleaved significance analysis.",
+    "Fixed closed-loop VUs with think time; results do not establish maximum capacity or linear scalability.",
+    "Maintenance access logging and shared production nodes were part of this measured setup.",
+    "No HPA, node failure, database failover, or platform-reuse acceptance was tested."
+  ]
+}

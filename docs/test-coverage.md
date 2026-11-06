@@ -39,4 +39,4 @@ python3 scripts/ci/coverage.py backend
 
 ## 待补验证
 
-自动 OpenAPI 符合性、数据库/API 路径的独立覆盖采集、当前 K3s 容量与扩容收益、十分钟稳态、主机/数据库故障以及完整灾难恢复尚未完成。优先级见[工程待办](roadmap.md)。
+自动 OpenAPI 符合性、数据库/API 路径的独立覆盖采集、主机/数据库故障以及完整灾难恢复尚未完成。当前 K3s 的[十分钟混合稳态与单轮扩容对照](evidence/2026-11-06-cloud-validation/README.md)已有记录，仍缺交错重复及 Admission 100 VU 双副本样本。优先级见[工程待办](roadmap.md)。

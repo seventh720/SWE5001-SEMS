@@ -1,6 +1,6 @@
 # 性能、扩容与恢复实验
 
-本指南定义如何测试当前三服务架构。生产运行方式见 [K3s 运维](k3s.md)，功能正确性与历史实测见[验收矩阵](acceptance-matrix.md)和[证据索引](evidence/README.md)。测试准备与计划不表示已取得性能成绩。
+本指南定义如何测试当前三服务架构。生产运行方式见 [K3s 运维](k3s.md)，功能正确性与历史实测见[验收矩阵](acceptance-matrix.md)和[证据索引](evidence/README.md)。2026-11-06 的[现有云资源实测](evidence/2026-11-06-cloud-validation/README.md)记录了十分钟混合负载、五组完整的 1/2 副本对照，以及未通过的预热样本。
 
 ## 当前可以开展的测试
 
@@ -16,7 +16,7 @@
 
 ## 测试环境与工具准备
 
-优先使用独立的本地 Kubernetes 集群验证测试流程；云端性能结论需独立云端测试环境。使用同一批应用 digest、单独的数据库/账号/JWT 和测试入口。先记录节点 CPU/内存、Pod requests/limits、数据库连接池、网络、镜像及 source commit。
+优先使用独立的本地 Kubernetes 集群验证测试流程，云端优先使用隔离测试环境。若已明确授权维护窗口，可复用现有 Pod 和 PostgreSQL，在新建的临时逻辑数据库中造数，并暂停普通公网写入。此次采用该方式，没有新增 EC2、节点或第二套应用。先记录节点 CPU/内存、Pod requests/limits、数据库连接池、网络、镜像及 source commit。
 
 两台生产节点还承载控制平面和监控。测试前执行 `kubectl top nodes`、`kubectl top pods` 并检查 requests、磁盘和数据库连接余量；不能依据 CPU 空闲就再部署一套 JVM。新 EC2、节点池或其他收费资源需要单独规划。配置和造数不得覆盖正式数据。
 
@@ -29,8 +29,10 @@
 | `cloud-capacity.py` / `cloud-guard.py` | 历史 Lightsail 环境的负载及主机保护；不能直接用于当前 K3s |
 | `scripts/k8s/local-acceptance.py` | 独立 kind 的跨 Pod 正确性检查；不测量扩容收益 |
 | `scripts/k8s/catalog-recovery.py` | 历史隔离 K3s 故障入口，保留生产保护；当前生产数据不可使用 |
+| `cloud-maintenance.py` | 明确授权的维护窗口；原库备份与指纹、临时数据库、原 Pod 副本控制、资源/网关/SQL 审计和自动恢复 |
+| `cloud-recovery.py` | 复用已验证的私有测试快照；100 人争抢 10 名额、分别删除 Catalog / Admission Pod、订单回执与数据库留存核对 |
 
-在 K3s 跑完整对照前，需补齐或选择独立测试用的副本控制、逐 Pod readiness、资源采样、PostgreSQL 快照恢复/审计和失败清理适配。不要将旧工具的 namespace 替换成 `sems-prod` 来绕过保护。`load.js` 本身不要求 Docker 运行时，可由原生 k6 或专用负载机执行。
+独立环境沿用原工具的环境保护；不要将旧工具的 namespace 替换成 `sems-prod` 来绕过保护。维护工具要求显式 `--maintenance-window`，核对运行标记、实际后端数据库连接、namespace/原数据库 Pod/PVC 身份，持有发布锁并设置远端恢复计时器。每轮先停后端、恢复临时库快照，再启动目标副本；结束后核对原库指纹和原配置，保存测试库备份并仅删除本次临时库。`load.js` 本身不要求 Docker 运行时，可由原生 k6 或专用负载机执行。
 
 ## 实验顺序
 
@@ -90,6 +92,10 @@ Catalog 的受保护内部 diagnostics 和 Grafana 提供读取、Identity 依�
 
 ## 已有结果的边界
 
-[历史容量报告](evidence/2026-10-22-cloud-capacity/README.md)属于当时的 Lightsail 版本：250 VU 读取通过，混合负载出现内部 504，500/1000 VU 未执行。K3s 的跨节点并发、Pod 故障和 CI 冷启动回归已验证功能正确性，尚无当前 K3s 的受控吞吐收益或十分钟稳态容量结论。
+[历史容量报告](evidence/2026-10-22-cloud-capacity/README.md)属于当时的 Lightsail 版本：250 VU 读取通过，混合负载出现内部 504，500/1000 VU 未执行。
+
+[2026-11-06 K3s 实测](evidence/2026-11-06-cloud-validation/README.md)使用 1000 账号、100 活动，100 VU 混合负载稳态十分钟通过，178959 次请求无客户端意外错误，最慢操作 p95 约 525 ms。Catalog 在 25/50/100 VU 的双副本吞吐收益分别约 2.3%/17.4%/51.7%；Admission 在 25/50 VU 约 5.8%/88.5%。Admission 100 VU 单副本的稳态客户端目标通过，但预热发生 16 次内部 504，严格服务端门禁未通过，因此停止剩余性能轮，未取得该档双副本对照。
+
+每个条件只有一个样本，未完成上文建议的三次交错重复。固定闭环 VU、思考时间、节点共置和 CPU 配额均影响结果，不能据此推断线性扩容、最大容量或 HPA 效果。首次失败与未执行档位同成功结果一起保存。
 
 负载数据、JWT、数据库快照和完整请求记录保存在忽略目录。对外证据只提交脱敏结果、参数、时间、版本和库存审计；所有实验保留实际执行范围与失败结果。

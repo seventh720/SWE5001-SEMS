@@ -1,0 +1,1438 @@
+{
+  "result": {
+    "name": "mixed-100vu-600s",
+    "mode": "mixed",
+    "vus": 100,
+    "counts": {
+      "identity": 2,
+      "event-catalog": 2,
+      "admission": 2
+    },
+    "duration": 600,
+    "warmup": 60,
+    "loadExitCode": 0,
+    "error": null,
+    "inventoryPassed": true,
+    "gatewayCoveragePassed": true,
+    "serverGatePassed": true,
+    "passed": true,
+    "replicaTrafficAssessed": true,
+    "replicaTrafficEvidence": "mixed-replica-traffic.json"
+  },
+  "measurement": {
+    "name": "mixed-100vu-600s",
+    "mode": "mixed",
+    "vus": 100,
+    "replicas": {
+      "identity": 2,
+      "event-catalog": 2,
+      "admission": 2
+    },
+    "plannedMeasurementSeconds": 600,
+    "actualTotalRuntimeSeconds": 661.078731792,
+    "firstMeasurementResponseAt": "2026-11-06T13:01:06.137891+00:00",
+    "lastMeasurementResponseAt": "2026-11-06T13:11:06.023795+00:00",
+    "measurementResponseTimestampSpanSeconds": 599.8859038352966,
+    "rawMeasurementRequests": 178959,
+    "summaryMeasurementRequests": 178959,
+    "rawAndSummaryCountsMatch": true,
+    "successfulHttpRps": 298.265,
+    "unexpectedErrorRate": 0,
+    "perOperationP95Ms": {
+      "orders": 402.76574219999975,
+      "cancel": 367.775725,
+      "book": 524.5671755999999,
+      "me": 197.01903809999973,
+      "event-detail": 267.432042,
+      "receipt": 306.89489599999973,
+      "events": 303.6357080499999
+    },
+    "requestsByOperationAndStatus": {
+      "receipt": {
+        "200": 7786
+      },
+      "orders": {
+        "200": 38909
+      },
+      "me": {
+        "200": 38899
+      },
+      "events": {
+        "200": 38900
+      },
+      "book": {
+        "200": 7777
+      },
+      "event-detail": {
+        "200": 38901
+      },
+      "cancel": {
+        "200": 7787
+      }
+    },
+    "resourceSamplingScope": "Kubelet snapshots between first and last measurement response; approximately every 5 seconds.",
+    "nodeMeanCpuCores": {
+      "sems-k3s-server": 1.3608806176623376,
+      "sems-k3s-worker": 1.6878540665844155
+    },
+    "nodeMinimumAvailableMiB": {
+      "sems-k3s-server": 744.9765625,
+      "sems-k3s-worker": 1542.07421875
+    },
+    "podMeanCpuCores": {
+      "admission-77d9d9cfd4-78hq2": 0.29879959883116886,
+      "event-catalog-755bf4fd9f-f5wfw": 0.3422692712207792,
+      "gateway-59b5f5c979-kg59m": 0.06802016681818182,
+      "identity-7656ff6b5d-wt5sl": 0.2430494783116883,
+      "web-57fb5b59f4-ghslq": 6.517866233766234e-05,
+      "web-57fb5b59f4-469j6": 6.905609090909091e-05,
+      "gateway-59b5f5c979-whnj2": 0.060115716935064935,
+      "identity-7656ff6b5d-xk27d": 0.2825462299220779,
+      "admission-77d9d9cfd4-xh75n": 0.3522800458961039,
+      "postgres-0": 0.46081108748051947,
+      "event-catalog-755bf4fd9f-74j52": 0.3728674217012987
+    },
+    "podMaximumWorkingSetMiB": {
+      "admission-77d9d9cfd4-78hq2": 382.9375,
+      "event-catalog-755bf4fd9f-f5wfw": 432.19921875,
+      "gateway-59b5f5c979-kg59m": 8.85546875,
+      "identity-7656ff6b5d-wt5sl": 430.99609375,
+      "web-57fb5b59f4-ghslq": 3.4375,
+      "web-57fb5b59f4-469j6": 3.5546875,
+      "gateway-59b5f5c979-whnj2": 10.28125,
+      "identity-7656ff6b5d-xk27d": 428.9453125,
+      "admission-77d9d9cfd4-xh75n": 391.06640625,
+      "postgres-0": 223.51171875,
+      "event-catalog-755bf4fd9f-74j52": 431.25390625
+    },
+    "singleSampleOnly": true,
+    "passed": true
+  },
+  "summary": {
+    "metrics": {
+      "http_req_duration{name:orders,phase:hold}": {
+        "avg": 161.472910000769,
+        "min": 19.1715,
+        "med": 129.533208,
+        "max": 1699.054084,
+        "p(90)": 316.6635254000001,
+        "p(95)": 402.76574219999975,
+        "thresholds": {
+          "p(95)<3000": false
+        }
+      },
+      "unexpected_failure": {
+        "passes": 0,
+        "fails": 185214,
+        "thresholds": {
+          "rate<0.01": false
+        },
+        "value": 0
+      },
+      "http_req_duration{name:cancel,phase:hold}": {
+        "p(95)": 367.775725,
+        "avg": 141.1185621169906,
+        "min": 18.912583,
+        "med": 106.649875,
+        "max": 1665.806376,
+        "p(90)": 286.0678916,
+        "thresholds": {
+          "p(95)<3000": false
+        }
+      },
+      "http_req_failed": {
+        "passes": 0,
+        "fails": 185214,
+        "value": 0
+      },
+      "http_req_duration{name:book,phase:hold}": {
+        "p(90)": 422.15570820000005,
+        "p(95)": 524.5671755999999,
+        "avg": 203.21499819866284,
+        "min": 25.586,
+        "med": 158.759334,
+        "max": 1366.469667,
+        "thresholds": {
+          "p(95)<3000": false
+        }
+      },
+      "http_req_duration{name:me,phase:hold}": {
+        "p(90)": 138.77045040000002,
+        "p(95)": 197.01903809999973,
+        "avg": 75.79435117321735,
+        "min": 10.671,
+        "med": 52.3655,
+        "max": 1646.555334,
+        "thresholds": {
+          "p(95)<3000": false
+        }
+      },
+      "http_req_receiving": {
+        "max": 1393.992084,
+        "p(90)": 13.097375,
+        "p(95)": 25.63695239999992,
+        "avg": 6.138616011025238,
+        "min": 0.005792,
+        "med": 0.141333
+      },
+      "http_req_duration{phase:hold}": {
+        "max": 1721.038835,
+        "p(90)": 244.76542460000002,
+        "p(95)": 338.1454794999999,
+        "avg": 117.19857812832066,
+        "min": 10.671,
+        "med": 80.8765,
+        "thresholds": {
+          "p(95)<3000": false
+        }
+      },
+      "http_req_tls_handshaking": {
+        "p(95)": 0,
+        "avg": 0.05387123027956849,
+        "min": 0,
+        "med": 0,
+        "max": 476.561667,
+        "p(90)": 0
+      },
+      "unexpected_failure{phase:hold}": {
+        "passes": 0,
+        "fails": 178959,
+        "thresholds": {
+          "rate<0.01": false
+        },
+        "value": 0
+      },
+      "data_sent": {
+        "count": 15002151,
+        "rate": 22693.44070309652
+      },
+      "http_req_duration{name:event-detail,phase:hold}": {
+        "avg": 93.94087450633644,
+        "min": 13.23025,
+        "med": 63.302084,
+        "max": 1714.801084,
+        "p(90)": 181.523208,
+        "p(95)": 267.432042,
+        "thresholds": {
+          "p(95)<3000": false
+        }
+      },
+      "http_reqs{name:cancel,phase:hold}": {
+        "count": 7787,
+        "rate": 11.779232375078253,
+        "thresholds": {
+          "count>0": false
+        }
+      },
+      "http_reqs{phase:hold}": {
+        "count": 178959,
+        "rate": 270.70754419052645,
+        "thresholds": {
+          "count>0": false
+        }
+      },
+      "http_req_connecting": {
+        "min": 0,
+        "med": 0,
+        "max": 38.900208,
+        "p(90)": 0,
+        "p(95)": 0,
+        "avg": 0.009673250137678575
+      },
+      "http_reqs{name:receipt,phase:hold}": {
+        "rate": 11.777719695949568,
+        "count": 7786,
+        "thresholds": {
+          "count>0": false
+        }
+      },
+      "http_req_sending": {
+        "min": 0.00775,
+        "med": 0.064375,
+        "max": 86.840125,
+        "p(90)": 0.148917,
+        "p(95)": 0.192541,
+        "avg": 0.08350668150355857
+      },
+      "vus_max": {
+        "value": 100,
+        "min": 100,
+        "max": 100
+      },
+      "http_reqs{name:orders,phase:hold}": {
+        "count": 38909,
+        "rate": 58.85683221804543,
+        "thresholds": {
+          "count>0": false
+        }
+      },
+      "iteration_duration": {
+        "max": 5747.530294,
+        "p(90)": 2107.1937508,
+        "p(95)": 2497.3878506999995,
+        "avg": 1566.441402031376,
+        "min": 1076.313917,
+        "med": 1429.939167
+      },
+      "http_reqs{name:me,phase:hold}": {
+        "count": 38899,
+        "rate": 58.84170542675857,
+        "thresholds": {
+          "count>0": false
+        }
+      },
+      "http_req_duration{name:receipt,phase:hold}": {
+        "med": 80.997354,
+        "max": 1179.0445,
+        "p(90)": 223.2273125,
+        "p(95)": 306.89489599999973,
+        "avg": 112.55305317338811,
+        "min": 16.394458,
+        "thresholds": {
+          "p(95)<3000": false
+        }
+      },
+      "http_reqs{name:events,phase:hold}": {
+        "count": 38900,
+        "rate": 58.84321810588726,
+        "thresholds": {
+          "count>0": false
+        }
+      },
+      "http_reqs": {
+        "count": 185214,
+        "rate": 280.16935214045765
+      },
+      "vus": {
+        "value": 15,
+        "min": 1,
+        "max": 100
+      },
+      "data_received": {
+        "count": 670401482,
+        "rate": 1014102.3296615952
+      },
+      "http_reqs{name:book,phase:hold}": {
+        "rate": 11.764105583791393,
+        "count": 7777,
+        "thresholds": {
+          "count>0": false
+        }
+      },
+      "http_req_duration": {
+        "p(95)": 359.09701229999973,
+        "avg": 122.38784627670228,
+        "min": 10.671,
+        "med": 83.6535835,
+        "max": 1721.038835,
+        "p(90)": 258.8688751,
+        "thresholds": {
+          "p(95)<3000": false
+        }
+      },
+      "http_req_blocked": {
+        "avg": 0.06446893005377666,
+        "min": 4.1e-05,
+        "med": 0.000333,
+        "max": 507.620667,
+        "p(90)": 0.000959,
+        "p(95)": 0.00125
+      },
+      "http_req_waiting": {
+        "avg": 116.16572358416975,
+        "min": 10.469583,
+        "med": 79.7449585,
+        "max": 1584.555751,
+        "p(90)": 244.7256046,
+        "p(95)": 336.5826318
+      },
+      "checks": {
+        "passes": 185214,
+        "fails": 0,
+        "thresholds": {
+          "rate==1": false
+        },
+        "value": 1
+      },
+      "bookings_created": {
+        "count": 8086,
+        "rate": 12.231523434555383
+      },
+      "http_req_duration{expected_response:true}": {
+        "min": 10.671,
+        "med": 83.6535835,
+        "max": 1721.038835,
+        "p(90)": 258.8688751,
+        "p(95)": 359.09701229999973,
+        "avg": 122.38784627670228
+      },
+      "http_req_duration{name:events,phase:hold}": {
+        "avg": 116.52033692503767,
+        "min": 15.930125,
+        "med": 85.5784375,
+        "max": 1721.038835,
+        "p(90)": 219.288683,
+        "p(95)": 303.6357080499999,
+        "thresholds": {
+          "p(95)<3000": false
+        }
+      },
+      "http_reqs{name:event-detail,phase:hold}": {
+        "count": 38901,
+        "rate": 58.84473078501595,
+        "thresholds": {
+          "count>0": false
+        }
+      },
+      "iterations": {
+        "count": 40239,
+        "rate": 60.86869545919787
+      }
+    }
+  },
+  "gateway": {
+    "entryByPhaseAndStatus": {
+      "ramp:200": 6247,
+      "measurement:200": 178959,
+      "drain:200": 8
+    },
+    "internalByStatus": {
+      "200": 72483
+    },
+    "upstreamErrorsByStatus": {},
+    "requestsWithMultipleUpstreams": 0,
+    "malformedLines": 0,
+    "expectedMeasurementRequests": 178959,
+    "recordedMeasurementRequests": 178959,
+    "measurementCoveragePassed": true,
+    "serverGatePassed": true
+  },
+  "podPlacementAndResources": {
+    "admission-77d9d9cfd4-78hq2": {
+      "uid": "1e8bc065-fbfa-4c9b-806e-20ea54534aed",
+      "service": "admission",
+      "node": "sems-k3s-server",
+      "ip": "10.42.0.159",
+      "containers": [
+        {
+          "name": "admission",
+          "image": "sha256:53e8213bc1d66f9e01e23459b2894198a0dd1ea57b57b5407e763d29246a3f8a",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/admission@sha256:d3a355ff4c758c517bd601d03a89494a928a5b666e3a70fe784e134b90913b95",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "768Mi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "512Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "admission-77d9d9cfd4-xh75n": {
+      "uid": "4163e53b-b041-4152-a875-71acf372e02b",
+      "service": "admission",
+      "node": "sems-k3s-worker",
+      "ip": "10.42.1.138",
+      "containers": [
+        {
+          "name": "admission",
+          "image": "sha256:53e8213bc1d66f9e01e23459b2894198a0dd1ea57b57b5407e763d29246a3f8a",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/admission@sha256:d3a355ff4c758c517bd601d03a89494a928a5b666e3a70fe784e134b90913b95",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "768Mi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "512Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "event-catalog-755bf4fd9f-74j52": {
+      "uid": "7246aa00-aa3b-4efa-aab7-973ec393df38",
+      "service": "event-catalog",
+      "node": "sems-k3s-worker",
+      "ip": "10.42.1.137",
+      "containers": [
+        {
+          "name": "event-catalog",
+          "image": "sha256:ddfad5b47a48fdbf9b2dcc419899de9b9176204ce032330f10bc10dd28c9e72a",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:7a9d700221f671b1ba062a01b690b31330dd8cd5e268b1d9ea22b71aa0daba84",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "768Mi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "512Mi"
+          }
+        }
+      ],
+      "poolSizes": [
+        {
+          "name": "CATALOG_DB_POOL_SIZE",
+          "value": "10"
+        }
+      ]
+    },
+    "event-catalog-755bf4fd9f-f5wfw": {
+      "uid": "1258a051-45fe-492a-a2f7-8492ce7460ab",
+      "service": "event-catalog",
+      "node": "sems-k3s-server",
+      "ip": "10.42.0.158",
+      "containers": [
+        {
+          "name": "event-catalog",
+          "image": "sha256:ddfad5b47a48fdbf9b2dcc419899de9b9176204ce032330f10bc10dd28c9e72a",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/event-catalog@sha256:7a9d700221f671b1ba062a01b690b31330dd8cd5e268b1d9ea22b71aa0daba84",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "768Mi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "512Mi"
+          }
+        }
+      ],
+      "poolSizes": [
+        {
+          "name": "CATALOG_DB_POOL_SIZE",
+          "value": "10"
+        }
+      ]
+    },
+    "gateway-59b5f5c979-kg59m": {
+      "uid": "413ce15a-d7d2-4d49-8706-53481c5927a7",
+      "service": "gateway",
+      "node": "sems-k3s-server",
+      "ip": "10.42.0.144",
+      "containers": [
+        {
+          "name": "gateway",
+          "image": "sha256:215fc33aeae677768846fd3e4bcbacb33a48ea2b32ab4b203cfe329763d24c67",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/gateway@sha256:66fce0b1bab9830fc7d8db74207fb4a10bb015bda97b9f6dddc2c9e0a2469ad9",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "500m",
+            "memory": "128Mi"
+          },
+          "requests": {
+            "cpu": "50m",
+            "memory": "64Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "gateway-59b5f5c979-whnj2": {
+      "uid": "1806047b-538e-4028-bc26-8bc663425477",
+      "service": "gateway",
+      "node": "sems-k3s-worker",
+      "ip": "10.42.1.123",
+      "containers": [
+        {
+          "name": "gateway",
+          "image": "sha256:215fc33aeae677768846fd3e4bcbacb33a48ea2b32ab4b203cfe329763d24c67",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/gateway@sha256:66fce0b1bab9830fc7d8db74207fb4a10bb015bda97b9f6dddc2c9e0a2469ad9",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "500m",
+            "memory": "128Mi"
+          },
+          "requests": {
+            "cpu": "50m",
+            "memory": "64Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "identity-7656ff6b5d-wt5sl": {
+      "uid": "63a3a0ca-f358-4d76-8224-669e7e3898ea",
+      "service": "identity",
+      "node": "sems-k3s-server",
+      "ip": "10.42.0.157",
+      "containers": [
+        {
+          "name": "identity",
+          "image": "sha256:075691439a882fa683e42e2346e76f0753e22c9b155093c99bf14cabbb02ceef",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/identity@sha256:6a9eb90e1187b3796f484239a49575f8a263971cbb7fa09d121b5fb632ca0b4e",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "768Mi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "512Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "identity-7656ff6b5d-xk27d": {
+      "uid": "18d3e57d-2c72-4c60-b3d5-79e5db28bc9d",
+      "service": "identity",
+      "node": "sems-k3s-worker",
+      "ip": "10.42.1.136",
+      "containers": [
+        {
+          "name": "identity",
+          "image": "sha256:075691439a882fa683e42e2346e76f0753e22c9b155093c99bf14cabbb02ceef",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/identity@sha256:6a9eb90e1187b3796f484239a49575f8a263971cbb7fa09d121b5fb632ca0b4e",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "768Mi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "512Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "postgres-0": {
+      "uid": "b70dc15e-fe76-4957-9e76-5bb55abfbdae",
+      "service": "postgres",
+      "node": "sems-k3s-worker",
+      "ip": "10.42.1.112",
+      "containers": [
+        {
+          "name": "postgres",
+          "image": "sha256:69e8bef45756082f75d51d4f4c706d0a8dd43898b70503e2253b896f24ee5058",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/postgres@sha256:426feb67931f53faf9d8640137b59c0e4d914baf55ea5c4405e434e203970a50",
+          "restartCount": 1
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "1",
+            "memory": "768Mi"
+          },
+          "requests": {
+            "cpu": "250m",
+            "memory": "256Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "web-57fb5b59f4-469j6": {
+      "uid": "d9c506c6-2884-4733-875a-6fc1e0496368",
+      "service": "web",
+      "node": "sems-k3s-worker",
+      "ip": "10.42.1.121",
+      "containers": [
+        {
+          "name": "web",
+          "image": "sha256:88aa44580c92d90047336a806510ea4462c27bd0f264e85db887a065c4bdb04e",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/web@sha256:4c556dc66ed90fe5463db892e6d456ad27aaf2d8f41cb9cfba8c58f04492b659",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "500m",
+            "memory": "128Mi"
+          },
+          "requests": {
+            "cpu": "50m",
+            "memory": "64Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    },
+    "web-57fb5b59f4-ghslq": {
+      "uid": "78f2dbee-4a19-4c68-a193-abada6743e0e",
+      "service": "web",
+      "node": "sems-k3s-server",
+      "ip": "10.42.0.142",
+      "containers": [
+        {
+          "name": "web",
+          "image": "sha256:88aa44580c92d90047336a806510ea4462c27bd0f264e85db887a065c4bdb04e",
+          "imageID": "ghcr.io/seventh720/swe5001-sems/web@sha256:4c556dc66ed90fe5463db892e6d456ad27aaf2d8f41cb9cfba8c58f04492b659",
+          "restartCount": 0
+        }
+      ],
+      "resources": [
+        {
+          "limits": {
+            "cpu": "500m",
+            "memory": "128Mi"
+          },
+          "requests": {
+            "cpu": "50m",
+            "memory": "64Mi"
+          }
+        }
+      ],
+      "poolSizes": []
+    }
+  },
+  "businessTrafficByTestedPod": {},
+  "inventory": {
+    "passed": true,
+    "eventCount": 100,
+    "rows": [
+      {
+        "id": "054cea2a-061f-42af-8408-b9d94e8ad604",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "06bfc93a-0be8-4680-92ba-dc196b394b8c",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "08ea4adc-237c-4da6-aa2d-aaad16bba5f7",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "0d5276bc-253c-47a0-b3d4-2c08fcbcd975",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "0e37a4c1-329b-4909-ab22-88261e4dc6a0",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "0ef3938e-ce26-4177-82ff-c61de8136010",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "1138e61a-61d3-42a5-8f4e-40b8d0c661cf",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "117d28d0-c22d-47eb-8add-72d7df12e22e",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "12726072-eeca-4fd0-b0f9-14627fe86164",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "128cea94-b9eb-47c3-a229-3e4c960935e4",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "19da0cb3-7dbf-43f4-8923-136351fb682b",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "1e042d2c-b0bd-4997-b077-19ef6ca282d4",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "1ef82d9c-8098-460e-853d-07ab636e92cd",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "22af3f3f-3930-4d1f-b870-539aadf0a010",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "235ba510-817e-401b-8aa1-04650bae1622",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "29a1d0a3-3667-46b4-b8a4-5b3d0a29a0f8",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "2d886d8d-d36e-44eb-bef3-8727c708f58d",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "32869748-faea-4b1f-9493-3efafd451658",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "36e7fec1-d975-4242-92a3-e6e2e3128cc5",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "3726a5fd-8966-4c72-b50e-b15aba45cda0",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "37da349e-13b8-46f3-8ad9-b1941c88308a",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "3c12a7d4-65fd-4c53-854c-4c5481d09023",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "3d6fc1b0-7097-46b1-8519-81189867ab03",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "3daefc03-c968-48e2-8bfc-9313c81c10b4",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "422010a0-789f-4348-8f79-e1f10460b175",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "44285e14-ec1e-4e12-85fb-a722fc0e12dd",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "4c498a2f-7ce0-494c-9200-d43c3c940123",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "4ceeea56-39b8-4a6e-9370-fde96a20afae",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "50eae32b-228a-40f5-90cc-b0aac94fd02d",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "51215175-c20d-4cfe-bf62-335e776031b7",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "55445de9-03b9-4628-b247-3cf5fc3a3548",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "5e2801ef-0189-4c6d-bd11-5fd0c94d5400",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "604fa336-4ee8-4515-a966-34703a53bdc3",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "615f2832-c756-4d7d-a27d-ca943ec0f4fe",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "64f7d439-809a-4a76-8b6a-ff4c037800f1",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "6762e562-4fe7-4567-8056-9cee85204625",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "67b42d80-44b3-466a-9a6c-c3b709d15690",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "697f4e66-9724-4676-bf90-5202e0191447",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "69ac6065-8da5-4709-9556-2e4c723a308b",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "6ef248af-e84b-40c6-a488-3f13d51df92a",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "71b387c6-9efb-4251-b70f-ae83d470d153",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "734a4aa9-65fe-4f44-b100-a05a3e337fd1",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "7909ea46-9f34-48fc-a26c-8bd36ffcbee1",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "7a1f8d28-bb58-4c70-9d9c-a8734a32ddff",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "7e1de545-412d-4d56-8d06-78ac2afd18fa",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "84762716-e1ce-45ca-92a0-ee93daf29f44",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "8969457a-8171-477d-9e59-3208408f3f9d",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "8a5a84d9-6ff1-4e2e-b050-3181ee607263",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "8baa150d-11e9-4a7f-9453-6a36a3394788",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "8baafbc2-c17a-4085-ab19-de7edb454db2",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "91f28ee6-af34-446f-9336-eb72e15e0fe1",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "9297519d-8e40-4111-97ff-628b81713616",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "96c1cafb-555a-4988-a7b8-14112bcc5811",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "970b2ace-7f84-4f88-83f1-dafc5dec958e",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "a097b1c0-1f03-4d56-af34-a4225cc5fc0e",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "a14c4355-d314-4a61-a38b-11c1fe9bf412",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "a936c16d-e02e-4d10-811d-704cd9356dcf",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "ab4a27f5-0566-46d2-b35c-805a173983a5",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "ab7547b8-7962-4372-aa52-f4f9c3fe6a19",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "abd109c3-b09a-4d9c-bec1-eef4c8631f0e",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "ac4e5614-4045-43c3-9edb-f56a06efa9db",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "b4f6277a-1e76-4759-a85f-0340d35d2424",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "b6bbba0e-17d5-4c9c-80bc-b268cf7bd89f",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "b869abdb-6f62-40d4-ab0d-9d0ab5d454e8",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "bc5bb07d-9a4b-412a-aba3-76e3b1779a1a",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "bd091975-591d-4115-b10a-c75c4f173a23",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "bd4ec30d-d24f-4d2e-b871-84689839c9aa",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "beb5cf52-b483-42aa-8666-5fea83fd13e3",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "c5b3bc77-9141-46c4-929f-01e317057b36",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "c5d26cba-8c47-42da-bee4-8f92b9fe512b",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "c71d7bf7-dfb1-44f9-83ea-dee4866dc60d",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "c7a28112-ee82-42ab-ab3f-bb4103fe35af",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "c919e26c-5885-4e38-a2c3-f3f7dfd7c648",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "c977fe22-7165-461f-84c9-b395cea58fa3",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "ca9387ad-0d6e-4acd-bd26-48475317f1ad",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "cbaee3b6-af7c-4871-a182-f646bf799915",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "cdd12a29-9c57-40b9-a27e-731486448505",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "cffba94e-0463-4a71-bc8e-4de97c3afb0d",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "d6524d3e-4d89-4896-88f2-0564885d5715",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "d7c05b2a-0b58-4290-81d3-b9c2fe05e0e7",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "d9ad0b0c-9336-4ff7-994e-2589c60642c9",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "dd1e168a-d755-4206-9e75-08b9756f3e9a",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "ddb456df-594c-4d47-83e5-ffeb692142fa",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "ddfa2feb-7fbe-447d-97f9-14b8530d6866",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "e32f72e8-9ac0-46ae-a0a7-8334c12e009c",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "e67a71c9-96a8-4e99-99fd-22e934481f2c",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "e72562ef-1798-4f3f-b53a-629d9747f47f",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "e847aa6d-7718-4413-8527-0bc0c25f2278",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "eedf2bca-d4e6-4fb4-9bf0-71ab92855d3f",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "ef2223ca-b73b-4586-82fb-d62623598246",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "efd73ad0-d406-4192-9440-5a658468be5c",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "f035f898-61c5-4dd7-8aa5-39405244b15e",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "f0a51541-af50-4457-9126-ace6fdd3fe0d",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "f1cc4bf9-ec7c-4b2c-b748-cba725220812",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "f2b4cf11-8dd8-410d-8c01-9dbb5e925bf5",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "f318f788-4c0f-4c00-b89b-3f386942b7a7",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "f44dbaa2-9b95-4e70-a479-df98be9612fc",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "fb6c6b2e-a4ca-49b4-af7d-eee3212ecbf9",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "fd121696-4986-4b9e-a8c4-d9aedec83ab4",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      },
+      {
+        "id": "fd355105-19b9-4ced-8d4f-ee19372fb5b5",
+        "quota": 1000000,
+        "reserved": 0,
+        "confirmed": 0,
+        "tickets": 0
+      }
+    ]
+  },
+  "sampledDatabaseAndGenerator": {
+    "databaseSampleCount": 77,
+    "maximumObservedConnections": 60,
+    "maximumObservedActiveConnections": 4,
+    "maximumObservedBlockedConnections": 0,
+    "maximumObservedLockWaitConnections": 0,
+    "observedDeadlocksCounterChange": 0,
+    "generatorSampleCount": 77,
+    "generatorMaximumDockerCpuPercent": 46.52,
+    "generatorMaximumMemoryPercentOf1GiBLimit": 12.61,
+    "scope": "Sampled extrema during measurement, not continuous maxima. No JVM/GC or Hikari wait-time profile was collected."
+  }
+}
