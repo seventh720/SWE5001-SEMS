@@ -1,0 +1,1576 @@
+{
+  "environment": {
+    "startedAt": "2026-10-25T17:06:34.282791+00:00",
+    "commit": "f33bf83168a44841895d074e917f01ff6ed5d70b",
+    "context": "kind-sems-local",
+    "namespace": "sems-benchmark",
+    "runnerSha256": "2cdac7d64e9cc1ebd035cd5892e3ca4f7187f527e65c0e02c92f6a220463f3d4",
+    "manifestSha256": "37e39758526830fc08f417d3e6031966d08fc497c6dad28959bfad53fe7d75eb",
+    "kubernetesVersion": "v1.36.4",
+    "javaOptions": "-Xms128m -Xmx384m -XX:MaxMetaspaceSize=192m",
+    "dataset": "fb83b336a7e6",
+    "users": 50,
+    "events": 10,
+    "baselineSha256": "9211fe51f8e7b52f198e7b1905006ec6965c996066df51349d4030aa723cfca4",
+    "initialPods": {
+      "admission-59b78d9fbd-lhhc9": {
+        "uid": "6e5212ab-7626-46b9-ad87-18f41f0791f0",
+        "service": "admission",
+        "node": "sems-local-control-plane",
+        "ip": "10.244.0.45",
+        "containers": [
+          {
+            "name": "admission",
+            "image": "docker.io/library/sems-benchmark-admission:latest",
+            "imageID": "sha256:ab690d78e6074644b73f53ba73b6aa2b2794eb49fcc4fad6cea2382b25d7ff44",
+            "restartCount": 0
+          }
+        ],
+        "resources": [
+          {
+            "limits": {
+              "cpu": "1",
+              "memory": "768Mi"
+            },
+            "requests": {
+              "cpu": "250m",
+              "memory": "512Mi"
+            }
+          }
+        ],
+        "poolSizes": []
+      },
+      "event-catalog-67fbdd9fc5-6hd6b": {
+        "uid": "4b43b683-55bc-467a-9518-ddd9154881bb",
+        "service": "event-catalog",
+        "node": "sems-local-control-plane",
+        "ip": "10.244.0.44",
+        "containers": [
+          {
+            "name": "event-catalog",
+            "image": "docker.io/library/sems-benchmark-event-catalog:latest",
+            "imageID": "sha256:e906f0bb000b27996a7d6e0cd27f76fab45107a94c9304c2a73835124b0e53ff",
+            "restartCount": 0
+          }
+        ],
+        "resources": [
+          {
+            "limits": {
+              "cpu": "1",
+              "memory": "768Mi"
+            },
+            "requests": {
+              "cpu": "250m",
+              "memory": "512Mi"
+            }
+          }
+        ],
+        "poolSizes": [
+          {
+            "name": "CATALOG_DB_POOL_SIZE",
+            "value": "10"
+          }
+        ]
+      },
+      "gateway-ffc575b96-mx25p": {
+        "uid": "21b9639f-3e93-425f-ba77-2fc5e3a82ff0",
+        "service": "gateway",
+        "node": "sems-local-control-plane",
+        "ip": "10.244.0.46",
+        "containers": [
+          {
+            "name": "gateway",
+            "image": "docker.io/library/sems-benchmark-gateway:latest",
+            "imageID": "sha256:47b0d014cae9d1f820baa874af5c1dccaabfe5593281b73e5e55017ea12cc47a",
+            "restartCount": 0
+          }
+        ],
+        "resources": [
+          {
+            "limits": {
+              "cpu": "500m",
+              "memory": "128Mi"
+            },
+            "requests": {
+              "cpu": "50m",
+              "memory": "64Mi"
+            }
+          }
+        ],
+        "poolSizes": []
+      },
+      "identity-56b9c7676f-fhd8n": {
+        "uid": "6c68aac6-876f-41b7-812e-03de75c6d2b9",
+        "service": "identity",
+        "node": "sems-local-control-plane",
+        "ip": "10.244.0.43",
+        "containers": [
+          {
+            "name": "identity",
+            "image": "docker.io/library/sems-benchmark-identity:latest",
+            "imageID": "docker.io/library/import-2026-10-25@sha256:99922d34192a81ee94479ff6e3fff5a5fefe40ca4b9015ac9df7adc29dce9e5f",
+            "restartCount": 0
+          }
+        ],
+        "resources": [
+          {
+            "limits": {
+              "cpu": "1",
+              "memory": "768Mi"
+            },
+            "requests": {
+              "cpu": "250m",
+              "memory": "512Mi"
+            }
+          }
+        ],
+        "poolSizes": []
+      },
+      "postgres-0": {
+        "uid": "16d76bb8-2043-494b-a147-73e8eea06263",
+        "service": "postgres",
+        "node": "sems-local-control-plane",
+        "ip": "10.244.0.19",
+        "containers": [
+          {
+            "name": "postgres",
+            "image": "docker.io/library/sems-benchmark-postgres:latest",
+            "imageID": "sha256:52945a779b33d303be9b7e590b995b1aac0167a8b5e75c018e1c2bd5b3d86cc2",
+            "restartCount": 0
+          }
+        ],
+        "resources": [
+          {
+            "limits": {
+              "cpu": "1",
+              "memory": "512Mi"
+            },
+            "requests": {
+              "cpu": "100m",
+              "memory": "128Mi"
+            }
+          }
+        ],
+        "poolSizes": []
+      },
+      "web-7fb766c867-j5rbn": {
+        "uid": "f909c769-d83d-426f-82c6-848bcd7ee05b",
+        "service": "web",
+        "node": "sems-local-control-plane",
+        "ip": "10.244.0.13",
+        "containers": [
+          {
+            "name": "web",
+            "image": "docker.io/library/sems-benchmark-web:latest",
+            "imageID": "sha256:33f82612e514a89744b29680f159fd3bdb03b5ad442a9dee307b5659d9a69a3e",
+            "restartCount": 0
+          }
+        ],
+        "resources": [
+          {
+            "limits": {
+              "cpu": "500m",
+              "memory": "128Mi"
+            },
+            "requests": {
+              "cpu": "50m",
+              "memory": "64Mi"
+            }
+          }
+        ],
+        "poolSizes": []
+      }
+    },
+    "vus": [
+      50
+    ],
+    "modes": [
+      "booking"
+    ],
+    "warmupSeconds": 60,
+    "measurementSeconds": 600,
+    "repeats": 1,
+    "pvcUid": "d640a3e7-5110-47e3-805a-4bbc69c46da9",
+    "replicaCounts": [
+      1,
+      2
+    ],
+    "distributions": [
+      "spread",
+      "hot"
+    ],
+    "thinkSeconds": 0,
+    "quotaPerEvent": 1000000,
+    "loadScriptSha256": "da562e8bd990d321c7cc7c0d4d4b5f5677f1a6ac8f81f1afc11c463e6b3ce433",
+    "loadImage": "sha256:3ddc8b1a33a2c3d8edc6e99b6a762ae36cba08788463458f5e6a7703e14eb77d",
+    "limitations": [
+      "Local kind single node; no EC2 capacity or cross-node HA claim",
+      "Load generator, existing local containers and services share Docker VM",
+      "Port-forward and gateway are possible bottlenecks",
+      "Record initialPods imageIDs as tested artifacts; HEAD alone is not image provenance",
+      "10 VU / 60 second defaults are a tool preflight, not a capacity result"
+    ]
+  },
+  "hostResources": {
+    "cpus": 10,
+    "memoryBytes": 8321515520
+  },
+  "completion": {
+    "completedAt": "2026-10-25T17:54:46.227176+00:00",
+    "status": "complete",
+    "runs": 4
+  },
+  "restore": {
+    "completedAt": "2026-10-25T17:55:23.778171+00:00",
+    "status": "restored",
+    "allTablesMatchPreTestBackup": true,
+    "tableCount": 27,
+    "totalRows": 21933,
+    "pvcUidUnchanged": true,
+    "replicas": {
+      "identity": 1,
+      "event-catalog": 1,
+      "admission": 1,
+      "web": 1,
+      "gateway": 1
+    },
+    "gatewayRuntimeRestored": true,
+    "health": {
+      "/health/gateway": 200,
+      "/health/identity": 200,
+      "/health/event-catalog": 200,
+      "/health/admission": 200
+    },
+    "healthRecheckFailures": [],
+    "preTestBackupSha256": "36143c5f5004a456788941a9cf24b0a06d0e9b61cc1672dea7296630b61f612e",
+    "experimentFailure": null
+  },
+  "incident": null,
+  "runs": [
+    {
+      "run": "booking-r1-vu50-repeat1",
+      "mode": "booking",
+      "replicas": 1,
+      "vus": 50,
+      "repeat": 1,
+      "distribution": "spread",
+      "thinkSeconds": 0,
+      "runnerSha256": "2cdac7d64e9cc1ebd035cd5892e3ca4f7187f527e65c0e02c92f6a220463f3d4",
+      "loadExitCode": 0,
+      "auditPassed": true,
+      "failure": null,
+      "gatewayCoveragePassed": true,
+      "serverGatePassed": true,
+      "eachReplicaServed": true,
+      "validContinuousMeasurement": true,
+      "maximumResourceSampleGapSeconds": 5.241718,
+      "metadata": {
+        "runId": "admission-scaling-20261026-01-booking-r1-vu50-repeat1",
+        "dataset": "fb83b336a7e6",
+        "mode": "booking",
+        "vus": 50,
+        "warmup": 60,
+        "duration": 600,
+        "base": "http://host.docker.internal:18087",
+        "distribution": "spread",
+        "thinkSeconds": 0,
+        "commit": "f33bf83168a44841895d074e917f01ff6ed5d70b",
+        "replicas": "catalog1-admission1",
+        "note": "Read measurement-tagged metrics only; HTTP counts include setup and warmup. No HA claim."
+      },
+      "measurementWindow": {
+        "firstPoint": "2026-10-25T17:08:22.999309+00:00",
+        "lastPoint": "2026-10-25T17:18:23.100700+00:00"
+      },
+      "thresholdsPassed": true,
+      "successfulRequests": {
+        "book": 195743,
+        "receipt": 195743
+      },
+      "successfulOrdersPerSecond": 326.23833333333334,
+      "successfulHttpRequestsPerSecond": 652.4766666666667,
+      "httpStatuses": {
+        "200": 391486
+      },
+      "unexpectedErrors": 0,
+      "unexpectedErrorRate": 0.0,
+      "businessRejections": {},
+      "latencyMilliseconds": {
+        "book": {
+          "count": 195743,
+          "mean": 100.03781108466714,
+          "p50": 95.230459,
+          "p95": 194.664709,
+          "p99": 237.42905157999436,
+          "max": 1414.004251
+        },
+        "receipt": {
+          "count": 195743,
+          "mean": 52.807066791098535,
+          "p50": 65.476625,
+          "p95": 100.94437589999998,
+          "p99": 176.79418549999994,
+          "max": 1291.138209
+        }
+      },
+      "database": {
+        "samples": 116,
+        "maxObservedApplicationSessions": 30,
+        "meanAdmissionConnections": 10,
+        "meanActiveAdmissionConnections": 0.9655172413793104,
+        "meanLockWaitingAdmissionConnections": 0.75,
+        "maxLockWaitingAdmissionConnections": 4,
+        "meanBlockedAdmissionConnections": 0.7155172413793104,
+        "lockWaitingSessionSnapshotFraction": 0.075,
+        "samplesWithAdmissionLockWait": 57,
+        "maxObservedTransactionAgeSeconds": 0.187876,
+        "admissionWaitSnapshotCounts": {
+          "idle in transaction/Client/ClientRead": 584,
+          "idle/Client/ClientRead": 445,
+          "active/Lock/transactionid": 80,
+          "idle in transaction/None/None": 9,
+          "idle/None/None": 9,
+          "active/Lock/tuple": 7,
+          "active/None/None": 7,
+          "active/LWLock/WALWrite": 9,
+          "active/Client/ClientRead": 3,
+          "active/IO/WalSync": 6,
+          "idle in transaction/LWLock/WALWrite": 1
+        },
+        "settings": {
+          "max_connections": "100",
+          "shared_buffers": "16384",
+          "track_io_timing": "off",
+          "work_mem": "4096"
+        },
+        "counterDeltas": {
+          "xact_commit": 2530706,
+          "xact_rollback": 0,
+          "blks_read": 43846,
+          "blks_hit": 18188716,
+          "tup_returned": 35035511,
+          "tup_fetched": 1061388,
+          "tup_inserted": 583726,
+          "tup_updated": 194947,
+          "tup_deleted": 86,
+          "conflicts": 0,
+          "temp_files": 0,
+          "temp_bytes": 0,
+          "deadlocks": 0,
+          "blk_read_time": 0,
+          "blk_write_time": 0
+        }
+      },
+      "podResources": {
+        "identity-56b9c7676f-xw2p4": {
+          "meanCpuCores": 0.17315772177586206,
+          "maxCpuCores": 0.273412096,
+          "maxWorkingSetMiB": 344.7109375
+        },
+        "event-catalog-67fbdd9fc5-kbstf": {
+          "meanCpuCores": 0.42260421675,
+          "maxCpuCores": 0.46885354,
+          "maxWorkingSetMiB": 347.19140625
+        },
+        "admission-59b78d9fbd-l7njm": {
+          "meanCpuCores": 0.9949727908362069,
+          "maxCpuCores": 1.001746616,
+          "maxWorkingSetMiB": 384.17578125
+        },
+        "postgres-0": {
+          "meanCpuCores": 0.52355224075,
+          "maxCpuCores": 0.597522768,
+          "maxWorkingSetMiB": 314.03125
+        },
+        "web-7fb766c867-j5rbn": {
+          "meanCpuCores": 3.183319827586207e-05,
+          "maxCpuCores": 7.6407e-05,
+          "maxWorkingSetMiB": 9.046875
+        },
+        "gateway-ffc575b96-mx25p": {
+          "meanCpuCores": 0.12937287720689655,
+          "maxCpuCores": 0.145342987,
+          "maxWorkingSetMiB": 11.265625
+        }
+      },
+      "admissionCpuThrottling": {
+        "admission-59b78d9fbd-l7njm": {
+          "usage_usec": 577810194,
+          "nr_periods": 5815,
+          "nr_throttled": 5778,
+          "throttled_usec": 1791297984,
+          "throttledPeriodFraction": 0.9936371453138435
+        }
+      },
+      "cpuThrottlingByPod": {
+        "admission-59b78d9fbd-l7njm": {
+          "usage_usec": 577810194,
+          "nr_periods": 5815,
+          "nr_throttled": 5778,
+          "throttled_usec": 1791297984,
+          "throttledPeriodFraction": 0.9936371453138435
+        },
+        "event-catalog-67fbdd9fc5-kbstf": {
+          "usage_usec": 247748543,
+          "nr_periods": 5809,
+          "nr_throttled": 7,
+          "throttled_usec": 832283,
+          "throttledPeriodFraction": 0.0012050266827336891
+        },
+        "identity-56b9c7676f-xw2p4": {
+          "usage_usec": 99324889,
+          "nr_periods": 5810,
+          "nr_throttled": 0,
+          "throttled_usec": 0,
+          "throttledPeriodFraction": 0.0
+        },
+        "postgres-0": {
+          "usage_usec": 307458848,
+          "nr_periods": 5814,
+          "nr_throttled": 64,
+          "throttled_usec": 4883641,
+          "throttledPeriodFraction": 0.011007911936704506
+        }
+      },
+      "loadGenerator": {
+        "samples": 26,
+        "meanCpuPercent": 28.336153846153845,
+        "maxCpuPercent": 40.09
+      },
+      "nodeMinimumAvailableMiB": 3903.375,
+      "inventory": {
+        "passed": true,
+        "inventory": [
+          {
+            "id": "01c469e6-79d7-4c9e-acf0-c35357b90dbb",
+            "quota": 1000000,
+            "reserved": 20576,
+            "confirmed": 20576,
+            "tickets": 20576
+          },
+          {
+            "id": "0220208f-39e2-4d16-b759-aab419c02f8a",
+            "quota": 1000000,
+            "reserved": 20537,
+            "confirmed": 20537,
+            "tickets": 20537
+          },
+          {
+            "id": "20a2efab-62ff-41db-b18f-5da506775713",
+            "quota": 1000000,
+            "reserved": 20555,
+            "confirmed": 20555,
+            "tickets": 20555
+          },
+          {
+            "id": "2a529c59-84e3-4549-bfdf-0d9c304283d8",
+            "quota": 1000000,
+            "reserved": 20559,
+            "confirmed": 20559,
+            "tickets": 20559
+          },
+          {
+            "id": "2ab054a6-db23-47a1-a26d-7c62af0580a9",
+            "quota": 1000000,
+            "reserved": 20587,
+            "confirmed": 20587,
+            "tickets": 20587
+          },
+          {
+            "id": "7118680c-5438-4f6b-8141-335665b7fea8",
+            "quota": 1000000,
+            "reserved": 20565,
+            "confirmed": 20565,
+            "tickets": 20565
+          },
+          {
+            "id": "bd012a89-63fb-4301-87a2-d2e5a7d15de3",
+            "quota": 1000000,
+            "reserved": 20548,
+            "confirmed": 20548,
+            "tickets": 20548
+          },
+          {
+            "id": "cf8aef62-e2d2-4633-9861-6e5d5e35d211",
+            "quota": 1000000,
+            "reserved": 20612,
+            "confirmed": 20612,
+            "tickets": 20612
+          },
+          {
+            "id": "d9315d3e-b456-415c-81c0-8a6e220b6ea9",
+            "quota": 1000000,
+            "reserved": 20547,
+            "confirmed": 20547,
+            "tickets": 20547
+          },
+          {
+            "id": "f39d2e11-8c61-4b81-8d51-851fe34a2da1",
+            "quota": 1000000,
+            "reserved": 20509,
+            "confirmed": 20509,
+            "tickets": 20509
+          }
+        ]
+      },
+      "traffic": {
+        "includesWarmup": true,
+        "requestsByPodAndStatus": {
+          "admission-59b78d9fbd-l7njm": {
+            "200": 411156
+          }
+        }
+      },
+      "gatewayEvidence": {
+        "entryByPhaseAndStatus": {
+          "warmup:200": 19670,
+          "measurement:200": 391486
+        },
+        "internalByStatus": {
+          "200": 616751
+        },
+        "upstreamErrorsByStatus": {},
+        "requestsWithMultipleUpstreams": 0,
+        "malformedLines": 0,
+        "expectedMeasurementRequests": 391486,
+        "recordedMeasurementRequests": 391486,
+        "measurementCoveragePassed": true,
+        "serverGatePassed": true,
+        "bytes": 354168221
+      },
+      "gatewaySha256": "fde36fecdcac3bb0d70eefdd873ccd5cd77cea9fd239e9637cbb1389c3227f17",
+      "gatewayAllWindowStatuses": {
+        "200": 1028089
+      },
+      "gatewayAllWindowRequestsWithMultipleUpstreams": 0,
+      "gatewayLogCoverage": "Dedicated file, reset per run; exact measurement request count checked using run/phase headers. Internal gate includes warmup."
+    },
+    {
+      "run": "booking-r2-vu50-repeat1",
+      "mode": "booking",
+      "replicas": 2,
+      "vus": 50,
+      "repeat": 1,
+      "distribution": "spread",
+      "thinkSeconds": 0,
+      "runnerSha256": "2cdac7d64e9cc1ebd035cd5892e3ca4f7187f527e65c0e02c92f6a220463f3d4",
+      "loadExitCode": 0,
+      "auditPassed": true,
+      "failure": null,
+      "gatewayCoveragePassed": true,
+      "serverGatePassed": true,
+      "eachReplicaServed": true,
+      "validContinuousMeasurement": true,
+      "maximumResourceSampleGapSeconds": 5.514442,
+      "metadata": {
+        "runId": "admission-scaling-20261026-01-booking-r2-vu50-repeat1",
+        "dataset": "fb83b336a7e6",
+        "mode": "booking",
+        "vus": 50,
+        "warmup": 60,
+        "duration": 600,
+        "base": "http://host.docker.internal:18087",
+        "distribution": "spread",
+        "thinkSeconds": 0,
+        "commit": "f33bf83168a44841895d074e917f01ff6ed5d70b",
+        "replicas": "catalog1-admission2",
+        "note": "Read measurement-tagged metrics only; HTTP counts include setup and warmup. No HA claim."
+      },
+      "measurementWindow": {
+        "firstPoint": "2026-10-25T17:20:21.197921+00:00",
+        "lastPoint": "2026-10-25T17:30:21.216992+00:00"
+      },
+      "thresholdsPassed": true,
+      "successfulRequests": {
+        "book": 304420,
+        "receipt": 304420
+      },
+      "successfulOrdersPerSecond": 507.3666666666667,
+      "successfulHttpRequestsPerSecond": 1014.7333333333333,
+      "httpStatuses": {
+        "200": 608840
+      },
+      "unexpectedErrors": 0,
+      "unexpectedErrorRate": 0.0,
+      "businessRejections": {},
+      "latencyMilliseconds": {
+        "book": {
+          "count": 304420,
+          "mean": 68.00952930391564,
+          "p50": 69.263958,
+          "p95": 124.27725654999999,
+          "p99": 180.80383276999996,
+          "max": 471.768625
+        },
+        "receipt": {
+          "count": 304420,
+          "mean": 30.001213026946324,
+          "p50": 21.064145500000002,
+          "p95": 72.6278476,
+          "p99": 94.56930397999997,
+          "max": 304.972583
+        }
+      },
+      "database": {
+        "samples": 113,
+        "maxObservedApplicationSessions": 40,
+        "meanAdmissionConnections": 20,
+        "meanActiveAdmissionConnections": 7.601769911504425,
+        "meanLockWaitingAdmissionConnections": 4,
+        "maxLockWaitingAdmissionConnections": 10,
+        "meanBlockedAdmissionConnections": 3.831858407079646,
+        "lockWaitingSessionSnapshotFraction": 0.2,
+        "samplesWithAdmissionLockWait": 106,
+        "maxObservedTransactionAgeSeconds": 0.347469,
+        "admissionWaitSnapshotCounts": {
+          "active/Lock/transactionid": 314,
+          "idle/Client/ClientRead": 716,
+          "idle in transaction/Client/ClientRead": 301,
+          "idle in transaction/None/None": 227,
+          "active/Lock/tuple": 133,
+          "active/None/None": 197,
+          "active/LWLock/WALWrite": 122,
+          "idle/None/None": 141,
+          "idle in transaction/LWLock/WALWrite": 7,
+          "active/IO/WalSync": 59,
+          "idle in transaction/Lock/tuple": 1,
+          "active/Client/ClientRead": 16,
+          "active/LWLock/BufferContent": 11,
+          "idle in transaction/IO/WalSync": 3,
+          "idle/Lock/transactionid": 1,
+          "active/LWLock/LockManager": 2,
+          "idle in transaction/LWLock/BufferContent": 1,
+          "idle in transaction/Lock/transactionid": 3,
+          "active/IO/DataFileRead": 3,
+          "active/IO/DataFileExtend": 1,
+          "active/IO/WalWrite": 1
+        },
+        "settings": {
+          "max_connections": "100",
+          "shared_buffers": "16384",
+          "track_io_timing": "off",
+          "work_mem": "4096"
+        },
+        "counterDeltas": {
+          "xact_commit": 3931569,
+          "xact_rollback": 0,
+          "blks_read": 157555,
+          "blks_hit": 27611108,
+          "tup_returned": 43523136,
+          "tup_fetched": 2227762,
+          "tup_inserted": 906891,
+          "tup_updated": 302651,
+          "tup_deleted": 83,
+          "conflicts": 0,
+          "temp_files": 0,
+          "temp_bytes": 0,
+          "deadlocks": 0,
+          "blk_read_time": 0,
+          "blk_write_time": 0
+        }
+      },
+      "podResources": {
+        "admission-59b78d9fbd-sl6ln": {
+          "meanCpuCores": 0.8709503401061947,
+          "maxCpuCores": 0.998595964,
+          "maxWorkingSetMiB": 360.24609375
+        },
+        "postgres-0": {
+          "meanCpuCores": 0.9904525738053097,
+          "maxCpuCores": 0.999312525,
+          "maxWorkingSetMiB": 341.33984375
+        },
+        "identity-56b9c7676f-cm7z7": {
+          "meanCpuCores": 0.3472013430176991,
+          "maxCpuCores": 0.386354211,
+          "maxWorkingSetMiB": 359.02734375
+        },
+        "web-7fb766c867-j5rbn": {
+          "meanCpuCores": 4.3588017699115045e-05,
+          "maxCpuCores": 9.594e-05,
+          "maxWorkingSetMiB": 10.609375
+        },
+        "admission-59b78d9fbd-n6mcq": {
+          "meanCpuCores": 0.904096167238938,
+          "maxCpuCores": 0.999154993,
+          "maxWorkingSetMiB": 366.4609375
+        },
+        "event-catalog-67fbdd9fc5-xr2x5": {
+          "meanCpuCores": 0.8162348130353982,
+          "maxCpuCores": 0.917472623,
+          "maxWorkingSetMiB": 365.55078125
+        },
+        "gateway-ffc575b96-mx25p": {
+          "meanCpuCores": 0.25468981169911503,
+          "maxCpuCores": 0.273393092,
+          "maxWorkingSetMiB": 16.6484375
+        }
+      },
+      "admissionCpuThrottling": {
+        "admission-59b78d9fbd-n6mcq": {
+          "usage_usec": 512584582,
+          "nr_periods": 5694,
+          "nr_throttled": 2377,
+          "throttled_usec": 237074887,
+          "throttledPeriodFraction": 0.4174569722514928
+        },
+        "admission-59b78d9fbd-sl6ln": {
+          "usage_usec": 493023856,
+          "nr_periods": 5694,
+          "nr_throttled": 1690,
+          "throttled_usec": 190622537,
+          "throttledPeriodFraction": 0.2968036529680365
+        }
+      },
+      "cpuThrottlingByPod": {
+        "admission-59b78d9fbd-n6mcq": {
+          "usage_usec": 512584582,
+          "nr_periods": 5694,
+          "nr_throttled": 2377,
+          "throttled_usec": 237074887,
+          "throttledPeriodFraction": 0.4174569722514928
+        },
+        "admission-59b78d9fbd-sl6ln": {
+          "usage_usec": 493023856,
+          "nr_periods": 5694,
+          "nr_throttled": 1690,
+          "throttled_usec": 190622537,
+          "throttledPeriodFraction": 0.2968036529680365
+        },
+        "event-catalog-67fbdd9fc5-xr2x5": {
+          "usage_usec": 463626029,
+          "nr_periods": 5695,
+          "nr_throttled": 222,
+          "throttled_usec": 2826514,
+          "throttledPeriodFraction": 0.038981562774363474
+        },
+        "identity-56b9c7676f-cm7z7": {
+          "usage_usec": 197272667,
+          "nr_periods": 5694,
+          "nr_throttled": 2,
+          "throttled_usec": 36411,
+          "throttledPeriodFraction": 0.00035124692658939234
+        },
+        "postgres-0": {
+          "usage_usec": 565034567,
+          "nr_periods": 5694,
+          "nr_throttled": 5457,
+          "throttled_usec": 916370951,
+          "throttledPeriodFraction": 0.958377239199157
+        }
+      },
+      "loadGenerator": {
+        "samples": 26,
+        "meanCpuPercent": 50.018076923076926,
+        "maxCpuPercent": 55.82
+      },
+      "nodeMinimumAvailableMiB": 3645.62890625,
+      "inventory": {
+        "passed": true,
+        "inventory": [
+          {
+            "id": "01c469e6-79d7-4c9e-acf0-c35357b90dbb",
+            "quota": 1000000,
+            "reserved": 32525,
+            "confirmed": 32525,
+            "tickets": 32525
+          },
+          {
+            "id": "0220208f-39e2-4d16-b759-aab419c02f8a",
+            "quota": 1000000,
+            "reserved": 32626,
+            "confirmed": 32626,
+            "tickets": 32626
+          },
+          {
+            "id": "20a2efab-62ff-41db-b18f-5da506775713",
+            "quota": 1000000,
+            "reserved": 32552,
+            "confirmed": 32552,
+            "tickets": 32552
+          },
+          {
+            "id": "2a529c59-84e3-4549-bfdf-0d9c304283d8",
+            "quota": 1000000,
+            "reserved": 32528,
+            "confirmed": 32528,
+            "tickets": 32528
+          },
+          {
+            "id": "2ab054a6-db23-47a1-a26d-7c62af0580a9",
+            "quota": 1000000,
+            "reserved": 32546,
+            "confirmed": 32546,
+            "tickets": 32546
+          },
+          {
+            "id": "7118680c-5438-4f6b-8141-335665b7fea8",
+            "quota": 1000000,
+            "reserved": 32457,
+            "confirmed": 32457,
+            "tickets": 32457
+          },
+          {
+            "id": "bd012a89-63fb-4301-87a2-d2e5a7d15de3",
+            "quota": 1000000,
+            "reserved": 32540,
+            "confirmed": 32540,
+            "tickets": 32540
+          },
+          {
+            "id": "cf8aef62-e2d2-4633-9861-6e5d5e35d211",
+            "quota": 1000000,
+            "reserved": 32466,
+            "confirmed": 32466,
+            "tickets": 32466
+          },
+          {
+            "id": "d9315d3e-b456-415c-81c0-8a6e220b6ea9",
+            "quota": 1000000,
+            "reserved": 32670,
+            "confirmed": 32670,
+            "tickets": 32670
+          },
+          {
+            "id": "f39d2e11-8c61-4b81-8d51-851fe34a2da1",
+            "quota": 1000000,
+            "reserved": 32586,
+            "confirmed": 32586,
+            "tickets": 32586
+          }
+        ]
+      },
+      "traffic": {
+        "includesWarmup": true,
+        "requestsByPodAndStatus": {
+          "admission-59b78d9fbd-n6mcq": {
+            "200": 329827
+          },
+          "admission-59b78d9fbd-sl6ln": {
+            "200": 321129
+          }
+        }
+      },
+      "gatewayEvidence": {
+        "entryByPhaseAndStatus": {
+          "warmup:200": 42116,
+          "measurement:200": 608840
+        },
+        "internalByStatus": {
+          "200": 976452
+        },
+        "upstreamErrorsByStatus": {},
+        "requestsWithMultipleUpstreams": 0,
+        "malformedLines": 0,
+        "expectedMeasurementRequests": 608840,
+        "recordedMeasurementRequests": 608840,
+        "measurementCoveragePassed": true,
+        "serverGatePassed": true,
+        "bytes": 560644542
+      },
+      "gatewaySha256": "6d224210a2a6eed4812419239007a96646c6c28d26c9468c0c91708c572f86a6",
+      "gatewayAllWindowStatuses": {
+        "200": 1627592
+      },
+      "gatewayAllWindowRequestsWithMultipleUpstreams": 0,
+      "gatewayLogCoverage": "Dedicated file, reset per run; exact measurement request count checked using run/phase headers. Internal gate includes warmup."
+    },
+    {
+      "run": "booking-r1-vu50-repeat1-hot",
+      "mode": "booking",
+      "replicas": 1,
+      "vus": 50,
+      "repeat": 1,
+      "distribution": "hot",
+      "thinkSeconds": 0,
+      "runnerSha256": "2cdac7d64e9cc1ebd035cd5892e3ca4f7187f527e65c0e02c92f6a220463f3d4",
+      "loadExitCode": 0,
+      "auditPassed": true,
+      "failure": null,
+      "gatewayCoveragePassed": true,
+      "serverGatePassed": true,
+      "eachReplicaServed": true,
+      "validContinuousMeasurement": true,
+      "maximumResourceSampleGapSeconds": 5.25488,
+      "metadata": {
+        "runId": "admission-scaling-20261026-01-booking-r1-vu50-repeat1-hot",
+        "dataset": "fb83b336a7e6",
+        "mode": "booking",
+        "vus": 50,
+        "warmup": 60,
+        "duration": 600,
+        "base": "http://host.docker.internal:18087",
+        "distribution": "hot",
+        "thinkSeconds": 0,
+        "commit": "f33bf83168a44841895d074e917f01ff6ed5d70b",
+        "replicas": "catalog1-admission1",
+        "note": "Read measurement-tagged metrics only; HTTP counts include setup and warmup. No HA claim."
+      },
+      "measurementWindow": {
+        "firstPoint": "2026-10-25T17:32:30.161456+00:00",
+        "lastPoint": "2026-10-25T17:42:30.160984+00:00"
+      },
+      "thresholdsPassed": true,
+      "successfulRequests": {
+        "book": 200349,
+        "receipt": 200349
+      },
+      "successfulOrdersPerSecond": 333.915,
+      "successfulHttpRequestsPerSecond": 667.83,
+      "httpStatuses": {
+        "200": 400698
+      },
+      "unexpectedErrors": 0,
+      "unexpectedErrorRate": 0.0,
+      "businessRejections": {},
+      "latencyMilliseconds": {
+        "book": {
+          "count": 200349,
+          "mean": 107.25798375666962,
+          "p50": 103.517375,
+          "p95": 155.76495019999984,
+          "p99": 189.28110499999997,
+          "max": 397.604375
+        },
+        "receipt": {
+          "count": 200349,
+          "mean": 42.191684546611164,
+          "p50": 41.854709,
+          "p95": 75.54800859999996,
+          "p99": 96.5545251599999,
+          "max": 300.372916
+        }
+      },
+      "database": {
+        "samples": 115,
+        "maxObservedApplicationSessions": 30,
+        "meanAdmissionConnections": 10,
+        "meanActiveAdmissionConnections": 8.156521739130435,
+        "meanLockWaitingAdmissionConnections": 7.756521739130434,
+        "maxLockWaitingAdmissionConnections": 9,
+        "meanBlockedAdmissionConnections": 7.739130434782608,
+        "lockWaitingSessionSnapshotFraction": 0.7756521739130435,
+        "samplesWithAdmissionLockWait": 115,
+        "maxObservedTransactionAgeSeconds": 0.125244,
+        "admissionWaitSnapshotCounts": {
+          "active/Lock/tuple": 777,
+          "idle in transaction/Client/ClientRead": 95,
+          "active/Lock/transactionid": 113,
+          "idle/Client/ClientRead": 72,
+          "idle in transaction/None/None": 26,
+          "active/None/None": 23,
+          "active/IO/WalSync": 12,
+          "idle/None/None": 14,
+          "active/Client/ClientRead": 13,
+          "idle in transaction/IO/WalWrite": 1,
+          "idle in transaction/Lock/tuple": 2,
+          "idle in transaction/IO/WalSync": 2
+        },
+        "settings": {
+          "max_connections": "100",
+          "shared_buffers": "16384",
+          "track_io_timing": "off",
+          "work_mem": "4096"
+        },
+        "counterDeltas": {
+          "xact_commit": 2578455,
+          "xact_rollback": 0,
+          "blks_read": 47495,
+          "blks_hit": 17233545,
+          "tup_returned": 35377746,
+          "tup_fetched": 1075142,
+          "tup_inserted": 594794,
+          "tup_updated": 198636,
+          "tup_deleted": 86,
+          "conflicts": 0,
+          "temp_files": 0,
+          "temp_bytes": 0,
+          "deadlocks": 0,
+          "blk_read_time": 0,
+          "blk_write_time": 0
+        }
+      },
+      "podResources": {
+        "postgres-0": {
+          "meanCpuCores": 0.7144416731913044,
+          "maxCpuCores": 0.748528003,
+          "maxWorkingSetMiB": 272.640625
+        },
+        "identity-56b9c7676f-cx7xk": {
+          "meanCpuCores": 0.19649518338260868,
+          "maxCpuCores": 0.349170458,
+          "maxWorkingSetMiB": 358.0234375
+        },
+        "admission-59b78d9fbd-9zbxx": {
+          "meanCpuCores": 0.9966139323391304,
+          "maxCpuCores": 1.000627308,
+          "maxWorkingSetMiB": 369.3515625
+        },
+        "gateway-ffc575b96-mx25p": {
+          "meanCpuCores": 0.19781342397391305,
+          "maxCpuCores": 0.200769311,
+          "maxWorkingSetMiB": 10.734375
+        },
+        "web-7fb766c867-j5rbn": {
+          "meanCpuCores": 3.6018391304347824e-05,
+          "maxCpuCores": 0.000138948,
+          "maxWorkingSetMiB": 9.0078125
+        },
+        "event-catalog-67fbdd9fc5-wp4kk": {
+          "meanCpuCores": 0.5169981916173914,
+          "maxCpuCores": 0.551974014,
+          "maxWorkingSetMiB": 342.125
+        }
+      },
+      "admissionCpuThrottling": {
+        "admission-59b78d9fbd-9zbxx": {
+          "usage_usec": 581289200,
+          "nr_periods": 5837,
+          "nr_throttled": 5753,
+          "throttled_usec": 317963838,
+          "throttledPeriodFraction": 0.985609045742676
+        }
+      },
+      "cpuThrottlingByPod": {
+        "admission-59b78d9fbd-9zbxx": {
+          "usage_usec": 581289200,
+          "nr_periods": 5837,
+          "nr_throttled": 5753,
+          "throttled_usec": 317963838,
+          "throttledPeriodFraction": 0.985609045742676
+        },
+        "event-catalog-67fbdd9fc5-wp4kk": {
+          "usage_usec": 300760601,
+          "nr_periods": 5837,
+          "nr_throttled": 5,
+          "throttled_usec": 148426,
+          "throttledPeriodFraction": 0.0008566044200788076
+        },
+        "identity-56b9c7676f-cx7xk": {
+          "usage_usec": 112884657,
+          "nr_periods": 5835,
+          "nr_throttled": 0,
+          "throttled_usec": 0,
+          "throttledPeriodFraction": 0.0
+        },
+        "postgres-0": {
+          "usage_usec": 417163890,
+          "nr_periods": 5838,
+          "nr_throttled": 92,
+          "throttled_usec": 8863462,
+          "throttledPeriodFraction": 0.0157588215142172
+        }
+      },
+      "loadGenerator": {
+        "samples": 27,
+        "meanCpuPercent": 28.436296296296295,
+        "maxCpuPercent": 42.39
+      },
+      "nodeMinimumAvailableMiB": 4102.5703125,
+      "inventory": {
+        "passed": true,
+        "inventory": [
+          {
+            "id": "01c469e6-79d7-4c9e-acf0-c35357b90dbb",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "0220208f-39e2-4d16-b759-aab419c02f8a",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "20a2efab-62ff-41db-b18f-5da506775713",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "2a529c59-84e3-4549-bfdf-0d9c304283d8",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "2ab054a6-db23-47a1-a26d-7c62af0580a9",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "7118680c-5438-4f6b-8141-335665b7fea8",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "bd012a89-63fb-4301-87a2-d2e5a7d15de3",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "cf8aef62-e2d2-4633-9861-6e5d5e35d211",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "d9315d3e-b456-415c-81c0-8a6e220b6ea9",
+            "quota": 1000000,
+            "reserved": 213452,
+            "confirmed": 213452,
+            "tickets": 213452
+          },
+          {
+            "id": "f39d2e11-8c61-4b81-8d51-851fe34a2da1",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          }
+        ]
+      },
+      "traffic": {
+        "includesWarmup": true,
+        "requestsByPodAndStatus": {
+          "admission-59b78d9fbd-9zbxx": {
+            "200": 426869
+          }
+        }
+      },
+      "gatewayEvidence": {
+        "entryByPhaseAndStatus": {
+          "warmup:200": 26171,
+          "measurement:200": 400698
+        },
+        "internalByStatus": {
+          "200": 640321
+        },
+        "upstreamErrorsByStatus": {},
+        "requestsWithMultipleUpstreams": 0,
+        "malformedLines": 0,
+        "expectedMeasurementRequests": 400698,
+        "recordedMeasurementRequests": 400698,
+        "measurementCoveragePassed": true,
+        "serverGatePassed": true,
+        "bytes": 369380637
+      },
+      "gatewaySha256": "3d469a5c768e85cb1367c4f048c1dc19b252c3e10c52c3b241d1fe68425120ef",
+      "gatewayAllWindowStatuses": {
+        "200": 1067374
+      },
+      "gatewayAllWindowRequestsWithMultipleUpstreams": 0,
+      "gatewayLogCoverage": "Dedicated file, reset per run; exact measurement request count checked using run/phase headers. Internal gate includes warmup."
+    },
+    {
+      "run": "booking-r2-vu50-repeat1-hot",
+      "mode": "booking",
+      "replicas": 2,
+      "vus": 50,
+      "repeat": 1,
+      "distribution": "hot",
+      "thinkSeconds": 0,
+      "runnerSha256": "2cdac7d64e9cc1ebd035cd5892e3ca4f7187f527e65c0e02c92f6a220463f3d4",
+      "loadExitCode": 0,
+      "auditPassed": true,
+      "failure": null,
+      "gatewayCoveragePassed": true,
+      "serverGatePassed": true,
+      "eachReplicaServed": true,
+      "validContinuousMeasurement": true,
+      "maximumResourceSampleGapSeconds": 5.386491,
+      "metadata": {
+        "runId": "admission-scaling-20261026-01-booking-r2-vu50-repeat1-hot",
+        "dataset": "fb83b336a7e6",
+        "mode": "booking",
+        "vus": 50,
+        "warmup": 60,
+        "duration": 600,
+        "base": "http://host.docker.internal:18087",
+        "distribution": "hot",
+        "thinkSeconds": 0,
+        "commit": "f33bf83168a44841895d074e917f01ff6ed5d70b",
+        "replicas": "catalog1-admission2",
+        "note": "Read measurement-tagged metrics only; HTTP counts include setup and warmup. No HA claim."
+      },
+      "measurementWindow": {
+        "firstPoint": "2026-10-25T17:44:35.530339+00:00",
+        "lastPoint": "2026-10-25T17:54:35.610689+00:00"
+      },
+      "thresholdsPassed": true,
+      "successfulRequests": {
+        "book": 252583,
+        "receipt": 252583
+      },
+      "successfulOrdersPerSecond": 420.9716666666667,
+      "successfulHttpRequestsPerSecond": 841.9433333333334,
+      "httpStatuses": {
+        "200": 505166
+      },
+      "unexpectedErrors": 0,
+      "unexpectedErrorRate": 0.0,
+      "businessRejections": {},
+      "latencyMilliseconds": {
+        "book": {
+          "count": 252583,
+          "mean": 92.35677672251101,
+          "p50": 87.758375,
+          "p95": 155.07705799999997,
+          "p99": 196.02915887999993,
+          "max": 1638.373584
+        },
+        "receipt": {
+          "count": 252583,
+          "mean": 26.060439665080388,
+          "p50": 22.387,
+          "p95": 59.4370087,
+          "p99": 83.22625149999999,
+          "max": 1184.446542
+        }
+      },
+      "database": {
+        "samples": 114,
+        "maxObservedApplicationSessions": 40,
+        "meanAdmissionConnections": 20,
+        "meanActiveAdmissionConnections": 17.80701754385965,
+        "meanLockWaitingAdmissionConnections": 17.114035087719298,
+        "maxLockWaitingAdmissionConnections": 19,
+        "meanBlockedAdmissionConnections": 17.087719298245613,
+        "lockWaitingSessionSnapshotFraction": 0.855701754385965,
+        "samplesWithAdmissionLockWait": 114,
+        "maxObservedTransactionAgeSeconds": 0.114477,
+        "admissionWaitSnapshotCounts": {
+          "active/Lock/tuple": 1842,
+          "idle/Client/ClientRead": 118,
+          "active/Client/ClientRead": 22,
+          "active/Lock/transactionid": 108,
+          "idle in transaction/Client/ClientRead": 39,
+          "idle/None/None": 36,
+          "active/None/None": 39,
+          "active/IO/WalWrite": 1,
+          "active/IO/WalSync": 17,
+          "idle in transaction/None/None": 51,
+          "idle in transaction/IO/WalWrite": 2,
+          "idle/Lock/tuple": 1,
+          "idle in transaction/IO/DataFileExtend": 1,
+          "idle in transaction/IO/WalSync": 2,
+          "active/IO/DataFileExtend": 1
+        },
+        "settings": {
+          "max_connections": "100",
+          "shared_buffers": "16384",
+          "track_io_timing": "off",
+          "work_mem": "4096"
+        },
+        "counterDeltas": {
+          "xact_commit": 3258803,
+          "xact_rollback": 0,
+          "blks_read": 93410,
+          "blks_hit": 22142697,
+          "tup_returned": 44722255,
+          "tup_fetched": 1360544,
+          "tup_inserted": 751662,
+          "tup_updated": 250925,
+          "tup_deleted": 86,
+          "conflicts": 0,
+          "temp_files": 0,
+          "temp_bytes": 0,
+          "deadlocks": 0,
+          "blk_read_time": 0,
+          "blk_write_time": 0
+        }
+      },
+      "podResources": {
+        "gateway-ffc575b96-mx25p": {
+          "meanCpuCores": 0.27597842000877193,
+          "maxCpuCores": 0.284705762,
+          "maxWorkingSetMiB": 14.30078125
+        },
+        "web-7fb766c867-j5rbn": {
+          "meanCpuCores": 4.226177192982456e-05,
+          "maxCpuCores": 0.000108194,
+          "maxWorkingSetMiB": 9.0078125
+        },
+        "identity-56b9c7676f-c7m5p": {
+          "meanCpuCores": 0.2762986474385965,
+          "maxCpuCores": 0.324441624,
+          "maxWorkingSetMiB": 348.91796875
+        },
+        "postgres-0": {
+          "meanCpuCores": 0.9727548455964913,
+          "maxCpuCores": 0.988309809,
+          "maxWorkingSetMiB": 322.0390625
+        },
+        "admission-59b78d9fbd-wg68p": {
+          "meanCpuCores": 0.8005210683070175,
+          "maxCpuCores": 0.871408245,
+          "maxWorkingSetMiB": 358.80859375
+        },
+        "admission-59b78d9fbd-6j4dp": {
+          "meanCpuCores": 0.7628855717719298,
+          "maxCpuCores": 0.894843883,
+          "maxWorkingSetMiB": 351.8671875
+        },
+        "event-catalog-67fbdd9fc5-tvlh4": {
+          "meanCpuCores": 0.7429427158245614,
+          "maxCpuCores": 0.76947279,
+          "maxWorkingSetMiB": 345.40234375
+        }
+      },
+      "admissionCpuThrottling": {
+        "admission-59b78d9fbd-6j4dp": {
+          "usage_usec": 449372184,
+          "nr_periods": 5895,
+          "nr_throttled": 77,
+          "throttled_usec": 1943901,
+          "throttledPeriodFraction": 0.013061916878710772
+        },
+        "admission-59b78d9fbd-wg68p": {
+          "usage_usec": 470319025,
+          "nr_periods": 5896,
+          "nr_throttled": 203,
+          "throttled_usec": 3625339,
+          "throttledPeriodFraction": 0.034430122116689284
+        }
+      },
+      "cpuThrottlingByPod": {
+        "admission-59b78d9fbd-6j4dp": {
+          "usage_usec": 449372184,
+          "nr_periods": 5895,
+          "nr_throttled": 77,
+          "throttled_usec": 1943901,
+          "throttledPeriodFraction": 0.013061916878710772
+        },
+        "admission-59b78d9fbd-wg68p": {
+          "usage_usec": 470319025,
+          "nr_periods": 5896,
+          "nr_throttled": 203,
+          "throttled_usec": 3625339,
+          "throttledPeriodFraction": 0.034430122116689284
+        },
+        "event-catalog-67fbdd9fc5-tvlh4": {
+          "usage_usec": 437770663,
+          "nr_periods": 5895,
+          "nr_throttled": 38,
+          "throttled_usec": 1803200,
+          "throttledPeriodFraction": 0.006446140797285836
+        },
+        "identity-56b9c7676f-c7m5p": {
+          "usage_usec": 162324582,
+          "nr_periods": 5895,
+          "nr_throttled": 6,
+          "throttled_usec": 231622,
+          "throttledPeriodFraction": 0.0010178117048346056
+        },
+        "postgres-0": {
+          "usage_usec": 573326813,
+          "nr_periods": 5896,
+          "nr_throttled": 2916,
+          "throttled_usec": 29613897,
+          "throttledPeriodFraction": 0.494572591587517
+        }
+      },
+      "loadGenerator": {
+        "samples": 27,
+        "meanCpuPercent": 42.12777777777778,
+        "maxCpuPercent": 49.47
+      },
+      "nodeMinimumAvailableMiB": 3711.37890625,
+      "inventory": {
+        "passed": true,
+        "inventory": [
+          {
+            "id": "01c469e6-79d7-4c9e-acf0-c35357b90dbb",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "0220208f-39e2-4d16-b759-aab419c02f8a",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "20a2efab-62ff-41db-b18f-5da506775713",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "2a529c59-84e3-4549-bfdf-0d9c304283d8",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "2ab054a6-db23-47a1-a26d-7c62af0580a9",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "7118680c-5438-4f6b-8141-335665b7fea8",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "bd012a89-63fb-4301-87a2-d2e5a7d15de3",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "cf8aef62-e2d2-4633-9861-6e5d5e35d211",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          },
+          {
+            "id": "d9315d3e-b456-415c-81c0-8a6e220b6ea9",
+            "quota": 1000000,
+            "reserved": 273591,
+            "confirmed": 273591,
+            "tickets": 273591
+          },
+          {
+            "id": "f39d2e11-8c61-4b81-8d51-851fe34a2da1",
+            "quota": 1000000,
+            "reserved": 0,
+            "confirmed": 0,
+            "tickets": 0
+          }
+        ]
+      },
+      "traffic": {
+        "includesWarmup": true,
+        "requestsByPodAndStatus": {
+          "admission-59b78d9fbd-6j4dp": {
+            "200": 269130
+          },
+          "admission-59b78d9fbd-wg68p": {
+            "200": 278014
+          }
+        }
+      },
+      "gatewayEvidence": {
+        "entryByPhaseAndStatus": {
+          "warmup:200": 41978,
+          "measurement:200": 505166
+        },
+        "internalByStatus": {
+          "200": 820735
+        },
+        "upstreamErrorsByStatus": {},
+        "requestsWithMultipleUpstreams": 0,
+        "malformedLines": 0,
+        "expectedMeasurementRequests": 505166,
+        "recordedMeasurementRequests": 505166,
+        "measurementCoveragePassed": true,
+        "serverGatePassed": true,
+        "bytes": 473400081
+      },
+      "gatewaySha256": "03ea6d10f4e25e2dc5c412af90e008c5740617fb4aec68c2f705ee2d3627a352",
+      "gatewayAllWindowStatuses": {
+        "200": 1368063
+      },
+      "gatewayAllWindowRequestsWithMultipleUpstreams": 0,
+      "gatewayLogCoverage": "Dedicated file, reset per run; exact measurement request count checked using run/phase headers. Internal gate includes warmup."
+    }
+  ],
+  "buildProvenance": {
+    "sourceCommit": "f33bf83168a44841895d074e917f01ff6ed5d70b",
+    "jars": {
+      "services/event-catalog/target/event-catalog-service-0.1.0-SNAPSHOT.jar": "cbb9f1e8f8832ffaf5292968e940c2914800e51437b81f3f1e0d4dc1a45e73ed",
+      "services/identity/target/identity-service-0.1.0-SNAPSHOT.jar": "0c4d69a9c964477dc6ce347a96f4d4af41fb59fc61406578df3c48b7c7a010f6",
+      "services/admission/target/admission-service-0.1.0-SNAPSHOT.jar": "c82214511391a65c1b9a88d3c1f4e4ac68ae1e6876654dbca356c6979aae3ef9"
+    },
+    "images": {
+      "identity": "sha256:37f452214cca9d470a136d7fa2c85b86e392ef1820d6cb9391a1f5a327bc8c63",
+      "event-catalog": "sha256:699d3d47a8674a3c1bbb712b434b528e490b92e333d6009969ee4b3abb58927e",
+      "admission": "sha256:29de081c1d703c131e870adb9b3f27c4d8a760d30b96cf1ad66b87fa8c5afe3d",
+      "web": "sha256:508a1470a122a85ca411dbabd517055db4dee088bda971ce9130500599c75c85",
+      "gateway": "sha256:d925758d80c8ccb213b18d76b78ba410e753287891d8038d9b1becffcb8045d2",
+      "postgres": "sha256:e8db7f7a67be45536c48d97a40adcdce9e423ee7d600487b8ec5144d40d8af50"
+    },
+    "webDistSha256": {
+      "apps/web/dist/index.html": "144a8256c494fbb74e60ae8601ee4f2510f1be3666ecfa67cec4a399ac7e83b3",
+      "apps/web/dist/favicon.svg": "30757f4a2f031af9b31a2df42d5034a6cfb41720fa64c097833fc793b82c7982",
+      "apps/web/dist/assets/index-CcR2QwPi.js": "286c9a76769c59cd7935de6d106e015d4bf27543a5bfb6377af9b1ccfd4228f3",
+      "apps/web/dist/assets/index-CJA_mJG7.css": "7d4cc8307b2eb9d793694b3cca68afe1214c8926923dce8729e0c94a6419f6f1",
+      "apps/web/dist/assets/jsQR-CsE2U4Pe.js": "a80f913422be8faad89aea9c4330c126892d24b99e830a70b8b7b046083be356"
+    }
+  },
+  "imageIdsMatchPriorPreflight": true,
+  "scope": "Local kind Admission 1/2 replicas; fixed 50 VU; no cloud capacity, node HA or HPA claim.",
+  "hotDoubleReplicaLockClassification": {
+    "time": "2026-10-25T17:48:57.991662+00:00",
+    "groups": [
+      {
+        "query_class": "other",
+        "state": "idle",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "sessions": 5
+      },
+      {
+        "query_class": "other",
+        "state": "idle in transaction",
+        "wait_event_type": "Client",
+        "wait_event": "ClientRead",
+        "sessions": 1
+      },
+      {
+        "query_class": "sales_row_lock",
+        "state": "active",
+        "wait_event_type": "Lock",
+        "wait_event": "transactionid",
+        "sessions": 1
+      },
+      {
+        "query_class": "sales_row_lock",
+        "state": "active",
+        "wait_event_type": "Lock",
+        "wait_event": "tuple",
+        "sessions": 13
+      }
+    ]
+  },
+  "comparisons": {
+    "spread": {
+      "successfulOrderThroughputRatio": 1.5552024848909027,
+      "bothClientThresholdsPassed": true,
+      "bothServerGatesPassed": true,
+      "bothAuditsPassed": true,
+      "bothContinuousMeasurementsValid": true
+    },
+    "hot": {
+      "successfulOrderThroughputRatio": 1.260715052233852,
+      "bothClientThresholdsPassed": true,
+      "bothServerGatesPassed": true,
+      "bothAuditsPassed": true,
+      "bothContinuousMeasurementsValid": true
+    }
+  }
+}

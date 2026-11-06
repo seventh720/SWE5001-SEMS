@@ -34,6 +34,31 @@ class ComparisonTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             module.compare(report(600), other)
 
+    def test_different_distribution_or_think_time_cannot_be_a_replica_comparison(self):
+        for field, value in (('distribution', 'hot'), ('thinkSeconds', 0)):
+            other = copy.deepcopy(report(600))
+            other['metadata'][field] = value
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                module.compare(report(600), other)
+
+    def test_database_cpu_comparison_requires_fixed_replicas_and_explicit_control(self):
+        first, second = report(600), report(1200)
+        first['metadata'].update(replicas='admission2', postgresCpuLimit='1')
+        second['metadata'].update(replicas='admission2', postgresCpuLimit='2')
+        with self.assertRaises(ValueError):
+            module.compare(first, second)
+        result = module.compare(first, second, 'postgresCpuLimit')
+        self.assertEqual(result['controlledVariable'], 'postgresCpuLimit')
+        self.assertEqual(result['successfulThroughputRatio'], 2)
+        self.assertEqual(second['metadata']['postgresCpuLimit'], '2')
+        second['metadata']['replicas'] = 'admission1'
+        with self.assertRaises(ValueError):
+            module.compare(first, second, 'postgresCpuLimit')
+
+    def test_unrecorded_database_cpu_cannot_be_a_cpu_experiment(self):
+        with self.assertRaises(ValueError):
+            module.compare(report(600), report(1200), 'postgresCpuLimit')
+
 
 if __name__ == '__main__':
     unittest.main()

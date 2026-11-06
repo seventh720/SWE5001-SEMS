@@ -1,0 +1,93 @@
+# Disposable local experiment. Never apply this overlay to production.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: sems-benchmark
+resources:
+  - ../local
+images:
+  - name: sems-k8s-local-identity
+    newName: sems-benchmark-identity
+  - name: sems-k8s-local-event-catalog
+    newName: sems-benchmark-event-catalog
+  - name: sems-k8s-local-admission
+    newName: sems-benchmark-admission
+  - name: sems-k8s-local-web
+    newName: sems-benchmark-web
+  - name: sems-k8s-local-gateway
+    newName: sems-benchmark-gateway
+  - name: sems-k8s-local-postgres
+    newName: sems-benchmark-postgres
+replicas:
+  - name: admission
+    count: 1
+patches:
+  - target:
+      kind: Deployment
+      name: gateway
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/command
+        value:
+          - /bin/sh
+          - -ec
+          - |
+            /bin/sh /config/kubernetes-entrypoint.sh -t
+            mkdir -p /tmp/sems-gateway
+            sed -i \
+              -e 's@access_log /var/log/nginx/access.log@access_log /tmp/sems-gateway/access.jsonl@' \
+              -e 's@"request_id":"$request_id"@"request_id":"$request_id","server_port":$server_port,"upstream_status":"$upstream_status","benchmark_run":"$http_x_benchmark_run","benchmark_phase":"$http_x_benchmark_phase"@' \
+              /etc/nginx/nginx.conf
+            exec nginx -e /tmp/sems-gateway/error.log -g 'daemon off;'
+      - op: replace
+        path: /spec/template/spec/containers/0/args
+        value: []
+  - target:
+      kind: Namespace
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          sems.seventh720.com/environment: benchmark
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: Never
+  - target:
+      kind: ConfigMap
+      name: sems-database
+    patch: |-
+      - op: replace
+        path: /data/IDENTITY_DB_URL
+        value: jdbc:postgresql://postgres:5432/sems?currentSchema=identity
+      - op: replace
+        path: /data/CATALOG_DB_URL
+        value: jdbc:postgresql://postgres:5432/sems?currentSchema=catalog
+      - op: replace
+        path: /data/ADMISSION_DB_URL
+        value: jdbc:postgresql://postgres:5432/sems?currentSchema=admission
+  - target:
+      kind: Deployment
+      name: (identity|event-catalog|admission)
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SERVER_TOMCAT_ACCESSLOG_ENABLED
+          value: "true"
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SERVER_TOMCAT_ACCESSLOG_DIRECTORY
+          value: /tmp/sems-access
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SERVER_TOMCAT_ACCESSLOG_BUFFERED
+          value: "false"
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: SERVER_TOMCAT_ACCESSLOG_PATTERN
+          value: "%m %U %s %D"
