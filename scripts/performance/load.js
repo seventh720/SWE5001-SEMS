@@ -46,7 +46,9 @@ export const options = {
 function request(method, path, body, token, operation) {
   const res = http.request(method, base + path, body === null ? null : JSON.stringify(body), {
     headers: { 'Content-Type': 'application/json', 'X-Benchmark-Run': runId,
-      'X-Benchmark-Phase': exec.scenario.name, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      'X-Benchmark-Phase': exec.scenario.name,
+      ...(__ENV.SEMS_MAINTENANCE_TOKEN ? { 'X-SEMS-Maintenance-Token': __ENV.SEMS_MAINTENANCE_TOKEN } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     tags: { name: operation, operation }, timeout: '15s',
   });
   const ok = res.status === 200;
@@ -61,7 +63,8 @@ function request(method, path, body, token, operation) {
 export function setup() {
   // Validate tokens against Identity before measuring. Fail clearly rather than benchmark 401s.
   for (let i = 0; i < vus; i++) {
-    const res = http.get(`${base}/api/v1/auth/me`, { headers: { Authorization: `Bearer ${dataset.users[i].token}` } });
+    const res = http.get(`${base}/api/v1/auth/me`, { headers: { Authorization: `Bearer ${dataset.users[i].token}`,
+      ...(__ENV.SEMS_MAINTENANCE_TOKEN ? { 'X-SEMS-Maintenance-Token': __ENV.SEMS_MAINTENANCE_TOKEN } : {}) } });
     if (res.status !== 200) throw new Error('Expired or invalid dataset tokens; run seed.py --refresh');
   }
 }
