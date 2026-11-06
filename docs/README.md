@@ -34,7 +34,7 @@
 | [监控与追踪](observability.md) | Grafana、Prometheus、Loki、Tempo、Telegram |
 | [安全](security.md) | 访问控制、扫描与限定依赖例外 |
 | [测试覆盖](test-coverage.md) | 单元、API、数据库、浏览器及覆盖率边界 |
-| [验收矩阵](acceptance-matrix.md) | 能力与验证结果的对应关系 |
+| [验收矩阵](acceptance-matrix.md) | 能力与验证结果、老师反馈完成情况及缺口 |
 | [性能与扩容实验](performance-and-availability.md) | 测试准备、对照矩阵与判定标准 |
 | [工程待办](roadmap.md) | 尚未完成的工作 |
 | [验收证据索引](evidence/README.md) | 按环境和版本保留的原始结果 |
