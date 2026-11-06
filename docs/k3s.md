@@ -9,8 +9,8 @@
 | 区域 / 可用区 | `ap-southeast-1` / `ap-southeast-1a` |
 | 网络 | 现有 VPC `vpc-02bd49f7852b0db8a`，同一默认子网 |
 | 节点 | 两台 `t3.medium`，每台 2 vCPU、4 GiB 内存、30 GiB gp3 根盘 |
-| Server | `sems-k3s-server`，公网 `13.229.121.219`，私网 `172.31.33.16` |
-| Worker | `sems-k3s-worker`，公网 `54.151.244.167`，私网 `172.31.39.232` |
+| Server | `sems-k3s-server`，公网 `18.141.228.205`，私网 `172.31.33.16` |
+| Worker | `sems-k3s-worker`，公网 `18.143.118.175`，私网 `172.31.39.232` |
 | 平台 | Ubuntu 24.04、K3s `v1.36.5+k3s1`、containerd |
 | 节点分组 | 自建节点标签 `sems.io/node-group=apps`，角色为 server / worker；未使用 EKS managed node groups |
 
@@ -68,7 +68,7 @@ Cloudflare 的 `swe5001` 与 `grafana` A 记录指向 server，使用 DNS only�
 ssh -N -i .secrets/k3s-cloud/ssh.pem \
   -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
   -o UserKnownHostsFile=.secrets/k3s-cloud/known_hosts \
-  -L 127.0.0.1:16443:127.0.0.1:6443 ubuntu@13.229.121.219
+  -L 127.0.0.1:16443:127.0.0.1:6443 ubuntu@18.141.228.205
 ```
 
 另开终端，显式指定 context，避免依赖默认集群：
@@ -103,7 +103,7 @@ python3 scripts/k8s/backup-postgres.py \
 
 备份包含 custom-format 业务库和不含密码的角色定义，需独立保管凭据、密钥并验证恢复。CD 还在 server 保存发布前备份。当前没有自动周期备份、WAL 归档或 PITR。
 
-只读数据库访问通过本机转发，Navicat 不再连接冻结的旧数据库：
+只读数据库访问通过本机转发：
 
 ```bash
 sems_kubectl -n sems-prod port-forward --address 127.0.0.1 svc/postgres 15432:5432
@@ -114,9 +114,9 @@ sems_kubectl -n sems-prod port-forward --address 127.0.0.1 svc/postgres 15432:54
 ## 扩容、启停与边界
 
 - 同服务硬反亲和意味着两个节点最多调度两个副本。`2→3` 不会增加节点，第三个 Pod 将 Pending；当前没有 HPA 或节点自动扩容。
-- 扩容正确性、吞吐收益和故障恢复分别测试。受控 1/2 副本对照、资源预算和工具适配见[扩容实验](performance-and-availability.md)。生产故障/夹具脚本拒绝 `sems-prod`，测试需独立数据和环境。
+- 扩容正确性、吞吐收益和故障恢复分别测试。受控 1/2 副本对照、资源预算和工具见[扩容实验](performance-and-availability.md)。原夹具/故障入口拒绝 `sems-prod`；已授权的维护验证使用临时测试库与专用恢复流程。
 - 停止 EC2 会中断服务；实例计算费用停止后，EBS 等保留资源仍有费用。停机前完成备份并正常停库，恢复时先启动 server，再启动 worker，并验证节点、数据和入口。
 - 当前没有 EKS、RDS、NAT Gateway 或 ALB。PostgreSQL、应用与监控共享已有 EC2 的资源。
-- 旧 Lightsail 保留 SWE5006 和共享代理，SEMS 旧后端已停止写入；其旧数据库仅保留历史数据。不要把清理 SEMS 文档当作删除共享主机的依据。
+- 共享 Lightsail 仍承载 SWE5006 和代理，SEMS 旧后端已停止写入；旧数据库仅保留历史数据，不属于当前应用部署。
 
-实测结果按版本保存在[证据目录](evidence/README.md)，待办见[路线图](roadmap.md)。
+实测结果按版本保存在[证据目录](evidence/README.md)，部署取舍与架构限制见[架构决策](adr/0001-service-boundaries.md#部署与取舍)。

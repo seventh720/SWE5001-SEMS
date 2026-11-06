@@ -1,6 +1,6 @@
 # Development guide
 
-Local setup prerequisites and first startup are in the [README](../README.md#2-local-setup). This guide covers daily development, database access and migrations. Review and merge conventions are in [CONTRIBUTING](../CONTRIBUTING.md).
+Local setup prerequisites and first startup are in the [README](../README.md#local-setup). This guide covers daily development, database access and migrations. Review and merge conventions are in [CONTRIBUTING](../CONTRIBUTING.md).
 
 ## Local environment
 
@@ -17,7 +17,7 @@ PostgreSQL still listens on 5432 **inside** Docker. Keep service JDBC URLs point
 
 ### Frontend
 
-Start the full stack using the [local setup guide](../README.md#2-local-setup), then use another terminal:
+Start the full stack using the [local setup guide](../README.md#local-setup), then use another terminal:
 
 ```bash
 npm --prefix apps/web ci

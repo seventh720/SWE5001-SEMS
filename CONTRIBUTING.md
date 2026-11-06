@@ -1,6 +1,6 @@
 # Contributing
 
-Start from the [local setup guide](README.md#2-local-setup), then use the [development guide](docs/development.md) for frontend/backend rebuilds and database changes. Keep each change focused on one problem.
+Start from the [local setup guide](README.md#local-setup), then use the [development guide](docs/development.md) for frontend/backend rebuilds and database changes. Keep each change focused on one problem.
 
 ## Branches and review
 
