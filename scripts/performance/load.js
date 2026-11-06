@@ -11,10 +11,13 @@ const mode = __ENV.MODE || 'catalog';
 const vus = Number(__ENV.VUS || 25);
 const warmup = Number(__ENV.WARMUP_SECONDS || 60);
 const duration = Number(__ENV.DURATION_SECONDS || 600);
+const distribution = __ENV.EVENT_DISTRIBUTION || 'spread';
+const thinkSeconds = Number(__ENV.THINK_SECONDS ?? .1);
 const runId = __ENV.RUN_ID;
 if (!runId || !['catalog', 'booking'].includes(mode) ||
     !Number.isInteger(vus) || vus < 1 || vus > dataset.users.length || warmup < 1 || duration < 1 ||
-    !dataset.events.length || dataset.users.some(u => !u.token)) {
+    !dataset.events.length || dataset.users.some(u => !u.token) ||
+    !['spread', 'hot'].includes(distribution) || !Number.isFinite(thinkSeconds) || thinkSeconds < 0) {
   throw new Error('Require RUN_ID, valid dataset/target, MODE=catalog|booking and enough authenticated users for VUS');
 }
 const successful = new Counter('successful_requests');
@@ -42,7 +45,8 @@ export const options = {
 };
 function request(method, path, body, token, operation) {
   const res = http.request(method, base + path, body === null ? null : JSON.stringify(body), {
-    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    headers: { 'Content-Type': 'application/json', 'X-Benchmark-Run': runId,
+      'X-Benchmark-Phase': exec.scenario.name, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     tags: { name: operation, operation }, timeout: '15s',
   });
   const ok = res.status === 200;
@@ -64,7 +68,7 @@ export function setup() {
 export default function () {
   const index = (__VU - 1) % vus;
   const user = dataset.users[index];
-  const event = dataset.events[(__ITER * vus + index) % dataset.events.length];
+  const event = dataset.events[distribution === 'hot' ? 0 : (__ITER * vus + index) % dataset.events.length];
   if (mode === 'catalog') {
     // Fixed 80% filtered directory / 20% details mix, independent of random seeds.
     if (__ITER % 5 !== 4) request('GET', `/api/v1/events?keyword=${dataset.runId}&size=20&page=${__ITER % Math.ceil(dataset.events.length / 20)}`, null, null, 'list');
@@ -78,11 +82,12 @@ export default function () {
     }, user.token, 'book');
     if (res.status === 200) request('GET', `/api/v1/bookings/${res.json('id')}`, null, user.token, 'receipt');
   }
-  sleep(Number(__ENV.THINK_SECONDS || .1));
+  sleep(thinkSeconds);
 }
 export function handleSummary(data) {
   return { [__ENV.SUMMARY_FILE || 'summary.json']: JSON.stringify({
-    metadata: { runId, dataset: dataset.runId, mode, vus, warmup, duration, base,
+    metadata: { runId, dataset: dataset.runId, mode, vus, warmup, duration, base, distribution, thinkSeconds,
+      postgresCpuLimit: __ENV.POSTGRES_CPU_LIMIT || 'unrecorded',
       commit: __ENV.COMMIT || 'unrecorded', replicas: __ENV.REPLICAS || 'unrecorded',
       note: 'Read measurement-tagged metrics only; HTTP counts include setup and warmup. No HA claim.' },
     ...data,
