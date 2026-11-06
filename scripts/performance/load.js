@@ -56,6 +56,12 @@ function request(method, path, body, token, operation) {
   errors.add(!ok && !business, { operation });
   rejectedRate.add(business, { operation });
   latency.add(res.timings.duration, { operation });
+  if (ok && operation === 'book' && __ENV.BOOKING_ACK_LOG === 'true') {
+    const order = res.json();
+    console.log(JSON.stringify({ kind: 'booking-ack', scenario: exec.scenario.name,
+      bookingId: order.id, requestKey: body.requestKey, confirmed: order.status === 'CONFIRMED',
+      validSingleTicket: order.tickets?.length === 1 && order.tickets[0].state === 'VALID' }));
+  }
   if (ok) successful.add(1, { operation });
   if (business) rejected.add(1, { operation });
   return res;

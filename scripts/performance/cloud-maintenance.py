@@ -89,6 +89,17 @@ def gateway_config(original, token):
                         '        if ($sems_maintenance_allowed = 0) { return 503; }', 1)
 
 
+def business_traffic_counts(text, service):
+    if service != 'identity':
+        return shared.traffic_counts(text, 'catalog' if service == 'event-catalog' else 'booking')
+    counts = {}
+    for line in text.splitlines():
+        fields = line.split()
+        if len(fields) == 4 and fields[:2] == ['GET', '/api/v1/auth/me'] and fields[2].isdigit():
+            counts[fields[2]] = counts.get(fields[2], 0) + 1
+    return counts
+
+
 class Maintenance:
     def __init__(self, args):
         self.args = args
@@ -183,6 +194,21 @@ class Maintenance:
         validate_active(self.state, self.j('get', 'namespace', 'sems-prod'),
                         self.j('get', 'configmap', 'sems-database'),
                         self.j('get', 'pod', 'postgres-0'), self.j('get', 'pvc', 'data-postgres-0'))
+
+    def runtime_guard(self, expected=None):
+        expected = expected or database_urls(self.state['testDatabase'])
+        seen = set()
+        for pod in self.pods():
+            service = pod['metadata'].get('labels', {}).get('app.kubernetes.io/name')
+            if service not in BACKENDS or pod['metadata'].get('deletionTimestamp'):
+                continue
+            schema = 'catalog' if service == 'event-catalog' else service
+            value = self.k('exec', pod['metadata']['name'], '-c', service, '--', 'printenv', 'DB_URL').decode().strip()
+            if value != expected[schema.upper() + '_DB_URL']:
+                raise ValueError('Running backend database URL differs: ' + pod['metadata']['name'])
+            seen.add(service)
+        if seen != set(BACKENDS):
+            raise ValueError('All three running backend services must be verified')
 
     def scale(self, counts):
         for service, count in counts.items():
@@ -292,6 +318,7 @@ call(['rollout','status','deployment/gateway','--timeout=600s'])
             self.patch('deployment', name, [{'op': 'replace', 'path': '/spec', 'value': spec}])
         self.ready(self.state['originalReplicas'])
         self.guard()
+        self.runtime_guard()
         self.state['phase'] = 'test-database-ready'
         self.state_save()
         print(now(), 'Temporary test database ready; original database retained', flush=True)
@@ -393,6 +420,7 @@ call(['rollout','status','deployment/gateway','--timeout=600s'])
         self.scale(counts)
         self.ready(counts)
         time.sleep(7)
+        self.runtime_guard()
 
     def stop_load(self):
         if self.active and self.active.poll() is None:
@@ -481,16 +509,15 @@ call(['rollout','status','deployment/gateway','--timeout=600s'])
         audit = {'passed': shared.inventory_passed(rows, len(data['events'])), 'inventory': rows}
         save(target / 'inventory.json', audit)
         traffic = {}
-        if mode != 'mixed':
-            for pod, info in mapping.items():
-                if info['service'] == tested:
-                    raw = self.k('exec', pod, '--', 'sh', '-c', 'cat /tmp/sems-access/* 2>/dev/null').decode()
-                    traffic[pod] = shared.traffic_counts(raw, mode)
+        for pod, info in mapping.items():
+            if info['service'] in (BACKENDS if mode == 'mixed' else (tested,)):
+                raw = self.k('exec', pod, '--', 'sh', '-c', 'cat /tmp/sems-access/* 2>/dev/null').decode()
+                traffic[pod] = business_traffic_counts(raw, info['service'])
         save(target / 'traffic.json', traffic)
         result = {'name': name, 'mode': mode, 'vus': vus, 'counts': counts, 'duration': duration, 'warmup': warmup,
                   'loadExitCode': code, 'error': error, 'inventoryPassed': audit['passed'],
                   'gatewayCoveragePassed': evidence['measurementCoveragePassed'], 'serverGatePassed': evidence['serverGatePassed'],
-                  'eachReplicaServed': mode == 'mixed' or (len(traffic) == replicas and all(sum(x.values()) > 0 for x in traffic.values()))}
+                  'eachReplicaServed': len(traffic) == (sum(counts.values()) if mode == 'mixed' else replicas) and all(sum(x.values()) > 0 for x in traffic.values())}
         result['passed'] = code == 0 and error is None and all(result[k] for k in
             ('inventoryPassed', 'gatewayCoveragePassed', 'serverGatePassed', 'eachReplicaServed'))
         save(target / 'result.json', result)
@@ -506,6 +533,7 @@ call(['rollout','status','deployment/gateway','--timeout=600s'])
             return
         self.command(self.ssh + ['sudo -n /usr/bin/python3 ' + self.state['watchdogDirectory'] + '/restore.py'], timeout=2400)
         self.ready(self.state['originalReplicas'])
+        self.runtime_guard(self.state['configmaps']['sems-database']['data'])
         fingerprint = self.fingerprint()
         same = fingerprint == self.state['originalFingerprint']
         self.state['restoration'] = {'at': now(), 'originalTableFingerprintsMatch': same,

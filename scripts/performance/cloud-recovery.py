@@ -6,6 +6,7 @@ data stays in its own database, and the maintenance runner restores service.
 """
 import argparse
 import concurrent.futures
+from collections import Counter
 import datetime as dt
 import hashlib
 import importlib.util
@@ -67,6 +68,37 @@ def load_points(path):
             elif row['metric'] == 'unexpected_error_rate':
                 points.append({**point, 'durationMs': None, 'error': data['value']})
     return points
+
+
+def load_booking_acks(log_path, raw_path):
+    """Reconcile private acknowledged IDs against k6's successful-book counters."""
+    acknowledgements, counted = [], Counter()
+    with log_path.open() as stream:
+        for line in stream:
+            try:
+                outer = json.loads(line)
+                value = json.loads(outer['msg']) if outer.get('source') == 'console' else {}
+            except (ValueError, KeyError, TypeError):
+                continue
+            if value.get('kind') != 'booking-ack':
+                continue
+            if value.get('confirmed') is not True or value.get('validSingleTicket') is not True:
+                raise ValueError('A successful booking response did not confirm one valid ticket')
+            acknowledgements.append({'id': str(uuid.UUID(value['bookingId'])),
+                                     'key': str(uuid.UUID(value['requestKey'])), 'scenario': value['scenario']})
+    with raw_path.open() as stream:
+        for line in stream:
+            if 'successful_requests' not in line:
+                continue
+            value = json.loads(line)
+            tags = value.get('data', {}).get('tags', {})
+            if value.get('type') == 'Point' and value['metric'] == 'successful_requests' and tags.get('operation') == 'book':
+                counted[tags['scenario']] += value['data']['value']
+    logged = Counter(a['scenario'] for a in acknowledgements)
+    complete = (logged == counted and len({a['id'] for a in acknowledgements}) == len(acknowledgements)
+                and len({a['key'] for a in acknowledgements}) == len(acknowledgements)
+                and set(logged) <= {'warmup', 'measurement'})
+    return acknowledgements, {'loggedByScenario': dict(logged), 'successfulBooksByScenario': dict(counted), 'passed': complete}
 
 
 class Recovery(m.Maintenance):
@@ -214,16 +246,18 @@ class Recovery(m.Maintenance):
         values = {'DATASET': '/input/dataset.json', 'MODE': mode, 'VUS': '25', 'RUN_ID': run,
                   'WARMUP_SECONDS': '10', 'DURATION_SECONDS': '150', 'THINK_SECONDS': '.1',
                   'SUMMARY_FILE': '/out/summary.json', 'SEMS_MAINTENANCE_TOKEN': self.state['maintenanceToken'],
+                  'BOOKING_ACK_LOG': 'true',
                   'COMMIT': '5e9081a9f5421fa5bdbd965d750641f3666dd5f3', 'REPLICAS': json.dumps(counts)}
         command = ['docker', 'run', '--rm', '--pull', 'never', '--name', self.load_name, '--cpus=2', '--memory=1g',
                    '-v', str(Path(__file__).parent) + ':/src:ro', '-v', str(self.out / 'dataset.json') + ':/input/dataset.json:ro',
                    '-v', str(target) + ':/out']
         for key, value in values.items():
             command += ['-e', key + '=' + value]
-        command += ['grafana/k6:1.3.0', 'run', '--quiet', '--out', 'json=/out/raw.json', '/src/load.js']
+        command += ['grafana/k6:1.3.0', 'run', '--quiet', '--log-format=json', '--out', 'json=/out/raw.json', '/src/load.js']
         threads = [threading.Thread(target=probe, args=(i,)) for i in range(3)]
         fault_at, replacement_at, previous, invalid, exit_code = None, None, None, None, None
         traffic_before_fault = {}
+        committed_before_fault = []
         started = time.monotonic()
         print(m.now(), 'Running failure trial', service, flush=True)
         try:
@@ -247,6 +281,10 @@ class Recovery(m.Maintenance):
                         m.save(target / 'traffic-before-fault.json', traffic_before_fault)
                         if len(traffic_before_fault) != 2 or not all(sum(v.values()) > 0 for v in traffic_before_fault.values()):
                             raise RuntimeError('Both replicas must serve business traffic before the fault')
+                        committed_before_fault = json.loads(self.sql(
+                            "SELECT coalesce(json_agg(id::text),'[]'::json) FROM admission.bookings WHERE status='CONFIRMED'",
+                            self.state['testDatabase']))
+                        m.save(target / 'committed-before-fault.json', {'at': m.now(), 'ids': committed_before_fault})
                         fault_at = time.time()
                         self.k('delete', 'pod', victim['metadata']['name'], '--grace-period=0', '--force', '--wait=false')
                     elif fault_at is not None and replacement_at is None:
@@ -270,13 +308,21 @@ class Recovery(m.Maintenance):
             replacement_at = time.time()  # Upper bound after the final readiness wait.
         m.save(target / 'probe-operations.json', probes)
         m.save(target / 'probe-attempts.json', {'requestKeysAndUsers': attempts, 'acknowledgedIdsAndKeys': committed, 'failures': failures})
+        acknowledgements, ack_coverage = load_booking_acks(target / 'load.log', target / 'raw.json')
+        m.save(target / 'acknowledgement-coverage.json', ack_coverage)
         keys = ','.join("'" + str(uuid.UUID(k)) + "'" for k in attempts)
+        before_ids = ','.join("'" + str(uuid.UUID(k)) + "'" for k in set(committed_before_fault) | {a['id'] for a in acknowledgements})
+        predicates = (["request_key IN (" + keys + ")"] if keys else []) + (["id IN (" + before_ids + ")"] if before_ids else [])
         rows = json.loads(self.sql("SELECT coalesce(json_agg(row_to_json(x)),'[]'::json) FROM "
-            "(SELECT id,user_id,request_key,status FROM admission.bookings WHERE request_key IN (" + keys + ')) x', self.state['testDatabase'])) if keys else []
+            "(SELECT id,user_id,request_key,status FROM admission.bookings WHERE " + ' OR '.join(predicates) + ') x',
+            self.state['testDatabase'])) if predicates else []
         persisted = {r['id'] for r in rows}
         if any(r['status'] != 'CONFIRMED' for r in rows):
             failures.append('a recovery probe booking lost its confirmed state')
         lost = sorted(set(committed) - persisted)
+        lost_before_fault = sorted(set(committed_before_fault) - persisted)
+        persisted_keys = {r['id']: r['request_key'] for r in rows if r['status'] == 'CONFIRMED'}
+        lost_background = sum(persisted_keys.get(a['id']) != a['key'] for a in acknowledgements)
         duplicates = len(rows) - len({(r['user_id'], r['request_key']) for r in rows})
         inventory = json.loads(self.sql(m.shared.inventory_query(data), self.state['testDatabase']))
         audit_ok = m.shared.inventory_passed(inventory, len(data['events']))
@@ -303,12 +349,15 @@ class Recovery(m.Maintenance):
                   'businessHealthyWindowStartSeconds': rto, 'probeHealthyWindowStartSeconds': probe_rto,
                   'healthyWindowSeconds': 30, 'acknowledgedProbeBookings': len(committed), 'lostAcknowledgedBookings': len(lost),
                   'duplicateProbeBookings': duplicates, 'probeConsistencyFailures': failures, 'inventoryPassed': audit_ok,
+                  'observedCommittedBookingsBeforeFault': len(committed_before_fault), 'lostBeforeFaultBookings': len(lost_before_fault),
+                  'acknowledgedBackgroundBookings': len(acknowledgements), 'lostBackgroundBookings': lost_background,
+                  'backgroundAcknowledgementCoveragePassed': ack_coverage['passed'],
                   'gatewayMeasurementCoveragePassed': evidence['measurementCoveragePassed'],
                   'measurementUnexpectedErrors': sum(errors), 'measurementRequests': len(errors),
                   'probeUnexpectedErrors': sum(p['error'] for p in probes),
                   'bothReplicasServedBeforeFault': len(traffic_before_fault) == 2 and all(sum(v.values()) > 0 for v in traffic_before_fault.values()),
                   'invalidReason': invalid, 'note': 'Single controlled Pod-failure sample; transient errors and masked upstream retries are retained. Not host or database HA.'}
-        result['passed'] = invalid is None and exit_code in (0, 99) and rto is not None and rto <= 60 and probe_rto is not None and probe_rto <= 60 and not lost and not duplicates and not failures and audit_ok and evidence['measurementCoveragePassed']
+        result['passed'] = invalid is None and exit_code in (0, 99) and rto is not None and rto <= 60 and probe_rto is not None and probe_rto <= 60 and not lost and not lost_before_fault and not lost_background and ack_coverage['passed'] and not duplicates and not failures and audit_ok and evidence['measurementCoveragePassed']
         m.save(target / 'result.json', result)
         self.state['trials'].append(result); self.state_save()
         print(m.now(), 'Completed failure trial', json.dumps(result), flush=True)

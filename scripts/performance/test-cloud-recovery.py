@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import importlib.util
+import json
 from pathlib import Path
+import tempfile
 import unittest
 
 spec = importlib.util.spec_from_file_location('recovery', Path(__file__).with_name('cloud-recovery.py'))
@@ -9,6 +11,37 @@ spec.loader.exec_module(m)
 
 
 class BusinessRecoveryTest(unittest.TestCase):
+    def test_missing_background_booking_ack_cannot_claim_retention(self):
+        with tempfile.TemporaryDirectory() as directory:
+            log, raw = Path(directory) / 'load.log', Path(directory) / 'raw.json'
+            ack = {'kind': 'booking-ack', 'scenario': 'measurement',
+                   'confirmed': True, 'validSingleTicket': True,
+                   'bookingId': '00000000-0000-0000-0000-000000000001',
+                   'requestKey': '00000000-0000-0000-0000-000000000002'}
+            log.write_text('k6 status text\n' + json.dumps({'source': 'console', 'msg': json.dumps(ack)}) + '\n')
+            point = {'type': 'Point', 'metric': 'successful_requests', 'data': {
+                'value': 1, 'tags': {'operation': 'book', 'scenario': 'measurement'}}}
+            raw.write_text(json.dumps(point) + '\n')
+            self.assertTrue(m.load_booking_acks(log, raw)[1]['passed'])
+            raw.write_text((json.dumps(point) + '\n') * 2)
+            self.assertFalse(m.load_booking_acks(log, raw)[1]['passed'])
+
+    def test_running_pod_database_url_is_checked_in_addition_to_configmap(self):
+        driver = object.__new__(m.Recovery)
+        driver.state = {'testDatabase': 'sems_validation_abcdef123456'}
+        driver.pods = lambda: [{'metadata': {'name': service, 'labels': {'app.kubernetes.io/name': service}}}
+                               for service in m.m.BACKENDS]
+        urls = m.m.database_urls(driver.state['testDatabase'])
+        def actual(*args):
+            service = args[1]
+            schema = 'catalog' if service == 'event-catalog' else service
+            return urls[schema.upper() + '_DB_URL'].encode()
+        driver.k = actual
+        driver.runtime_guard()
+        driver.k = lambda *args: b'jdbc:postgresql://postgres:5432/sems?currentSchema=admission' if args[1] == 'admission' else actual(*args)
+        with self.assertRaises(ValueError):
+            driver.runtime_guard()
+
     def test_seeded_snapshot_cannot_select_a_different_host_or_small_dataset(self):
         state = {'baselineSha256': 'matched'}
         data = {'baseUrl': m.m.BASE, 'users': [None] * 1000, 'events': [None] * 100}

@@ -13,6 +13,12 @@ spec.loader.exec_module(m)
 
 
 class BoundaryTest(unittest.TestCase):
+    def test_replica_traffic_requires_business_requests(self):
+        self.assertEqual(m.business_traffic_counts('GET /actuator/health 200 10\n', 'identity'), {})
+        self.assertEqual(m.business_traffic_counts('GET /api/v1/auth/me 200 10\n', 'identity'), {'200': 1})
+        self.assertEqual(m.business_traffic_counts('GET /api/v1/events 200 10\n', 'event-catalog'), {'200': 1})
+        self.assertEqual(m.business_traffic_counts('POST /api/v1/bookings 200 10\n', 'admission'), {'200': 1})
+
     def test_original_and_arbitrary_database_names_are_rejected(self):
         for database in ('sems', 'postgres', 'sems_validation_', 'sems_validation_abcdef123456; DROP DATABASE sems',
                          'sems_validation_ABCDEF123456'):
