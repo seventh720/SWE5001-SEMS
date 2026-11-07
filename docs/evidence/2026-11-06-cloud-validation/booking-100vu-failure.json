@@ -1,0 +1,13 @@
+{
+  "serverErrors": 16,
+  "status": 504,
+  "servicePort": 8080,
+  "routePattern": "GET /internal/v1/events/{eventId}/published",
+  "firstFailureAt": "2026-11-06T15:25:56+00:00",
+  "lastFailureAt": "2026-11-06T15:25:56+00:00",
+  "measurementFirstResponseAt": "2026-11-06T15:26:50.829355+00:00",
+  "allFailuresBeforeFirstMeasurementResponse": true,
+  "clientMeasurementErrors": 0,
+  "strictServerGatePassed": false,
+  "classification": "Warmup internal read timeouts retained as a failed trial; the steady client SLO alone did not pass the complete gate."
+}

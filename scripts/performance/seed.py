@@ -14,6 +14,9 @@ import uuid
 
 def call(base, method, path, body=None, token=None):
     headers = {'Content-Type': 'application/json'}
+    maintenance = os.environ.get('SEMS_MAINTENANCE_TOKEN')
+    if maintenance:
+        headers['X-SEMS-Maintenance-Token'] = maintenance
     if token:
         headers['Authorization'] = 'Bearer ' + token
     request = urllib.request.Request(base + path, method=method, headers=headers,

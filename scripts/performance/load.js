@@ -46,7 +46,9 @@ export const options = {
 function request(method, path, body, token, operation) {
   const res = http.request(method, base + path, body === null ? null : JSON.stringify(body), {
     headers: { 'Content-Type': 'application/json', 'X-Benchmark-Run': runId,
-      'X-Benchmark-Phase': exec.scenario.name, ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      'X-Benchmark-Phase': exec.scenario.name,
+      ...(__ENV.SEMS_MAINTENANCE_TOKEN ? { 'X-SEMS-Maintenance-Token': __ENV.SEMS_MAINTENANCE_TOKEN } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     tags: { name: operation, operation }, timeout: '15s',
   });
   const ok = res.status === 200;
@@ -54,6 +56,12 @@ function request(method, path, body, token, operation) {
   errors.add(!ok && !business, { operation });
   rejectedRate.add(business, { operation });
   latency.add(res.timings.duration, { operation });
+  if (ok && operation === 'book' && __ENV.BOOKING_ACK_LOG === 'true') {
+    const order = res.json();
+    console.log(JSON.stringify({ kind: 'booking-ack', scenario: exec.scenario.name,
+      bookingId: order.id, requestKey: body.requestKey, confirmed: order.status === 'CONFIRMED',
+      validSingleTicket: order.tickets?.length === 1 && order.tickets[0].state === 'VALID' }));
+  }
   if (ok) successful.add(1, { operation });
   if (business) rejected.add(1, { operation });
   return res;
@@ -61,7 +69,8 @@ function request(method, path, body, token, operation) {
 export function setup() {
   // Validate tokens against Identity before measuring. Fail clearly rather than benchmark 401s.
   for (let i = 0; i < vus; i++) {
-    const res = http.get(`${base}/api/v1/auth/me`, { headers: { Authorization: `Bearer ${dataset.users[i].token}` } });
+    const res = http.get(`${base}/api/v1/auth/me`, { headers: { Authorization: `Bearer ${dataset.users[i].token}`,
+      ...(__ENV.SEMS_MAINTENANCE_TOKEN ? { 'X-SEMS-Maintenance-Token': __ENV.SEMS_MAINTENANCE_TOKEN } : {}) } });
     if (res.status !== 200) throw new Error('Expired or invalid dataset tokens; run seed.py --refresh');
   }
 }

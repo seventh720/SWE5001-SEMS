@@ -1,6 +1,6 @@
 # 测试覆盖与适用范围
 
-测试入口以 [CI workflow](../.github/workflows/ci.yml) 为准，最新结果见 [GitHub Actions](https://github.com/seventh720/SWE5001-SEMS/actions/workflows/ci.yml)。长期实测材料按日期和版本保存在[证据目录](evidence/README.md)。本文说明各类检查覆盖什么，不累计逐次 PR 的测试数。
+测试入口以 [CI workflow](../.github/workflows/ci.yml) 为准，结果见 [GitHub Actions](https://github.com/seventh720/SWE5001-SEMS/actions/workflows/ci.yml)。长期实测材料按日期和版本保存在[证据目录](evidence/README.md)。
 
 ## 自动检查
 
@@ -13,7 +13,7 @@
 | 运行镜像 | 扫描过的同一批镜像启动、数据库初始化、API smoke 与库存审计 | 高负载或故障域级可靠性 |
 | K3s / 生产只读 | 实际镜像、副本/节点、HTTPS、登录、内部接口拒绝、指标、日志及三服务追踪 | 生产故障注入或全部写业务的本轮复测 |
 
-Catalog 客户端回归覆盖 502/503/504 后成功、最多两次尝试、404/409 不重试、只读 details POST 重试及 prepare-sales 写操作不重放。冷启动验收继续要求订票、同键重放和当前回执无失败，并验证全部 Catalog 停止后的有界 503 和恢复后的唯一订单。
+Catalog 客户端回归覆盖 502/503/504 后成功、最多两次尝试、404/409 不重试、只读 details POST 重试及 prepare-sales 写操作不重放。冷启动验收核对订票、同键重放和回执，验证全部 Catalog 停止后的有界 503 和恢复后的唯一订单。
 
 ## 业务与故障验收
 
@@ -37,6 +37,6 @@ python3 scripts/ci/coverage.py frontend
 python3 scripts/ci/coverage.py backend
 ```
 
-## 待补验证
+## 验证边界
 
-自动 OpenAPI 符合性、数据库/API 路径的独立覆盖采集、当前 K3s 容量与扩容收益、十分钟稳态、主机/数据库故障以及完整灾难恢复尚未完成。优先级见[工程待办](roadmap.md)。
+单元覆盖率不包含真实 API/数据库路径，自动 OpenAPI 符合性校验未接入。主机或数据库故障、完整灾难恢复及跨设备扫码成功率不在已测范围。K3s 的[十分钟混合稳态与扩容对照](evidence/2026-11-06-cloud-validation/README.md)每个条件仅一次样本，Admission 100 VU 双副本未执行。

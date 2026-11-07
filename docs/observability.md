@@ -6,7 +6,7 @@
 
 直接打开 <https://grafana.seventh720.com/d/sems-operations>，使用现有 Grafana 账号登录。用户名和密码保存在本机 `.secrets/observability/grafana-login.txt`。浏览器访问不依赖本机隧道，电脑关闭不会停止监控或 Telegram 通知。
 
-域名 `grafana` 在 Cloudflare 使用 DNS only 的 A 记录，当前指向 `13.229.121.219`。现有 Traefik 处理 HTTP → HTTPS 和 Let's Encrypt 自动证书；Grafana 使用正式 root URL、Secure/HttpOnly/SameSite 会话，保留账号登录并关闭匿名访问和自行注册。Grafana 自身 `/metrics` 也有单独的 Basic Auth 保护，复用现有管理员 Secret。Prometheus、Loki、Tempo、Alertmanager、OTLP 和数据库继续通过 ClusterIP 在内部访问。
+域名 `grafana` 在 Cloudflare 使用 DNS only 的 A 记录，指向 server `18.141.228.205`。Traefik 处理 HTTP → HTTPS 和 Let's Encrypt 自动证书；Grafana 使用正式 root URL、Secure/HttpOnly/SameSite 会话，保留账号登录并关闭匿名访问和自行注册。Grafana 自身 `/metrics` 也有单独的 Basic Auth 保护，复用管理员 Secret。Prometheus、Loki、Tempo、Alertmanager、OTLP 和数据库通过 ClusterIP 在内部访问。
 
 需要诊断集群内部 API 时，仍可执行 `python3 scripts/observability/access.py` 创建本机 HTTP 转发；API 验证可使用 Basic Auth，浏览器登录使用上述正式 HTTPS 地址。该转发仅绑定本机，退出终端后关闭。
 

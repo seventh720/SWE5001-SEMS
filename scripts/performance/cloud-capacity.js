@@ -15,11 +15,14 @@ const config = new SharedArray('config', () => {
 const vus = Number(__ENV.VUS || 50);
 const hold = __ENV.HOLD || '30s';
 const holdSeconds = Number(hold.replace(/s$/, ''));
+const rampSeconds = Number(__ENV.RAMP_SECONDS || 30);
+const maxWrites = Number(__ENV.MAX_WRITES_PER_VU ?? 60); // Zero keeps writes active for the whole hold.
 const mode = __ENV.MODE || 'read';
 const run = __ENV.RUN_ID;
 if (!run || !['read', 'mixed', 'contention'].includes(mode) ||
     !Number.isInteger(vus) || vus < 1 || vus > users.length || !events.length ||
-    !/^\d+s$/.test(hold) || holdSeconds < 1 ||
+    !/^\d+s$/.test(hold) || holdSeconds < 1 || !Number.isInteger(rampSeconds) || rampSeconds < 1 ||
+    !Number.isInteger(maxWrites) || maxWrites < 0 ||
     (mode === 'contention' && !config.hot)) throw new Error('Invalid run, mode or fixtures');
 const errors = new Rate('unexpected_failure');
 const created = new Counter('bookings_created');
@@ -31,7 +34,7 @@ export const options = {
     load: mode === 'contention'
       ? { executor: 'per-vu-iterations', vus, iterations: 1, maxDuration: '60s', gracefulStop: '10s' }
       : { executor: 'ramping-vus', startVUs: 0, stages: [
-        { target: vus, duration: '30s' }, { target: vus, duration: hold },
+        { target: vus, duration: `${rampSeconds}s` }, { target: vus, duration: hold },
       ], gracefulRampDown: '10s', gracefulStop: '10s' },
   },
   thresholds: {
@@ -41,6 +44,7 @@ export const options = {
     ...(mode === 'contention' ? {} : {
       'http_req_duration{phase:hold}': ['p(95)<3000'],
       'unexpected_failure{phase:hold}': ['rate<0.01'],
+      'http_reqs{phase:hold}': ['count>0'],
       ...Object.fromEntries(operations.flatMap(name => [
         [`http_req_duration{name:${name},phase:hold}`, ['p(95)<3000']],
         [`http_reqs{name:${name},phase:hold}`, ['count>0']],
@@ -52,9 +56,11 @@ export const options = {
 
 function request(method, path, name, account, data, predicate, expected = [200]) {
   const elapsed = (Date.now() - execution.scenario.startTime) / 1000;
-  const phase = mode === 'contention' ? 'hold' : elapsed < 30 ? 'ramp' : elapsed < 30 + holdSeconds ? 'hold' : 'drain';
+  const phase = mode === 'contention' ? 'hold' : elapsed < rampSeconds ? 'ramp' : elapsed < rampSeconds + holdSeconds ? 'hold' : 'drain';
   const response = http.request(method, config.base + path, data == null ? null : JSON.stringify(data), {
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${account.token}` },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${account.token}`,
+      'X-Benchmark-Run': run, 'X-Benchmark-Phase': phase === 'hold' ? 'measurement' : phase,
+      ...(__ENV.SEMS_MAINTENANCE_TOKEN ? { 'X-SEMS-Maintenance-Token': __ENV.SEMS_MAINTENANCE_TOKEN } : {}) },
     tags: { name, phase, mode, target_vus: String(vus) }, timeout: '8s',
     responseCallback: http.expectedStatuses(...expected),
   });
@@ -78,7 +84,7 @@ export default function () {
     request('GET', '/api/v1/auth/me', 'me', user, null, x => x.id === user.id);
     request('GET', '/api/v1/bookings?page=0&size=10', 'orders', user, null, x => Array.isArray(x.items));
   }
-  if (mode === 'contention' || (mode === 'mixed' && __ITER % 5 === 0 && __ITER < 300)) {
+  if (mode === 'contention' || (mode === 'mixed' && __ITER % 5 === 0 && (maxWrites === 0 || __ITER < maxWrites * 5))) {
     const key = crypto.sha256(`${run}-${mode}-${vus}-${__VU}-${__ITER}`, 'hex');
     const booking = request('POST', '/api/v1/bookings', 'book', user, {
       eventId: event.eventId, ticketTypeId: event.ticketTypeId, quantity: 1,

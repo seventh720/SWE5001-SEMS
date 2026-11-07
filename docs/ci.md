@@ -33,7 +33,7 @@
 
 ## 本地运行
 
-先按 [README](../README.md#2-local-setup)构建并启动独立测试栈。测试项目需要独立的凭据、数据卷、网络和主机端口；仅改 Compose project name 无法覆盖显式命名的资源。
+先按 [README](../README.md#local-setup)构建并启动独立测试栈。测试项目需要独立的凭据、数据卷、网络和主机端口；仅改 Compose project name 无法覆盖显式命名的资源。
 
 ```bash
 mvn verify

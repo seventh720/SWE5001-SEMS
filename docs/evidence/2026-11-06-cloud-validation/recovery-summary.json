@@ -1,0 +1,125 @@
+{
+  "sourceHashes": {
+    "recordedAt": "2026-11-06T15:49:50.827433+00:00",
+    "applicationCommit": "5e9081a9f5421fa5bdbd965d750641f3666dd5f3",
+    "harnessCommit": "2083b0fae6721ae0e61b4e8c3dc5e9619c329576",
+    "sha256": {
+      "cloud-maintenance.py": "201933ba7ccde356a576c20c221df4b58391ba7a38999b6c69e1d8180561c4ec",
+      "cloud-recovery.py": "5b26ba14c12fb69c83804a176543ac2794b91111bf634b65bc6b0ad1c6ba49d6",
+      "load.js": "85b792f8314b15f2840007af190af6c4b69735ed14df072b5f2c0d83138704c0",
+      "seed.py": "224e3e16dbac65de701508072abf0b352cefcf5e4180284997c14079bb7abc68",
+      "k8s-experiment.py": "ec56e79da9d01b71a72cf224f841fa069fd77ed6adfb2bbcdd00281f3847e3a0"
+    }
+  },
+  "localVerification": {
+    "offlineTestsPassed": 36,
+    "k6SyntaxAndOptionsPassed": true,
+    "clockCheck": {
+      "hostEpochBefore": 1793980451.444528,
+      "hostEpochAfter": 1793980451.688996,
+      "dockerEpochInteger": 1793980451,
+      "withinOneSecondResolution": true
+    }
+  },
+  "executionStatus": "recovery-complete",
+  "executionError": null,
+  "capturedAt": "2026-11-06T15:49:56.548105+00:00",
+  "restoration": {
+    "at": "2026-11-06T16:08:50.444089+00:00",
+    "originalTableFingerprintsMatch": true,
+    "tables": 27,
+    "originalReplicasReady": true,
+    "databaseConnectionConfigRestored": true,
+    "databasePodAndPvcUnchanged": true,
+    "temporaryDatabaseRemoved": true
+  },
+  "trials": [
+    {
+      "requests": 100,
+      "availablePlaces": 10,
+      "successfulBookings": 10,
+      "soldOutResponses": 90,
+      "validResponses": true,
+      "distinctAcknowledgedBookings": 10,
+      "inventory": [
+        {
+          "id": "b70e980c-7164-4f99-8fbf-584b091168f4",
+          "quota": 10,
+          "reserved": 10,
+          "confirmed": 10,
+          "tickets": 10
+        }
+      ],
+      "trafficByAdmissionPod": {
+        "admission-7b969cb988-pfl2c": {
+          "409": 47
+        },
+        "admission-7b969cb988-zq4fg": {
+          "200": 10,
+          "409": 43
+        }
+      },
+      "passed": true
+    },
+    {
+      "service": "event-catalog",
+      "loadVUs": 25,
+      "additionalBookingWorkers": 3,
+      "loadExitCode": 0,
+      "faultAtEpoch": 1793980776.114829,
+      "replacementReadySeconds": 72.2301938533783,
+      "businessHealthyWindowStartSeconds": 0,
+      "probeHealthyWindowStartSeconds": 0,
+      "healthyWindowSeconds": 30,
+      "acknowledgedProbeBookings": 850,
+      "lostAcknowledgedBookings": 0,
+      "duplicateProbeBookings": 0,
+      "probeConsistencyFailures": [],
+      "inventoryPassed": true,
+      "observedCommittedBookingsBeforeFault": 139,
+      "lostBeforeFaultBookings": 0,
+      "acknowledgedBackgroundBookings": 0,
+      "lostBackgroundBookings": 0,
+      "backgroundAcknowledgementCoveragePassed": true,
+      "gatewayMeasurementCoveragePassed": true,
+      "measurementUnexpectedErrors": 0,
+      "measurementRequests": 21705,
+      "probeUnexpectedErrors": 0,
+      "bothReplicasServedBeforeFault": true,
+      "invalidReason": null,
+      "note": "Single controlled Pod-failure sample; transient errors and masked upstream retries are retained. Not host or database HA.",
+      "passed": true
+    },
+    {
+      "service": "admission",
+      "loadVUs": 25,
+      "additionalBookingWorkers": 3,
+      "loadExitCode": 0,
+      "faultAtEpoch": 1793981046.0640872,
+      "replacementReadySeconds": 61.249021768569946,
+      "businessHealthyWindowStartSeconds": 0,
+      "probeHealthyWindowStartSeconds": 0,
+      "healthyWindowSeconds": 30,
+      "acknowledgedProbeBookings": 549,
+      "lostAcknowledgedBookings": 0,
+      "duplicateProbeBookings": 0,
+      "probeConsistencyFailures": [],
+      "inventoryPassed": true,
+      "observedCommittedBookingsBeforeFault": 1083,
+      "lostBeforeFaultBookings": 0,
+      "acknowledgedBackgroundBookings": 8598,
+      "lostBackgroundBookings": 0,
+      "backgroundAcknowledgementCoveragePassed": true,
+      "gatewayMeasurementCoveragePassed": true,
+      "measurementUnexpectedErrors": 3,
+      "measurementRequests": 16847,
+      "probeUnexpectedErrors": 0,
+      "bothReplicasServedBeforeFault": true,
+      "invalidReason": null,
+      "note": "Single controlled Pod-failure sample; transient errors and masked upstream retries are retained. Not host or database HA.",
+      "passed": true
+    }
+  ],
+  "notExecuted": [],
+  "scope": "One controlled Pod deletion per tested service at 25 VU plus three booking/replay/receipt workers. No node or database failure."
+}
