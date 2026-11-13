@@ -65,7 +65,7 @@ npm --prefix apps/web run build
 | One/two-replica comparisons | Catalog at 25/50/100 VU and Admission at 25/50 VU |
 | Separate Catalog and Admission Pod failures | Business recovery target met; no acknowledged bookings lost |
 
-Each cloud condition has one sample. Admission at 100 VU with one replica recorded 16 internal 504s during warmup and failed the server-side check; the paired two-replica trial was not run. Parameters, transient errors and data audits are in the [cloud validation record](docs/evidence/2026-11-06-cloud-validation/README.md). [Test coverage](docs/test-coverage.md) and the [acceptance matrix](docs/acceptance-matrix.md) describe the verification scope.
+Each cloud condition has one sample. Admission at 100 VU with one replica recorded 16 internal 504s during warmup and failed the server-side check; the paired two-replica trial was not run. Measured parameters and outcomes are summarized in the [cloud validation record](docs/evidence/2026-11-06-cloud-validation/README.md). [Test coverage](docs/test-coverage.md) and the [acceptance matrix](docs/acceptance-matrix.md) describe the verification scope.
 
 ## Deployment and documentation
 

@@ -55,7 +55,7 @@ My profile 支持用户名及多份有名称的联系人；报名时手动选择
 
 已有环境的组织升级必须按[维护迁移说明](organization-upgrade.md)执行；通知迁移见[通知说明](in-app-notifications.md)。镜像回滚不撤销数据库迁移。
 
-验收入口与运行限制见 [CI](ci.md)。保留所有 `scripts/*acceptance.py`：较新的脚本会复用旧脚本，它们是可执行回归资产。历史实测保留在 `docs/evidence/`，不等同于当前版本或云环境的重新验收。
+验收入口与运行限制见 [CI](ci.md)。保留所有 `scripts/*acceptance.py`：较新的脚本会复用旧脚本，它们是可执行回归资产。`docs/evidence/` 保留结果摘要，完整历史实测随报告离线归档，不等同于当前版本或云环境的重新验收。
 
 ## 会话、安全与列表规模
 

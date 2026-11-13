@@ -1,34 +1,43 @@
-# 验收证据
+# 验证结果与证据保存
 
-原始记录按测试日期、版本和环境保留。它们用于复核已执行的检查；部署方式见 [K3s 运维](../k3s.md)。首次失败、补测和最终结果均保留，不能把旧环境的容量或覆盖率作为当前版本成绩。
+仓库保留验证结果摘要、对应版本和结论边界。完整测试记录随项目报告离线交付，原始日志、JSON、截图、CI ZIP、数据库备份和报告文件不再提交到当前文件树。
 
-## 部署与运行
+## CI 验证基线
 
-| 证据 | 范围 |
+[main run 42192164894](https://github.com/seventh720/SWE5001-SEMS/actions/runs/42192164894)于 2026-11-06 验证应用提交 `5e9081a9f5421fa5bdbd965d750641f3666dd5f3`。以下数字属于该次运行；新提交的执行状态见 [GitHub Actions](https://github.com/seventh720/SWE5001-SEMS/actions/workflows/ci.yml)。
+
+| 检查 | 记录结果 |
 | --- | --- |
-| [本地 Kubernetes](2026-10-24-kubernetes-local/README.md) | 独立 kind、业务并发和数据库隔离 |
-| [K3s 节点与网络](2026-10-24-k3s-bootstrap/README.md) | 两台 EC2、控制平面、跨节点通信与入口 |
-| [自建 PostgreSQL](2026-10-24-k3s-postgres/README.md) | 账号/schema/网络隔离、持久化和临时库恢复 |
-| [应用与 HTTPS](2026-10-24-k3s-application/README.md) | 双节点应用、可信 TLS 和独立副本操作 |
-| [K3s 完整业务回归](2026-10-24-k3s-regression/README.md) | API、跨节点并发、Catalog 故障、库存审计及浏览器 |
-| [发布与回退](2026-10-25-k3s-cd/README.md) | SSM/OIDC 发布、失败候选拒绝及兼容镜像回退 |
-| [原数据切换](2026-10-25-k3s-cutover/README.md) | 27 张表、账号/JWT、域名、证书和共享主机保护 |
-| [可观测性](2026-10-25-observability/README.md) | 指标、日志、三服务追踪、Telegram 及 Grafana HTTPS |
-| [生产 namespace](2026-10-25-production-namespace/README.md) | 数据卷重新绑定、数据/凭据一致及监控迁移 |
+| 后端单元/组件 | 92 项通过：Identity 32、Catalog 35、Admission 25；失败、错误、跳过均为 0 |
+| 后端 JaCoCo | 加权行覆盖率 320/1260（25.40%），分支 200/1020（19.61%） |
+| 前端 | 27 个文件、141 项测试通过；TypeScript 检查和 Vite 构建通过 |
+| 前端 V8 | 行 1084/1197（90.55%）；语句 1668/1976（84.41%）；函数 462/617（74.87%）；分支 1351/1708（79.09%） |
+| API / PostgreSQL | schema 隔离和 15 个业务验收入口完成；入口会复用前置套件，不按脚本数汇总独立断言 |
+| Lint | ESLint、Checkstyle、actionlint 和 shell 语法检查通过 |
+| SAST | Semgrep 扫描 169 个文件，发现与扫描错误均为 0 |
+| 依赖、secrets 与镜像 | 记录策略下源码/实际 JAR 和七个候选镜像无报告的 HIGH/CRITICAL 问题；限定例外见[安全说明](../security.md) |
+| 发布 | OIDC/SSM 发布及镜像、跨节点副本、HTTPS、登录/JWT、内部接口拒绝检查通过；数据库 Pod/PVC 未变 |
 
-最新应用验证、镜像锁和发布结果从 [GitHub Actions](https://github.com/seventh720/SWE5001-SEMS/actions/workflows/ci.yml) 的对应运行与 artifacts 查阅。仓库内的历史部署记录不随新发布改写。
+后端覆盖率仅来自该次 JaCoCo 单元/组件运行，真实 API/数据库验收不计入这些百分比。扫描结果属于当时的依赖、扫描库和例外集合。当前生产运行镜像不能仅凭历史候选镜像扫描推定为相同版本。
 
-## 业务与质量
+## 云端与历史验证
 
-- [组织模型升级](2026-10-15-organization-upgrade/verification.md)、[组织治理](2026-10-17-organization-governance/verification.md)、[组织管理](2026-10-20-organization-management/verification.md)。
-- [业务通知](2026-10-16-notifications/verification.md)、[成员通知](2026-10-17-membership-notifications/verification.md)。
-- [整场取消](2026-10-17-event-cancellation/verification.md)、[发布前协议修正](2026-10-17-predeployment-fixes/verification.md)、[业务回归](2026-10-19-business-fixes/verification.md)。
-- [历史覆盖率分子与分母](2026-10-19-coverage-review/summary.json)、[交付工具验证](2026-10-19-delivery-tooling/summary.json)。
+[2026-11-06 云端验证摘要](2026-11-06-cloud-validation/README.md)保留十分钟混合负载、五组完整副本对照、预热失败、库存竞争、单 Pod 故障与恢复检查的结果。
 
-## 性能
+历史记录在离线包中按原日期和环境保存：
 
-[2026-11-06 开始的现有云资源验证](2026-11-06-cloud-validation/README.md)记录当前 K3s 的 100 VU 十分钟混合负载、Catalog/Admission 的单轮副本对照、100 VU 单副本预热失败、100 人抢 10 名额、两个服务各一次 Pod 故障及维护后原库/网站恢复检查。没有新增云实例；测试使用现有 PostgreSQL 内的临时逻辑数据库。结果不构成最大容量、线性扩容或主机/数据库 HA 证明。
+| 日期 | 验证范围与保留的边界 |
+| --- | --- |
+| 2026-10-15 至 20 | 组织模型、权限、通知、取消、治理和旧库升级验收 |
+| 2026-10-22 | 当时 Lightsail 容量实验保留内部 504 失败；500/1000 VU 未执行，不作为当前 K3s 成绩 |
+| 2026-10-24 | 本地 kind、双节点 K3s、PostgreSQL、HTTPS、跨节点业务及浏览器回归；初次运行器失败和补测结果分别保留 |
+| 2026-10-25 | 自动发布与兼容镜像回退、27 表原数据切换、监控和生产 namespace 验证；初次失败、修正和最终结果保留 |
+| 2026-10-25 至 26 | 本地副本、热点和数据库 CPU 对照；单节点 kind 的结果不替代云端容量结论 |
 
-[2026-10-22 容量实验](2026-10-22-cloud-capacity/README.md)记录当时的测试版本、50 活动/1000 账号、已执行档位、内部 504 失败和清理情况。该轮未执行 500/1000 VU，不用于证明当前 K3s 的容量或扩容收益。新的实验方法见[性能与扩容实验](../performance-and-availability.md)。
+## 保存与复核
 
-凭据、JWT、票凭证、数据库 dump 和私有数据集不进入本目录。CI 短时 smoke、功能正确性、容量、扩容收益与恢复时间分别报告。
+本地 `.local-evidence/SEMS_Verification_Evidence_20261114.zip` 保存八份原始 CI 产物、带时间戳的测试输出摘录、逐轮云端结果、历史失败与补测记录、版本索引和 SHA-256 清单。报告 Appendix A 提供结果与文件位置的对应关系。解压后可在包根目录执行 `shasum -a 256 -c SHA256SUMS.txt` 核对完整性。
+
+GitHub Actions 一般报告保留七天，发布锁和部署结果保留三十天。需要长期复核的产物应在到期前下载到本地归档。`.local-evidence/`、`.performance/` 和 `reports/` 均由 Git 忽略；公开摘要不存放凭据、JWT、票凭证、私有数据集或数据库 dump。
+
+复现方法见[测试说明](../test-coverage.md)、[CI 操作](../ci.md)和[性能与扩容实验](../performance-and-availability.md)。历史结果保留各自版本，不随文档整理改写。

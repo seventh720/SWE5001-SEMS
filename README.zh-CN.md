@@ -65,7 +65,7 @@ npm --prefix apps/web run build
 | 单/双副本对照 | Catalog 25/50/100 VU、Admission 25/50 VU |
 | 分别删除 Catalog、Admission 一个 Pod | 业务恢复目标通过，已确认订单无丢失 |
 
-每个云端条件只有一次样本。Admission 100 VU 单副本在预热时出现 16 次内部 504，服务端检查未通过，该档双副本未执行。参数、瞬态错误和数据审计见[云端验证记录](docs/evidence/2026-11-06-cloud-validation/README.md)；各类验证范围见[测试说明](docs/test-coverage.md)和[验收矩阵](docs/acceptance-matrix.md)。
+每个云端条件只有一次样本。Admission 100 VU 单副本在预热时出现 16 次内部 504，服务端检查未通过，该档双副本未执行。参数和结果摘要见[云端验证记录](docs/evidence/2026-11-06-cloud-validation/README.md)；各类验证范围见[测试说明](docs/test-coverage.md)和[验收矩阵](docs/acceptance-matrix.md)。
 
 ## 部署与文档
 

@@ -26,3 +26,14 @@ lint-reports/
 # Local presentation decks, scripts, videos and raw captures
 presentation-recordings/
 presentation-content/
+
+# Local reports, offline verification archives and private recovery copies
+/reports/
+/.local-evidence/
+
+# Publish concise verification summaries only; keep raw records offline
+/docs/evidence/*
+!/docs/evidence/README.md
+!/docs/evidence/2026-11-06-cloud-validation/
+/docs/evidence/2026-11-06-cloud-validation/*
+!/docs/evidence/2026-11-06-cloud-validation/README.md

@@ -37,4 +37,4 @@ python3 scripts/migrate-organizations.py \
 
 旧版个人 owner 授权不能安全理解组织内部可见性、暂停/取消、CLOSING/DELETED 和分页 API。应用回退不撤销 Flyway，也不能在接收组织数据后直接运行旧二进制。按[发布回退](k3s-cd.md)核对 schema 与目标镜像；数据恢复需明确同步维护后的写入。
 
-`organization-migration-acceptance.py` 在独立测试栈核对映射、幂等重放和票券/库存；`organization-acceptance.py`、`organization-governance-acceptance.py` 和 `predeployment-fixes-acceptance.py` 覆盖组织授权、治理与关闭恢复。全部使用独立数据，原始结果见[验收证据](evidence/README.md)。
+`organization-migration-acceptance.py` 在独立测试栈核对映射、幂等重放和票券/库存；`organization-acceptance.py`、`organization-governance-acceptance.py` 和 `predeployment-fixes-acceptance.py` 覆盖组织授权、治理与关闭恢复。全部使用独立数据，结果摘要与离线归档方式见[验收说明](evidence/README.md)。
