@@ -92,7 +92,7 @@ Catalog 的受保护内部 diagnostics 和 Grafana 提供读取、Identity 依�
 
 ## 已有结果的边界
 
-[历史容量报告](evidence/2026-10-22-cloud-capacity/README.md)属于当时的 Lightsail 版本：250 VU 读取通过，混合负载出现内部 504，500/1000 VU 未执行。
+[历史容量报告](evidence/README.md)属于当时的 Lightsail 版本：250 VU 读取通过，混合负载出现内部 504，500/1000 VU 未执行。
 
 [2026-11-06 K3s 实测](evidence/2026-11-06-cloud-validation/README.md)使用 1000 账号、100 活动，100 VU 混合负载稳态十分钟通过，178959 次请求无客户端意外错误，最慢操作 p95 约 525 ms。Catalog 在 25/50/100 VU 的双副本吞吐收益分别约 2.3%/17.4%/51.7%；Admission 在 25/50 VU 约 5.8%/88.5%。Admission 100 VU 单副本的稳态客户端目标通过，但预热发生 16 次内部 504，严格服务端门禁未通过，因此停止剩余性能轮，未取得该档双副本对照。
 

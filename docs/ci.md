@@ -51,7 +51,7 @@ bash scripts/ci/lint.sh
 
 main 使用同次测试 JAR/web-dist 构建镜像，保存不可变 image lock，经 GitHub OIDC 换取 AWS 临时身份，再通过 SSM 调用发布器。应用 rollout、数据库备份和 HTTPS/登录检查通过后才推进成功指针。流程见 [K3s 发布与回退](k3s-cd.md)。
 
-一般报告和失败诊断保存七天，release-image-lock 保存三十天。单元/组件覆盖率与真实 API/数据库验收分别统计；缺失报告显示 N/A，当前没有覆盖率百分比门槛。发布材料和长期需要的实测数据应按[证据规范](evidence/README.md)保存。
+一般报告和失败诊断保存七天，release-image-lock 保存三十天。单元/组件覆盖率与真实 API/数据库验收分别统计；缺失报告显示 N/A，当前没有覆盖率百分比门槛。发布材料和长期需要的实测数据应按[证据保存说明](evidence/README.md)下载到本地离线归档，原始产物不提交到仓库。
 
 CI Telegram 使用 Actions secrets `TELEGRAM_TOKEN` 和 `TELEGRAM_TO`，与运行时 Alertmanager 的 Telegram Secret 分开。通知区分成功、失败、取消和跳过，也区分 PR 镜像验证与 main 发布；通知不是合并门禁。
 

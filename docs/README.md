@@ -36,4 +36,4 @@
 | [验收矩阵](acceptance-matrix.md) | 业务、架构与运行能力的验证范围及限制 |
 | [性能与扩容实验](performance-and-availability.md) | 负载场景、副本对照、恢复指标和判定方法 |
 | [云端验证结果](evidence/2026-11-06-cloud-validation/README.md) | 十分钟混合负载、扩容对照、并发库存、Pod 故障及数据恢复检查 |
-| [验收证据索引](evidence/README.md) | 按环境和版本保留的原始结果 |
+| [验证结果与归档](evidence/README.md) | 测试数量、覆盖率、版本和本地离线证据保存方式 |

@@ -119,4 +119,4 @@ sems_kubectl -n sems-prod port-forward --address 127.0.0.1 svc/postgres 15432:54
 - 当前没有 EKS、RDS、NAT Gateway 或 ALB。PostgreSQL、应用与监控共享已有 EC2 的资源。
 - 共享 Lightsail 仍承载 SWE5006 和代理，SEMS 旧后端已停止写入；旧数据库仅保留历史数据，不属于当前应用部署。
 
-实测结果按版本保存在[证据目录](evidence/README.md)，部署取舍与架构限制见[架构决策](adr/0001-service-boundaries.md#部署与取舍)。
+实测结果与离线归档方式见[验证摘要](evidence/README.md)，部署取舍与架构限制见[架构决策](adr/0001-service-boundaries.md#部署与取舍)。

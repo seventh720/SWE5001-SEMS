@@ -1,6 +1,6 @@
 # 测试覆盖与适用范围
 
-测试入口以 [CI workflow](../.github/workflows/ci.yml) 为准，结果见 [GitHub Actions](https://github.com/seventh720/SWE5001-SEMS/actions/workflows/ci.yml)。长期实测材料按日期和版本保存在[证据目录](evidence/README.md)。
+测试入口以 [CI workflow](../.github/workflows/ci.yml) 为准，结果见 [GitHub Actions](https://github.com/seventh720/SWE5001-SEMS/actions/workflows/ci.yml)。测量结果和版本见[验证摘要](evidence/README.md)，完整实测材料保存在本地离线证据包。
 
 ## 自动检查
 
@@ -19,7 +19,7 @@ Catalog 客户端回归覆盖 502/503/504 后成功、最多两次尝试、404/4
 
 [CI 操作](ci.md)列出脚本与执行环境。验收覆盖组织权限、发布/修订、公开/内部活动、通知、订单/票券、核销、取消、组织关闭、旧库迁移和中断恢复。并发库存以独立 SQL 结果核对，不能只检查 HTTP 状态。
 
-[跨节点 K3s 记录](evidence/2026-10-24-k3s-regression/README.md)包含两个 Admission Pod 的正确性、Catalog Pod 故障和浏览器闭环；[生产数据迁移](evidence/2026-10-25-production-namespace/README.md)比较全部 27 张表、角色及凭据。历史脚本在独立测试库中执行；当前生产 `sems-prod` 拒绝原夹具/故障入口。
+历史跨节点 K3s 验证覆盖两个 Admission Pod 的正确性、Catalog Pod 故障和浏览器闭环；生产数据迁移比较全部 27 张表、角色及凭据。结果摘要与离线记录位置见[验证索引](evidence/README.md)。历史脚本在独立测试库中执行；当前生产 `sems-prod` 拒绝原夹具/故障入口。
 
 浏览器检查与设备实测分开记录。已有桌面、390px 移动布局、报名/二维码/取消/通知及用户确认的手机扫码结果；没有测量所有设备识别率。
 
@@ -27,7 +27,7 @@ Catalog 客户端回归覆盖 502/503/504 后成功、最多两次尝试、404/4
 
 前端使用 Vitest V8；后端使用 JaCoCo，按服务和有效报告加权统计。真实 API/数据库验收不计入单元覆盖率。CI 缺失报告显示 N/A，当前没有百分比门槛；测试、类型检查、构建和安全失败仍阻断相应任务。
 
-历史百分比保留于[覆盖汇总](evidence/2026-10-19-coverage-review/summary.json)，不套用到当前版本。复现当前报告：
+已记录的测试数量与覆盖率分子、分母见[验证摘要](evidence/README.md)，不套用到后续版本。复现当前报告：
 
 ```bash
 npm --prefix apps/web run test:coverage
